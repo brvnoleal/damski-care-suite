@@ -136,7 +136,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="rounded-xl border border-gold/20 bg-card p-5 shadow-elegant">
+          <div className="rounded-xl border border-border bg-card p-5 shadow-elegant">
             <h3 className="text-sm font-semibold text-foreground mb-3">Próximos Agendamentos</h3>
             <div className="space-y-2.5">
               {[
@@ -145,7 +145,7 @@ const Dashboard = () => {
                 { time: "14:00", name: "Carla Dias", proc: "Lente de Contato Dental" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 text-sm">
-                  <span className="text-xs font-mono text-gold-dark font-semibold w-12">
+                  <span className="text-xs font-mono text-primary font-semibold w-12">
                     {item.time}
                   </span>
                   <div className="flex-1 min-w-0">

@@ -40,7 +40,7 @@ const Sessoes = () => {
             className="rounded-xl border border-border bg-card p-4 sm:p-5 shadow-elegant flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-10 h-10 rounded-lg gradient-burgundy flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shrink-0">
                 <span className="text-xs font-bold text-primary-foreground">
                   {s.patient.split(" ").map(n => n[0]).join("")}
                 </span>
@@ -48,7 +48,7 @@ const Sessoes = () => {
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-foreground truncate">{s.proc}</p>
                 <p className="text-xs text-muted-foreground">
-                  {s.patient} · <span className="font-mono text-gold-dark">{s.prontuario}</span>
+                  {s.patient} · <span className="font-mono text-primary">{s.prontuario}</span>
                 </p>
               </div>
             </div>
