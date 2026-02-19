@@ -12,14 +12,14 @@ interface StatCardProps {
 
 const variantStyles = {
   default: "bg-card border-border",
-  gold: "bg-card border-gold/30",
-  warning: "bg-card border-warning/30",
-  success: "bg-card border-success/30",
+  gold: "bg-card border-primary/20",
+  warning: "bg-card border-warning/20",
+  success: "bg-card border-success/20",
 };
 
 const iconStyles = {
   default: "bg-primary/10 text-primary",
-  gold: "bg-gold/10 text-gold-dark",
+  gold: "bg-primary/10 text-primary",
   warning: "bg-warning/10 text-warning",
   success: "bg-success/10 text-success",
 };
@@ -28,7 +28,7 @@ const StatCard = ({ title, value, subtitle, icon: Icon, trend, variant = "defaul
   <div className={cn("rounded-xl border p-5 shadow-elegant transition-all hover:shadow-lg", variantStyles[variant])}>
     <div className="flex items-start justify-between">
       <div className="space-y-1">
-        <p className="text-sm text-muted-foreground font-medium">{title}</p>
+        <p className="text-[13px] text-muted-foreground font-medium">{title}</p>
         <p className="text-2xl font-display font-bold text-foreground">{value}</p>
         {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
         {trend && (

@@ -40,7 +40,7 @@ const Pacientes = () => {
             Prontuário eletrônico conforme RDC 1.002/2025
           </p>
         </div>
-        <Button className="bg-primary text-primary-foreground hover:bg-burgundy-light gap-2">
+        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
           <Plus className="w-4 h-4" />
           Novo Paciente
         </Button>
@@ -81,7 +81,7 @@ const Pacientes = () => {
           <TableBody>
             {filtered.map((patient) => (
               <TableRow key={patient.id} className="hover:bg-muted/30 transition-colors">
-                <TableCell className="font-mono text-xs text-gold-dark font-semibold">
+                <TableCell className="font-mono text-xs text-primary font-semibold">
                   {patient.id}
                 </TableCell>
                 <TableCell className="font-medium">{patient.name}</TableCell>
