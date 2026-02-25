@@ -5,6 +5,7 @@ import {
   Users,
   FileText,
   Package,
+  DollarSign,
   Shield,
   Settings,
   Menu,
@@ -25,6 +26,7 @@ const navigation = [
   { name: "Pacientes", href: "/pacientes", icon: Users },
   { name: "Sessões", href: "/sessoes", icon: FileText },
   { name: "Insumos", href: "/insumos", icon: Package },
+  { name: "Financeiro", href: "/financeiro", icon: DollarSign },
   { name: "Fiscalização", href: "/fiscalizacao", icon: Shield },
   { name: "Configurações", href: "/configuracoes", icon: Settings },
 ];
