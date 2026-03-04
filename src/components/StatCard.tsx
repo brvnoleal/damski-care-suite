@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 interface StatCardProps {
   title: string;
@@ -28,8 +28,19 @@ const iconStyles = {
 };
 
 const StatCard = ({ title, value, subtitle, icon: Icon, trend, variant = "default", hoverContent }: StatCardProps) => {
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const [triggerWidth, setTriggerWidth] = useState<number>(0);
+
+  useEffect(() => {
+    if (!triggerRef.current || !hoverContent) return;
+    const update = () => setTriggerWidth(triggerRef.current?.offsetWidth ?? 0);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [hoverContent]);
+
   const card = (
-    <div className={cn("rounded-xl border p-5 shadow-elegant transition-all hover:shadow-lg cursor-default", variantStyles[variant])}>
+    <div ref={triggerRef} className={cn("rounded-xl border p-5 shadow-elegant transition-all hover:shadow-lg cursor-default", variantStyles[variant])}>
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <p className="text-[13px] text-muted-foreground font-medium">{title}</p>
@@ -53,7 +64,14 @@ const StatCard = ({ title, value, subtitle, icon: Icon, trend, variant = "defaul
   return (
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>{card}</HoverCardTrigger>
-      <HoverCardContent className="p-0 animate-fade-in" side="bottom" align="start" sideOffset={8} avoidCollisions={false} style={{ width: 'var(--radix-hover-card-trigger-width)' }}>
+      <HoverCardContent
+        className="p-0 animate-fade-in"
+        side="bottom"
+        align="start"
+        sideOffset={8}
+        avoidCollisions={false}
+        style={{ width: triggerWidth > 0 ? triggerWidth : undefined }}
+      >
         {hoverContent}
       </HoverCardContent>
     </HoverCard>
