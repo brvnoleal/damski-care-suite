@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useSyncExternalStore } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -15,9 +15,20 @@ import {
   LogOut,
   Bell,
   Search,
+  CheckCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { notificationStore } from "@/stores/notificationStore";
+import { formatDistanceToNow } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface AppLayoutProps {
   children: React.ReactNode;
