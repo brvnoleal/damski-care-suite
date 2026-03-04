@@ -50,7 +50,7 @@ const Dashboard = () => {
           <h2 className="text-lg font-display font-semibold text-foreground">
             Alertas e Notificações
           </h2>
-          <div className="space-y-3">
+          <div className="space-y-3 flex-1 overflow-y-auto max-h-[400px] pr-1">
             <AlertCard
               type="expiry"
               title="Ácido Hialurônico — Lote AH2024-089"
