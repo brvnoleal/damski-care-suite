@@ -19,77 +19,77 @@ const Dashboard = () => {
           title="Pacientes Ativos"
           value={148}
           icon={Users}
-          trend={{ value: "+12 este mês", positive: true }}
-        />
+          trend={{ value: "+12 este mês", positive: true }} />
+        
         <StatCard
           title="Sessões Hoje"
           value={8}
           subtitle="3 concluídas"
           icon={Calendar}
-          variant="gold"
-        />
+          variant="gold" />
+        
         <StatCard
           title="Pendentes de Assinatura"
           value={5}
           subtitle="Últimos 7 dias"
           icon={FileCheck}
-          variant="warning"
-        />
+          variant="warning" />
+        
         <StatCard
           title="Insumos Críticos"
           value={3}
           subtitle="Vencimento próximo"
           icon={Package}
-          variant="warning"
-        />
+          variant="warning" />
+        
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Alerts */}
-        <div className="space-y-4 flex flex-col">
-          <h2 className="text-lg font-display font-semibold text-foreground">
-            Alertas e Notificações
+        <div className="lg:col-span-2 space-y-4">
+          <h2 className="text-lg font-display font-semibold text-foreground">Alertas
+
           </h2>
-          <div className="space-y-3 flex-1 overflow-y-auto max-h-[400px] pr-1">
+          <div className="space-y-3">
             <AlertCard
               type="expiry"
               title="Ácido Hialurônico — Lote AH2024-089"
               description="Validade em 15 dias. 3 unidades em estoque."
-              time="Há 2h"
-            />
+              time="Há 2h" />
+            
             <AlertCard
               type="signature"
               title="Sessão #1247 — Maria Silva"
               description="Evolução de harmonização facial pendente de assinatura digital."
-              time="Há 4h"
-            />
+              time="Há 4h" />
+            
             <AlertCard
               type="compliance"
               title="Não conformidade — Prontuário #0892"
               description="TCLE não anexado. Bloqueio de finalização ativo."
-              time="Ontem"
-            />
+              time="Ontem" />
+            
             <AlertCard
               type="expiry"
               title="Toxina Botulínica — Lote TB2024-156"
               description="Validade em 22 dias. 8 unidades em estoque."
-              time="Ontem"
-            />
+              time="Ontem" />
+            
             <AlertCard
               type="signature"
               title="Sessão #1245 — João Oliveira"
               description="Procedimento de lente de contato dental pendente de assinatura."
-              time="2 dias"
-            />
+              time="2 dias" />
+            
           </div>
         </div>
 
-        {/* Conformidade */}
-        <div className="space-y-4 flex flex-col">
+        {/* Quick Info */}
+        <div className="space-y-4">
           <h2 className="text-lg font-display font-semibold text-foreground">
             Conformidade
           </h2>
-          <div className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-elegant flex-1">
+          <div className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-elegant">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
                 <Activity className="w-5 h-5 text-success" />
@@ -135,21 +135,16 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
-        </div>
 
-        {/* Próximos Agendamentos */}
-        <div className="space-y-4 flex flex-col">
-          <h2 className="text-lg font-display font-semibold text-foreground">
-            Próximos Agendamentos
-          </h2>
-          <div className="rounded-xl border border-border bg-card p-5 shadow-elegant flex-1">
+          <div className="rounded-xl border border-border bg-card p-5 shadow-elegant">
+            <h3 className="text-sm font-semibold text-foreground mb-3">Próximos Agendamentos</h3>
             <div className="space-y-2.5">
               {[
-                { time: "09:00", name: "Ana Costa", proc: "Toxina Botulínica" },
-                { time: "10:30", name: "Pedro Santos", proc: "Preenchimento Labial" },
-                { time: "14:00", name: "Carla Dias", proc: "Lente de Contato Dental" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 text-sm">
+              { time: "09:00", name: "Ana Costa", proc: "Toxina Botulínica" },
+              { time: "10:30", name: "Pedro Santos", proc: "Preenchimento Labial" },
+              { time: "14:00", name: "Carla Dias", proc: "Lente de Contato Dental" }].
+              map((item, i) =>
+              <div key={i} className="flex items-center gap-3 text-sm">
                   <span className="text-xs font-mono text-primary font-semibold w-12">
                     {item.time}
                   </span>
@@ -158,13 +153,13 @@ const Dashboard = () => {
                     <p className="text-xs text-muted-foreground">{item.proc}</p>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Dashboard;
