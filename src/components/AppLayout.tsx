@@ -50,6 +50,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
 
+  const notifications = useSyncExternalStore(
+    notificationStore.subscribe,
+    notificationStore.getAll
+  );
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
   return (
     <div className="min-h-screen flex bg-background">
       {/* Mobile overlay */}
