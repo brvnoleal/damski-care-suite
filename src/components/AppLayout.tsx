@@ -28,7 +28,7 @@ const navigation = [
   { name: "Pacientes", href: "/pacientes", icon: Users },
   { name: "Dentistas", href: "/dentistas", icon: UserCog },
   { name: "Agendamentos", href: "/agendamentos", icon: CalendarDays },
-  { name: "Sessões", href: "/sessoes", icon: FileText },
+  
   { name: "Insumos", href: "/insumos", icon: Package },
   { name: "Financeiro", href: "/financeiro", icon: DollarSign },
   { name: "Fiscalização", href: "/fiscalizacao", icon: Shield },
