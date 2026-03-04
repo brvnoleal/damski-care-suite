@@ -9,7 +9,7 @@ import Pacientes from "./pages/Pacientes";
 import PacienteDetalhe from "./pages/PacienteDetalhe";
 import Dentistas from "./pages/Dentistas";
 import Agendamentos from "./pages/Agendamentos";
-import Sessoes from "./pages/Sessoes";
+
 import Insumos from "./pages/Insumos";
 import Financeiro from "./pages/Financeiro";
 import Fiscalizacao from "./pages/Fiscalizacao";
