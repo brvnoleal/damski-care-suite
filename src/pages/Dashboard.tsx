@@ -49,7 +49,7 @@ const Dashboard = () => {
 
       {/* 3 colunas alinhadas e com mesmo tamanho */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-        <section className="rounded-xl border border-border bg-card p-5 shadow-elegant min-h-[460px] h-full flex flex-col">
+        <section className="rounded-xl border border-border bg-card p-4 shadow-elegant min-h-[320px] h-full flex flex-col">
           <h2 className="text-lg font-display font-semibold text-foreground mb-4">
             Alertas
           </h2>
@@ -87,7 +87,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-card p-5 shadow-elegant min-h-[460px] h-full flex flex-col">
+        <section className="rounded-xl border border-border bg-card p-4 shadow-elegant min-h-[320px] h-full flex flex-col">
           <h2 className="text-lg font-display font-semibold text-foreground mb-4">
             Conformidade
           </h2>
@@ -123,7 +123,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-card p-5 shadow-elegant min-h-[460px] h-full flex flex-col">
+        <section className="rounded-xl border border-border bg-card p-4 shadow-elegant min-h-[320px] h-full flex flex-col">
           <h3 className="text-lg font-display font-semibold text-foreground mb-4">
             Próximos Agendamentos
           </h3>
