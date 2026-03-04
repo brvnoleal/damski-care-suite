@@ -74,11 +74,11 @@ const moduleLabel: Record<NotificationModule, string> = {
 export const notificationStore = {
   subscribe(listener: Listener) {
     listeners.add(listener);
-    return () => listeners.delete(listener);
+    return () => { listeners.delete(listener); };
   },
 
-  getAll(): AppNotification[] {
-    return [...notifications];
+  getSnapshot(): AppNotification[] {
+    return notifications;
   },
 
   getUnreadCount(): number {

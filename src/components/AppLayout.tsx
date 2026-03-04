@@ -52,9 +52,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   const notifications = useSyncExternalStore(
     notificationStore.subscribe,
-    notificationStore.getAll
+    notificationStore.getSnapshot
   );
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadCount = notifications.filter((n: any) => !n.read).length;
 
   return (
     <div className="min-h-screen flex bg-background">
