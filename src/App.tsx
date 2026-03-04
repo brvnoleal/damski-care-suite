@@ -12,7 +12,7 @@ import Agendamentos from "./pages/Agendamentos";
 
 import Insumos from "./pages/Insumos";
 import Financeiro from "./pages/Financeiro";
-import Fiscalizacao from "./pages/Fiscalizacao";
+
 import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
 
