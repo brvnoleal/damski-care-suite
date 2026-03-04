@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
+  UserCog,
+  CalendarDays,
   FileText,
   Package,
   DollarSign,
@@ -24,6 +26,8 @@ interface AppLayoutProps {
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Pacientes", href: "/pacientes", icon: Users },
+  { name: "Dentistas", href: "/dentistas", icon: UserCog },
+  { name: "Agendamentos", href: "/agendamentos", icon: CalendarDays },
   { name: "Sessões", href: "/sessoes", icon: FileText },
   { name: "Insumos", href: "/insumos", icon: Package },
   { name: "Financeiro", href: "/financeiro", icon: DollarSign },

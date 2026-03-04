@@ -1,73 +1,204 @@
-# Welcome to your Lovable project
+# Damski Odonto — Sistema de Gestão Odontológica
 
-## Project info
+## 📋 Descrição
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Sistema SaaS de gestão para clínicas odontológicas, desenvolvido como **Projeto Integrador** de desenvolvimento web com banco de dados e controle de versão. O sistema contempla gerenciamento de pacientes, dentistas, agendamentos, insumos, financeiro e conformidade regulatória.
 
-## How can I edit this code?
+## 🎯 Objetivo
 
-There are several ways of editing your application.
+Fornecer uma solução completa para administração de clínicas odontológicas, com foco em:
+- Gerenciamento de prontuários eletrônicos
+- Controle de agendamentos e consultas
+- Rastreabilidade de insumos
+- Gestão financeira
+- Conformidade com regulamentações sanitárias
 
-**Use Lovable**
+## 🛠️ Tecnologias Utilizadas
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+| Tecnologia | Função |
+|---|---|
+| **React 18** | Biblioteca de UI (interface do usuário) |
+| **TypeScript** | Linguagem de programação com tipagem estática |
+| **Vite** | Bundler e servidor de desenvolvimento |
+| **Tailwind CSS** | Framework CSS utilitário para estilização |
+| **shadcn/ui** | Biblioteca de componentes (baseada em Radix UI) |
+| **React Router DOM** | Roteamento SPA (Single Page Application) |
+| **Recharts** | Visualização de dados e gráficos |
+| **PostgreSQL** | Banco de dados relacional (schema documentado) |
+| **Git / GitHub** | Controle de versão |
 
-Changes made via Lovable will be committed automatically to this repo.
+> **Nota:** Este projeto é uma SPA (Single Page Application) construída com React. Não utiliza framework full-stack (Next.js, Angular, etc.). O React atua como a camada de apresentação (View) da arquitetura.
 
-**Use your preferred IDE**
+## 🏗️ Arquitetura
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+O projeto segue uma **arquitetura em camadas** inspirada no padrão MVC:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```
+src/
+├── types/              # Camada de Modelo (Model) — Tipos TypeScript
+│   └── index.ts        # Interfaces: Paciente, Dentista, Agendamento, etc.
+│
+├── data/               # Camada de Dados — Mock data (substituível por API)
+│   ├── mockPacientes.ts
+│   ├── mockDentistas.ts
+│   └── mockAgendamentos.ts
+│
+├── services/           # Camada de Serviço (Controller) — Lógica de negócio
+│   ├── pacienteService.ts    # CRUD de Pacientes
+│   ├── dentistaService.ts    # CRUD de Dentistas
+│   └── agendamentoService.ts # CRUD de Agendamentos
+│
+├── pages/              # Camada de Visão (View) — Páginas/Telas
+│   ├── Dashboard.tsx
+│   ├── Pacientes.tsx         # CRUD completo
+│   ├── PacienteDetalhe.tsx
+│   ├── Dentistas.tsx         # CRUD completo
+│   ├── Agendamentos.tsx      # CRUD completo
+│   ├── Sessoes.tsx
+│   ├── Insumos.tsx
+│   ├── Financeiro.tsx
+│   ├── Fiscalizacao.tsx
+│   ├── Configuracoes.tsx
+│   └── NotFound.tsx
+│
+├── components/         # Componentes reutilizáveis
+│   ├── AppLayout.tsx         # Layout principal com sidebar
+│   ├── StatCard.tsx
+│   ├── AlertCard.tsx
+│   ├── NavLink.tsx
+│   └── ui/                   # Componentes shadcn/ui
+│
+├── hooks/              # Custom hooks
+├── lib/                # Utilitários
+├── App.tsx             # Roteamento principal
+├── main.tsx            # Entry point
+└── index.css           # Design system (tokens CSS)
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+docs/
+└── database/
+    ├── schema.sql      # Script SQL de criação das tabelas
+    └── DER.md          # Diagrama Entidade-Relacionamento
 ```
 
-**Edit a file directly in GitHub**
+## 🗄️ Modelagem do Banco de Dados
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Tabelas
 
-**Use GitHub Codespaces**
+| Tabela | Descrição | Chave Primária |
+|---|---|---|
+| `paciente` | Cadastro de pacientes | `id (UUID)` |
+| `dentista` | Cadastro de dentistas | `id (UUID)` |
+| `agendamento` | Agendamentos de consultas | `id (UUID)` |
+| `procedimento` | Catálogo de procedimentos | `id (UUID)` |
+| `pagamento` | Registros de pagamento | `id (UUID)` |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Relacionamentos
 
-## What technologies are used for this project?
+- **Paciente → Agendamento** (1:N) — Um paciente pode ter vários agendamentos
+- **Dentista → Agendamento** (1:N) — Um dentista pode ter vários agendamentos
+- **Agendamento → Pagamento** (1:N) — Um agendamento pode gerar vários pagamentos
 
-This project is built with:
+### Arquivos de Referência
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- Script SQL: [`docs/database/schema.sql`](docs/database/schema.sql)
+- Diagrama DER: [`docs/database/DER.md`](docs/database/DER.md)
 
-## How can I deploy this project?
+## ⚙️ Fluxo de Funcionamento
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+```
+Usuário → React Router → Página (View)
+                            ↓
+                      Service (Controller)
+                            ↓
+                      Data Layer (Model)
+                            ↓
+                      Mock Data / Banco PostgreSQL
+```
 
-## Can I connect a custom domain to my Lovable project?
+1. O usuário navega pelas rotas da aplicação
+2. A página correspondente é renderizada
+3. Operações CRUD chamam a camada de serviço
+4. A camada de serviço abstrai o acesso aos dados
+5. Atualmente usa dados mock; preparado para integração com PostgreSQL
 
-Yes, you can!
+## 🚀 Instalação e Execução
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Pré-requisitos
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- Node.js 18+ instalado ([instalar com nvm](https://github.com/nvm-sh/nvm))
+- npm ou bun como gerenciador de pacotes
+
+### Passos
+
+```bash
+# 1. Clonar o repositório
+git clone <URL_DO_REPOSITORIO>
+
+# 2. Acessar a pasta do projeto
+cd damski-odonto
+
+# 3. Instalar dependências
+npm install
+
+# 4. Iniciar o servidor de desenvolvimento
+npm run dev
+
+# 5. Acessar no navegador
+# http://localhost:5173
+```
+
+### Scripts Disponíveis
+
+| Script | Comando | Descrição |
+|---|---|---|
+| Desenvolvimento | `npm run dev` | Inicia servidor com hot-reload |
+| Build | `npm run build` | Gera build de produção |
+| Preview | `npm run preview` | Preview do build de produção |
+| Testes | `npm run test` | Executa testes automatizados |
+| Lint | `npm run lint` | Verifica qualidade do código |
+
+## 📱 Telas do Sistema
+
+| Tela | Rota | Funcionalidade |
+|---|---|---|
+| Dashboard | `/` | Visão geral com KPIs e alertas |
+| Pacientes | `/pacientes` | CRUD completo de pacientes |
+| Detalhe Paciente | `/pacientes/:id` | Prontuário detalhado |
+| Dentistas | `/dentistas` | CRUD completo de dentistas |
+| Agendamentos | `/agendamentos` | CRUD completo de agendamentos |
+| Sessões | `/sessoes` | Registro de evoluções clínicas |
+| Insumos | `/insumos` | Controle de estoque e validade |
+| Financeiro | `/financeiro` | Faturamento, despesas e gráficos |
+| Fiscalização | `/fiscalizacao` | Modo auditoria e conformidade |
+| Configurações | `/configuracoes` | Controle de acesso e segurança |
+
+## 🔀 Controle de Versão
+
+### Estratégia de Branches
+
+```
+main                    ← Branch principal (produção)
+├── feature/pacientes   ← CRUD de pacientes
+├── feature/dentistas   ← CRUD de dentistas
+├── feature/agendamentos← CRUD de agendamentos
+├── feature/financeiro  ← Módulo financeiro
+└── feature/docs        ← Documentação
+```
+
+### Convenção de Commits
+
+```
+feat: adiciona CRUD de pacientes
+feat: implementa página de dentistas
+feat: cria módulo de agendamentos
+docs: adiciona documentação acadêmica
+refactor: reorganiza arquitetura em camadas
+```
+
+## 👤 Autor
+
+**Projeto Integrador — Desenvolvimento Web**
+
+---
+
+*Sistema desenvolvido com [Lovable](https://lovable.dev) — Plataforma de desenvolvimento assistido por IA*
