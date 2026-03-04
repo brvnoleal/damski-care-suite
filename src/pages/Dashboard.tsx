@@ -85,7 +85,7 @@ const Dashboard = () => {
         </div>
 
         {/* Conformidade */}
-        <div className="space-y-4">
+        <div className="space-y-4 flex flex-col">
           <h2 className="text-lg font-display font-semibold text-foreground">
             Conformidade
           </h2>
