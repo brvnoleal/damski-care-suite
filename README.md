@@ -200,5 +200,3 @@ refactor: reorganiza arquitetura em camadas
 **Projeto Integrador — Desenvolvimento Web**
 
 ---
-
-*Sistema desenvolvido com [Lovable](https://lovable.dev) — Plataforma de desenvolvimento assistido por IA*
