@@ -143,6 +143,8 @@ const Dashboard = () => {
               { time: "09:00", name: "Ana Costa", proc: "Toxina Botulínica" },
               { time: "10:30", name: "Pedro Santos", proc: "Preenchimento Labial" },
               { time: "14:00", name: "Carla Dias", proc: "Lente de Contato Dental" },
+              { time: "15:30", name: "Lucas Mendes", proc: "Clareamento Dental" },
+              { time: "16:45", name: "Fernanda Lima", proc: "Harmonização Facial" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 text-sm">
                 <span className="text-xs font-mono text-primary font-semibold w-12">
