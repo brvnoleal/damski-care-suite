@@ -42,7 +42,7 @@ const navigation = [
   
   { name: "Insumos", href: "/insumos", icon: Package },
   { name: "Financeiro", href: "/financeiro", icon: DollarSign },
-  { name: "Fiscalização", href: "/fiscalizacao", icon: Shield },
+  
   { name: "Configurações", href: "/configuracoes", icon: Settings },
 ];
 
