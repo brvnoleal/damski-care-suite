@@ -87,7 +87,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-card p-5 shadow-elegant min-h-[460px] h-full flex flex-col">
+        <section className="rounded-xl border border-border bg-card p-4 shadow-elegant min-h-[320px] h-full flex flex-col">
           <h2 className="text-lg font-display font-semibold text-foreground mb-4">
             Conformidade
           </h2>
