@@ -132,7 +132,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-card p-5 shadow-elegant min-h-[460px] h-full flex flex-col">
+        <section className={`rounded-xl border border-border bg-card p-5 shadow-elegant ${sizeConfig[cardSize].minH} h-full flex flex-col transition-all duration-300`}>
           <h2 className="text-lg font-display font-semibold text-foreground mb-4">
             Conformidade
           </h2>
