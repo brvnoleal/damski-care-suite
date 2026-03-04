@@ -66,9 +66,31 @@ const Dashboard = () => {
         />
       </div>
 
+      {/* Size toggle */}
+      <div className="flex items-center justify-end gap-1">
+        <span className="text-xs text-muted-foreground mr-2">Visualização:</span>
+        {sizeOrder.map((size) => {
+          const Icon = sizeIcons[size];
+          return (
+            <button
+              key={size}
+              onClick={() => setCardSize(size)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                cardSize === size
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-accent"
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {sizeConfig[size].label}
+            </button>
+          );
+        })}
+      </div>
+
       {/* 3 colunas alinhadas e com mesmo tamanho */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-        <section className="rounded-xl border border-border bg-card p-5 shadow-elegant min-h-[460px] h-full flex flex-col">
+        <section className={`rounded-xl border border-border bg-card p-5 shadow-elegant ${sizeConfig[cardSize].minH} h-full flex flex-col transition-all duration-300`}>
           <h2 className="text-lg font-display font-semibold text-foreground mb-4">
             Alertas e Notificações
           </h2>
