@@ -89,7 +89,7 @@ const Dashboard = () => {
           <h2 className="text-lg font-display font-semibold text-foreground">
             Conformidade
           </h2>
-          <div className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-elegant">
+          <div className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-elegant flex-1">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
                 <Activity className="w-5 h-5 text-success" />
