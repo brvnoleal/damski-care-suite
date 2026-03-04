@@ -1,27 +1,8 @@
-import { useState } from "react";
-import { Users, Calendar, Package, FileCheck, Activity, Minimize2, Square, Maximize2 } from "lucide-react";
+import { Users, Calendar, Package, FileCheck, Activity } from "lucide-react";
 import StatCard from "@/components/StatCard";
 import AlertCard from "@/components/AlertCard";
 
-type CardSize = "compact" | "default" | "expanded";
-
-const sizeConfig: Record<CardSize, { minH: string; label: string }> = {
-  compact: { minH: "min-h-[300px]", label: "Compacto" },
-  default: { minH: "min-h-[460px]", label: "Padrão" },
-  expanded: { minH: "min-h-[620px]", label: "Expandido" },
-};
-
-const sizeIcons: Record<CardSize, typeof Minimize2> = {
-  compact: Minimize2,
-  default: Square,
-  expanded: Maximize2,
-};
-
-const sizeOrder: CardSize[] = ["compact", "default", "expanded"];
-
 const Dashboard = () => {
-  const [cardSize, setCardSize] = useState<CardSize>("default");
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -66,31 +47,9 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Size toggle */}
-      <div className="flex items-center justify-end gap-1">
-        <span className="text-xs text-muted-foreground mr-2">Visualização:</span>
-        {sizeOrder.map((size) => {
-          const Icon = sizeIcons[size];
-          return (
-            <button
-              key={size}
-              onClick={() => setCardSize(size)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                cardSize === size
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-accent"
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              {sizeConfig[size].label}
-            </button>
-          );
-        })}
-      </div>
-
       {/* 3 colunas alinhadas e com mesmo tamanho */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-        <section className={`rounded-xl border border-border bg-card p-5 shadow-elegant ${sizeConfig[cardSize].minH} h-full flex flex-col transition-all duration-300`}>
+        <section className="rounded-xl border border-border bg-card p-5 shadow-elegant min-h-[460px] h-full flex flex-col">
           <h2 className="text-lg font-display font-semibold text-foreground mb-4">
             Alertas e Notificações
           </h2>
@@ -132,7 +91,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className={`rounded-xl border border-border bg-card p-5 shadow-elegant ${sizeConfig[cardSize].minH} h-full flex flex-col transition-all duration-300`}>
+        <section className="rounded-xl border border-border bg-card p-5 shadow-elegant min-h-[460px] h-full flex flex-col">
           <h2 className="text-lg font-display font-semibold text-foreground mb-4">
             Conformidade
           </h2>
@@ -179,7 +138,7 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className={`rounded-xl border border-border bg-card p-5 shadow-elegant ${sizeConfig[cardSize].minH} h-full flex flex-col transition-all duration-300`}>
+        <section className="rounded-xl border border-border bg-card p-5 shadow-elegant min-h-[460px] h-full flex flex-col">
           <h3 className="text-lg font-display font-semibold text-foreground mb-4">
             Próximos Agendamentos
           </h3>
