@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Search, Plus, Filter, Eye, Edit, Trash2 } from "lucide-react";
+import { Search, Plus, Edit, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,62 +15,62 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Paciente } from "@/types";
-import { pacienteService } from "@/services/pacienteService";
+import { Dentista } from "@/types";
+import { dentistaService } from "@/services/dentistaService";
 
-const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
-  nome: "", cpf: "", telefone: "", email: "", data_nascimento: "", status: "ativo",
+const emptyDentista = (): Omit<Dentista, "id" | "created_at"> => ({
+  nome: "", especialidade: "", cro: "", telefone: "", email: "", status: "ativo",
 });
 
-const Pacientes = () => {
+const Dentistas = () => {
   const { toast } = useToast();
   const [search, setSearch] = useState("");
-  const [pacientes, setPacientes] = useState<Paciente[]>(pacienteService.listar());
+  const [dentistas, setDentistas] = useState<Dentista[]>(dentistaService.listar());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [form, setForm] = useState(emptyPaciente());
+  const [form, setForm] = useState(emptyDentista());
 
-  const filtered = pacientes.filter(
-    (p) =>
-      p.nome.toLowerCase().includes(search.toLowerCase()) ||
-      p.cpf.includes(search)
+  const filtered = dentistas.filter(
+    (d) =>
+      d.nome.toLowerCase().includes(search.toLowerCase()) ||
+      d.cro.toLowerCase().includes(search.toLowerCase())
   );
 
   const openCreate = () => {
     setEditingId(null);
-    setForm(emptyPaciente());
+    setForm(emptyDentista());
     setDialogOpen(true);
   };
 
-  const openEdit = (p: Paciente) => {
-    setEditingId(p.id);
-    setForm({ nome: p.nome, cpf: p.cpf, telefone: p.telefone, email: p.email, data_nascimento: p.data_nascimento, status: p.status });
+  const openEdit = (d: Dentista) => {
+    setEditingId(d.id);
+    setForm({ nome: d.nome, especialidade: d.especialidade, cro: d.cro, telefone: d.telefone || "", email: d.email || "", status: d.status });
     setDialogOpen(true);
   };
 
   const handleSave = () => {
-    if (!form.nome || !form.cpf || !form.data_nascimento) {
+    if (!form.nome || !form.cro || !form.especialidade) {
       toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
       return;
     }
     if (editingId) {
-      pacienteService.atualizar(editingId, form);
-      toast({ title: "Paciente atualizado com sucesso" });
+      dentistaService.atualizar(editingId, form);
+      toast({ title: "Dentista atualizado com sucesso" });
     } else {
-      pacienteService.criar(form);
-      toast({ title: "Paciente cadastrado com sucesso" });
+      dentistaService.criar(form);
+      toast({ title: "Dentista cadastrado com sucesso" });
     }
-    setPacientes(pacienteService.listar());
+    setDentistas(dentistaService.listar());
     setDialogOpen(false);
   };
 
   const handleDelete = () => {
     if (deletingId) {
-      pacienteService.excluir(deletingId);
-      setPacientes(pacienteService.listar());
-      toast({ title: "Paciente excluído" });
+      dentistaService.excluir(deletingId);
+      setDentistas(dentistaService.listar());
+      toast({ title: "Dentista excluído" });
     }
     setDeleteOpen(false);
     setDeletingId(null);
@@ -81,26 +80,22 @@ const Pacientes = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Pacientes</h1>
+          <h1 className="text-2xl font-bold text-foreground">Dentistas</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Cadastro e gerenciamento de pacientes — CRUD completo
+            Cadastro e gerenciamento do corpo clínico
           </p>
         </div>
         <Button onClick={openCreate} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
           <Plus className="w-4 h-4" />
-          Novo Paciente
+          Novo Dentista
         </Button>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Buscar por nome ou CPF..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          <Input placeholder="Buscar por nome ou CRO..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
-        <Button variant="outline" className="gap-2">
-          <Filter className="w-4 h-4" />
-          Filtros
-        </Button>
       </div>
 
       <div className="rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
@@ -108,34 +103,31 @@ const Pacientes = () => {
           <TableHeader>
             <TableRow className="bg-muted/50">
               <TableHead className="font-semibold">Nome</TableHead>
-              <TableHead className="font-semibold hidden md:table-cell">CPF</TableHead>
+              <TableHead className="font-semibold">CRO</TableHead>
+              <TableHead className="font-semibold hidden md:table-cell">Especialidade</TableHead>
               <TableHead className="font-semibold hidden lg:table-cell">Telefone</TableHead>
-              <TableHead className="font-semibold hidden sm:table-cell">Email</TableHead>
               <TableHead className="font-semibold">Status</TableHead>
               <TableHead className="font-semibold text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((p) => (
-              <TableRow key={p.id} className="hover:bg-muted/30 transition-colors">
-                <TableCell className="font-medium">{p.nome}</TableCell>
-                <TableCell className="text-muted-foreground hidden md:table-cell">{p.cpf}</TableCell>
-                <TableCell className="text-muted-foreground hidden lg:table-cell">{p.telefone}</TableCell>
-                <TableCell className="text-muted-foreground hidden sm:table-cell">{p.email}</TableCell>
+            {filtered.map((d) => (
+              <TableRow key={d.id} className="hover:bg-muted/30 transition-colors">
+                <TableCell className="font-medium">{d.nome}</TableCell>
+                <TableCell className="font-mono text-xs text-primary font-semibold">{d.cro}</TableCell>
+                <TableCell className="text-muted-foreground hidden md:table-cell">{d.especialidade}</TableCell>
+                <TableCell className="text-muted-foreground hidden lg:table-cell">{d.telefone}</TableCell>
                 <TableCell>
-                  <Badge className={p.status === "ativo" ? "bg-success/10 text-success border-success/20" : "bg-muted text-muted-foreground"}>
-                    {p.status}
+                  <Badge className={d.status === "ativo" ? "bg-success/10 text-success border-success/20" : "bg-muted text-muted-foreground"}>
+                    {d.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <Link to={`/pacientes/${p.id}`} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
-                      <Eye className="w-4 h-4" />
-                    </Link>
-                    <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                    <button onClick={() => openEdit(d)} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button onClick={() => { setDeletingId(p.id); setDeleteOpen(true); }} className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
+                    <button onClick={() => { setDeletingId(d.id); setDeleteOpen(true); }} className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -145,7 +137,7 @@ const Pacientes = () => {
             {filtered.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                  Nenhum paciente encontrado.
+                  Nenhum dentista encontrado.
                 </TableCell>
               </TableRow>
             )}
@@ -153,13 +145,12 @@ const Pacientes = () => {
         </Table>
       </div>
 
-      {/* Create / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editingId ? "Editar Paciente" : "Novo Paciente"}</DialogTitle>
+            <DialogTitle>{editingId ? "Editar Dentista" : "Novo Dentista"}</DialogTitle>
             <DialogDescription>
-              {editingId ? "Atualize os dados do paciente." : "Preencha os dados para cadastrar um novo paciente."}
+              {editingId ? "Atualize os dados do dentista." : "Preencha os dados para cadastrar um novo dentista."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
@@ -168,12 +159,12 @@ const Pacientes = () => {
               <Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Nome completo" />
             </div>
             <div>
-              <Label>CPF *</Label>
-              <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} placeholder="000.000.000-00" />
+              <Label>CRO *</Label>
+              <Input value={form.cro} onChange={(e) => setForm({ ...form, cro: e.target.value })} placeholder="CRO-XX 00000" />
             </div>
             <div>
-              <Label>Data de Nascimento *</Label>
-              <Input type="date" value={form.data_nascimento} onChange={(e) => setForm({ ...form, data_nascimento: e.target.value })} />
+              <Label>Especialidade *</Label>
+              <Input value={form.especialidade} onChange={(e) => setForm({ ...form, especialidade: e.target.value })} placeholder="Ex: Ortodontia" />
             </div>
             <div>
               <Label>Telefone</Label>
@@ -191,13 +182,12 @@ const Pacientes = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir Paciente</AlertDialogTitle>
+            <AlertDialogTitle>Excluir Dentista</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir este paciente? Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir este dentista? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -212,4 +202,4 @@ const Pacientes = () => {
   );
 };
 
-export default Pacientes;
+export default Dentistas;
