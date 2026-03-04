@@ -3,6 +3,7 @@ import { Search, Plus, Filter, AlertTriangle, CheckCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -11,8 +12,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
 
-const mockSupplies = [
+interface Supply {
+  name: string;
+  manufacturer: string;
+  lot: string;
+  expiry: string;
+  qty: number;
+  daysLeft: number;
+  usedBy: number;
+}
+
+const initialSupplies: Supply[] = [
   { name: "Ácido Hialurônico 20mg/ml", manufacturer: "Galderma", lot: "AH2024-089", expiry: "15/03/2026", qty: 3, daysLeft: 24, usedBy: 2 },
   { name: "Toxina Botulínica 100U", manufacturer: "Allergan", lot: "TB2024-156", expiry: "22/03/2026", qty: 8, daysLeft: 31, usedBy: 5 },
   { name: "Ácido Hialurônico 24mg/ml", manufacturer: "Galderma", lot: "AH2024-112", expiry: "10/06/2026", qty: 12, daysLeft: 111, usedBy: 0 },
@@ -27,13 +46,61 @@ const getExpiryStatus = (days: number) => {
   return { label: "OK", className: "bg-success/10 text-success border-success/20" };
 };
 
+const calcDaysLeft = (expiryDate: string): number => {
+  const [day, month, year] = expiryDate.split("/").map(Number);
+  const expiry = new Date(year, month - 1, day);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+};
+
 const Insumos = () => {
   const [search, setSearch] = useState("");
+  const [supplies, setSupplies] = useState<Supply[]>(initialSupplies);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [form, setForm] = useState({ name: "", manufacturer: "", lot: "", expiry: "", qty: "" });
 
-  const filtered = mockSupplies.filter((s) =>
+  const filtered = supplies.filter((s) =>
     s.name.toLowerCase().includes(search.toLowerCase()) ||
     s.lot.toLowerCase().includes(search.toLowerCase())
   );
+
+  const summaryStats = supplies.reduce(
+    (acc, s) => {
+      if (s.daysLeft <= 15) acc.critical++;
+      else if (s.daysLeft <= 30) acc.warning++;
+      else acc.ok++;
+      return acc;
+    },
+    { critical: 0, warning: 0, ok: 0 }
+  );
+
+  const handleSubmit = () => {
+    if (!form.name || !form.manufacturer || !form.lot || !form.expiry || !form.qty) {
+      toast({ title: "Preencha todos os campos", variant: "destructive" });
+      return;
+    }
+
+    // Convert date from yyyy-mm-dd to dd/mm/yyyy
+    const [y, m, d] = form.expiry.split("-");
+    const expiryFormatted = `${d}/${m}/${y}`;
+    const daysLeft = calcDaysLeft(expiryFormatted);
+
+    const newSupply: Supply = {
+      name: form.name,
+      manufacturer: form.manufacturer,
+      lot: form.lot,
+      expiry: expiryFormatted,
+      qty: parseInt(form.qty, 10),
+      daysLeft,
+      usedBy: 0,
+    };
+
+    setSupplies((prev) => [newSupply, ...prev]);
+    setForm({ name: "", manufacturer: "", lot: "", expiry: "", qty: "" });
+    setDialogOpen(false);
+    toast({ title: "Insumo cadastrado com sucesso!" });
+  };
 
   return (
     <div className="space-y-6">
@@ -44,7 +111,7 @@ const Insumos = () => {
             Rastreabilidade por lote conforme RDC 1.002/2025
           </p>
         </div>
-        <Button className="bg-primary text-primary-foreground hover:bg-burgundy-light gap-2">
+        <Button onClick={() => setDialogOpen(true)} className="bg-primary text-primary-foreground hover:bg-burgundy-light gap-2">
           <Plus className="w-4 h-4" />
           Cadastrar Insumo
         </Button>
@@ -55,21 +122,21 @@ const Insumos = () => {
         <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-destructive" />
           <div>
-            <p className="text-sm font-semibold text-foreground">2 Críticos</p>
+            <p className="text-sm font-semibold text-foreground">{summaryStats.critical} Crítico{summaryStats.critical !== 1 ? "s" : ""}</p>
             <p className="text-xs text-muted-foreground">Vencimento em até 15 dias</p>
           </div>
         </div>
         <div className="rounded-xl border border-warning/20 bg-warning/5 p-4 flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-warning" />
           <div>
-            <p className="text-sm font-semibold text-foreground">1 Atenção</p>
+            <p className="text-sm font-semibold text-foreground">{summaryStats.warning} Atenção</p>
             <p className="text-xs text-muted-foreground">Vencimento em até 30 dias</p>
           </div>
         </div>
         <div className="rounded-xl border border-success/20 bg-success/5 p-4 flex items-center gap-3">
           <CheckCircle className="w-5 h-5 text-success" />
           <div>
-            <p className="text-sm font-semibold text-foreground">3 Em dia</p>
+            <p className="text-sm font-semibold text-foreground">{summaryStats.ok} Em dia</p>
             <p className="text-xs text-muted-foreground">Validade superior a 30 dias</p>
           </div>
         </div>
@@ -127,6 +194,43 @@ const Insumos = () => {
           </TableBody>
         </Table>
       </div>
+
+      {/* Dialog de Cadastro */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Cadastrar Insumo</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="supply-name">Nome do Insumo</Label>
+              <Input id="supply-name" placeholder="Ex: Ácido Hialurônico 20mg/ml" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="supply-manufacturer">Fabricante</Label>
+              <Input id="supply-manufacturer" placeholder="Ex: Galderma" value={form.manufacturer} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="supply-lot">Lote</Label>
+                <Input id="supply-lot" placeholder="Ex: AH2024-089" value={form.lot} onChange={(e) => setForm({ ...form, lot: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="supply-qty">Quantidade</Label>
+                <Input id="supply-qty" type="number" min="1" placeholder="0" value={form.qty} onChange={(e) => setForm({ ...form, qty: e.target.value })} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="supply-expiry">Validade</Label>
+              <Input id="supply-expiry" type="date" value={form.expiry} onChange={(e) => setForm({ ...form, expiry: e.target.value })} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={handleSubmit}>Cadastrar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
