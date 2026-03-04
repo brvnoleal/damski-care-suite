@@ -51,7 +51,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
         <section className="rounded-xl border border-border bg-card p-5 shadow-elegant min-h-[460px] h-full flex flex-col">
           <h2 className="text-lg font-display font-semibold text-foreground mb-4">
-            Alertas e Notificações
+            Alertas
           </h2>
           <div className="space-y-3 flex-1 overflow-y-auto pr-1">
             <AlertCard
