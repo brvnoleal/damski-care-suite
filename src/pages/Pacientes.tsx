@@ -111,7 +111,7 @@ const Pacientes = () => {
               <TableHead className="font-semibold hidden md:table-cell">CPF</TableHead>
               <TableHead className="font-semibold hidden lg:table-cell">Telefone</TableHead>
               <TableHead className="font-semibold hidden sm:table-cell">Email</TableHead>
-              <TableHead className="font-semibold">Status</TableHead>
+              <TableHead className="font-semibold hidden sm:table-cell">Instagram</TableHead>
               <TableHead className="font-semibold text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -122,11 +122,7 @@ const Pacientes = () => {
                 <TableCell className="text-muted-foreground hidden md:table-cell">{p.cpf}</TableCell>
                 <TableCell className="text-muted-foreground hidden lg:table-cell">{p.telefone}</TableCell>
                 <TableCell className="text-muted-foreground hidden sm:table-cell">{p.email}</TableCell>
-                <TableCell>
-                  <Badge className={p.status === "ativo" ? "bg-success/10 text-success border-success/20" : "bg-muted text-muted-foreground"}>
-                    {p.status}
-                  </Badge>
-                </TableCell>
+                <TableCell className="text-muted-foreground hidden sm:table-cell">{p.instagram || "—"}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">
                     <Link to={`/pacientes/${p.id}`} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
