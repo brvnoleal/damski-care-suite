@@ -142,7 +142,7 @@ const Dashboard = () => {
           <h2 className="text-lg font-display font-semibold text-foreground">
             Próximos Agendamentos
           </h2>
-          <div className="rounded-xl border border-border bg-card p-5 shadow-elegant">
+          <div className="rounded-xl border border-border bg-card p-5 shadow-elegant flex-1">
             <div className="space-y-2.5">
               {[
                 { time: "09:00", name: "Ana Costa", proc: "Toxina Botulínica" },
