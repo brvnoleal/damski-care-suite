@@ -9,6 +9,7 @@ export interface Paciente {
   cpf: string;
   telefone: string;
   email: string;
+  instagram?: string;
   data_nascimento: string;
   status: "ativo" | "inativo";
   created_at?: string;

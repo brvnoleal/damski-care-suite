@@ -20,7 +20,7 @@ import { Paciente } from "@/types";
 import { pacienteService } from "@/services/pacienteService";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
-  nome: "", cpf: "", telefone: "", email: "", data_nascimento: "", status: "ativo",
+  nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo",
 });
 
 const Pacientes = () => {
@@ -47,7 +47,7 @@ const Pacientes = () => {
 
   const openEdit = (p: Paciente) => {
     setEditingId(p.id);
-    setForm({ nome: p.nome, cpf: p.cpf, telefone: p.telefone, email: p.email, data_nascimento: p.data_nascimento, status: p.status });
+    setForm({ nome: p.nome, cpf: p.cpf, telefone: p.telefone, email: p.email, instagram: p.instagram || "", data_nascimento: p.data_nascimento, status: p.status });
     setDialogOpen(true);
   };
 
@@ -111,7 +111,7 @@ const Pacientes = () => {
               <TableHead className="font-semibold hidden md:table-cell">CPF</TableHead>
               <TableHead className="font-semibold hidden lg:table-cell">Telefone</TableHead>
               <TableHead className="font-semibold hidden sm:table-cell">Email</TableHead>
-              <TableHead className="font-semibold">Status</TableHead>
+              <TableHead className="font-semibold hidden sm:table-cell">Instagram</TableHead>
               <TableHead className="font-semibold text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -122,11 +122,7 @@ const Pacientes = () => {
                 <TableCell className="text-muted-foreground hidden md:table-cell">{p.cpf}</TableCell>
                 <TableCell className="text-muted-foreground hidden lg:table-cell">{p.telefone}</TableCell>
                 <TableCell className="text-muted-foreground hidden sm:table-cell">{p.email}</TableCell>
-                <TableCell>
-                  <Badge className={p.status === "ativo" ? "bg-success/10 text-success border-success/20" : "bg-muted text-muted-foreground"}>
-                    {p.status}
-                  </Badge>
-                </TableCell>
+                <TableCell className="text-muted-foreground hidden sm:table-cell">{p.instagram || "—"}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">
                     <Link to={`/pacientes/${p.id}`} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
@@ -182,6 +178,10 @@ const Pacientes = () => {
             <div>
               <Label>Email</Label>
               <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@exemplo.com" />
+            </div>
+            <div>
+              <Label>Instagram</Label>
+              <Input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@usuario" />
             </div>
           </div>
           <DialogFooter>
