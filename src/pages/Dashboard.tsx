@@ -44,9 +44,9 @@ const Dashboard = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Alerts */}
-        <div className="space-y-4">
+        <div className="space-y-4 flex flex-col">
           <h2 className="text-lg font-display font-semibold text-foreground">
             Alertas e Notificações
           </h2>
