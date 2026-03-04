@@ -146,12 +146,69 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
           <div className="flex-1" />
 
-          <button className="relative text-muted-foreground hover:text-foreground transition-colors">
-            <Bell className="w-[18px] h-[18px]" />
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[10px] text-destructive-foreground flex items-center justify-center font-bold">
-              3
-            </span>
-          </button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="relative text-muted-foreground hover:text-foreground transition-colors">
+                <Bell className="w-[18px] h-[18px]" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[10px] text-destructive-foreground flex items-center justify-center font-bold">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <h3 className="text-sm font-semibold text-foreground">Notificações</h3>
+                {unreadCount > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-7 gap-1 text-muted-foreground"
+                    onClick={() => notificationStore.markAllRead()}
+                  >
+                    <CheckCheck className="w-3.5 h-3.5" />
+                    Marcar todas como lidas
+                  </Button>
+                )}
+              </div>
+              <ScrollArea className="max-h-80">
+                {notifications.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-8">Nenhuma notificação.</p>
+                ) : (
+                  notifications.slice(0, 20).map((n) => (
+                    <div
+                      key={n.id}
+                      className={cn(
+                        "px-4 py-3 border-b border-border last:border-0 cursor-pointer hover:bg-muted/30 transition-colors",
+                        !n.read && "bg-primary/5"
+                      )}
+                      onClick={() => notificationStore.markRead(n.id)}
+                    >
+                      <div className="flex items-start gap-2.5">
+                        <span className="text-sm mt-0.5">{notificationStore.getIcon(n.type)}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className={cn("text-sm truncate", !n.read ? "font-semibold text-foreground" : "text-foreground")}>
+                            {n.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.description}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                              {notificationStore.getModuleLabel(n.module)}
+                            </Badge>
+                            <span className="text-[10px] text-muted-foreground">
+                              {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true, locale: ptBR })}
+                            </span>
+                          </div>
+                        </div>
+                        {!n.read && <span className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
 
           <Badge variant="outline" className="text-[11px] font-medium hidden sm:flex">
             RDC 1.002/2025
