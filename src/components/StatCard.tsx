@@ -58,9 +58,6 @@ const StatCard = ({ title, value, subtitle, icon: Icon, trend, variant = "defaul
       </HoverCardContent>
     </HoverCard>
   );
-      </HoverCardContent>
-    </HoverCard>
-  );
 };
 
 export default StatCard;
