@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
+  UserCog,
+  CalendarDays,
   FileText,
   Package,
   DollarSign,
