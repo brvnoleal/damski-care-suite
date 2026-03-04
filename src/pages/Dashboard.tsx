@@ -46,7 +46,7 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Alerts */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="space-y-4">
           <h2 className="text-lg font-display font-semibold text-foreground">
             Alertas e Notificações
           </h2>
@@ -84,7 +84,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Quick Info */}
+        {/* Conformidade */}
         <div className="space-y-4">
           <h2 className="text-lg font-display font-semibold text-foreground">
             Conformidade
@@ -135,9 +135,14 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
+        </div>
 
+        {/* Próximos Agendamentos */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-display font-semibold text-foreground">
+            Próximos Agendamentos
+          </h2>
           <div className="rounded-xl border border-border bg-card p-5 shadow-elegant">
-            <h3 className="text-sm font-semibold text-foreground mb-3">Próximos Agendamentos</h3>
             <div className="space-y-2.5">
               {[
                 { time: "09:00", name: "Ana Costa", proc: "Toxina Botulínica" },
