@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
+import React from "react";
 
 interface StatCardProps {
   title: string;
@@ -8,6 +10,7 @@ interface StatCardProps {
   icon: LucideIcon;
   trend?: { value: string; positive: boolean };
   variant?: "default" | "gold" | "warning" | "success";
+  hoverContent?: React.ReactNode;
 }
 
 const variantStyles = {
@@ -24,24 +27,37 @@ const iconStyles = {
   success: "bg-success/10 text-success",
 };
 
-const StatCard = ({ title, value, subtitle, icon: Icon, trend, variant = "default" }: StatCardProps) => (
-  <div className={cn("rounded-xl border p-5 shadow-elegant transition-all hover:shadow-lg", variantStyles[variant])}>
-    <div className="flex items-start justify-between">
-      <div className="space-y-1">
-        <p className="text-[13px] text-muted-foreground font-medium">{title}</p>
-        <p className="text-2xl font-display font-bold text-foreground">{value}</p>
-        {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
-        {trend && (
-          <p className={cn("text-xs font-medium", trend.positive ? "text-success" : "text-destructive")}>
-            {trend.value}
-          </p>
-        )}
-      </div>
-      <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", iconStyles[variant])}>
-        <Icon className="w-5 h-5" />
+const StatCard = ({ title, value, subtitle, icon: Icon, trend, variant = "default", hoverContent }: StatCardProps) => {
+  const card = (
+    <div className={cn("rounded-xl border p-5 shadow-elegant transition-all hover:shadow-lg cursor-default", variantStyles[variant])}>
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
+          <p className="text-[13px] text-muted-foreground font-medium">{title}</p>
+          <p className="text-2xl font-display font-bold text-foreground">{value}</p>
+          {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+          {trend && (
+            <p className={cn("text-xs font-medium", trend.positive ? "text-success" : "text-destructive")}>
+              {trend.value}
+            </p>
+          )}
+        </div>
+        <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", iconStyles[variant])}>
+          <Icon className="w-5 h-5" />
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+
+  if (!hoverContent) return card;
+
+  return (
+    <HoverCard openDelay={200} closeDelay={100}>
+      <HoverCardTrigger asChild>{card}</HoverCardTrigger>
+      <HoverCardContent className="w-80 p-0" side="bottom" align="start">
+        {hoverContent}
+      </HoverCardContent>
+    </HoverCard>
+  );
+};
 
 export default StatCard;
