@@ -53,7 +53,7 @@ const StatCard = ({ title, value, subtitle, icon: Icon, trend, variant = "defaul
   return (
     <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>{card}</HoverCardTrigger>
-      <HoverCardContent className="w-80 p-0" side="bottom" align="start">
+      <HoverCardContent className="w-80 p-0 animate-fade-in" side="bottom" align="center" sideOffset={8}>
         {hoverContent}
       </HoverCardContent>
     </HoverCard>
