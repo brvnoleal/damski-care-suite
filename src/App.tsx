@@ -7,6 +7,8 @@ import AppLayout from "./components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Pacientes from "./pages/Pacientes";
 import PacienteDetalhe from "./pages/PacienteDetalhe";
+import Dentistas from "./pages/Dentistas";
+import Agendamentos from "./pages/Agendamentos";
 import Sessoes from "./pages/Sessoes";
 import Insumos from "./pages/Insumos";
 import Financeiro from "./pages/Financeiro";
@@ -31,6 +33,8 @@ const App = () => (
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/pacientes" element={<Pacientes />} />
                   <Route path="/pacientes/:id" element={<PacienteDetalhe />} />
+                  <Route path="/dentistas" element={<Dentistas />} />
+                  <Route path="/agendamentos" element={<Agendamentos />} />
                   <Route path="/sessoes" element={<Sessoes />} />
                   <Route path="/insumos" element={<Insumos />} />
                   <Route path="/financeiro" element={<Financeiro />} />
