@@ -92,7 +92,7 @@ const Dashboard = () => {
             Conformidade
           </h2>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
               <Activity className="w-5 h-5 text-success" />
             </div>
@@ -102,35 +102,24 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="space-y-3 mt-4 flex-1">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Prontuários completos</span>
-              <span className="font-medium text-foreground">94%</span>
-            </div>
-            <div className="w-full bg-muted rounded-full h-2">
-              <div className="bg-success rounded-full h-2" style={{ width: "94%" }} />
-            </div>
-
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Assinaturas em dia</span>
-              <span className="font-medium text-foreground">87%</span>
-            </div>
-            <div className="w-full bg-muted rounded-full h-2">
-              <div className="bg-warning rounded-full h-2" style={{ width: "87%" }} />
-            </div>
-
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Rastreabilidade de lotes</span>
-              <span className="font-medium text-foreground">100%</span>
-            </div>
-            <div className="w-full bg-muted rounded-full h-2">
-              <div className="bg-success rounded-full h-2" style={{ width: "100%" }} />
-            </div>
-          </div>
-
-          <div className="pt-3 border-t border-border">
-            <p className="text-xs text-muted-foreground">Último backup: hoje às 03:00</p>
-            <p className="text-xs text-muted-foreground">Logs de auditoria: 1.247 registros</p>
+          <div className="space-y-4 flex-1 overflow-hidden">
+            {[
+              { label: "Prontuários completos", value: "94%", width: "94%", color: "bg-success" },
+              { label: "Assinaturas em dia", value: "87%", width: "87%", color: "bg-warning" },
+              { label: "Rastreabilidade de lotes", value: "100%", width: "100%", color: "bg-success" },
+              { label: "TCLEs anexados", value: "91%", width: "91%", color: "bg-success" },
+              { label: "Fotos clínicas registradas", value: "78%", width: "78%", color: "bg-warning" },
+            ].map((item, i) => (
+              <div key={i}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-muted-foreground">{item.label}</span>
+                  <span className="font-medium text-foreground">{item.value}</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div className={`${item.color} rounded-full h-2`} style={{ width: item.width }} />
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
