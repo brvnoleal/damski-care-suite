@@ -1,8 +1,27 @@
-import { Users, Calendar, Package, FileCheck, Activity } from "lucide-react";
+import { useState } from "react";
+import { Users, Calendar, Package, FileCheck, Activity, Minimize2, Square, Maximize2 } from "lucide-react";
 import StatCard from "@/components/StatCard";
 import AlertCard from "@/components/AlertCard";
 
+type CardSize = "compact" | "default" | "expanded";
+
+const sizeConfig: Record<CardSize, { minH: string; label: string }> = {
+  compact: { minH: "min-h-[300px]", label: "Compacto" },
+  default: { minH: "min-h-[460px]", label: "Padrão" },
+  expanded: { minH: "min-h-[620px]", label: "Expandido" },
+};
+
+const sizeIcons: Record<CardSize, typeof Minimize2> = {
+  compact: Minimize2,
+  default: Square,
+  expanded: Maximize2,
+};
+
+const sizeOrder: CardSize[] = ["compact", "default", "expanded"];
+
 const Dashboard = () => {
+  const [cardSize, setCardSize] = useState<CardSize>("default");
+
   return (
     <div className="space-y-6">
       {/* Header */}
