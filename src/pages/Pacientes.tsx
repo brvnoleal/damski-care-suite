@@ -20,7 +20,7 @@ import { Paciente } from "@/types";
 import { pacienteService } from "@/services/pacienteService";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
-  nome: "", cpf: "", telefone: "", email: "", data_nascimento: "", status: "ativo",
+  nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo",
 });
 
 const Pacientes = () => {
