@@ -4,6 +4,7 @@
  */
 import { Agendamento } from "@/types";
 import { mockAgendamentos } from "@/data/mockAgendamentos";
+import { notificationStore } from "@/stores/notificationStore";
 
 let agendamentos: Agendamento[] = [...mockAgendamentos];
 
@@ -23,6 +24,7 @@ export const agendamentoService = {
       created_at: new Date().toISOString(),
     };
     agendamentos = [...agendamentos, novo];
+    notificationStore.add("create", "agendamento", "Novo agendamento criado", `Agendamento para ${novo.data} às ${novo.horario}.`);
     return novo;
   },
 
@@ -31,12 +33,16 @@ export const agendamentoService = {
     if (index === -1) return null;
     agendamentos[index] = { ...agendamentos[index], ...dados };
     agendamentos = [...agendamentos];
+    notificationStore.add("update", "agendamento", "Agendamento alterado", `Agendamento #${agendamentos[index].id} foi atualizado.`);
     return agendamentos[index];
   },
 
   excluir: (id: string): boolean => {
     const len = agendamentos.length;
     agendamentos = agendamentos.filter((a) => a.id !== id);
+    if (agendamentos.length < len) {
+      notificationStore.add("delete", "agendamento", "Agendamento excluído", `Agendamento #${id} foi removido.`);
+    }
     return agendamentos.length < len;
   },
 };

@@ -4,6 +4,7 @@
  */
 import { Dentista } from "@/types";
 import { mockDentistas } from "@/data/mockDentistas";
+import { notificationStore } from "@/stores/notificationStore";
 
 let dentistas: Dentista[] = [...mockDentistas];
 
@@ -23,6 +24,7 @@ export const dentistaService = {
       created_at: new Date().toISOString(),
     };
     dentistas = [...dentistas, novo];
+    notificationStore.add("create", "dentista", "Novo dentista cadastrado", `${novo.nome} foi adicionado.`);
     return novo;
   },
 
@@ -31,12 +33,17 @@ export const dentistaService = {
     if (index === -1) return null;
     dentistas[index] = { ...dentistas[index], ...dados };
     dentistas = [...dentistas];
+    notificationStore.add("update", "dentista", "Dentista atualizado", `${dentistas[index].nome} teve dados alterados.`);
     return dentistas[index];
   },
 
   excluir: (id: string): boolean => {
+    const dentista = dentistas.find((d) => d.id === id);
     const len = dentistas.length;
     dentistas = dentistas.filter((d) => d.id !== id);
+    if (dentistas.length < len && dentista) {
+      notificationStore.add("delete", "dentista", "Dentista excluído", `${dentista.nome} foi removido.`);
+    }
     return dentistas.length < len;
   },
 };
