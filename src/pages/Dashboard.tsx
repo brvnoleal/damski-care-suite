@@ -1,8 +1,25 @@
-import { Users, Calendar, Package, FileCheck, Activity } from "lucide-react";
+import { useState } from "react";
+import { Users, Calendar, Package, FileCheck, Activity, ChevronLeft, ChevronRight } from "lucide-react";
 import StatCard from "@/components/StatCard";
 import AlertCard from "@/components/AlertCard";
+import { Button } from "@/components/ui/button";
+
+const alerts = [
+  { type: "expiry" as const, title: "Ácido Hialurônico — Lote AH2024-089", description: "Validade em 15 dias. 3 unidades em estoque.", time: "Há 2h" },
+  { type: "signature" as const, title: "Sessão #1247 — Maria Silva", description: "Evolução de harmonização facial pendente de assinatura digital.", time: "Há 4h" },
+  { type: "compliance" as const, title: "Não conformidade — Prontuário #0892", description: "TCLE não anexado. Bloqueio de finalização ativo.", time: "Ontem" },
+  { type: "expiry" as const, title: "Toxina Botulínica — Lote TB2024-156", description: "Validade em 22 dias. 8 unidades em estoque.", time: "Ontem" },
+  { type: "signature" as const, title: "Sessão #1245 — João Oliveira", description: "Procedimento de lente de contato dental pendente de assinatura.", time: "2 dias" },
+  { type: "compliance" as const, title: "Registro incompleto — Sessão #1240", description: "Fotos clínicas não anexadas ao prontuário.", time: "3 dias" },
+];
+
+const ALERTS_PER_PAGE = 3;
 
 const Dashboard = () => {
+  const [alertPage, setAlertPage] = useState(0);
+  const totalPages = Math.ceil(alerts.length / ALERTS_PER_PAGE);
+  const pagedAlerts = alerts.slice(alertPage * ALERTS_PER_PAGE, (alertPage + 1) * ALERTS_PER_PAGE);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -15,79 +32,41 @@ const Dashboard = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Pacientes Ativos"
-          value={148}
-          icon={Users}
-          trend={{ value: "+12 este mês", positive: true }}
-        />
-
-        <StatCard
-          title="Sessões Hoje"
-          value={8}
-          subtitle="3 concluídas"
-          icon={Calendar}
-          variant="gold"
-        />
-
-        <StatCard
-          title="Pendentes de Assinatura"
-          value={5}
-          subtitle="Últimos 7 dias"
-          icon={FileCheck}
-          variant="warning"
-        />
-
-        <StatCard
-          title="Insumos Críticos"
-          value={3}
-          subtitle="Vencimento próximo"
-          icon={Package}
-          variant="warning"
-        />
+        <StatCard title="Pacientes Ativos" value={148} icon={Users} trend={{ value: "+12 este mês", positive: true }} />
+        <StatCard title="Sessões Hoje" value={8} subtitle="3 concluídas" icon={Calendar} variant="gold" />
+        <StatCard title="Pendentes de Assinatura" value={5} subtitle="Últimos 7 dias" icon={FileCheck} variant="warning" />
+        <StatCard title="Insumos Críticos" value={3} subtitle="Vencimento próximo" icon={Package} variant="warning" />
       </div>
 
-      {/* 3 colunas alinhadas e com mesmo tamanho */}
+      {/* 3 colunas alinhadas */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-        <section className="rounded-xl border border-border bg-card p-4 shadow-elegant min-h-[320px] h-full flex flex-col">
+        {/* Alertas com paginação */}
+        <section className="rounded-xl border border-border bg-card p-4 shadow-elegant h-[380px] flex flex-col">
           <h2 className="text-lg font-display font-semibold text-foreground mb-4">
             Alertas
           </h2>
-          <div className="space-y-3 flex-1 overflow-hidden pr-1">
-            <AlertCard
-              type="expiry"
-              title="Ácido Hialurônico — Lote AH2024-089"
-              description="Validade em 15 dias. 3 unidades em estoque."
-              time="Há 2h"
-            />
-            <AlertCard
-              type="signature"
-              title="Sessão #1247 — Maria Silva"
-              description="Evolução de harmonização facial pendente de assinatura digital."
-              time="Há 4h"
-            />
-            <AlertCard
-              type="compliance"
-              title="Não conformidade — Prontuário #0892"
-              description="TCLE não anexado. Bloqueio de finalização ativo."
-              time="Ontem"
-            />
-            <AlertCard
-              type="expiry"
-              title="Toxina Botulínica — Lote TB2024-156"
-              description="Validade em 22 dias. 8 unidades em estoque."
-              time="Ontem"
-            />
-            <AlertCard
-              type="signature"
-              title="Sessão #1245 — João Oliveira"
-              description="Procedimento de lente de contato dental pendente de assinatura."
-              time="2 dias"
-            />
+          <div className="space-y-3 flex-1">
+            {pagedAlerts.map((a, i) => (
+              <AlertCard key={alertPage * ALERTS_PER_PAGE + i} type={a.type} title={a.title} description={a.description} time={a.time} />
+            ))}
+          </div>
+          <div className="flex items-center justify-between pt-3 border-t border-border mt-auto">
+            <span className="text-xs text-muted-foreground">
+              {alertPage + 1} / {totalPages}
+            </span>
+            <div className="flex gap-1">
+              <Button variant="ghost" size="icon" className="h-7 w-7" disabled={alertPage === 0} onClick={() => setAlertPage(alertPage - 1)}>
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7" disabled={alertPage >= totalPages - 1} onClick={() => setAlertPage(alertPage + 1)}>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-card p-4 shadow-elegant min-h-[320px] h-full flex flex-col">
+        {/* Conformidade */}
+        <section className="rounded-xl border border-border bg-card p-4 shadow-elegant h-[380px] flex flex-col">
           <h2 className="text-lg font-display font-semibold text-foreground mb-4">
             Conformidade
           </h2>
@@ -102,7 +81,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="space-y-4 flex-1 overflow-hidden">
+          <div className="space-y-4 flex-1">
             {[
               { label: "Prontuários completos", value: "94%", width: "94%", color: "bg-success" },
               { label: "Assinaturas em dia", value: "87%", width: "87%", color: "bg-warning" },
@@ -123,7 +102,8 @@ const Dashboard = () => {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-card p-4 shadow-elegant min-h-[320px] h-full flex flex-col">
+        {/* Próximos Agendamentos */}
+        <section className="rounded-xl border border-border bg-card p-4 shadow-elegant h-[380px] flex flex-col">
           <h3 className="text-lg font-display font-semibold text-foreground mb-4">
             Próximos Agendamentos
           </h3>
