@@ -53,35 +53,31 @@ const Dashboard = () => {
           <h2 className="text-lg font-display font-semibold text-foreground mb-4">
             Alertas
           </h2>
-          <div className="space-y-3 flex-1 overflow-y-auto pr-1">
+          <div className="space-y-3 flex-1 overflow-hidden pr-1">
             <AlertCard
               type="expiry"
               title="Ácido Hialurônico — Lote AH2024-089"
               description="Validade em 15 dias. 3 unidades em estoque."
               time="Há 2h"
             />
-
             <AlertCard
               type="signature"
               title="Sessão #1247 — Maria Silva"
               description="Evolução de harmonização facial pendente de assinatura digital."
               time="Há 4h"
             />
-
             <AlertCard
               type="compliance"
               title="Não conformidade — Prontuário #0892"
               description="TCLE não anexado. Bloqueio de finalização ativo."
               time="Ontem"
             />
-
             <AlertCard
               type="expiry"
               title="Toxina Botulínica — Lote TB2024-156"
               description="Validade em 22 dias. 8 unidades em estoque."
               time="Ontem"
             />
-
             <AlertCard
               type="signature"
               title="Sessão #1245 — João Oliveira"
