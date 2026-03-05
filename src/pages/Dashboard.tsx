@@ -6,9 +6,9 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { cn } from "@/lib/utils";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 /* ───────── Mock Data ───────── */
 
@@ -42,11 +42,16 @@ const pendingSignatures = [
 ];
 
 const topProcedures = [
-  { name: "Harmonização Facial", count: 32, revenue: "R$ 19.200", pct: 100 },
-  { name: "Toxina Botulínica", count: 28, revenue: "R$ 11.200", pct: 87 },
-  { name: "Clareamento Dental", count: 18, revenue: "R$ 5.400", pct: 56 },
-  { name: "Lente de Contato", count: 12, revenue: "R$ 8.400", pct: 37 },
-  { name: "Preenchimento Labial", count: 10, revenue: "R$ 6.000", pct: 31 },
+  { name: "Harmonização", count: 32, revenue: 19200 },
+  { name: "Toxina Bot.", count: 28, revenue: 11200 },
+  { name: "Clareamento", count: 18, revenue: 5400 },
+  { name: "Lente Contato", count: 12, revenue: 8400 },
+  { name: "Preench. Labial", count: 10, revenue: 6000 },
+];
+
+const CHART_COLORS = [
+  "hsl(239, 84%, 67%)", "hsl(217, 91%, 60%)", "hsl(160, 84%, 39%)",
+  "hsl(40, 60%, 55%)", "hsl(345, 45%, 45%)",
 ];
 
 
@@ -104,17 +109,35 @@ const Dashboard = () => {
             <Star className="w-4 h-4 text-[hsl(var(--gold))]" />
             <h2 className="text-sm font-semibold text-foreground">Top Procedimentos</h2>
           </div>
-          <div className="p-5 space-y-4">
-            {topProcedures.map((p, i) => (
-              <div key={i} className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-foreground">{p.name}</span>
-                  <span className="text-xs text-muted-foreground">{p.count}x</span>
-                </div>
-                <Progress value={p.pct} className="h-1.5" />
-                <p className="text-[11px] text-muted-foreground">{p.revenue}</p>
-              </div>
-            ))}
+          <div className="p-4">
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={topProcedures} layout="vertical" margin={{ left: 0, right: 12, top: 4, bottom: 4 }}>
+                <XAxis type="number" hide />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  width={95}
+                  tick={{ fontSize: 11, fill: "hsl(215, 16%, 47%)" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  formatter={(value: number) => [`${value}x`, "Sessões"]}
+                  contentStyle={{
+                    background: "var(--glass-bg-strong)",
+                    backdropFilter: "blur(16px)",
+                    border: "1px solid var(--glass-border)",
+                    borderRadius: "0.75rem",
+                    fontSize: 12,
+                  }}
+                />
+                <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={18}>
+                  {topProcedures.map((_, i) => (
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
