@@ -227,7 +227,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Top Procedimentos - Pie Chart */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
+        <motion.div {...fadeUp(0.6)} className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
           <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--glass-border)]">
             <Star className="w-4 h-4 text-[hsl(var(--gold))]" />
             <h2 className="text-sm font-semibold text-foreground">Top Procedimentos</h2>
