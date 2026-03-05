@@ -135,30 +135,86 @@ O script completo de criação está em [`docs/database/schema.sql`](docs/databa
 - **Git**: Sistema de controle de versão distribuído
 - **GitHub**: Plataforma de hospedagem de repositórios com colaboração
 
+## 8. Integrações e APIs Externas
+
+### 8.1 API ViaCEP
+
+O sistema integra a API pública **ViaCEP** (https://viacep.com.br) para preenchimento automático de endereços a partir do CEP informado pelo usuário. A integração funciona da seguinte forma:
+
+- **Endpoint utilizado**: `GET https://viacep.com.br/ws/{cep}/json/`
+- **Formato de resposta**: JSON contendo logradouro, bairro, cidade e UF
+- **Fluxo de uso**: Ao digitar um CEP válido (8 dígitos) no cadastro de dentistas, o sistema realiza uma requisição assíncrona à API e preenche automaticamente os campos de endereço
+- **Tratamento de erros**: CEPs inválidos ou inexistentes são tratados com feedback visual ao usuário
+- **Benefício**: Reduz erros de digitação e agiliza o cadastro, melhorando a experiência do usuário
+
+A utilização de uma API REST externa demonstra a capacidade do sistema de se integrar com serviços de terceiros, um requisito comum em aplicações web modernas.
+
 ---
 
-## 8. Funcionalidades Implementadas
+## 9. Design System — Liquid Glass
 
-### 8.1 CRUD de Pacientes
+### 9.1 Conceito Visual
+
+O projeto adota o conceito de design **Liquid Glass** (Glassmorphism), uma tendência moderna de UI que simula superfícies de vidro translúcido com efeitos de desfoque. Essa abordagem proporciona uma interface elegante, com profundidade visual e hierarquia clara entre os elementos.
+
+### 9.2 Características Técnicas
+
+| Propriedade | Implementação |
+|---|---|
+| Transparência | `background: rgba(255, 255, 255, 0.45)` com variações de intensidade |
+| Desfoque | `backdrop-filter: blur(16px)` e `blur(24px)` para elementos de destaque |
+| Bordas | Bordas semi-transparentes (`rgba(255, 255, 255, 0.5)`) para efeito de borda luminosa |
+| Sombras | Sombras suaves e difusas (`0 8px 32px rgba(0, 0, 0, 0.06)`) |
+| Fundo gradiente | Gradientes radiais multicamada em Indigo, Verde e Dourado como base da aplicação |
+
+### 9.3 Tokens Semânticos (Design Tokens)
+
+O sistema de cores é implementado inteiramente via **CSS Custom Properties (variáveis CSS)** em formato HSL, consumidas pelo Tailwind CSS através do arquivo `tailwind.config.ts`. Isso garante:
+
+- **Consistência**: Todas as cores são referenciadas por tokens semânticos (`--primary`, `--background`, `--muted`, etc.)
+- **Tematização**: Suporte nativo a modo escuro (dark mode) com troca automática de paleta
+- **Manutenibilidade**: Alterações de cor propagam-se automaticamente por toda a aplicação
+
+### 9.4 Tipografia
+
+| Uso | Fonte | Pesos |
+|---|---|---|
+| Títulos (display) | Plus Jakarta Sans | 600 (semibold), 700 (bold) |
+| Corpo (body) | IBM Plex Sans | 400 (regular), 500 (medium) |
+
+### 9.5 Animações
+
+A biblioteca **Framer Motion** é utilizada para animações de entrada (mount animations) nos componentes, incluindo:
+
+- **Fade-in com deslocamento vertical**: Elementos surgem de baixo para cima com opacidade progressiva
+- **Scale-in**: Componentes expandem suavemente ao aparecer
+- **Stagger**: Animações coordenadas em listas, onde cada item aparece com um pequeno atraso em relação ao anterior
+- **Transições suaves**: Curvas de easing personalizadas (`cubic-bezier`) para naturalidade no movimento
+
+---
+
+## 10. Funcionalidades Implementadas
+
+### 10.1 CRUD de Pacientes
 - ✅ Criar paciente (formulário com validação)
 - ✅ Listar pacientes (tabela com busca)
 - ✅ Editar paciente (modal de edição)
 - ✅ Excluir paciente (confirmação de exclusão)
 
-### 8.2 CRUD de Dentistas
+### 10.2 CRUD de Dentistas
 - ✅ Criar dentista
 - ✅ Listar dentistas
 - ✅ Editar dentista
 - ✅ Excluir dentista
 
-### 8.3 CRUD de Consultas (anteriormente Agendamentos)
+### 10.3 CRUD de Consultas (anteriormente Agendamentos)
 - ✅ Criar consulta (com seleção de paciente, dentista e procedimento odontológico)
 - ✅ Listar consultas (tabela com coluna de procedimento)
 - ✅ Editar consulta (alterar procedimento, data, horário)
 - ✅ Cancelar/Excluir consulta
 - ✅ Campo Procedimento com tipos específicos: Limpeza, Restauração, Extração, Tratamento de Canal, Clareamento, Ortodontia, Implante, Prótese, Avaliação, Retorno, Urgência
 
-### 8.4 Módulos Complementares
+### 10.4 Módulos Complementares
 - Dashboard com KPIs e alertas
 - Controle de insumos com rastreabilidade
 - Painel financeiro com gráficos
@@ -166,7 +222,7 @@ O script completo de criação está em [`docs/database/schema.sql`](docs/databa
 
 ---
 
-## 9. Conclusão
+## 11. Conclusão
 
 O projeto **Damski Odonto** atingiu os objetivos propostos, resultando em uma aplicação web funcional que demonstra a integração entre desenvolvimento frontend moderno, modelagem de banco de dados relacional e práticas de controle de versão.
 
