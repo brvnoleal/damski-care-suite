@@ -6,9 +6,9 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { cn } from "@/lib/utils";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 /* ───────── Mock Data ───────── */
 
