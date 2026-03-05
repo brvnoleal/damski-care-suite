@@ -99,9 +99,9 @@ const Dashboard = () => {
       </div>
 
       {/* Calendar + Side Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Agenda - left half */}
-        <div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        {/* Agenda - left half, stretches to match right panels */}
+        <div className="min-h-0">
           <WeeklyCalendar />
         </div>
 
