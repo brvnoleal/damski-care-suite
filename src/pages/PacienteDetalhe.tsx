@@ -167,7 +167,6 @@ const PacienteDetalhe = () => {
     });
     toast({ title: `${imageFiles.length} foto(s) adicionada(s)` });
   };
-  };
 
   if (!patientData) {
     return (
