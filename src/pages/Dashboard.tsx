@@ -76,7 +76,7 @@ const Dashboard = () => {
           return (
             <div
               key={kpi.label}
-              className="rounded-xl border border-border bg-card p-5 shadow-elegant hover:shadow-lg transition-shadow"
+              className="rounded-2xl glass glass-hover p-5"
             >
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
