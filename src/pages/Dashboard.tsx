@@ -178,7 +178,7 @@ const Dashboard = () => {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </motion.div>
 
         {/* Google Calendar */}
         <div className="lg:col-span-3 rounded-2xl glass overflow-hidden">
