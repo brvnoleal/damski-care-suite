@@ -75,6 +75,18 @@ const PacienteDetalhe = () => {
     date: "", proc: "", tech: "", substance: "", signed: false,
   });
 
+  // Photos
+  interface Foto {
+    id: string;
+    url: string;
+    name: string;
+    date: string;
+    label: string;
+  }
+  const [fotos, setFotos] = useState<Foto[]>([]);
+  const [previewFoto, setPreviewFoto] = useState<Foto | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Refresh patient data
   const [patientData, setPatientData] = useState(paciente);
 
