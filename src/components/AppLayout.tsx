@@ -57,7 +57,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const unreadCount = notifications.filter((n: any) => !n.read).length;
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="h-screen flex bg-background overflow-hidden">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
