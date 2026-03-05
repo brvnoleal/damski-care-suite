@@ -42,11 +42,16 @@ const pendingSignatures = [
 ];
 
 const topProcedures = [
-  { name: "Harmonização Facial", count: 32, revenue: "R$ 19.200", pct: 100 },
-  { name: "Toxina Botulínica", count: 28, revenue: "R$ 11.200", pct: 87 },
-  { name: "Clareamento Dental", count: 18, revenue: "R$ 5.400", pct: 56 },
-  { name: "Lente de Contato", count: 12, revenue: "R$ 8.400", pct: 37 },
-  { name: "Preenchimento Labial", count: 10, revenue: "R$ 6.000", pct: 31 },
+  { name: "Harmonização", count: 32, revenue: 19200 },
+  { name: "Toxina Bot.", count: 28, revenue: 11200 },
+  { name: "Clareamento", count: 18, revenue: 5400 },
+  { name: "Lente Contato", count: 12, revenue: 8400 },
+  { name: "Preench. Labial", count: 10, revenue: 6000 },
+];
+
+const CHART_COLORS = [
+  "hsl(239, 84%, 67%)", "hsl(217, 91%, 60%)", "hsl(160, 84%, 39%)",
+  "hsl(40, 60%, 55%)", "hsl(345, 45%, 45%)",
 ];
 
 
