@@ -197,7 +197,33 @@ const Pacientes = () => {
             </div>
             <div>
               <Label>CEP</Label>
-              <Input value={form.cep} onChange={(e) => setForm({ ...form, cep: e.target.value })} placeholder="00000-000" />
+              <Input
+                value={form.cep}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/\D/g, "").slice(0, 8);
+                  const masked = raw.length > 5 ? raw.slice(0, 5) + "-" + raw.slice(5) : raw;
+                  setForm({ ...form, cep: masked });
+                  if (raw.length === 8) {
+                    fetch(`https://viacep.com.br/ws/${raw}/json/`)
+                      .then((r) => r.json())
+                      .then((data) => {
+                        if (!data.erro) {
+                          setForm((prev) => ({
+                            ...prev,
+                            cep: masked,
+                            estado: data.uf || prev.estado,
+                            cidade: data.localidade || prev.cidade,
+                            bairro: data.bairro || prev.bairro,
+                            rua: data.logradouro || prev.rua,
+                            complemento: data.complemento || prev.complemento,
+                          }));
+                        }
+                      })
+                      .catch(() => {});
+                  }
+                }}
+                placeholder="00000-000"
+              />
             </div>
             <div>
               <Label>Estado</Label>
