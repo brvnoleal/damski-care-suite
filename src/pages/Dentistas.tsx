@@ -48,7 +48,7 @@ const Dentistas = () => {
 
   const openEdit = (d: Dentista) => {
     setEditingId(d.id);
-    setForm({ nome: d.nome, especialidade: d.especialidade, cro: d.cro, telefone: d.telefone || "", email: d.email || "", status: d.status });
+    setForm({ nome: d.nome, especialidade: d.especialidade, cro: d.cro, telefone: d.telefone || "", email: d.email || "", instagram: d.instagram || "", cep: d.cep || "", estado: d.estado || "", cidade: d.cidade || "", bairro: d.bairro || "", rua: d.rua || "", numero: d.numero || "", complemento: d.complemento || "", ponto_referencia: d.ponto_referencia || "", status: d.status });
     setDialogOpen(true);
   };
 
