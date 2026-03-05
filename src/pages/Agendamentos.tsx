@@ -106,7 +106,7 @@ const Agendamentos = () => {
         </div>
         <Button onClick={openCreate} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
           <Plus className="w-4 h-4" />
-          Novo Agendamento
+          Nova Consulta
         </Button>
       </div>
 
