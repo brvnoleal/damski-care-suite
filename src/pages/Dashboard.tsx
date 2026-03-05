@@ -181,7 +181,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Google Calendar */}
-        <div className="lg:col-span-3 rounded-2xl glass overflow-hidden">
+        <motion.div {...scaleIn(0.45)} className="lg:col-span-3 rounded-2xl glass overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-primary" />
