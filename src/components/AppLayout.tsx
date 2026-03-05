@@ -38,7 +38,7 @@ const navigation = [
   { name: "Início", href: "/", icon: LayoutDashboard },
   { name: "Pacientes", href: "/pacientes", icon: Users },
   { name: "Dentistas", href: "/dentistas", icon: UserCog },
-  { name: "Agendamentos", href: "/agendamentos", icon: CalendarDays },
+  { name: "Consultas", href: "/agendamentos", icon: CalendarDays },
   
   { name: "Insumos", href: "/insumos", icon: Package },
   { name: "Financeiro", href: "/financeiro", icon: DollarSign },
