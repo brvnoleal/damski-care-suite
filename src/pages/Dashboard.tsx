@@ -204,7 +204,7 @@ const Dashboard = () => {
       {/* ── Row 3: Sessões da Semana + Top Procedimentos + Próximos Atendimentos ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Sessões da Semana - Bar Chart */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
+        <motion.div {...fadeUp(0.5)} className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
           <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--glass-border)]">
             <Clock className="w-4 h-4 text-info" />
             <h2 className="text-sm font-semibold text-foreground">Sessões da Semana</h2>
