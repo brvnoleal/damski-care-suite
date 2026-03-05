@@ -299,7 +299,7 @@ const Dashboard = () => {
       {/* ── Row 4: Insumos Críticos + Pendentes de Assinatura ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Insumos Críticos */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden">
+        <motion.div {...fadeUp(0.8)} className="rounded-2xl glass glass-hover overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-warning" />
