@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import {
   Users, Calendar, Package, FileCheck, DollarSign, TrendingUp,
   Clock, AlertTriangle, CheckCircle2, ArrowUpRight, Syringe,
-  ChevronRight, Activity, Star, MapPin, User,
+  ChevronRight, Star, MapPin, User,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,13 +65,6 @@ const topProcedures = [
   { name: "Preenchimento Labial", count: 10, revenue: "R$ 6.000", pct: 31 },
 ];
 
-const recentActivity = [
-  { icon: Syringe, text: "Sessão de Harmonização concluída — Maria Silva", time: "há 25 min", type: "session" },
-  { icon: Users, text: "Novo paciente cadastrado — Ricardo Nunes", time: "há 1h", type: "patient" },
-  { icon: DollarSign, text: "Pagamento recebido — R$ 1.200 via PIX", time: "há 2h", type: "payment" },
-  { icon: Package, text: "Lote AH2024-089 próximo do vencimento", time: "há 3h", type: "alert" },
-  { icon: FileCheck, text: "TCLE assinado digitalmente — João Oliveira", time: "há 4h", type: "doc" },
-];
 
 /* ───────── Helpers ───────── */
 
@@ -184,9 +177,9 @@ const Dashboard = () => {
       </div>
 
       {/* Main Grid: Agenda (Google Calendar style) + Sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Agenda do Dia — Google Calendar day view */}
-        <div className="lg:col-span-2 rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
+        <div className="rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-center">
@@ -287,29 +280,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Sidebar column */}
-        <div className="space-y-6">
-          {/* Atividade Recente */}
-          <div className="rounded-xl border border-border bg-card shadow-elegant">
-            <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
-              <Activity className="w-4 h-4 text-primary" />
-              <h2 className="text-sm font-semibold text-foreground">Atividade Recente</h2>
-            </div>
-            <div className="divide-y divide-border">
-              {recentActivity.map((a, i) => (
-                <div key={i} className="flex items-start gap-3 px-5 py-3">
-                  <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
-                    <a.icon className="w-3.5 h-3.5 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-foreground leading-snug">{a.text}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">{a.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Bottom Row: 3 panels */}
