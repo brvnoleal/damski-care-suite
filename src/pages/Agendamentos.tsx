@@ -125,6 +125,7 @@ const Agendamentos = () => {
               <TableHead className="font-semibold">Horário</TableHead>
               <TableHead className="font-semibold">Paciente</TableHead>
               <TableHead className="font-semibold hidden md:table-cell">Dentista</TableHead>
+              <TableHead className="font-semibold">Procedimento</TableHead>
               <TableHead className="font-semibold">Status</TableHead>
               <TableHead className="font-semibold text-right">Ações</TableHead>
             </TableRow>
