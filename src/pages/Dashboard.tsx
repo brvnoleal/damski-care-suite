@@ -15,7 +15,7 @@ import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts";
 const kpis = [
   { label: "Pacientes Ativos", value: "148", change: "+12", icon: Users, color: "primary" as const },
   { label: "Sessões Hoje", value: "8", change: "3 concluídas", icon: Calendar, color: "info" as const },
-  { label: "Faturamento Mensal", value: "R$ 47.800", change: "+18%", icon: DollarSign, color: "success" as const },
+  { label: "Insumos Críticos", value: "4", change: "1 vencido", icon: Package, color: "warning" as const },
   { label: "Taxa de Retorno", value: "82%", change: "+5%", icon: TrendingUp, color: "gold" as const },
 ];
 
