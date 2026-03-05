@@ -293,7 +293,7 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* ── Row 4: Insumos Críticos + Pendentes de Assinatura ── */}
