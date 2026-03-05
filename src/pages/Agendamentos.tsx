@@ -18,7 +18,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Agendamento } from "@/types";
+import { Agendamento, ProcedimentoConsulta, procedimentoConsultaLabels } from "@/types";
 import { agendamentoService } from "@/services/agendamentoService";
 import { pacienteService } from "@/services/pacienteService";
 import { dentistaService } from "@/services/dentistaService";
