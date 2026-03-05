@@ -27,23 +27,6 @@ const colorMap = {
   gold: { bg: "bg-[hsl(var(--gold))]/10", text: "text-[hsl(var(--gold))]", ring: "ring-[hsl(var(--gold))]/20" },
 };
 
-const eventColors = [
-  "bg-primary", "bg-info", "bg-success", "bg-warning", "bg-destructive",
-  "bg-[hsl(var(--gold))]", "bg-primary/80", "bg-info/80",
-];
-
-const todayAgenda = [
-  { time: "09:00", endTime: "09:45", name: "Ana Costa", proc: "Toxina Botulínica", status: "concluída", sala: "Sala 1" },
-  { time: "10:30", endTime: "11:15", name: "Pedro Santos", proc: "Preenchimento Labial", status: "concluída", sala: "Sala 2" },
-  { time: "11:00", endTime: "11:45", name: "Julia Ramos", proc: "Clareamento", status: "concluída", sala: "Sala 1" },
-  { time: "14:00", endTime: "15:00", name: "Carla Dias", proc: "Lente de Contato Dental", status: "agendado", sala: "Sala 1" },
-  { time: "15:30", endTime: "16:15", name: "Lucas Mendes", proc: "Clareamento Dental", status: "agendado", sala: "Sala 2" },
-  { time: "16:00", endTime: "16:30", name: "Beatriz Alves", proc: "Avaliação", status: "agendado", sala: "Sala 1" },
-  { time: "16:45", endTime: "17:30", name: "Fernanda Lima", proc: "Harmonização Facial", status: "agendado", sala: "Sala 3" },
-  { time: "17:30", endTime: "18:00", name: "Ricardo Nunes", proc: "Profilaxia", status: "agendado", sala: "Sala 2" },
-];
-
-const timeSlots = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
 
 const criticalSupplies = [
   { name: "Fio PDO Espiculado", lot: "PDO2024-067", expiry: "28/02/2026", daysLeft: -4 },
