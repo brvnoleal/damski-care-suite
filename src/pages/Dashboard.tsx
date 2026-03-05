@@ -80,6 +80,56 @@ function timeToMinutes(t: string) {
   return h * 60 + m;
 }
 
+/** Compute column layout for overlapping events (Google Calendar algorithm) */
+function layoutEvents(events: typeof todayAgenda) {
+  const sorted = events.map((e, i) => ({
+    ...e,
+    idx: i,
+    startMin: timeToMinutes(e.time),
+    endMin: timeToMinutes(e.endTime),
+    col: 0,
+    totalCols: 1,
+  })).sort((a, b) => a.startMin - b.startMin || a.endMin - b.endMin);
+
+  const groups: (typeof sorted)[] = [];
+  let currentGroup: typeof sorted = [];
+
+  for (const ev of sorted) {
+    if (currentGroup.length === 0 || ev.startMin < Math.max(...currentGroup.map(e => e.endMin))) {
+      currentGroup.push(ev);
+    } else {
+      groups.push(currentGroup);
+      currentGroup = [ev];
+    }
+  }
+  if (currentGroup.length > 0) groups.push(currentGroup);
+
+  for (const group of groups) {
+    const columns: number[] = [];
+    for (const ev of group) {
+      let placed = false;
+      for (let c = 0; c < columns.length; c++) {
+        if (ev.startMin >= columns[c]) {
+          ev.col = c;
+          columns[c] = ev.endMin;
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        ev.col = columns.length;
+        columns.push(ev.endMin);
+      }
+    }
+    const totalCols = columns.length;
+    for (const ev of group) {
+      ev.totalCols = totalCols;
+    }
+  }
+
+  return sorted;
+}
+
 /* ───────── Component ───────── */
 
 const Dashboard = () => {
@@ -185,57 +235,54 @@ const Dashboard = () => {
                 </div>
               )}
 
-              {/* Event blocks */}
-              {todayAgenda.map((event, i) => {
-                const evStart = timeToMinutes(event.time);
-                const evEnd = timeToMinutes(event.endTime);
-                const top = ((evStart - startMinutes) / totalRange) * (timeSlots.length * 64);
-                const height = Math.max(((evEnd - evStart) / totalRange) * (timeSlots.length * 64), 28);
-                const isDone = event.status === "concluída";
-                const colorClass = eventColors[i % eventColors.length];
+              {/* Events container - positioned to the right of time labels */}
+              <div className="absolute top-0 bottom-0 left-14 right-3">
+                {layoutEvents(todayAgenda).map((event) => {
+                  const top = ((event.startMin - startMinutes) / totalRange) * (timeSlots.length * 64);
+                  const height = Math.max(((event.endMin - event.startMin) / totalRange) * (timeSlots.length * 64), 32);
+                  const isDone = event.status === "concluída";
+                  const colorClass = eventColors[event.idx % eventColors.length];
 
-                return (
-                  <div
-                    key={i}
-                    className={cn(
-                      "absolute left-16 right-3 z-10 rounded-lg px-3 py-1.5 cursor-pointer transition-all hover:opacity-90 hover:shadow-md group",
-                      isDone ? "opacity-50" : ""
-                    )}
-                    style={{
-                      top: `${top}px`,
-                      height: `${height}px`,
-                      minHeight: "28px",
-                    }}
-                  >
-                    {/* Color bar */}
-                    <div className={cn("absolute inset-0 rounded-lg", colorClass, "opacity-15")} />
-                    <div className={cn("absolute left-0 top-0 bottom-0 w-1 rounded-l-lg", colorClass)} />
+                  const colWidth = 100 / event.totalCols;
+                  const leftPct = event.col * colWidth;
 
-                    <div className="relative flex items-start justify-between h-full">
-                      <div className="flex-1 min-w-0 pl-2">
+                  return (
+                    <div
+                      key={event.idx}
+                      className={cn(
+                        "absolute z-10 rounded-lg cursor-pointer transition-all hover:shadow-md",
+                        isDone ? "opacity-50" : ""
+                      )}
+                      style={{
+                        top: `${top}px`,
+                        height: `${height}px`,
+                        left: `${leftPct}%`,
+                        width: `calc(${colWidth}% - 3px)`,
+                      }}
+                    >
+                      <div className={cn("absolute inset-0 rounded-lg", colorClass, "opacity-15")} />
+                      <div className={cn("absolute left-0 top-0 bottom-0 w-1 rounded-l-lg", colorClass)} />
+
+                      <div className="relative h-full px-2.5 py-1.5 overflow-hidden">
                         <p className={cn(
-                          "text-[13px] font-semibold truncate",
+                          "text-[12px] font-semibold truncate leading-tight",
                           isDone ? "text-muted-foreground line-through" : "text-foreground"
                         )}>
                           {event.name}
                         </p>
-                        {height > 36 && (
-                          <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1 mt-0.5">
-                            <Syringe className="w-3 h-3 shrink-0" />
+                        <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
+                          {event.time}–{event.endTime}
+                        </p>
+                        {height > 50 && (
+                          <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
                             {event.proc}
                           </p>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {isDone && <CheckCircle2 className="w-3.5 h-3.5 text-success" />}
-                        <span className="text-[10px] text-muted-foreground font-mono whitespace-nowrap">
-                          {event.time}–{event.endTime}
-                        </span>
-                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
