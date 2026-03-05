@@ -43,12 +43,42 @@ export interface Dentista {
   created_at?: string;
 }
 
+export type ProcedimentoConsulta =
+  | "limpeza"
+  | "restauracao"
+  | "extracao"
+  | "canal"
+  | "clareamento"
+  | "ortodontia"
+  | "implante"
+  | "protese"
+  | "avaliacao"
+  | "retorno"
+  | "urgencia"
+  | "outro";
+
+export const procedimentoConsultaLabels: Record<ProcedimentoConsulta, string> = {
+  limpeza: "Limpeza",
+  restauracao: "Restauração",
+  extracao: "Extração",
+  canal: "Tratamento de Canal",
+  clareamento: "Clareamento",
+  ortodontia: "Ortodontia",
+  implante: "Implante",
+  protese: "Prótese",
+  avaliacao: "Avaliação",
+  retorno: "Retorno",
+  urgencia: "Urgência",
+  outro: "Outro",
+};
+
 export interface Agendamento {
   id: string;
   data: string;
   horario: string;
   paciente_id: string;
   dentista_id: string;
+  procedimento: ProcedimentoConsulta;
   status: "agendado" | "confirmado" | "realizado" | "cancelado";
   observacoes?: string;
   created_at?: string;
