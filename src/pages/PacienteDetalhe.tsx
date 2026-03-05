@@ -388,15 +388,57 @@ const PacienteDetalhe = () => {
           {/* Preview modal */}
           {previewFoto && (
             <Dialog open={!!previewFoto} onOpenChange={() => setPreviewFoto(null)}>
-              <DialogContent className="sm:max-w-2xl p-2">
-                <DialogHeader className="sr-only">
-                  <DialogTitle>{previewFoto.name}</DialogTitle>
-                  <DialogDescription>Visualização da foto</DialogDescription>
+              <DialogContent className="sm:max-w-2xl p-4">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    {previewFoto.label || previewFoto.name}
+                    <Badge variant="outline" className="text-xs">{previewFoto.categoria.charAt(0).toUpperCase() + previewFoto.categoria.slice(1)}</Badge>
+                  </DialogTitle>
+                  <DialogDescription>{previewFoto.descricao || "Sem descrição"} — {previewFoto.date}</DialogDescription>
                 </DialogHeader>
                 <img src={previewFoto.url} alt={previewFoto.name} className="w-full h-auto rounded-lg" />
               </DialogContent>
             </Dialog>
           )}
+
+          {/* Upload metadata dialog */}
+          <Dialog open={fotoDialogOpen} onOpenChange={setFotoDialogOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Detalhes da Foto</DialogTitle>
+                <DialogDescription>
+                  {pendingFiles.length} arquivo(s) selecionado(s). Defina a categoria e descrição.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div>
+                  <Label>Categoria</Label>
+                  <Select value={fotoMeta.categoria} onValueChange={(v) => setFotoMeta({ ...fotoMeta, categoria: v as Foto["categoria"] })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="antes">Antes</SelectItem>
+                      <SelectItem value="durante">Durante</SelectItem>
+                      <SelectItem value="depois">Depois</SelectItem>
+                      <SelectItem value="outro">Outro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Descrição</Label>
+                  <Textarea
+                    value={fotoMeta.descricao}
+                    onChange={(e) => setFotoMeta({ ...fotoMeta, descricao: e.target.value })}
+                    placeholder="Ex: Região labial antes do preenchimento"
+                    rows={3}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => { setFotoDialogOpen(false); setPendingFiles([]); }}>Cancelar</Button>
+                <Button onClick={handleFotoSave}>Salvar Fotos</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         <TabsContent value="insumos">
