@@ -205,7 +205,7 @@ export const WeeklyCalendar = () => {
   }, [weekStart]);
 
   return (
-    <div className="rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
+    <div className="rounded-2xl glass overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <div className="flex items-center gap-2">
