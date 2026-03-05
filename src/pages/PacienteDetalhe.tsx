@@ -232,12 +232,13 @@ const PacienteDetalhe = () => {
       </div>
 
       {/* Info Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {[
           { label: "Data de Nascimento", value: nascFormatted },
-          { label: "CPF", value: patientData.cpf },
+          { label: "CPF", value: patientData.cpf ? patientData.cpf.slice(0, 3) + ".•••.•••-••" : "—" },
           { label: "Telefone", value: patientData.telefone },
           { label: "Email", value: patientData.email },
+          { label: "Instagram", value: patientData.instagram || "—" },
         ].map((item, i) => (
           <div key={i} className="rounded-lg border border-border bg-card p-4">
             <p className="text-xs text-muted-foreground">{item.label}</p>
