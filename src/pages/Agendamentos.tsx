@@ -24,7 +24,7 @@ import { pacienteService } from "@/services/pacienteService";
 import { dentistaService } from "@/services/dentistaService";
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
-  data: "", horario: "", paciente_id: "", dentista_id: "", status: "agendado", observacoes: "",
+  data: "", horario: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", observacoes: "",
 });
 
 const statusConfig: Record<string, { label: string; className: string }> = {
