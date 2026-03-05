@@ -205,9 +205,9 @@ export const WeeklyCalendar = () => {
   }, [weekStart]);
 
   return (
-    <div className="rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
+    <div className="rounded-2xl glass overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--glass-border)]">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -233,7 +233,7 @@ export const WeeklyCalendar = () => {
       </div>
 
       {/* Day headers */}
-      <div className="flex border-b border-border">
+      <div className="flex border-b border-[var(--glass-border)]">
         {/* Gutter for time labels */}
         <div className="w-14 shrink-0" />
         {weekDays.map((day, i) => {

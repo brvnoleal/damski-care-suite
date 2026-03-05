@@ -57,7 +57,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const unreadCount = notifications.filter((n: any) => !n.read).length;
 
   return (
-    <div className="h-screen flex bg-background overflow-hidden">
+    <div className="h-screen flex overflow-hidden">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -69,7 +69,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[260px] bg-sidebar flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto",
+          "fixed inset-y-0 left-0 z-50 w-[260px] glass-sidebar flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -136,7 +136,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-card border-b border-border px-4 lg:px-6 h-14 flex items-center gap-4">
+        <header className="sticky top-0 z-30 glass-header px-4 lg:px-6 h-14 flex items-center gap-4">
           <button
             className="lg:hidden text-muted-foreground hover:text-foreground"
             onClick={() => setSidebarOpen(true)}

@@ -6,43 +6,43 @@
 
 @layer base {
   :root {
-    --background: 220 14% 96%;
+    --background: 220 20% 95%;
     --foreground: 222 47% 11%;
 
-    --card: 0 0% 100%;
+    --card: 0 0% 100% / 0.55;
     --card-foreground: 222 47% 11%;
 
-    --popover: 0 0% 100%;
+    --popover: 0 0% 100% / 0.75;
     --popover-foreground: 222 47% 11%;
 
     --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 96%;
+    --secondary: 220 14% 96% / 0.5;
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 220 14% 96%;
+    --muted: 220 14% 96% / 0.6;
     --muted-foreground: 215 16% 47%;
 
-    --accent: 220 14% 96%;
+    --accent: 220 14% 96% / 0.5;
     --accent-foreground: 222 47% 11%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    --border: 220 20% 88% / 0.6;
+    --input: 220 13% 91% / 0.5;
     --ring: 239 84% 67%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 222 47% 11%;
+    --sidebar-background: 222 47% 11% / 0.85;
     --sidebar-foreground: 213 31% 91%;
     --sidebar-primary: 239 84% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent: 217 33% 17% / 0.6;
     --sidebar-accent-foreground: 213 31% 91%;
-    --sidebar-border: 217 33% 17%;
+    --sidebar-border: 217 33% 30% / 0.3;
     --sidebar-ring: 239 84% 67%;
 
     --gold: 40 60% 55%;
@@ -62,6 +62,14 @@
     --font-display: 'Plus Jakarta Sans', sans-serif;
     --font-body: 'IBM Plex Sans', sans-serif;
 
+    --glass-bg: rgba(255, 255, 255, 0.45);
+    --glass-bg-strong: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    --glass-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.1);
+    --glass-blur: 16px;
+    --glass-blur-strong: 24px;
+
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
@@ -70,31 +78,37 @@
   .dark {
     --background: 222 47% 6%;
     --foreground: 213 31% 91%;
-    --card: 222 47% 9%;
+    --card: 222 47% 12% / 0.55;
     --card-foreground: 213 31% 91%;
-    --popover: 222 47% 9%;
+    --popover: 222 47% 12% / 0.75;
     --popover-foreground: 213 31% 91%;
     --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217 33% 17%;
+    --secondary: 217 33% 17% / 0.5;
     --secondary-foreground: 213 31% 91%;
-    --muted: 217 33% 17%;
+    --muted: 217 33% 17% / 0.6;
     --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
+    --accent: 217 33% 17% / 0.5;
     --accent-foreground: 213 31% 91%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
+    --border: 217 33% 25% / 0.4;
+    --input: 217 33% 17% / 0.5;
     --ring: 239 84% 67%;
-    --sidebar-background: 222 47% 6%;
+    --sidebar-background: 222 47% 6% / 0.85;
     --sidebar-foreground: 213 31% 91%;
     --sidebar-primary: 239 84% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 33% 12%;
+    --sidebar-accent: 217 33% 12% / 0.6;
     --sidebar-accent-foreground: 213 31% 91%;
-    --sidebar-border: 217 33% 12%;
+    --sidebar-border: 217 33% 20% / 0.3;
     --sidebar-ring: 239 84% 67%;
+
+    --glass-bg: rgba(30, 35, 55, 0.45);
+    --glass-bg-strong: rgba(30, 35, 55, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    --glass-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.3);
   }
 }
 
@@ -104,7 +118,13 @@
   }
 
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply text-foreground font-body antialiased;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 20%, hsla(239, 84%, 67%, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, hsla(160, 84%, 39%, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 50% at 50% 0%, hsla(40, 60%, 55%, 0.05) 0%, transparent 50%),
+      hsl(220, 20%, 95%);
+    min-height: 100vh;
   }
 
   h1, h2, h3, h4 {
@@ -129,8 +149,49 @@
   .border-gold {
     border-color: hsl(var(--gold));
   }
+
+  /* ── Liquid Glass Utilities ── */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .glass-strong {
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(var(--glass-blur-strong));
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+  }
+
+  .glass-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .glass-hover:hover {
+    box-shadow: var(--glass-shadow-hover);
+    background: var(--glass-bg-strong);
+  }
+
+  .glass-sidebar {
+    background: rgba(15, 20, 40, 0.75);
+    backdrop-filter: blur(var(--glass-blur-strong));
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong));
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .glass-header {
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(var(--glass-blur-strong));
+    -webkit-backdrop-filter: blur(var(--glass-blur-strong));
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
   .shadow-elegant {
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--glass-shadow);
   }
   .shadow-gold {
     box-shadow: 0 4px 14px -2px hsl(40 60% 55% / 0.25);

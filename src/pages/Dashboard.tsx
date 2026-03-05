@@ -76,7 +76,7 @@ const Dashboard = () => {
           return (
             <div
               key={kpi.label}
-              className="rounded-xl border border-border bg-card p-5 shadow-elegant hover:shadow-lg transition-shadow"
+              className="rounded-2xl glass glass-hover p-5"
             >
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
@@ -99,8 +99,8 @@ const Dashboard = () => {
       {/* Bottom Row: 3 panels */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Procedimentos Populares */}
-        <div className="rounded-xl border border-border bg-card shadow-elegant">
-          <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
+        <div className="rounded-2xl glass glass-hover overflow-hidden">
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-[var(--glass-border)]">
             <Star className="w-4 h-4 text-[hsl(var(--gold))]" />
             <h2 className="text-sm font-semibold text-foreground">Top Procedimentos</h2>
           </div>
@@ -119,8 +119,8 @@ const Dashboard = () => {
         </div>
 
         {/* Insumos Críticos */}
-        <div className="rounded-xl border border-border bg-card shadow-elegant">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        <div className="rounded-2xl glass glass-hover overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-warning" />
               <h2 className="text-sm font-semibold text-foreground">Insumos Críticos</h2>
@@ -155,8 +155,8 @@ const Dashboard = () => {
         </div>
 
         {/* Pendentes de Assinatura */}
-        <div className="rounded-xl border border-border bg-card shadow-elegant">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        <div className="rounded-2xl glass glass-hover overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <FileCheck className="w-4 h-4 text-warning" />
               <h2 className="text-sm font-semibold text-foreground">Pendentes de Assinatura</h2>
