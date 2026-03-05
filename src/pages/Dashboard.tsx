@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import {
   Users, Calendar, Package, FileCheck, DollarSign, TrendingUp,
-  Clock, AlertTriangle, CheckCircle2, ArrowUpRight, Syringe,
-  ChevronRight, Star, MapPin, User,
+  AlertTriangle, ArrowUpRight,
+  ChevronRight, Star,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { cn } from "@/lib/utils";
 
 /* ───────── Mock Data ───────── */
@@ -25,23 +26,6 @@ const colorMap = {
   gold: { bg: "bg-[hsl(var(--gold))]/10", text: "text-[hsl(var(--gold))]", ring: "ring-[hsl(var(--gold))]/20" },
 };
 
-const eventColors = [
-  "bg-primary", "bg-info", "bg-success", "bg-warning", "bg-destructive",
-  "bg-[hsl(var(--gold))]", "bg-primary/80", "bg-info/80",
-];
-
-const todayAgenda = [
-  { time: "09:00", endTime: "09:45", name: "Ana Costa", proc: "Toxina Botulínica", status: "concluída", sala: "Sala 1" },
-  { time: "10:30", endTime: "11:15", name: "Pedro Santos", proc: "Preenchimento Labial", status: "concluída", sala: "Sala 2" },
-  { time: "11:00", endTime: "11:45", name: "Julia Ramos", proc: "Clareamento", status: "concluída", sala: "Sala 1" },
-  { time: "14:00", endTime: "15:00", name: "Carla Dias", proc: "Lente de Contato Dental", status: "agendado", sala: "Sala 1" },
-  { time: "15:30", endTime: "16:15", name: "Lucas Mendes", proc: "Clareamento Dental", status: "agendado", sala: "Sala 2" },
-  { time: "16:00", endTime: "16:30", name: "Beatriz Alves", proc: "Avaliação", status: "agendado", sala: "Sala 1" },
-  { time: "16:45", endTime: "17:30", name: "Fernanda Lima", proc: "Harmonização Facial", status: "agendado", sala: "Sala 3" },
-  { time: "17:30", endTime: "18:00", name: "Ricardo Nunes", proc: "Profilaxia", status: "agendado", sala: "Sala 2" },
-];
-
-const timeSlots = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
 
 const criticalSupplies = [
   { name: "Fio PDO Espiculado", lot: "PDO2024-067", expiry: "28/02/2026", daysLeft: -4 },
@@ -66,74 +50,12 @@ const topProcedures = [
 ];
 
 
-/* ───────── Helpers ───────── */
-
-function timeToMinutes(t: string) {
-  const [h, m] = t.split(":").map(Number);
-  return h * 60 + m;
-}
-
-/** Compute column layout for overlapping events (Google Calendar algorithm) */
-function layoutEvents(events: typeof todayAgenda) {
-  const sorted = events.map((e, i) => ({
-    ...e,
-    idx: i,
-    startMin: timeToMinutes(e.time),
-    endMin: timeToMinutes(e.endTime),
-    col: 0,
-    totalCols: 1,
-  })).sort((a, b) => a.startMin - b.startMin || a.endMin - b.endMin);
-
-  const groups: (typeof sorted)[] = [];
-  let currentGroup: typeof sorted = [];
-
-  for (const ev of sorted) {
-    if (currentGroup.length === 0 || ev.startMin < Math.max(...currentGroup.map(e => e.endMin))) {
-      currentGroup.push(ev);
-    } else {
-      groups.push(currentGroup);
-      currentGroup = [ev];
-    }
-  }
-  if (currentGroup.length > 0) groups.push(currentGroup);
-
-  for (const group of groups) {
-    const columns: number[] = [];
-    for (const ev of group) {
-      let placed = false;
-      for (let c = 0; c < columns.length; c++) {
-        if (ev.startMin >= columns[c]) {
-          ev.col = c;
-          columns[c] = ev.endMin;
-          placed = true;
-          break;
-        }
-      }
-      if (!placed) {
-        ev.col = columns.length;
-        columns.push(ev.endMin);
-      }
-    }
-    const totalCols = columns.length;
-    for (const ev of group) {
-      ev.totalCols = totalCols;
-    }
-  }
-
-  return sorted;
-}
 
 /* ───────── Component ───────── */
 
 const Dashboard = () => {
-  const completedCount = todayAgenda.filter((s) => s.status === "concluída").length;
   const now = new Date();
   const greeting = now.getHours() < 12 ? "Bom dia" : now.getHours() < 18 ? "Boa tarde" : "Boa noite";
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const startMinutes = timeToMinutes(timeSlots[0]);
-  const endMinutes = timeToMinutes(timeSlots[timeSlots.length - 1]);
-  const totalRange = endMinutes - startMinutes;
 
   return (
     <div className="space-y-6">
@@ -176,111 +98,8 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Main Grid: Agenda (Google Calendar style) + Sidebar */}
-      <div className="grid grid-cols-1 gap-6">
-        {/* Agenda do Dia — Google Calendar day view */}
-        <div className="rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col items-center">
-                <span className="text-[10px] uppercase font-semibold text-primary tracking-wider">
-                  {now.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", "")}
-                </span>
-                <span className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-bold">
-                  {now.getDate()}
-                </span>
-              </div>
-              <div>
-                <h2 className="text-sm font-semibold text-foreground">Agenda de Hoje</h2>
-                <p className="text-[11px] text-muted-foreground">{completedCount} concluídas · {todayAgenda.length - completedCount} restantes</p>
-              </div>
-            </div>
-            <Link to="/agendamentos" className="text-xs text-primary hover:underline flex items-center gap-0.5">
-              Ver todas <ChevronRight className="w-3 h-3" />
-            </Link>
-          </div>
-
-          {/* Calendar grid */}
-          <div className="relative overflow-y-auto max-h-[480px]">
-            <div className="relative" style={{ height: `${timeSlots.length * 64}px` }}>
-              {/* Time slots + horizontal lines */}
-              {timeSlots.map((slot, i) => (
-                <div
-                  key={slot}
-                  className="absolute left-0 right-0 flex items-start"
-                  style={{ top: `${i * 64}px` }}
-                >
-                  <span className="w-14 text-[11px] text-muted-foreground font-mono text-right pr-3 -mt-2 shrink-0 select-none">
-                    {slot}
-                  </span>
-                  <div className="flex-1 border-t border-border h-16" />
-                </div>
-              ))}
-
-              {/* Current time indicator */}
-              {currentMinutes >= startMinutes && currentMinutes <= endMinutes && (
-                <div
-                  className="absolute left-14 right-0 z-20 flex items-center pointer-events-none"
-                  style={{ top: `${((currentMinutes - startMinutes) / totalRange) * (timeSlots.length * 64)}px` }}
-                >
-                  <div className="w-2.5 h-2.5 rounded-full bg-destructive -ml-1.5 shrink-0" />
-                  <div className="flex-1 h-[2px] bg-destructive" />
-                </div>
-              )}
-
-              {/* Events container - positioned to the right of time labels */}
-              <div className="absolute top-0 bottom-0 left-14 right-3">
-                {layoutEvents(todayAgenda).map((event) => {
-                  const top = ((event.startMin - startMinutes) / totalRange) * (timeSlots.length * 64);
-                  const height = Math.max(((event.endMin - event.startMin) / totalRange) * (timeSlots.length * 64), 32);
-                  const isDone = event.status === "concluída";
-                  const colorClass = eventColors[event.idx % eventColors.length];
-
-                  const colWidth = 100 / event.totalCols;
-                  const leftPct = event.col * colWidth;
-
-                  return (
-                    <div
-                      key={event.idx}
-                      className={cn(
-                        "absolute z-10 rounded-lg cursor-pointer transition-all hover:shadow-md",
-                        isDone ? "opacity-50" : ""
-                      )}
-                      style={{
-                        top: `${top}px`,
-                        height: `${height}px`,
-                        left: `${leftPct}%`,
-                        width: `calc(${colWidth}% - 3px)`,
-                      }}
-                    >
-                      <div className={cn("absolute inset-0 rounded-lg", colorClass, "opacity-15")} />
-                      <div className={cn("absolute left-0 top-0 bottom-0 w-1 rounded-l-lg", colorClass)} />
-
-                      <div className="relative h-full px-2.5 py-1.5 overflow-hidden">
-                        <p className={cn(
-                          "text-[12px] font-semibold truncate leading-tight",
-                          isDone ? "text-muted-foreground line-through" : "text-foreground"
-                        )}>
-                          {event.name}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
-                          {event.time}–{event.endTime}
-                        </p>
-                        {height > 50 && (
-                          <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
-                            {event.proc}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
+      {/* Weekly Calendar */}
+      <WeeklyCalendar />
 
       {/* Bottom Row: 3 panels */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
