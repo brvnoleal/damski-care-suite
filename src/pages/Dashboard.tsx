@@ -198,7 +198,7 @@ const Dashboard = () => {
             scrolling="no"
             title="Google Calendar"
           />
-        </div>
+        </motion.div>
       </div>
 
       {/* ── Row 3: Sessões da Semana + Top Procedimentos + Próximos Atendimentos ── */}
