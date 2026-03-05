@@ -313,8 +313,7 @@ const PacienteDetalhe = () => {
             onDrop={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"));
-              handleFileUpload(files);
+              openFotoDialog(Array.from(e.dataTransfer.files));
             }}
           >
             <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
@@ -328,7 +327,7 @@ const PacienteDetalhe = () => {
               className="hidden"
               onChange={(e) => {
                 if (e.target.files) {
-                  handleFileUpload(Array.from(e.target.files));
+                  openFotoDialog(Array.from(e.target.files));
                   e.target.value = "";
                 }
               }}
