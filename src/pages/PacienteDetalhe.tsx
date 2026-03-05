@@ -232,12 +232,13 @@ const PacienteDetalhe = () => {
       </div>
 
       {/* Info Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {[
           { label: "Data de Nascimento", value: nascFormatted },
-          { label: "CPF", value: patientData.cpf },
+          { label: "CPF", value: patientData.cpf ? patientData.cpf.slice(0, 3) + ".•••.•••-••" : "—" },
           { label: "Telefone", value: patientData.telefone },
           { label: "Email", value: patientData.email },
+          { label: "Instagram", value: patientData.instagram || "—" },
         ].map((item, i) => (
           <div key={i} className="rounded-lg border border-border bg-card p-4">
             <p className="text-xs text-muted-foreground">{item.label}</p>
@@ -250,7 +251,7 @@ const PacienteDetalhe = () => {
       <Tabs defaultValue="evolucoes" className="space-y-4">
         <TabsList className="bg-muted/50 p-1">
           <TabsTrigger value="evolucoes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
-            <ClipboardList className="w-3.5 h-3.5" /> Evoluções
+            <ClipboardList className="w-3.5 h-3.5" /> Consultas
           </TabsTrigger>
           <TabsTrigger value="documentos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <FileText className="w-3.5 h-3.5" /> Documentos
@@ -297,12 +298,32 @@ const PacienteDetalhe = () => {
           ))}
         </TabsContent>
 
-        <TabsContent value="documentos">
-          <div className="rounded-xl border border-border bg-card p-8 text-center">
-            <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">TCLE, Contrato, Orçamento, Histórico de Saúde</p>
-            <p className="text-xs text-muted-foreground mt-1">Funcionalidade disponível com backend ativo</p>
-          </div>
+        <TabsContent value="documentos" className="space-y-4">
+          {[
+            { name: "TCLE — Termo de Consentimento Livre e Esclarecido", status: "assinado" as const },
+            { name: "Contrato de Prestação de Serviços", status: "assinado" as const },
+            { name: "Orçamento", status: "pendente" as const },
+          ].map((doc, i) => (
+            <div key={i} className="rounded-xl border border-border bg-card p-4 shadow-elegant flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <FileText className="w-5 h-5 text-muted-foreground shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{doc.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {doc.status === "assinado" ? "Assinado pelo paciente" : "Aguardando assinatura"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Badge className={doc.status === "assinado" ? "bg-success/10 text-success border-success/20 text-xs" : "bg-warning/10 text-warning border-warning/20 text-xs"}>
+                  {doc.status === "assinado" ? "Assinado" : "Pendente"}
+                </Badge>
+                <Button variant="outline" size="sm" className="gap-1.5 text-xs" disabled={doc.status !== "assinado"}>
+                  <FileText className="w-3.5 h-3.5" /> Ver Termo
+                </Button>
+              </div>
+            </div>
+          ))}
         </TabsContent>
 
         <TabsContent value="fotos" className="space-y-4">
