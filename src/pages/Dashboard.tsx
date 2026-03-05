@@ -262,7 +262,7 @@ const Dashboard = () => {
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Próximos Atendimentos */}
         <div className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
