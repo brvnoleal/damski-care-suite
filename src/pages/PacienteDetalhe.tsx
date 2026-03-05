@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -82,10 +83,15 @@ const PacienteDetalhe = () => {
     name: string;
     date: string;
     label: string;
+    categoria: "antes" | "depois" | "durante" | "outro";
+    descricao: string;
   }
   const [fotos, setFotos] = useState<Foto[]>([]);
   const [previewFoto, setPreviewFoto] = useState<Foto | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fotoDialogOpen, setFotoDialogOpen] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [fotoMeta, setFotoMeta] = useState<{ categoria: Foto["categoria"]; descricao: string }>({ categoria: "antes", descricao: "" });
 
   // Refresh patient data
   const [patientData, setPatientData] = useState(paciente);
@@ -142,16 +148,22 @@ const PacienteDetalhe = () => {
     toast({ title: "Sessão registrada com sucesso" });
   };
 
-  const handleFileUpload = (files: File[]) => {
+  const openFotoDialog = (files: File[]) => {
     const imageFiles = files.filter((f) => f.type.startsWith("image/"));
     if (imageFiles.length === 0) {
       toast({ title: "Selecione arquivos de imagem válidos", variant: "destructive" });
       return;
     }
+    setPendingFiles(imageFiles);
+    setFotoMeta({ categoria: "antes", descricao: "" });
+    setFotoDialogOpen(true);
+  };
+
+  const handleFotoSave = () => {
     const today = new Date();
     const dateBR = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
 
-    imageFiles.forEach((file) => {
+    pendingFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const newFoto: Foto = {
@@ -160,12 +172,16 @@ const PacienteDetalhe = () => {
           name: file.name,
           date: dateBR,
           label: file.name.replace(/\.[^.]+$/, ""),
+          categoria: fotoMeta.categoria,
+          descricao: fotoMeta.descricao,
         };
         setFotos((prev) => [newFoto, ...prev]);
       };
       reader.readAsDataURL(file);
     });
-    toast({ title: `${imageFiles.length} foto(s) adicionada(s)` });
+    toast({ title: `${pendingFiles.length} foto(s) adicionada(s)` });
+    setFotoDialogOpen(false);
+    setPendingFiles([]);
   };
 
   if (!patientData) {
@@ -298,8 +314,7 @@ const PacienteDetalhe = () => {
             onDrop={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"));
-              handleFileUpload(files);
+              openFotoDialog(Array.from(e.dataTransfer.files));
             }}
           >
             <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
@@ -313,7 +328,7 @@ const PacienteDetalhe = () => {
               className="hidden"
               onChange={(e) => {
                 if (e.target.files) {
-                  handleFileUpload(Array.from(e.target.files));
+                  openFotoDialog(Array.from(e.target.files));
                   e.target.value = "";
                 }
               }}
@@ -329,7 +344,19 @@ const PacienteDetalhe = () => {
                     <img src={foto.url} alt={foto.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="p-2">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <Badge variant="outline" className={cn(
+                        "text-[10px] px-1.5 py-0",
+                        foto.categoria === "antes" && "border-blue-500/30 text-blue-600",
+                        foto.categoria === "depois" && "border-green-500/30 text-green-600",
+                        foto.categoria === "durante" && "border-amber-500/30 text-amber-600",
+                        foto.categoria === "outro" && "border-muted-foreground/30 text-muted-foreground",
+                      )}>
+                        {foto.categoria.charAt(0).toUpperCase() + foto.categoria.slice(1)}
+                      </Badge>
+                    </div>
                     <p className="text-xs font-medium text-foreground truncate">{foto.label || foto.name}</p>
+                    {foto.descricao && <p className="text-[11px] text-muted-foreground truncate">{foto.descricao}</p>}
                     <p className="text-xs text-muted-foreground">{foto.date}</p>
                   </div>
                   {/* Overlay actions */}
@@ -362,15 +389,57 @@ const PacienteDetalhe = () => {
           {/* Preview modal */}
           {previewFoto && (
             <Dialog open={!!previewFoto} onOpenChange={() => setPreviewFoto(null)}>
-              <DialogContent className="sm:max-w-2xl p-2">
-                <DialogHeader className="sr-only">
-                  <DialogTitle>{previewFoto.name}</DialogTitle>
-                  <DialogDescription>Visualização da foto</DialogDescription>
+              <DialogContent className="sm:max-w-2xl p-4">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    {previewFoto.label || previewFoto.name}
+                    <Badge variant="outline" className="text-xs">{previewFoto.categoria.charAt(0).toUpperCase() + previewFoto.categoria.slice(1)}</Badge>
+                  </DialogTitle>
+                  <DialogDescription>{previewFoto.descricao || "Sem descrição"} — {previewFoto.date}</DialogDescription>
                 </DialogHeader>
                 <img src={previewFoto.url} alt={previewFoto.name} className="w-full h-auto rounded-lg" />
               </DialogContent>
             </Dialog>
           )}
+
+          {/* Upload metadata dialog */}
+          <Dialog open={fotoDialogOpen} onOpenChange={setFotoDialogOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Detalhes da Foto</DialogTitle>
+                <DialogDescription>
+                  {pendingFiles.length} arquivo(s) selecionado(s). Defina a categoria e descrição.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div>
+                  <Label>Categoria</Label>
+                  <Select value={fotoMeta.categoria} onValueChange={(v) => setFotoMeta({ ...fotoMeta, categoria: v as Foto["categoria"] })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="antes">Antes</SelectItem>
+                      <SelectItem value="durante">Durante</SelectItem>
+                      <SelectItem value="depois">Depois</SelectItem>
+                      <SelectItem value="outro">Outro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Descrição</Label>
+                  <Textarea
+                    value={fotoMeta.descricao}
+                    onChange={(e) => setFotoMeta({ ...fotoMeta, descricao: e.target.value })}
+                    placeholder="Ex: Região labial antes do preenchimento"
+                    rows={3}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => { setFotoDialogOpen(false); setPendingFiles([]); }}>Cancelar</Button>
+                <Button onClick={handleFotoSave}>Salvar Fotos</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         <TabsContent value="insumos">
