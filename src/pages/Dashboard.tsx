@@ -67,11 +67,6 @@ const Dashboard = () => {
             {now.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
         </div>
-        <Link to="/agendamentos">
-          <Button size="sm" className="gap-1.5">
-            <Calendar className="w-3.5 h-3.5" /> Ver Agenda Completa
-          </Button>
-        </Link>
       </div>
 
       {/* KPI Cards */}
