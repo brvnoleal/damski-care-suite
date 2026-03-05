@@ -1,42 +1,178 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit } from "lucide-react";
+import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { pacienteService } from "@/services/pacienteService";
+
+interface Sessao {
+  id: string;
+  date: string;
+  proc: string;
+  tech: string;
+  substance: string;
+  signed: boolean;
+}
+
+const initialSessions: Sessao[] = [
+  {
+    id: "s1",
+    date: "12/02/2026",
+    proc: "Harmonização Facial — Preenchimento Labial",
+    tech: "Cânula 25G, técnica retroinjeção",
+    substance: "Ácido Hialurônico 20mg/ml — Lote AH2024-089 — 1ml",
+    signed: true,
+  },
+  {
+    id: "s2",
+    date: "08/01/2026",
+    proc: "Toxina Botulínica — Terço Superior",
+    tech: "Agulha 30G, técnica intramuscular",
+    substance: "Toxina Botulínica 100U — Lote TB2024-156 — 32U",
+    signed: true,
+  },
+  {
+    id: "s3",
+    date: "15/12/2025",
+    proc: "Avaliação e Planejamento",
+    tech: "Análise facial, fotografias, planejamento digital",
+    substance: "N/A",
+    signed: false,
+  },
+];
+
+const formatDateBR = (iso: string) => {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+};
 
 const PacienteDetalhe = () => {
   const { id } = useParams();
+  const { toast } = useToast();
+
+  // Patient data
+  const paciente = pacienteService.buscarPorId(id || "");
+  const [editOpen, setEditOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo" as "ativo" | "inativo",
+  });
+
+  // Sessions
+  const [sessions, setSessions] = useState<Sessao[]>(initialSessions);
+  const [sessionOpen, setSessionOpen] = useState(false);
+  const [sessionForm, setSessionForm] = useState({
+    date: "", proc: "", tech: "", substance: "", signed: false,
+  });
+
+  // Refresh patient data
+  const [patientData, setPatientData] = useState(paciente);
+
+  const initials = patientData?.nome
+    ? patientData.nome.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
+    : "??";
+
+  const openEditDialog = () => {
+    if (!patientData) return;
+    setEditForm({
+      nome: patientData.nome,
+      cpf: patientData.cpf,
+      telefone: patientData.telefone,
+      email: patientData.email,
+      instagram: patientData.instagram || "",
+      data_nascimento: patientData.data_nascimento,
+      status: patientData.status,
+    });
+    setEditOpen(true);
+  };
+
+  const handleEditSave = () => {
+    if (!id || !editForm.nome || !editForm.cpf) {
+      toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
+      return;
+    }
+    pacienteService.atualizar(id, editForm);
+    setPatientData(pacienteService.buscarPorId(id));
+    setEditOpen(false);
+    toast({ title: "Paciente atualizado com sucesso" });
+  };
+
+  const openSessionDialog = () => {
+    setSessionForm({ date: "", proc: "", tech: "", substance: "", signed: false });
+    setSessionOpen(true);
+  };
+
+  const handleSessionSave = () => {
+    if (!sessionForm.date || !sessionForm.proc) {
+      toast({ title: "Preencha procedimento e data", variant: "destructive" });
+      return;
+    }
+    const newSession: Sessao = {
+      id: `s${Date.now()}`,
+      date: formatDateBR(sessionForm.date),
+      proc: sessionForm.proc,
+      tech: sessionForm.tech || "N/A",
+      substance: sessionForm.substance || "N/A",
+      signed: sessionForm.signed,
+    };
+    setSessions([newSession, ...sessions]);
+    setSessionOpen(false);
+    toast({ title: "Sessão registrada com sucesso" });
+  };
+
+  if (!patientData) {
+    return (
+      <div className="space-y-6">
+        <Link to="/pacientes" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Voltar para Pacientes
+        </Link>
+        <p className="text-muted-foreground">Paciente não encontrado.</p>
+      </div>
+    );
+  }
+
+  const nascFormatted = patientData.data_nascimento?.includes("-")
+    ? formatDateBR(patientData.data_nascimento)
+    : patientData.data_nascimento || "—";
 
   return (
     <div className="space-y-6">
-      {/* Back */}
       <Link to="/pacientes" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-        <ArrowLeft className="w-4 h-4" />
-        Voltar para Pacientes
+        <ArrowLeft className="w-4 h-4" /> Voltar para Pacientes
       </Link>
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-xl gradient-burgundy flex items-center justify-center">
-            <span className="text-xl font-display font-bold text-primary-foreground">MS</span>
+            <span className="text-xl font-display font-bold text-primary-foreground">{initials}</span>
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Maria Silva</h1>
+            <h1 className="text-2xl font-bold text-foreground">{patientData.nome}</h1>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs font-mono text-gold-dark font-semibold">{id}</span>
-              <Badge className="bg-success/10 text-success border-success/20 text-xs">Ativo</Badge>
+              <Badge className={patientData.status === "ativo" ? "bg-success/10 text-success border-success/20 text-xs" : "bg-muted text-muted-foreground text-xs"}>
+                {patientData.status === "ativo" ? "Ativo" : "Inativo"}
+              </Badge>
             </div>
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <Edit className="w-3.5 h-3.5" />
-            Editar
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={openEditDialog}>
+            <Edit className="w-3.5 h-3.5" /> Editar
           </Button>
-          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-burgundy-light gap-1.5">
-            <Syringe className="w-3.5 h-3.5" />
-            Nova Sessão
+          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5" onClick={openSessionDialog}>
+            <Syringe className="w-3.5 h-3.5" /> Nova Sessão
           </Button>
         </div>
       </div>
@@ -44,10 +180,10 @@ const PacienteDetalhe = () => {
       {/* Info Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Data de Nascimento", value: "15/03/1985" },
-          { label: "CPF", value: "***.***.***-12" },
-          { label: "Telefone", value: "(11) 99999-1234" },
-          { label: "Início do Tratamento", value: "10/06/2024" },
+          { label: "Data de Nascimento", value: nascFormatted },
+          { label: "CPF", value: patientData.cpf },
+          { label: "Telefone", value: patientData.telefone },
+          { label: "Email", value: patientData.email },
         ].map((item, i) => (
           <div key={i} className="rounded-lg border border-border bg-card p-4">
             <p className="text-xs text-muted-foreground">{item.label}</p>
@@ -60,71 +196,37 @@ const PacienteDetalhe = () => {
       <Tabs defaultValue="evolucoes" className="space-y-4">
         <TabsList className="bg-muted/50 p-1">
           <TabsTrigger value="evolucoes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
-            <ClipboardList className="w-3.5 h-3.5" />
-            Evoluções
+            <ClipboardList className="w-3.5 h-3.5" /> Evoluções
           </TabsTrigger>
           <TabsTrigger value="documentos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
-            <FileText className="w-3.5 h-3.5" />
-            Documentos
+            <FileText className="w-3.5 h-3.5" /> Documentos
           </TabsTrigger>
           <TabsTrigger value="fotos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
-            <Camera className="w-3.5 h-3.5" />
-            Fotos
+            <Camera className="w-3.5 h-3.5" /> Fotos
           </TabsTrigger>
           <TabsTrigger value="insumos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
-            <Syringe className="w-3.5 h-3.5" />
-            Insumos Utilizados
+            <Syringe className="w-3.5 h-3.5" /> Insumos Utilizados
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="evolucoes" className="space-y-4">
-          {[
-            {
-              date: "12/02/2026",
-              proc: "Harmonização Facial — Preenchimento Labial",
-              tech: "Cânula 25G, técnica retroinjeção",
-              substance: "Ácido Hialurônico 20mg/ml — Lote AH2024-089 — 1ml",
-              signed: true,
-            },
-            {
-              date: "08/01/2026",
-              proc: "Toxina Botulínica — Terço Superior",
-              tech: "Agulha 30G, técnica intramuscular",
-              substance: "Toxina Botulínica 100U — Lote TB2024-156 — 32U",
-              signed: true,
-            },
-            {
-              date: "15/12/2025",
-              proc: "Avaliação e Planejamento",
-              tech: "Análise facial, fotografias, planejamento digital",
-              substance: "N/A",
-              signed: false,
-            },
-          ].map((session, i) => (
-            <div
-              key={i}
-              className="rounded-xl border border-border bg-card p-5 shadow-elegant space-y-3"
-            >
+          {sessions.length === 0 && (
+            <div className="rounded-xl border border-border bg-card p-8 text-center">
+              <ClipboardList className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">Nenhuma sessão registrada ainda.</p>
+            </div>
+          )}
+          {sessions.map((session) => (
+            <div key={session.id} className="rounded-xl border border-border bg-card p-5 shadow-elegant space-y-3">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-semibold text-foreground">{session.proc}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{session.date}</p>
                 </div>
-                <Badge
-                  className={
-                    session.signed
-                      ? "bg-success/10 text-success border-success/20"
-                      : "bg-warning/10 text-warning border-warning/20"
-                  }
-                >
+                <Badge className={session.signed ? "bg-success/10 text-success border-success/20" : "bg-warning/10 text-warning border-warning/20"}>
                   {session.signed ? (
-                    <span className="flex items-center gap-1">
-                      <ShieldCheck className="w-3 h-3" />
-                      Assinado
-                    </span>
-                  ) : (
-                    "Pendente"
-                  )}
+                    <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> Assinado</span>
+                  ) : "Pendente"}
                 </Badge>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
@@ -189,6 +291,98 @@ const PacienteDetalhe = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Patient Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Editar Paciente</DialogTitle>
+            <DialogDescription>Atualize os dados do paciente.</DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+            <div className="sm:col-span-2">
+              <Label>Nome *</Label>
+              <Input value={editForm.nome} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} />
+            </div>
+            <div>
+              <Label>CPF *</Label>
+              <Input value={editForm.cpf} onChange={(e) => setEditForm({ ...editForm, cpf: e.target.value })} />
+            </div>
+            <div>
+              <Label>Data de Nascimento</Label>
+              <Input type="date" value={editForm.data_nascimento} onChange={(e) => setEditForm({ ...editForm, data_nascimento: e.target.value })} />
+            </div>
+            <div>
+              <Label>Telefone</Label>
+              <Input value={editForm.telefone} onChange={(e) => setEditForm({ ...editForm, telefone: e.target.value })} />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
+            </div>
+            <div>
+              <Label>Instagram</Label>
+              <Input value={editForm.instagram} onChange={(e) => setEditForm({ ...editForm, instagram: e.target.value })} />
+            </div>
+            <div>
+              <Label>Status</Label>
+              <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v as "ativo" | "inativo" })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ativo">Ativo</SelectItem>
+                  <SelectItem value="inativo">Inativo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancelar</Button>
+            <Button onClick={handleEditSave}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* New Session Dialog */}
+      <Dialog open={sessionOpen} onOpenChange={setSessionOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Nova Sessão</DialogTitle>
+            <DialogDescription>Registre o procedimento realizado.</DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+            <div className="sm:col-span-2">
+              <Label>Procedimento *</Label>
+              <Input value={sessionForm.proc} onChange={(e) => setSessionForm({ ...sessionForm, proc: e.target.value })} placeholder="Ex: Harmonização Facial — Preenchimento Labial" />
+            </div>
+            <div>
+              <Label>Data *</Label>
+              <Input type="date" value={sessionForm.date} onChange={(e) => setSessionForm({ ...sessionForm, date: e.target.value })} />
+            </div>
+            <div>
+              <Label>Técnica</Label>
+              <Input value={sessionForm.tech} onChange={(e) => setSessionForm({ ...sessionForm, tech: e.target.value })} placeholder="Ex: Cânula 25G, técnica retroinjeção" />
+            </div>
+            <div className="sm:col-span-2">
+              <Label>Substância / Lote / Quantidade</Label>
+              <Input value={sessionForm.substance} onChange={(e) => setSessionForm({ ...sessionForm, substance: e.target.value })} placeholder="Ex: Ácido Hialurônico 20mg/ml — Lote AH2024-089 — 1ml" />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="signed"
+                checked={sessionForm.signed}
+                onChange={(e) => setSessionForm({ ...sessionForm, signed: e.target.checked })}
+                className="rounded border-border"
+              />
+              <Label htmlFor="signed" className="cursor-pointer">Assinado digitalmente</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSessionOpen(false)}>Cancelar</Button>
+            <Button onClick={handleSessionSave}>Registrar Sessão</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
