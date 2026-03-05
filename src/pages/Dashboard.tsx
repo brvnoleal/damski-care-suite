@@ -287,29 +287,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Sidebar column */}
-        <div className="space-y-6">
-          {/* Atividade Recente */}
-          <div className="rounded-xl border border-border bg-card shadow-elegant">
-            <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
-              <Activity className="w-4 h-4 text-primary" />
-              <h2 className="text-sm font-semibold text-foreground">Atividade Recente</h2>
-            </div>
-            <div className="divide-y divide-border">
-              {recentActivity.map((a, i) => (
-                <div key={i} className="flex items-start gap-3 px-5 py-3">
-                  <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
-                    <a.icon className="w-3.5 h-3.5 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-foreground leading-snug">{a.text}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">{a.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Bottom Row: 3 panels */}
