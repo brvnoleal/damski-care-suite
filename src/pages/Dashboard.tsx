@@ -332,7 +332,7 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Pendentes de Assinatura */}
         <div className="rounded-2xl glass glass-hover overflow-hidden">
