@@ -172,7 +172,14 @@ const Pacientes = () => {
             </div>
             <div>
               <Label>CPF *</Label>
-              <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} placeholder="000.000.000-00" />
+              <Input value={form.cpf} onChange={(e) => {
+                const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
+                const formatted = raw
+                  .replace(/(\d{3})(\d)/, "$1.$2")
+                  .replace(/(\d{3})(\d)/, "$1.$2")
+                  .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+                setForm({ ...form, cpf: formatted });
+              }} placeholder="000.000.000-00" />
             </div>
             <div>
               <Label>Data de Nascimento *</Label>
@@ -180,7 +187,13 @@ const Pacientes = () => {
             </div>
             <div>
               <Label>Telefone</Label>
-              <Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} placeholder="(11) 99999-0000" />
+              <Input value={form.telefone} onChange={(e) => {
+                const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
+                const formatted = raw.length <= 10
+                  ? raw.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2")
+                  : raw.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2");
+                setForm({ ...form, telefone: formatted });
+              }} placeholder="(11) 99999-0000" />
             </div>
             <div>
               <Label>Email</Label>
