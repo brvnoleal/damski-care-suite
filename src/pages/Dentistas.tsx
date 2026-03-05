@@ -19,7 +19,9 @@ import { Dentista } from "@/types";
 import { dentistaService } from "@/services/dentistaService";
 
 const emptyDentista = (): Omit<Dentista, "id" | "created_at"> => ({
-  nome: "", especialidade: "", cro: "", telefone: "", email: "", status: "ativo",
+  nome: "", especialidade: "", cro: "", telefone: "", email: "", instagram: "",
+  cep: "", estado: "", cidade: "", bairro: "", rua: "", numero: "", complemento: "", ponto_referencia: "",
+  status: "ativo",
 });
 
 const Dentistas = () => {
