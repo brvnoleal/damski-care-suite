@@ -1,44 +1,51 @@
 import { Link } from "react-router-dom";
 import {
   Users, Calendar, Package, FileCheck, DollarSign, TrendingUp,
-  AlertTriangle, ArrowUpRight,
-  ChevronRight, Star,
+  AlertTriangle, ArrowUpRight, ChevronRight, Star, Activity,
+  Smile, Clock,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { cn } from "@/lib/utils";
-import { PieChart, Pie, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import {
+  PieChart, Pie, Tooltip, ResponsiveContainer, Cell,
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  BarChart, Bar,
+} from "recharts";
 
 /* ───────── Mock Data ───────── */
 
 const kpis = [
-  { label: "Pacientes Ativos", value: "148", change: "+12", icon: Users, color: "primary" as const },
-  { label: "Sessões Hoje", value: "8", change: "3 concluídas", icon: Calendar, color: "info" as const },
-  { label: "Insumos Críticos", value: "4", change: "1 vencido", icon: Package, color: "warning" as const },
-  { label: "Taxa de Retorno", value: "82%", change: "+5%", icon: TrendingUp, color: "gold" as const },
+  { label: "Pacientes Ativos", value: "148", change: "+12 este mês", icon: Users, color: "primary" as const, trend: "up" },
+  { label: "Sessões Hoje", value: "8", change: "3 concluídas", icon: Calendar, color: "info" as const, trend: "neutral" },
+  { label: "Faturamento Mensal", value: "R$ 47.8k", change: "+18%", icon: DollarSign, color: "success" as const, trend: "up" },
+  { label: "Taxa de Retorno", value: "82%", change: "+5%", icon: TrendingUp, color: "gold" as const, trend: "up" },
 ];
 
 const colorMap = {
-  primary: { bg: "bg-primary/10", text: "text-primary", ring: "ring-primary/20" },
-  info: { bg: "bg-info/10", text: "text-info", ring: "ring-info/20" },
-  warning: { bg: "bg-warning/10", text: "text-warning", ring: "ring-warning/20" },
-  gold: { bg: "bg-[hsl(var(--gold))]/10", text: "text-[hsl(var(--gold))]", ring: "ring-[hsl(var(--gold))]/20" },
+  primary: { bg: "bg-primary/10", text: "text-primary" },
+  info: { bg: "bg-info/10", text: "text-info" },
+  success: { bg: "bg-success/10", text: "text-success" },
+  gold: { bg: "bg-[hsl(var(--gold))]/10", text: "text-[hsl(var(--gold))]" },
 };
 
-
-const criticalSupplies = [
-  { name: "Fio PDO Espiculado", lot: "PDO2024-067", expiry: "28/02/2026", daysLeft: -4 },
-  { name: "Ácido Hialurônico 20mg/ml", lot: "AH2024-089", expiry: "08/03/2026", daysLeft: 4 },
-  { name: "Toxina Botulínica 100U", lot: "TB2024-156", expiry: "10/03/2026", daysLeft: 6 },
-  { name: "Anestésico Articaína", lot: "AN2024-312", expiry: "12/03/2026", daysLeft: 8 },
+const revenueData = [
+  { month: "Set", value: 32000 },
+  { month: "Out", value: 35000 },
+  { month: "Nov", value: 38500 },
+  { month: "Dez", value: 41000 },
+  { month: "Jan", value: 39200 },
+  { month: "Fev", value: 44500 },
+  { month: "Mar", value: 47800 },
 ];
 
-const pendingSignatures = [
-  { session: "#1247", patient: "Maria Silva", proc: "Harmonização facial", date: "03/03" },
-  { session: "#1245", patient: "João Oliveira", proc: "Lente de contato dental", date: "02/03" },
-  { session: "#1243", patient: "Ana Costa", proc: "Toxina Botulínica", date: "01/03" },
-  { session: "#1240", patient: "Pedro Santos", proc: "Preenchimento Labial", date: "28/02" },
+const sessionsWeekly = [
+  { day: "Seg", sessoes: 6 },
+  { day: "Ter", sessoes: 9 },
+  { day: "Qua", sessoes: 7 },
+  { day: "Qui", sessoes: 11 },
+  { day: "Sex", sessoes: 8 },
+  { day: "Sáb", sessoes: 4 },
 ];
 
 const topProcedures = [
@@ -54,7 +61,35 @@ const CHART_COLORS = [
   "hsl(40, 60%, 55%)", "hsl(345, 45%, 45%)",
 ];
 
+const criticalSupplies = [
+  { name: "Fio PDO Espiculado", lot: "PDO2024-067", expiry: "28/02/2026", daysLeft: -4 },
+  { name: "Ácido Hialurônico 20mg/ml", lot: "AH2024-089", expiry: "08/03/2026", daysLeft: 4 },
+  { name: "Toxina Botulínica 100U", lot: "TB2024-156", expiry: "10/03/2026", daysLeft: 6 },
+  { name: "Anestésico Articaína", lot: "AN2024-312", expiry: "12/03/2026", daysLeft: 8 },
+];
 
+const pendingSignatures = [
+  { session: "#1247", patient: "Maria Silva", proc: "Harmonização facial", date: "03/03" },
+  { session: "#1245", patient: "João Oliveira", proc: "Lente de contato dental", date: "02/03" },
+  { session: "#1243", patient: "Ana Costa", proc: "Toxina Botulínica", date: "01/03" },
+  { session: "#1240", patient: "Pedro Santos", proc: "Preenchimento Labial", date: "28/02" },
+];
+
+const nextAppointments = [
+  { time: "14:00", patient: "Carla Dias", proc: "Lente de Contato Dental", sala: "Sala 1", status: "confirmado" },
+  { time: "14:30", patient: "Marcos Lima", proc: "Profilaxia", sala: "Sala 3", status: "confirmado" },
+  { time: "15:30", patient: "Lucas Mendes", proc: "Clareamento Dental", sala: "Sala 2", status: "aguardando" },
+  { time: "16:00", patient: "Beatriz Alves", proc: "Avaliação", sala: "Sala 1", status: "confirmado" },
+  { time: "16:45", patient: "Fernanda Lima", proc: "Harmonização Facial", sala: "Sala 3", status: "aguardando" },
+];
+
+const glassTooltip = {
+  background: "var(--glass-bg-strong)",
+  backdropFilter: "blur(16px)",
+  border: "1px solid var(--glass-border)",
+  borderRadius: "0.75rem",
+  fontSize: 12,
+};
 
 /* ───────── Component ───────── */
 
@@ -63,8 +98,8 @@ const Dashboard = () => {
   const greeting = now.getHours() < 12 ? "Bom dia" : now.getHours() < 18 ? "Boa tarde" : "Boa noite";
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-5">
+      {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
         <div>
           <h1 className="text-2xl font-bold text-foreground">{greeting}, Dra. Damski</h1>
@@ -72,25 +107,29 @@ const Dashboard = () => {
             {now.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
         </div>
+        <div className="flex items-center gap-2">
+          <Badge className="bg-success/10 text-success border-success/20 text-[11px]">
+            <Activity className="w-3 h-3 mr-1" /> Clínica aberta
+          </Badge>
+        </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ── KPI Cards ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {kpis.map((kpi) => {
           const colors = colorMap[kpi.color];
           return (
-            <div
-              key={kpi.label}
-              className="rounded-2xl glass glass-hover p-5"
-            >
+            <div key={kpi.label} className="rounded-2xl glass glass-hover p-4 sm:p-5">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
-                  <p className="text-[13px] text-muted-foreground font-medium">{kpi.label}</p>
-                  <p className="text-2xl font-display font-bold text-foreground">{kpi.value}</p>
-                  <p className="text-xs font-medium text-success">{kpi.change}</p>
+                  <p className="text-[11px] sm:text-[13px] text-muted-foreground font-medium">{kpi.label}</p>
+                  <p className="text-xl sm:text-2xl font-display font-bold text-foreground">{kpi.value}</p>
+                  <p className={cn("text-[10px] sm:text-xs font-medium", kpi.trend === "up" ? "text-success" : "text-muted-foreground")}>
+                    {kpi.change}
+                  </p>
                 </div>
-                <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center", colors.bg)}>
-                  <kpi.icon className={cn("w-5 h-5", colors.text)} />
+                <div className={cn("w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center", colors.bg)}>
+                  <kpi.icon className={cn("w-4 h-4 sm:w-5 sm:h-5", colors.text)} />
                 </div>
               </div>
             </div>
@@ -98,26 +137,90 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* 4 panels side by side */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        {/* Agenda */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden h-[420px]">
+      {/* ── Row 2: Revenue Chart + Google Calendar ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        {/* Faturamento - Area Chart */}
+        <div className="lg:col-span-2 rounded-2xl glass glass-hover overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-success" />
+              <h2 className="text-sm font-semibold text-foreground">Evolução de Faturamento</h2>
+            </div>
+            <Badge variant="outline" className="text-[10px] text-success border-success/30">+18%</Badge>
+          </div>
+          <div className="p-4 flex-1">
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={revenueData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(160, 84%, 39%)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(160, 84%, 39%)" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000}k`} />
+                <Tooltip formatter={(v: number) => [`R$ ${v.toLocaleString("pt-BR")}`, "Faturamento"]} contentStyle={glassTooltip} />
+                <Area type="monotone" dataKey="value" stroke="hsl(160, 84%, 39%)" strokeWidth={2.5} fill="url(#revenueGrad)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Google Calendar */}
+        <div className="lg:col-span-3 rounded-2xl glass overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-primary" />
+              <h2 className="text-sm font-semibold text-foreground">Agenda</h2>
+            </div>
+            <Link to="/agendamentos" className="text-xs text-primary hover:underline flex items-center gap-0.5">
+              Ver completa <ChevronRight className="w-3 h-3" />
+            </Link>
+          </div>
           <iframe
             src="https://calendar.google.com/calendar/embed?src=brunolealcavalcante%40gmail.com&ctz=America%2FSao_Paulo"
-            className="w-full h-full border-0"
+            className="w-full border-0"
+            height="260"
             scrolling="no"
             title="Google Calendar"
           />
         </div>
+      </div>
 
-        {/* Top Procedimentos */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden h-[420px] flex flex-col">
+      {/* ── Row 3: Sessões da Semana + Top Procedimentos + Próximos Atendimentos ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Sessões da Semana - Bar Chart */}
+        <div className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
+          <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--glass-border)]">
+            <Clock className="w-4 h-4 text-info" />
+            <h2 className="text-sm font-semibold text-foreground">Sessões da Semana</h2>
+          </div>
+          <div className="p-4 flex-1">
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={sessionsWeekly} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
+                <XAxis dataKey="day" tick={{ fontSize: 11, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={glassTooltip} formatter={(v: number) => [`${v}`, "Sessões"]} />
+                <Bar dataKey="sessoes" radius={[6, 6, 0, 0]} barSize={28}>
+                  {sessionsWeekly.map((_, i) => (
+                    <Cell key={i} fill={i === 3 ? "hsl(239, 84%, 67%)" : "hsl(239, 84%, 67%, 0.35)"} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Top Procedimentos - Pie Chart */}
+        <div className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
           <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--glass-border)]">
             <Star className="w-4 h-4 text-[hsl(var(--gold))]" />
             <h2 className="text-sm font-semibold text-foreground">Top Procedimentos</h2>
           </div>
           <div className="p-3 flex-1 flex flex-col items-center justify-center">
-            <ResponsiveContainer width="100%" height={180}>
+            <ResponsiveContainer width="100%" height={160}>
               <PieChart>
                 <Pie
                   data={topProcedures}
@@ -125,8 +228,8 @@ const Dashboard = () => {
                   nameKey="name"
                   cx="50%"
                   cy="50%"
-                  outerRadius={70}
-                  innerRadius={35}
+                  outerRadius={65}
+                  innerRadius={32}
                   strokeWidth={2}
                   stroke="var(--glass-border)"
                 >
@@ -134,31 +237,56 @@ const Dashboard = () => {
                     <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip
-                  formatter={(value: number, name: string) => [`${value}x`, name]}
-                  contentStyle={{
-                    background: "var(--glass-bg-strong)",
-                    backdropFilter: "blur(16px)",
-                    border: "1px solid var(--glass-border)",
-                    borderRadius: "0.75rem",
-                    fontSize: 12,
-                  }}
-                />
+                <Tooltip formatter={(v: number, name: string) => [`${v}x`, name]} contentStyle={glassTooltip} />
               </PieChart>
             </ResponsiveContainer>
-            <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-2">
+            <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-1">
               {topProcedures.map((p, i) => (
                 <div key={i} className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[i] }} />
-                  <span className="text-[11px] text-muted-foreground">{p.name}</span>
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[i] }} />
+                  <span className="text-[10px] text-muted-foreground">{p.name}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
+        {/* Próximos Atendimentos */}
+        <div className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
+            <div className="flex items-center gap-2">
+              <Smile className="w-4 h-4 text-primary" />
+              <h2 className="text-sm font-semibold text-foreground">Próximos Atendimentos</h2>
+            </div>
+            <Badge variant="outline" className="text-[10px]">{nextAppointments.length}</Badge>
+          </div>
+          <div className="divide-y divide-border flex-1 overflow-y-auto">
+            {nextAppointments.map((a, i) => (
+              <div key={i} className="flex items-center gap-3 px-5 py-2.5">
+                <span className="text-xs font-mono font-semibold text-primary w-10 shrink-0">{a.time}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{a.patient}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">{a.proc} · {a.sala}</p>
+                </div>
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-[10px] shrink-0",
+                    a.status === "confirmado" ? "text-success border-success/30" : "text-warning border-warning/30"
+                  )}
+                >
+                  {a.status === "confirmado" ? "✓" : "⏳"}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Row 4: Insumos Críticos + Pendentes de Assinatura ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Insumos Críticos */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden h-[420px] flex flex-col">
+        <div className="rounded-2xl glass glass-hover overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-warning" />
@@ -168,7 +296,7 @@ const Dashboard = () => {
               Ver todos <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
-          <div className="divide-y divide-border flex-1 overflow-y-auto">
+          <div className="divide-y divide-border">
             {criticalSupplies.map((s, i) => (
               <div key={i} className="flex items-center gap-3 px-5 py-2.5">
                 <div className={cn(
@@ -194,7 +322,7 @@ const Dashboard = () => {
         </div>
 
         {/* Pendentes de Assinatura */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden h-[420px] flex flex-col">
+        <div className="rounded-2xl glass glass-hover overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <FileCheck className="w-4 h-4 text-warning" />
@@ -202,7 +330,7 @@ const Dashboard = () => {
             </div>
             <Badge variant="outline" className="text-[10px] text-warning border-warning/30">{pendingSignatures.length}</Badge>
           </div>
-          <div className="divide-y divide-border flex-1 overflow-y-auto">
+          <div className="divide-y divide-border">
             {pendingSignatures.map((s, i) => (
               <div key={i} className="flex items-center gap-3 px-5 py-2.5">
                 <div className="w-7 h-7 rounded-full bg-warning/10 flex items-center justify-center shrink-0">
