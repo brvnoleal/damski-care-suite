@@ -147,16 +147,22 @@ const PacienteDetalhe = () => {
     toast({ title: "Sessão registrada com sucesso" });
   };
 
-  const handleFileUpload = (files: File[]) => {
+  const openFotoDialog = (files: File[]) => {
     const imageFiles = files.filter((f) => f.type.startsWith("image/"));
     if (imageFiles.length === 0) {
       toast({ title: "Selecione arquivos de imagem válidos", variant: "destructive" });
       return;
     }
+    setPendingFiles(imageFiles);
+    setFotoMeta({ categoria: "antes", descricao: "" });
+    setFotoDialogOpen(true);
+  };
+
+  const handleFotoSave = () => {
     const today = new Date();
     const dateBR = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
 
-    imageFiles.forEach((file) => {
+    pendingFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const newFoto: Foto = {
@@ -165,12 +171,16 @@ const PacienteDetalhe = () => {
           name: file.name,
           date: dateBR,
           label: file.name.replace(/\.[^.]+$/, ""),
+          categoria: fotoMeta.categoria,
+          descricao: fotoMeta.descricao,
         };
         setFotos((prev) => [newFoto, ...prev]);
       };
       reader.readAsDataURL(file);
     });
-    toast({ title: `${imageFiles.length} foto(s) adicionada(s)` });
+    toast({ title: `${pendingFiles.length} foto(s) adicionada(s)` });
+    setFotoDialogOpen(false);
+    setPendingFiles([]);
   };
 
   if (!patientData) {
