@@ -215,14 +215,13 @@ const Agendamentos = () => {
               </Select>
             </div>
             <div className="sm:col-span-2">
-              <Label>Status</Label>
-              <Select value={form.status} onValueChange={(v: Agendamento["status"]) => setForm({ ...form, status: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Label>Procedimento *</Label>
+              <Select value={form.procedimento} onValueChange={(v: ProcedimentoConsulta) => setForm({ ...form, procedimento: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecione o procedimento..." /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="agendado">Agendado</SelectItem>
-                  <SelectItem value="confirmado">Confirmado</SelectItem>
-                  <SelectItem value="realizado">Realizado</SelectItem>
-                  <SelectItem value="cancelado">Cancelado</SelectItem>
+                  {Object.entries(procedimentoConsultaLabels).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
