@@ -49,7 +49,12 @@ const Pacientes = () => {
 
   const openEdit = (p: Paciente) => {
     setEditingId(p.id);
-    setForm({ nome: p.nome, cpf: p.cpf, telefone: p.telefone, email: p.email, instagram: p.instagram || "", data_nascimento: p.data_nascimento, status: p.status });
+    setForm({
+      nome: p.nome, cpf: p.cpf, telefone: p.telefone, email: p.email, instagram: p.instagram || "",
+      data_nascimento: p.data_nascimento, cep: p.cep || "", estado: p.estado || "", cidade: p.cidade || "",
+      bairro: p.bairro || "", rua: p.rua || "", numero: p.numero || "", complemento: p.complemento || "",
+      ponto_referencia: p.ponto_referencia || "", status: p.status,
+    });
     setDialogOpen(true);
   };
 
