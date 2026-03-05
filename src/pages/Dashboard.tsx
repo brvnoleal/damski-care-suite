@@ -109,20 +109,26 @@ const Dashboard = () => {
             <Star className="w-4 h-4 text-[hsl(var(--gold))]" />
             <h2 className="text-sm font-semibold text-foreground">Top Procedimentos</h2>
           </div>
-          <div className="p-4">
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={topProcedures} layout="vertical" margin={{ left: 0, right: 12, top: 4, bottom: 4 }}>
-                <XAxis type="number" hide />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  width={95}
-                  tick={{ fontSize: 11, fill: "hsl(215, 16%, 47%)" }}
-                  axisLine={false}
-                  tickLine={false}
-                />
+          <div className="p-4 flex flex-col items-center">
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={topProcedures}
+                  dataKey="count"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  innerRadius={40}
+                  strokeWidth={2}
+                  stroke="var(--glass-border)"
+                >
+                  {topProcedures.map((_, i) => (
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                  ))}
+                </Pie>
                 <Tooltip
-                  formatter={(value: number) => [`${value}x`, "Sessões"]}
+                  formatter={(value: number, name: string) => [`${value}x`, name]}
                   contentStyle={{
                     background: "var(--glass-bg-strong)",
                     backdropFilter: "blur(16px)",
@@ -131,13 +137,16 @@ const Dashboard = () => {
                     fontSize: 12,
                   }}
                 />
-                <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={18}>
-                  {topProcedures.map((_, i) => (
-                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
+              </PieChart>
             </ResponsiveContainer>
+            <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-1">
+              {topProcedures.map((p, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[i] }} />
+                  <span className="text-[11px] text-muted-foreground">{p.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
