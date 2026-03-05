@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import {
   Users, Calendar, Package, FileCheck, DollarSign, TrendingUp,
   Clock, AlertTriangle, CheckCircle2, ArrowUpRight, Syringe,
-  ChevronRight, Activity, Star, MapPin, User,
+  ChevronRight, Star, MapPin, User,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
