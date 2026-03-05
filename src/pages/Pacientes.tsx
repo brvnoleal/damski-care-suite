@@ -20,7 +20,9 @@ import { Paciente } from "@/types";
 import { pacienteService } from "@/services/pacienteService";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
-  nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo",
+  nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "",
+  cep: "", estado: "", cidade: "", bairro: "", rua: "", numero: "", complemento: "", ponto_referencia: "",
+  status: "ativo",
 });
 
 const Pacientes = () => {
@@ -47,7 +49,12 @@ const Pacientes = () => {
 
   const openEdit = (p: Paciente) => {
     setEditingId(p.id);
-    setForm({ nome: p.nome, cpf: p.cpf, telefone: p.telefone, email: p.email, instagram: p.instagram || "", data_nascimento: p.data_nascimento, status: p.status });
+    setForm({
+      nome: p.nome, cpf: p.cpf, telefone: p.telefone, email: p.email, instagram: p.instagram || "",
+      data_nascimento: p.data_nascimento, cep: p.cep || "", estado: p.estado || "", cidade: p.cidade || "",
+      bairro: p.bairro || "", rua: p.rua || "", numero: p.numero || "", complemento: p.complemento || "",
+      ponto_referencia: p.ponto_referencia || "", status: p.status,
+    });
     setDialogOpen(true);
   };
 
@@ -151,7 +158,7 @@ const Pacientes = () => {
 
       {/* Create / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingId ? "Editar Paciente" : "Novo Paciente"}</DialogTitle>
             <DialogDescription>
@@ -182,6 +189,43 @@ const Pacientes = () => {
             <div>
               <Label>Instagram</Label>
               <Input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@usuario" />
+            </div>
+
+            {/* Endereço */}
+            <div className="sm:col-span-2 pt-2">
+              <p className="text-sm font-semibold text-foreground border-b border-border pb-1">Endereço</p>
+            </div>
+            <div>
+              <Label>CEP</Label>
+              <Input value={form.cep} onChange={(e) => setForm({ ...form, cep: e.target.value })} placeholder="00000-000" />
+            </div>
+            <div>
+              <Label>Estado</Label>
+              <Input value={form.estado} onChange={(e) => setForm({ ...form, estado: e.target.value })} placeholder="SP" />
+            </div>
+            <div>
+              <Label>Cidade</Label>
+              <Input value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} placeholder="São Paulo" />
+            </div>
+            <div>
+              <Label>Bairro</Label>
+              <Input value={form.bairro} onChange={(e) => setForm({ ...form, bairro: e.target.value })} placeholder="Centro" />
+            </div>
+            <div className="sm:col-span-2">
+              <Label>Rua</Label>
+              <Input value={form.rua} onChange={(e) => setForm({ ...form, rua: e.target.value })} placeholder="Rua Exemplo" />
+            </div>
+            <div>
+              <Label>Número</Label>
+              <Input value={form.numero} onChange={(e) => setForm({ ...form, numero: e.target.value })} placeholder="123" />
+            </div>
+            <div>
+              <Label>Complemento</Label>
+              <Input value={form.complemento} onChange={(e) => setForm({ ...form, complemento: e.target.value })} placeholder="Apto 45" />
+            </div>
+            <div className="sm:col-span-2">
+              <Label>Ponto de Referência</Label>
+              <Input value={form.ponto_referencia} onChange={(e) => setForm({ ...form, ponto_referencia: e.target.value })} placeholder="Próximo ao mercado" />
             </div>
           </div>
           <DialogFooter>
