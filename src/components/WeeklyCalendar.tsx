@@ -233,7 +233,7 @@ export const WeeklyCalendar = () => {
       </div>
 
       {/* Day headers */}
-      <div className="flex border-b border-border">
+      <div className="flex border-b border-[var(--glass-border)]">
         {/* Gutter for time labels */}
         <div className="w-14 shrink-0" />
         {weekDays.map((day, i) => {

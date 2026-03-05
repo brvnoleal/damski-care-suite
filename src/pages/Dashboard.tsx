@@ -155,8 +155,8 @@ const Dashboard = () => {
         </div>
 
         {/* Pendentes de Assinatura */}
-        <div className="rounded-xl border border-border bg-card shadow-elegant">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        <div className="rounded-2xl glass glass-hover overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <FileCheck className="w-4 h-4 text-warning" />
               <h2 className="text-sm font-semibold text-foreground">Pendentes de Assinatura</h2>
