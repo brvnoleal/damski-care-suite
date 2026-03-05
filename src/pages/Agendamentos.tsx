@@ -150,6 +150,9 @@ const Agendamentos = () => {
                   <TableCell className="font-medium">{getPacienteNome(a.paciente_id)}</TableCell>
                   <TableCell className="text-muted-foreground hidden md:table-cell">{getDentistaNome(a.dentista_id)}</TableCell>
                   <TableCell>
+                    <Badge variant="outline" className="font-medium">{procedimentoConsultaLabels[a.procedimento]}</Badge>
+                  </TableCell>
+                  <TableCell>
                     <Badge className={st.className}>{st.label}</Badge>
                   </TableCell>
                   <TableCell className="text-right">
