@@ -99,8 +99,8 @@ const Dashboard = () => {
       {/* Bottom Row: 3 panels */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Procedimentos Populares */}
-        <div className="rounded-xl border border-border bg-card shadow-elegant">
-          <div className="flex items-center gap-2 px-5 py-4 border-b border-border">
+        <div className="rounded-2xl glass glass-hover overflow-hidden">
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-[var(--glass-border)]">
             <Star className="w-4 h-4 text-[hsl(var(--gold))]" />
             <h2 className="text-sm font-semibold text-foreground">Top Procedimentos</h2>
           </div>
