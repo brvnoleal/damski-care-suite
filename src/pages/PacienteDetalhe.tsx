@@ -82,10 +82,15 @@ const PacienteDetalhe = () => {
     name: string;
     date: string;
     label: string;
+    categoria: "antes" | "depois" | "durante" | "outro";
+    descricao: string;
   }
   const [fotos, setFotos] = useState<Foto[]>([]);
   const [previewFoto, setPreviewFoto] = useState<Foto | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fotoDialogOpen, setFotoDialogOpen] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [fotoMeta, setFotoMeta] = useState<{ categoria: Foto["categoria"]; descricao: string }>({ categoria: "antes", descricao: "" });
 
   // Refresh patient data
   const [patientData, setPatientData] = useState(paciente);
