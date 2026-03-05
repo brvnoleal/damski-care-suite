@@ -80,6 +80,56 @@ function timeToMinutes(t: string) {
   return h * 60 + m;
 }
 
+/** Compute column layout for overlapping events (Google Calendar algorithm) */
+function layoutEvents(events: typeof todayAgenda) {
+  const sorted = events.map((e, i) => ({
+    ...e,
+    idx: i,
+    startMin: timeToMinutes(e.time),
+    endMin: timeToMinutes(e.endTime),
+    col: 0,
+    totalCols: 1,
+  })).sort((a, b) => a.startMin - b.startMin || a.endMin - b.endMin);
+
+  const groups: (typeof sorted)[] = [];
+  let currentGroup: typeof sorted = [];
+
+  for (const ev of sorted) {
+    if (currentGroup.length === 0 || ev.startMin < Math.max(...currentGroup.map(e => e.endMin))) {
+      currentGroup.push(ev);
+    } else {
+      groups.push(currentGroup);
+      currentGroup = [ev];
+    }
+  }
+  if (currentGroup.length > 0) groups.push(currentGroup);
+
+  for (const group of groups) {
+    const columns: number[] = [];
+    for (const ev of group) {
+      let placed = false;
+      for (let c = 0; c < columns.length; c++) {
+        if (ev.startMin >= columns[c]) {
+          ev.col = c;
+          columns[c] = ev.endMin;
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        ev.col = columns.length;
+        columns.push(ev.endMin);
+      }
+    }
+    const totalCols = columns.length;
+    for (const ev of group) {
+      ev.totalCols = totalCols;
+    }
+  }
+
+  return sorted;
+}
+
 /* ───────── Component ───────── */
 
 const Dashboard = () => {
