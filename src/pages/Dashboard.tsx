@@ -265,7 +265,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Próximos Atendimentos */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
+        <motion.div {...fadeUp(0.7)} className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <Smile className="w-4 h-4 text-primary" />
