@@ -65,13 +65,6 @@ const topProcedures = [
   { name: "Preenchimento Labial", count: 10, revenue: "R$ 6.000", pct: 31 },
 ];
 
-const recentActivity = [
-  { icon: Syringe, text: "Sessão de Harmonização concluída — Maria Silva", time: "há 25 min", type: "session" },
-  { icon: Users, text: "Novo paciente cadastrado — Ricardo Nunes", time: "há 1h", type: "patient" },
-  { icon: DollarSign, text: "Pagamento recebido — R$ 1.200 via PIX", time: "há 2h", type: "payment" },
-  { icon: Package, text: "Lote AH2024-089 próximo do vencimento", time: "há 3h", type: "alert" },
-  { icon: FileCheck, text: "TCLE assinado digitalmente — João Oliveira", time: "há 4h", type: "doc" },
-];
 
 /* ───────── Helpers ───────── */
 
