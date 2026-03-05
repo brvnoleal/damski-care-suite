@@ -190,6 +190,43 @@ const Pacientes = () => {
               <Label>Instagram</Label>
               <Input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@usuario" />
             </div>
+
+            {/* Endereço */}
+            <div className="sm:col-span-2 pt-2">
+              <p className="text-sm font-semibold text-foreground border-b border-border pb-1">Endereço</p>
+            </div>
+            <div>
+              <Label>CEP</Label>
+              <Input value={form.cep} onChange={(e) => setForm({ ...form, cep: e.target.value })} placeholder="00000-000" />
+            </div>
+            <div>
+              <Label>Estado</Label>
+              <Input value={form.estado} onChange={(e) => setForm({ ...form, estado: e.target.value })} placeholder="SP" />
+            </div>
+            <div>
+              <Label>Cidade</Label>
+              <Input value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} placeholder="São Paulo" />
+            </div>
+            <div>
+              <Label>Bairro</Label>
+              <Input value={form.bairro} onChange={(e) => setForm({ ...form, bairro: e.target.value })} placeholder="Centro" />
+            </div>
+            <div className="sm:col-span-2">
+              <Label>Rua</Label>
+              <Input value={form.rua} onChange={(e) => setForm({ ...form, rua: e.target.value })} placeholder="Rua Exemplo" />
+            </div>
+            <div>
+              <Label>Número</Label>
+              <Input value={form.numero} onChange={(e) => setForm({ ...form, numero: e.target.value })} placeholder="123" />
+            </div>
+            <div>
+              <Label>Complemento</Label>
+              <Input value={form.complemento} onChange={(e) => setForm({ ...form, complemento: e.target.value })} placeholder="Apto 45" />
+            </div>
+            <div className="sm:col-span-2">
+              <Label>Ponto de Referência</Label>
+              <Input value={form.ponto_referencia} onChange={(e) => setForm({ ...form, ponto_referencia: e.target.value })} placeholder="Próximo ao mercado" />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
