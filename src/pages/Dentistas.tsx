@@ -148,7 +148,7 @@ const Dentistas = () => {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingId ? "Editar Dentista" : "Novo Dentista"}</DialogTitle>
             <DialogDescription>
@@ -175,6 +175,72 @@ const Dentistas = () => {
             <div>
               <Label>Email</Label>
               <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@exemplo.com" />
+            </div>
+            <div>
+              <Label>Instagram</Label>
+              <Input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@usuario" />
+            </div>
+
+            <div className="sm:col-span-2 pt-2">
+              <h3 className="text-sm font-semibold text-foreground mb-3">Endereço</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <Label>CEP</Label>
+                  <Input
+                    value={form.cep}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/\D/g, "").slice(0, 8);
+                      const formatted = raw.length > 5 ? raw.slice(0, 5) + "-" + raw.slice(5) : raw;
+                      setForm((prev) => ({ ...prev, cep: formatted }));
+                      if (raw.length === 8) {
+                        fetch(`https://viacep.com.br/ws/${raw}/json/`)
+                          .then((r) => r.json())
+                          .then((data) => {
+                            if (!data.erro) {
+                              setForm((prev) => ({
+                                ...prev,
+                                estado: data.uf || prev.estado,
+                                cidade: data.localidade || prev.cidade,
+                                bairro: data.bairro || prev.bairro,
+                                rua: data.logradouro || prev.rua,
+                              }));
+                            }
+                          })
+                          .catch(() => {});
+                      }
+                    }}
+                    placeholder="00000-000"
+                  />
+                </div>
+                <div>
+                  <Label>Estado</Label>
+                  <Input value={form.estado} onChange={(e) => setForm({ ...form, estado: e.target.value })} placeholder="SP" />
+                </div>
+                <div>
+                  <Label>Cidade</Label>
+                  <Input value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} placeholder="São Paulo" />
+                </div>
+                <div>
+                  <Label>Bairro</Label>
+                  <Input value={form.bairro} onChange={(e) => setForm({ ...form, bairro: e.target.value })} placeholder="Centro" />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label>Rua</Label>
+                  <Input value={form.rua} onChange={(e) => setForm({ ...form, rua: e.target.value })} placeholder="Rua Exemplo" />
+                </div>
+                <div>
+                  <Label>Número</Label>
+                  <Input value={form.numero} onChange={(e) => setForm({ ...form, numero: e.target.value })} placeholder="123" />
+                </div>
+                <div>
+                  <Label>Complemento</Label>
+                  <Input value={form.complemento} onChange={(e) => setForm({ ...form, complemento: e.target.value })} placeholder="Sala 1" />
+                </div>
+                <div>
+                  <Label>Ponto de Referência</Label>
+                  <Input value={form.ponto_referencia} onChange={(e) => setForm({ ...form, ponto_referencia: e.target.value })} placeholder="Próximo ao..." />
+                </div>
+              </div>
             </div>
           </div>
           <DialogFooter>
