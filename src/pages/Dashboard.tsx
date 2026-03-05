@@ -224,7 +224,7 @@ const Dashboard = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </motion.div>
 
         {/* Top Procedimentos - Pie Chart */}
         <div className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
