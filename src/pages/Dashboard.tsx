@@ -186,7 +186,7 @@ const Dashboard = () => {
       {/* Main Grid: Agenda (Google Calendar style) + Sidebar */}
       <div className="grid grid-cols-1 gap-6">
         {/* Agenda do Dia — Google Calendar day view */}
-        <div className="lg:col-span-2 rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
+        <div className="rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-center">
