@@ -12,6 +12,19 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
   BarChart, Bar,
 } from "recharts";
+import { motion } from "framer-motion";
+
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
+});
+
+const scaleIn = (delay = 0) => ({
+  initial: { opacity: 0, scale: 0.95 },
+  animate: { opacity: 1, scale: 1 },
+  transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
+});
 
 /* ───────── Mock Data ───────── */
 
@@ -116,10 +129,10 @@ const Dashboard = () => {
 
       {/* ── KPI Cards ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {kpis.map((kpi) => {
+        {kpis.map((kpi, i) => {
           const colors = colorMap[kpi.color];
           return (
-            <div key={kpi.label} className="rounded-2xl glass glass-hover p-4 sm:p-5">
+            <motion.div key={kpi.label} {...fadeUp(i * 0.08)} className="rounded-2xl glass glass-hover p-4 sm:p-5">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
                   <p className="text-[11px] sm:text-[13px] text-muted-foreground font-medium">{kpi.label}</p>
@@ -132,7 +145,7 @@ const Dashboard = () => {
                   <kpi.icon className={cn("w-4 h-4 sm:w-5 sm:h-5", colors.text)} />
                 </div>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -140,7 +153,7 @@ const Dashboard = () => {
       {/* ── Row 2: Revenue Chart + Google Calendar ── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {/* Faturamento - Area Chart */}
-        <div className="lg:col-span-2 rounded-2xl glass glass-hover overflow-hidden flex flex-col">
+        <motion.div {...scaleIn(0.35)} className="lg:col-span-2 rounded-2xl glass glass-hover overflow-hidden flex flex-col">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-success" />
@@ -165,10 +178,10 @@ const Dashboard = () => {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </motion.div>
 
         {/* Google Calendar */}
-        <div className="lg:col-span-3 rounded-2xl glass overflow-hidden">
+        <motion.div {...scaleIn(0.45)} className="lg:col-span-3 rounded-2xl glass overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4 text-primary" />
@@ -185,13 +198,13 @@ const Dashboard = () => {
             scrolling="no"
             title="Google Calendar"
           />
-        </div>
+        </motion.div>
       </div>
 
       {/* ── Row 3: Sessões da Semana + Top Procedimentos + Próximos Atendimentos ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Sessões da Semana - Bar Chart */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
+        <motion.div {...fadeUp(0.5)} className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
           <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--glass-border)]">
             <Clock className="w-4 h-4 text-info" />
             <h2 className="text-sm font-semibold text-foreground">Sessões da Semana</h2>
@@ -211,10 +224,10 @@ const Dashboard = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </motion.div>
 
         {/* Top Procedimentos - Pie Chart */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
+        <motion.div {...fadeUp(0.6)} className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
           <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--glass-border)]">
             <Star className="w-4 h-4 text-[hsl(var(--gold))]" />
             <h2 className="text-sm font-semibold text-foreground">Top Procedimentos</h2>
@@ -249,10 +262,10 @@ const Dashboard = () => {
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Próximos Atendimentos */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
+        <motion.div {...fadeUp(0.7)} className="rounded-2xl glass glass-hover overflow-hidden flex flex-col">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <Smile className="w-4 h-4 text-primary" />
@@ -280,13 +293,13 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* ── Row 4: Insumos Críticos + Pendentes de Assinatura ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Insumos Críticos */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden">
+        <motion.div {...fadeUp(0.8)} className="rounded-2xl glass glass-hover overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 text-warning" />
@@ -319,10 +332,10 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Pendentes de Assinatura */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden">
+        <motion.div {...fadeUp(0.9)} className="rounded-2xl glass glass-hover overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <FileCheck className="w-4 h-4 text-warning" />
@@ -346,7 +359,7 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
