@@ -105,8 +105,8 @@ const Dashboard = () => {
           <WeeklyCalendar />
         </div>
 
-        {/* Right panels - 2 cols */}
-        <div className="lg:col-span-2 flex flex-col gap-4">
+        {/* Right panels - stacked */}
+        <div className="flex flex-col gap-4">
           {/* Top Procedimentos */}
           <div className="rounded-2xl glass glass-hover overflow-hidden flex-1">
             <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--glass-border)]">
