@@ -129,10 +129,10 @@ const Dashboard = () => {
 
       {/* ── KPI Cards ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {kpis.map((kpi) => {
+        {kpis.map((kpi, i) => {
           const colors = colorMap[kpi.color];
           return (
-            <div key={kpi.label} className="rounded-2xl glass glass-hover p-4 sm:p-5">
+            <motion.div key={kpi.label} {...fadeUp(i * 0.08)} className="rounded-2xl glass glass-hover p-4 sm:p-5">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
                   <p className="text-[11px] sm:text-[13px] text-muted-foreground font-medium">{kpi.label}</p>
@@ -145,7 +145,7 @@ const Dashboard = () => {
                   <kpi.icon className={cn("w-4 h-4 sm:w-5 sm:h-5", colors.text)} />
                 </div>
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -153,7 +153,7 @@ const Dashboard = () => {
       {/* ── Row 2: Revenue Chart + Google Calendar ── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {/* Faturamento - Area Chart */}
-        <div className="lg:col-span-2 rounded-2xl glass glass-hover overflow-hidden flex flex-col">
+        <motion.div {...scaleIn(0.35)} className="lg:col-span-2 rounded-2xl glass glass-hover overflow-hidden flex flex-col">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-success" />
