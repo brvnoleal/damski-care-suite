@@ -11,6 +11,14 @@ export interface Paciente {
   email: string;
   instagram?: string;
   data_nascimento: string;
+  cep?: string;
+  estado?: string;
+  cidade?: string;
+  bairro?: string;
+  rua?: string;
+  numero?: string;
+  complemento?: string;
+  ponto_referencia?: string;
   status: "ativo" | "inativo";
   created_at?: string;
 }
