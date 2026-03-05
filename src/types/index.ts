@@ -30,6 +30,15 @@ export interface Dentista {
   cro: string;
   telefone?: string;
   email?: string;
+  instagram?: string;
+  cep?: string;
+  estado?: string;
+  cidade?: string;
+  bairro?: string;
+  rua?: string;
+  numero?: string;
+  complemento?: string;
+  ponto_referencia?: string;
   status: "ativo" | "inativo";
   created_at?: string;
 }
