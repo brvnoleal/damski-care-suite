@@ -151,17 +151,17 @@ O script completo de criação está em [`docs/database/schema.sql`](docs/databa
 - ✅ Editar dentista
 - ✅ Excluir dentista
 
-### 8.3 CRUD de Agendamentos
-- ✅ Criar agendamento (com seleção de paciente e dentista)
-- ✅ Listar agendamentos
-- ✅ Editar agendamento (alterar status, data, horário)
-- ✅ Cancelar/Excluir agendamento
+### 8.3 CRUD de Consultas (anteriormente Agendamentos)
+- ✅ Criar consulta (com seleção de paciente, dentista e procedimento odontológico)
+- ✅ Listar consultas (tabela com coluna de procedimento)
+- ✅ Editar consulta (alterar procedimento, data, horário)
+- ✅ Cancelar/Excluir consulta
+- ✅ Campo Procedimento com tipos específicos: Limpeza, Restauração, Extração, Tratamento de Canal, Clareamento, Ortodontia, Implante, Prótese, Avaliação, Retorno, Urgência
 
 ### 8.4 Módulos Complementares
 - Dashboard com KPIs e alertas
 - Controle de insumos com rastreabilidade
 - Painel financeiro com gráficos
-- Modo fiscalização para auditoria
 - Configurações de sistema
 
 ---
