@@ -250,7 +250,7 @@ const PacienteDetalhe = () => {
       <Tabs defaultValue="evolucoes" className="space-y-4">
         <TabsList className="bg-muted/50 p-1">
           <TabsTrigger value="evolucoes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
-            <ClipboardList className="w-3.5 h-3.5" /> Evoluções
+            <ClipboardList className="w-3.5 h-3.5" /> Consultas
           </TabsTrigger>
           <TabsTrigger value="documentos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <FileText className="w-3.5 h-3.5" /> Documentos
