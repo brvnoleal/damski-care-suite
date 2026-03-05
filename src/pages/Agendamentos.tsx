@@ -106,7 +106,7 @@ const Agendamentos = () => {
         </div>
         <Button onClick={openCreate} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
           <Plus className="w-4 h-4" />
-          Novo Agendamento
+          Nova Consulta
         </Button>
       </div>
 
@@ -178,9 +178,9 @@ const Agendamentos = () => {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editingId ? "Editar Agendamento" : "Novo Agendamento"}</DialogTitle>
+            <DialogTitle>{editingId ? "Editar Consulta" : "Nova Consulta"}</DialogTitle>
             <DialogDescription>
-              {editingId ? "Atualize os dados do agendamento." : "Preencha os dados para criar um novo agendamento."}
+              {editingId ? "Atualize os dados da consulta." : "Preencha os dados para criar uma nova consulta."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
