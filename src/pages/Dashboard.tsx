@@ -283,51 +283,6 @@ const Dashboard = () => {
                   );
                 })}
               </div>
-                const top = ((event.startMin - startMinutes) / totalRange) * (timeSlots.length * 64);
-                const height = Math.max(((event.endMin - event.startMin) / totalRange) * (timeSlots.length * 64), 32);
-                const isDone = event.status === "concluída";
-                const colorClass = eventColors[event.idx % eventColors.length];
-
-                const colWidth = 100 / event.totalCols;
-                const leftPct = event.col * colWidth;
-
-                return (
-                  <div
-                    key={event.idx}
-                    className={cn(
-                      "absolute z-10 rounded-lg cursor-pointer transition-all hover:shadow-md",
-                      isDone ? "opacity-50" : ""
-                    )}
-                    style={{
-                      top: `${top}px`,
-                      height: `${height}px`,
-                      left: `calc(3.5rem + 4px + ${leftPct}% * (100% - 3.5rem - 4px - 12px) / 100)`,
-                      width: `calc(${colWidth}% * (100% - 3.5rem - 4px - 12px) / 100 - 3px)`,
-                    }}
-                  >
-                    {/* Background + left accent bar */}
-                    <div className={cn("absolute inset-0 rounded-lg", colorClass, "opacity-15")} />
-                    <div className={cn("absolute left-0 top-0 bottom-0 w-1 rounded-l-lg", colorClass)} />
-
-                    <div className="relative h-full px-2.5 py-1.5 overflow-hidden">
-                      <p className={cn(
-                        "text-[12px] font-semibold truncate leading-tight",
-                        isDone ? "text-muted-foreground line-through" : "text-foreground"
-                      )}>
-                        {event.name}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
-                        {event.time}–{event.endTime}
-                      </p>
-                      {height > 50 && (
-                        <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
-                          {event.proc}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </div>
