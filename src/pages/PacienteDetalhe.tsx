@@ -343,7 +343,19 @@ const PacienteDetalhe = () => {
                     <img src={foto.url} alt={foto.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="p-2">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <Badge variant="outline" className={cn(
+                        "text-[10px] px-1.5 py-0",
+                        foto.categoria === "antes" && "border-blue-500/30 text-blue-600",
+                        foto.categoria === "depois" && "border-green-500/30 text-green-600",
+                        foto.categoria === "durante" && "border-amber-500/30 text-amber-600",
+                        foto.categoria === "outro" && "border-muted-foreground/30 text-muted-foreground",
+                      )}>
+                        {foto.categoria.charAt(0).toUpperCase() + foto.categoria.slice(1)}
+                      </Badge>
+                    </div>
                     <p className="text-xs font-medium text-foreground truncate">{foto.label || foto.name}</p>
+                    {foto.descricao && <p className="text-[11px] text-muted-foreground truncate">{foto.descricao}</p>}
                     <p className="text-xs text-muted-foreground">{foto.date}</p>
                   </div>
                   {/* Overlay actions */}
