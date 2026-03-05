@@ -142,6 +142,33 @@ const PacienteDetalhe = () => {
     toast({ title: "Sessão registrada com sucesso" });
   };
 
+  const handleFileUpload = (files: File[]) => {
+    const imageFiles = files.filter((f) => f.type.startsWith("image/"));
+    if (imageFiles.length === 0) {
+      toast({ title: "Selecione arquivos de imagem válidos", variant: "destructive" });
+      return;
+    }
+    const today = new Date();
+    const dateBR = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
+
+    imageFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const newFoto: Foto = {
+          id: `f${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          url: e.target?.result as string,
+          name: file.name,
+          date: dateBR,
+          label: file.name.replace(/\.[^.]+$/, ""),
+        };
+        setFotos((prev) => [newFoto, ...prev]);
+      };
+      reader.readAsDataURL(file);
+    });
+    toast({ title: `${imageFiles.length} foto(s) adicionada(s)` });
+  };
+  };
+
   if (!patientData) {
     return (
       <div className="space-y-6">
