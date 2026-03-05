@@ -236,52 +236,48 @@ const Dashboard = () => {
               )}
 
               {/* Event blocks */}
-              {todayAgenda.map((event, i) => {
-                const evStart = timeToMinutes(event.time);
-                const evEnd = timeToMinutes(event.endTime);
-                const top = ((evStart - startMinutes) / totalRange) * (timeSlots.length * 64);
-                const height = Math.max(((evEnd - evStart) / totalRange) * (timeSlots.length * 64), 28);
+              {layoutEvents(todayAgenda).map((event) => {
+                const top = ((event.startMin - startMinutes) / totalRange) * (timeSlots.length * 64);
+                const height = Math.max(((event.endMin - event.startMin) / totalRange) * (timeSlots.length * 64), 32);
                 const isDone = event.status === "concluída";
-                const colorClass = eventColors[i % eventColors.length];
+                const colorClass = eventColors[event.idx % eventColors.length];
+
+                const colWidth = 100 / event.totalCols;
+                const leftPct = event.col * colWidth;
 
                 return (
                   <div
-                    key={i}
+                    key={event.idx}
                     className={cn(
-                      "absolute left-16 right-3 z-10 rounded-lg px-3 py-1.5 cursor-pointer transition-all hover:opacity-90 hover:shadow-md group",
+                      "absolute z-10 rounded-lg cursor-pointer transition-all hover:shadow-md",
                       isDone ? "opacity-50" : ""
                     )}
                     style={{
                       top: `${top}px`,
                       height: `${height}px`,
-                      minHeight: "28px",
+                      left: `calc(3.5rem + 4px + ${leftPct}% * (100% - 3.5rem - 4px - 12px) / 100)`,
+                      width: `calc(${colWidth}% * (100% - 3.5rem - 4px - 12px) / 100 - 3px)`,
                     }}
                   >
-                    {/* Color bar */}
+                    {/* Background + left accent bar */}
                     <div className={cn("absolute inset-0 rounded-lg", colorClass, "opacity-15")} />
                     <div className={cn("absolute left-0 top-0 bottom-0 w-1 rounded-l-lg", colorClass)} />
 
-                    <div className="relative flex items-start justify-between h-full">
-                      <div className="flex-1 min-w-0 pl-2">
-                        <p className={cn(
-                          "text-[13px] font-semibold truncate",
-                          isDone ? "text-muted-foreground line-through" : "text-foreground"
-                        )}>
-                          {event.name}
+                    <div className="relative h-full px-2.5 py-1.5 overflow-hidden">
+                      <p className={cn(
+                        "text-[12px] font-semibold truncate leading-tight",
+                        isDone ? "text-muted-foreground line-through" : "text-foreground"
+                      )}>
+                        {event.name}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
+                        {event.time}–{event.endTime}
+                      </p>
+                      {height > 50 && (
+                        <p className="text-[10px] text-muted-foreground truncate leading-tight mt-0.5">
+                          {event.proc}
                         </p>
-                        {height > 36 && (
-                          <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1 mt-0.5">
-                            <Syringe className="w-3 h-3 shrink-0" />
-                            {event.proc}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {isDone && <CheckCircle2 className="w-3.5 h-3.5 text-success" />}
-                        <span className="text-[10px] text-muted-foreground font-mono whitespace-nowrap">
-                          {event.time}–{event.endTime}
-                        </span>
-                      </div>
+                      )}
                     </div>
                   </div>
                 );
