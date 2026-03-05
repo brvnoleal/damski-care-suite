@@ -335,7 +335,7 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Pendentes de Assinatura */}
-        <div className="rounded-2xl glass glass-hover overflow-hidden">
+        <motion.div {...fadeUp(0.9)} className="rounded-2xl glass glass-hover overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--glass-border)]">
             <div className="flex items-center gap-2">
               <FileCheck className="w-4 h-4 text-warning" />
