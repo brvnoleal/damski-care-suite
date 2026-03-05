@@ -263,12 +263,88 @@ const PacienteDetalhe = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="fotos">
-          <div className="rounded-xl border border-border bg-card p-8 text-center">
-            <Camera className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">Fotos de antes/depois dos procedimentos</p>
-            <p className="text-xs text-muted-foreground mt-1">Funcionalidade disponível com backend ativo</p>
+        <TabsContent value="fotos" className="space-y-4">
+          {/* Upload area */}
+          <div
+            className="rounded-xl border-2 border-dashed border-border bg-card p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors"
+            onClick={() => fileInputRef.current?.click()}
+            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const files = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith("image/"));
+              handleFileUpload(files);
+            }}
+          >
+            <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm font-medium text-foreground">Clique ou arraste imagens aqui</p>
+            <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP — antes/depois dos procedimentos</p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files) {
+                  handleFileUpload(Array.from(e.target.files));
+                  e.target.value = "";
+                }
+              }}
+            />
           </div>
+
+          {/* Grid de fotos */}
+          {fotos.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {fotos.map((foto) => (
+                <div key={foto.id} className="group relative rounded-xl border border-border bg-card overflow-hidden shadow-elegant">
+                  <div className="aspect-square overflow-hidden">
+                    <img src={foto.url} alt={foto.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="p-2">
+                    <p className="text-xs font-medium text-foreground truncate">{foto.label || foto.name}</p>
+                    <p className="text-xs text-muted-foreground">{foto.date}</p>
+                  </div>
+                  {/* Overlay actions */}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => setPreviewFoto(foto)}
+                      className="p-2 rounded-full bg-card/90 text-foreground hover:bg-card transition-colors"
+                    >
+                      <ZoomIn className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setFotos((prev) => prev.filter((f) => f.id !== foto.id));
+                        toast({ title: "Foto removida" });
+                      }}
+                      className="p-2 rounded-full bg-destructive/90 text-destructive-foreground hover:bg-destructive transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {fotos.length === 0 && (
+            <p className="text-center text-xs text-muted-foreground">Nenhuma foto adicionada ainda.</p>
+          )}
+
+          {/* Preview modal */}
+          {previewFoto && (
+            <Dialog open={!!previewFoto} onOpenChange={() => setPreviewFoto(null)}>
+              <DialogContent className="sm:max-w-2xl p-2">
+                <DialogHeader className="sr-only">
+                  <DialogTitle>{previewFoto.name}</DialogTitle>
+                  <DialogDescription>Visualização da foto</DialogDescription>
+                </DialogHeader>
+                <img src={previewFoto.url} alt={previewFoto.name} className="w-full h-auto rounded-lg" />
+              </DialogContent>
+            </Dialog>
+          )}
         </TabsContent>
 
         <TabsContent value="insumos">
