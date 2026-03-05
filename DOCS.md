@@ -195,26 +195,26 @@ A biblioteca **Framer Motion** é utilizada para animações de entrada (mount a
 
 ## 10. Funcionalidades Implementadas
 
-### 8.1 CRUD de Pacientes
+### 10.1 CRUD de Pacientes
 - ✅ Criar paciente (formulário com validação)
 - ✅ Listar pacientes (tabela com busca)
 - ✅ Editar paciente (modal de edição)
 - ✅ Excluir paciente (confirmação de exclusão)
 
-### 8.2 CRUD de Dentistas
+### 10.2 CRUD de Dentistas
 - ✅ Criar dentista
 - ✅ Listar dentistas
 - ✅ Editar dentista
 - ✅ Excluir dentista
 
-### 8.3 CRUD de Consultas (anteriormente Agendamentos)
+### 10.3 CRUD de Consultas (anteriormente Agendamentos)
 - ✅ Criar consulta (com seleção de paciente, dentista e procedimento odontológico)
 - ✅ Listar consultas (tabela com coluna de procedimento)
 - ✅ Editar consulta (alterar procedimento, data, horário)
 - ✅ Cancelar/Excluir consulta
 - ✅ Campo Procedimento com tipos específicos: Limpeza, Restauração, Extração, Tratamento de Canal, Clareamento, Ortodontia, Implante, Prótese, Avaliação, Retorno, Urgência
 
-### 8.4 Módulos Complementares
+### 10.4 Módulos Complementares
 - Dashboard com KPIs e alertas
 - Controle de insumos com rastreabilidade
 - Painel financeiro com gráficos
@@ -222,7 +222,7 @@ A biblioteca **Framer Motion** é utilizada para animações de entrada (mount a
 
 ---
 
-## 9. Conclusão
+## 11. Conclusão
 
 O projeto **Damski Odonto** atingiu os objetivos propostos, resultando em uma aplicação web funcional que demonstra a integração entre desenvolvimento frontend moderno, modelagem de banco de dados relacional e práticas de controle de versão.
 
