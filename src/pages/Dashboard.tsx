@@ -22,7 +22,7 @@ const kpis = [
 const colorMap = {
   primary: { bg: "bg-primary/10", text: "text-primary", ring: "ring-primary/20" },
   info: { bg: "bg-info/10", text: "text-info", ring: "ring-info/20" },
-  success: { bg: "bg-success/10", text: "text-success", ring: "ring-success/20" },
+  warning: { bg: "bg-warning/10", text: "text-warning", ring: "ring-warning/20" },
   gold: { bg: "bg-[hsl(var(--gold))]/10", text: "text-[hsl(var(--gold))]", ring: "ring-[hsl(var(--gold))]/20" },
 };
 
