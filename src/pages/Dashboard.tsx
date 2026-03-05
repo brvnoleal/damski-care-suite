@@ -55,14 +55,8 @@ const topProcedures = [
 /* ───────── Component ───────── */
 
 const Dashboard = () => {
-  const completedCount = todayAgenda.filter((s) => s.status === "concluída").length;
   const now = new Date();
   const greeting = now.getHours() < 12 ? "Bom dia" : now.getHours() < 18 ? "Boa tarde" : "Boa noite";
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-  const startMinutes = timeToMinutes(timeSlots[0]);
-  const endMinutes = timeToMinutes(timeSlots[timeSlots.length - 1]);
-  const totalRange = endMinutes - startMinutes;
 
   return (
     <div className="space-y-6">
