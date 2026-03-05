@@ -1,12 +1,14 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Users, Calendar, Package, FileCheck, DollarSign, TrendingUp,
-  Clock, AlertTriangle, CheckCircle2, ArrowUpRight, Syringe,
-  ChevronRight, Star, MapPin, User,
+  AlertTriangle, ArrowUpRight,
+  ChevronRight, Star,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { WeeklyCalendar } from "@/components/WeeklyCalendar";
 import { cn } from "@/lib/utils";
 
 /* ───────── Mock Data ───────── */
