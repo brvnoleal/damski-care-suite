@@ -493,7 +493,7 @@ const PacienteDetalhe = () => {
                 </tr>
               </tbody>
             </table>
-          </div>
+          </LiquidGlassCard>
         </TabsContent>
       </Tabs>
 
