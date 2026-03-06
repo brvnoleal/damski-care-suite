@@ -15,10 +15,14 @@ import Financeiro from "./pages/Financeiro";
 
 import Configuracoes from "./pages/Configuracoes";
 import NotFound from "./pages/NotFound";
+import { useCodeProtection } from "./hooks/useCodeProtection";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  useCodeProtection();
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
