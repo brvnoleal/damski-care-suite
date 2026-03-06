@@ -263,7 +263,7 @@ const Financeiro = () => {
         {/* Receita por Procedimento (Pie) */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Por Procedimento</CardTitle>
+            <CardTitle className="text-base">Procedimento</CardTitle>
             <CardDescription>Distribuição da receita</CardDescription>
           </CardHeader>
           <CardContent>
