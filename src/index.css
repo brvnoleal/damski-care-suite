@@ -128,10 +128,9 @@
   }
 
   .dark body {
-    background:
-      radial-gradient(ellipse 80% 50% at 20% 20%, hsla(239, 84%, 67%, 0.1) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 80%, hsla(160, 84%, 39%, 0.06) 0%, transparent 50%),
-      linear-gradient(to right, #000000, #152331);
+    background: linear-gradient(to right, #000000, #152331);
+    background-attachment: fixed;
+    min-height: 100vh;
   }
 
   h1, h2, h3, h4 {
