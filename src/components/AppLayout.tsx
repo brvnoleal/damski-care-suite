@@ -1,5 +1,6 @@
 import { useState, useEffect, useSyncExternalStore } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { MeshGradientBackground } from "@/components/ui/mesh-gradient-background";
 import {
   LayoutDashboard,
   Users,
