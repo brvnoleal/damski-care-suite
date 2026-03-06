@@ -22,6 +22,7 @@ import { Agendamento, ProcedimentoConsulta, procedimentoConsultaLabels, FormaPag
 import { agendamentoService } from "@/services/agendamentoService";
 import { pacienteService } from "@/services/pacienteService";
 import { dentistaService } from "@/services/dentistaService";
+import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
   data: "", horario: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
@@ -117,10 +118,10 @@ const Agendamentos = () => {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
+      <LiquidGlassCard className="overflow-hidden" draggable={false}>
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
+            <TableRow className="bg-white/5">
               <TableHead className="font-semibold">Data</TableHead>
               <TableHead className="font-semibold">Horário</TableHead>
               <TableHead className="font-semibold">Paciente</TableHead>
@@ -134,7 +135,7 @@ const Agendamentos = () => {
             {filtered.map((a) => {
               const st = statusConfig[a.status] || statusConfig.agendado;
               return (
-                <TableRow key={a.id} className="hover:bg-muted/30 transition-colors">
+                <TableRow key={a.id} className="hover:bg-white/5 transition-colors">
                   <TableCell>
                     <span className="flex items-center gap-1.5 text-sm">
                       <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
@@ -157,7 +158,7 @@ const Agendamentos = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <button onClick={() => openEdit(a)} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                      <button onClick={() => openEdit(a)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
                         <Edit className="w-4 h-4" />
                       </button>
                       <button onClick={() => { setDeletingId(a.id); setDeleteOpen(true); }} className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
@@ -177,7 +178,7 @@ const Agendamentos = () => {
             )}
           </TableBody>
         </Table>
-      </div>
+      </LiquidGlassCard>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-lg">

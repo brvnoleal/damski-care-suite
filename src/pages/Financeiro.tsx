@@ -11,7 +11,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,6 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
@@ -60,20 +56,20 @@ const receitaPorProcedimento = [
 ];
 
 const pieColors = [
-  "hsl(239 84% 67%)",       // indigo (primary)
-  "hsl(160 84% 39%)",       // emerald (success)
-  "hsl(38 92% 50%)",        // amber (warning)
-  "hsl(345 45% 40%)",       // burgundy
-  "hsl(217 91% 60%)",       // sky blue (info)
-  "hsl(280 60% 55%)",       // purple
+  "hsl(239 84% 67%)",
+  "hsl(160 84% 39%)",
+  "hsl(38 92% 50%)",
+  "hsl(345 45% 40%)",
+  "hsl(217 91% 60%)",
+  "hsl(280 60% 55%)",
 ];
 
 const pagamentoColors = [
-  "hsl(160 84% 39%)",       // emerald
-  "hsl(239 84% 67%)",       // indigo
-  "hsl(38 92% 50%)",        // amber
-  "hsl(0 72% 51%)",         // red (destructive)
-  "hsl(280 60% 55%)",       // purple
+  "hsl(160 84% 39%)",
+  "hsl(239 84% 67%)",
+  "hsl(38 92% 50%)",
+  "hsl(0 72% 51%)",
+  "hsl(280 60% 55%)",
 ];
 
 const formasPagamento = [
@@ -151,100 +147,91 @@ const Financeiro = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Total</p>
-                <p className="text-2xl font-bold text-foreground mt-1">
-                  R$ {receitaTotal.toLocaleString("pt-BR")}
-                </p>
-                <div className="flex items-center gap-1 mt-1">
-                  <ArrowUpRight className="w-3.5 h-3.5 text-chart-2" />
-                  <span className="text-xs font-medium text-chart-2">+12.5%</span>
-                  <span className="text-xs text-muted-foreground">vs mês anterior</span>
-                </div>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-primary" />
+        <LiquidGlassCard draggable={false} className="p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Total</p>
+              <p className="text-2xl font-bold text-foreground mt-1">
+                R$ {receitaTotal.toLocaleString("pt-BR")}
+              </p>
+              <div className="flex items-center gap-1 mt-1">
+                <ArrowUpRight className="w-3.5 h-3.5 text-success" />
+                <span className="text-xs font-medium text-success">+12.5%</span>
+                <span className="text-xs text-muted-foreground">vs mês anterior</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-primary" />
+            </div>
+          </div>
+        </LiquidGlassCard>
 
-        <Card>
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Despesas</p>
-                <p className="text-2xl font-bold text-foreground mt-1">
-                  R$ {despesaTotal.toLocaleString("pt-BR")}
-                </p>
-                <div className="flex items-center gap-1 mt-1">
-                  <ArrowDownRight className="w-3.5 h-3.5 text-destructive" />
-                  <span className="text-xs font-medium text-destructive">+3.2%</span>
-                  <span className="text-xs text-muted-foreground">vs mês anterior</span>
-                </div>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
-                <TrendingDown className="w-5 h-5 text-destructive" />
+        <LiquidGlassCard draggable={false} className="p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Despesas</p>
+              <p className="text-2xl font-bold text-foreground mt-1">
+                R$ {despesaTotal.toLocaleString("pt-BR")}
+              </p>
+              <div className="flex items-center gap-1 mt-1">
+                <ArrowDownRight className="w-3.5 h-3.5 text-destructive" />
+                <span className="text-xs font-medium text-destructive">+3.2%</span>
+                <span className="text-xs text-muted-foreground">vs mês anterior</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
+              <TrendingDown className="w-5 h-5 text-destructive" />
+            </div>
+          </div>
+        </LiquidGlassCard>
 
-        <Card>
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Lucro Líquido</p>
-                <p className="text-2xl font-bold text-foreground mt-1">
-                  R$ {lucroLiquido.toLocaleString("pt-BR")}
-                </p>
-                <div className="flex items-center gap-1 mt-1">
-                  <ArrowUpRight className="w-3.5 h-3.5 text-chart-2" />
-                  <span className="text-xs font-medium text-chart-2">+18.7%</span>
-                  <span className="text-xs text-muted-foreground">margem 43.4%</span>
-                </div>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-chart-2/10 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-chart-2" />
+        <LiquidGlassCard draggable={false} className="p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Lucro Líquido</p>
+              <p className="text-2xl font-bold text-foreground mt-1">
+                R$ {lucroLiquido.toLocaleString("pt-BR")}
+              </p>
+              <div className="flex items-center gap-1 mt-1">
+                <ArrowUpRight className="w-3.5 h-3.5 text-success" />
+                <span className="text-xs font-medium text-success">+18.7%</span>
+                <span className="text-xs text-muted-foreground">margem 43.4%</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-success" />
+            </div>
+          </div>
+        </LiquidGlassCard>
 
-        <Card>
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Ticket Médio</p>
-                <p className="text-2xl font-bold text-foreground mt-1">
-                  R$ {ticketMedio.toLocaleString("pt-BR")}
-                </p>
-                <div className="flex items-center gap-1 mt-1">
-                  <ArrowUpRight className="w-3.5 h-3.5 text-chart-2" />
-                  <span className="text-xs font-medium text-chart-2">+5.3%</span>
-                  <span className="text-xs text-muted-foreground">vs mês anterior</span>
-                </div>
-              </div>
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Receipt className="w-5 h-5 text-primary" />
+        <LiquidGlassCard draggable={false} className="p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Ticket Médio</p>
+              <p className="text-2xl font-bold text-foreground mt-1">
+                R$ {ticketMedio.toLocaleString("pt-BR")}
+              </p>
+              <div className="flex items-center gap-1 mt-1">
+                <ArrowUpRight className="w-3.5 h-3.5 text-success" />
+                <span className="text-xs font-medium text-success">+5.3%</span>
+                <span className="text-xs text-muted-foreground">vs mês anterior</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Receipt className="w-5 h-5 text-primary" />
+            </div>
+          </div>
+        </LiquidGlassCard>
       </div>
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Faturamento x Despesas */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Receita vs Despesas</CardTitle>
-            <CardDescription>Últimos 8 meses</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <LiquidGlassCard className="lg:col-span-2 overflow-hidden" draggable={false}>
+          <div className="p-5 pb-2">
+            <h3 className="text-base font-semibold text-foreground">Receita vs Despesas</h3>
+            <p className="text-sm text-muted-foreground">Últimos 8 meses</p>
+          </div>
+          <div className="px-5 pb-5">
             <ChartContainer config={faturamentoConfig} className="h-[300px] w-full">
               <AreaChart data={faturamentoMensal} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
@@ -265,16 +252,15 @@ const Financeiro = () => {
                 <Area type="monotone" dataKey="despesas" stroke="hsl(var(--destructive))" fill="url(#fillDespesas)" strokeWidth={2} />
               </AreaChart>
             </ChartContainer>
-          </CardContent>
-        </Card>
+          </div>
+        </LiquidGlassCard>
 
-        {/* Receita por Procedimento (Pie) */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Procedimento</CardTitle>
-            <CardDescription>Distribuição da receita</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <LiquidGlassCard className="overflow-hidden" draggable={false}>
+          <div className="p-5 pb-2">
+            <h3 className="text-base font-semibold text-foreground">Procedimento</h3>
+            <p className="text-sm text-muted-foreground">Distribuição da receita</p>
+          </div>
+          <div className="px-5 pb-5">
             <ChartContainer config={procedimentoConfig} className="h-[220px] w-full">
               <PieChart>
                 <Pie
@@ -305,18 +291,18 @@ const Financeiro = () => {
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </LiquidGlassCard>
       </div>
 
       {/* Formas de Pagamento + Transações/Contas */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Formas de Pagamento</CardTitle>
-            <CardDescription>Distribuição por método</CardDescription>
-          </CardHeader>
-          <CardContent>
+        <LiquidGlassCard className="overflow-hidden" draggable={false}>
+          <div className="p-5 pb-2">
+            <h3 className="text-base font-semibold text-foreground">Formas de Pagamento</h3>
+            <p className="text-sm text-muted-foreground">Distribuição por método</p>
+          </div>
+          <div className="px-5 pb-5">
             <ChartContainer config={procedimentoConfig} className="h-[220px] w-full">
               <PieChart>
                 <Pie
@@ -347,8 +333,8 @@ const Financeiro = () => {
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </LiquidGlassCard>
 
         <div className="lg:col-span-2">
           <Tabs defaultValue="transacoes">
@@ -358,8 +344,8 @@ const Financeiro = () => {
             </TabsList>
 
             <TabsContent value="transacoes">
-              <Card>
-                <CardContent className="p-0">
+              <LiquidGlassCard className="overflow-hidden" draggable={false}>
+                <div className="p-0">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -391,13 +377,13 @@ const Financeiro = () => {
                       ))}
                     </TableBody>
                   </Table>
-                </CardContent>
-              </Card>
+                </div>
+              </LiquidGlassCard>
             </TabsContent>
 
             <TabsContent value="contas">
-              <Card>
-                <CardContent className="p-0">
+              <LiquidGlassCard className="overflow-hidden" draggable={false}>
+                <div className="p-0">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -422,8 +408,8 @@ const Financeiro = () => {
                       ))}
                     </TableBody>
                   </Table>
-                </CardContent>
-              </Card>
+                </div>
+              </LiquidGlassCard>
             </TabsContent>
           </Tabs>
         </div>

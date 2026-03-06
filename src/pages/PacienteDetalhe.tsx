@@ -4,6 +4,7 @@ import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit,
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -240,10 +241,10 @@ const PacienteDetalhe = () => {
           { label: "Email", value: patientData.email },
           { label: "Instagram", value: patientData.instagram || "—" },
         ].map((item, i) => (
-          <div key={i} className="rounded-lg border border-border bg-card p-4">
+          <LiquidGlassCard key={i} draggable={false} className="p-4">
             <p className="text-xs text-muted-foreground">{item.label}</p>
             <p className="text-sm font-medium text-foreground mt-1">{item.value}</p>
-          </div>
+          </LiquidGlassCard>
         ))}
       </div>
 
@@ -272,7 +273,7 @@ const PacienteDetalhe = () => {
             </div>
           )}
           {sessions.map((session) => (
-            <div key={session.id} className="rounded-xl border border-border bg-card p-5 shadow-elegant space-y-3">
+            <LiquidGlassCard key={session.id} draggable={false} className="p-5 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-semibold text-foreground">{session.proc}</p>
@@ -294,7 +295,7 @@ const PacienteDetalhe = () => {
                   <p className="text-foreground">{session.substance}</p>
                 </div>
               </div>
-            </div>
+            </LiquidGlassCard>
           ))}
         </TabsContent>
 
@@ -304,7 +305,7 @@ const PacienteDetalhe = () => {
             { name: "Contrato de Prestação de Serviços", status: "assinado" as const },
             { name: "Orçamento", status: "pendente" as const },
           ].map((doc, i) => (
-            <div key={i} className="rounded-xl border border-border bg-card p-4 shadow-elegant flex items-center justify-between gap-4">
+            <LiquidGlassCard key={i} draggable={false} className="p-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
                 <FileText className="w-5 h-5 text-muted-foreground shrink-0" />
                 <div className="min-w-0">
@@ -322,7 +323,7 @@ const PacienteDetalhe = () => {
                   <FileText className="w-3.5 h-3.5" /> Ver Termo
                 </Button>
               </div>
-            </div>
+            </LiquidGlassCard>
           ))}
         </TabsContent>
 
@@ -464,7 +465,7 @@ const PacienteDetalhe = () => {
         </TabsContent>
 
         <TabsContent value="insumos">
-          <div className="rounded-xl border border-border bg-card p-5 shadow-elegant">
+          <LiquidGlassCard draggable={false} className="p-5">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-xs text-muted-foreground border-b border-border">
@@ -492,7 +493,7 @@ const PacienteDetalhe = () => {
                 </tr>
               </tbody>
             </table>
-          </div>
+          </LiquidGlassCard>
         </TabsContent>
       </Tabs>
 
