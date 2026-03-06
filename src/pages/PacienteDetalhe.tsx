@@ -273,7 +273,7 @@ const PacienteDetalhe = () => {
             </div>
           )}
           {sessions.map((session) => (
-            <div key={session.id} className="rounded-xl border border-border bg-card p-5 shadow-elegant space-y-3">
+            <LiquidGlassCard key={session.id} draggable={false} className="p-5 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-semibold text-foreground">{session.proc}</p>
