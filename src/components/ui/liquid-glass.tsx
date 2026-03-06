@@ -172,7 +172,7 @@ export const LiquidGlassCard = ({
             boxShadow: glowStyles[glowIntensity],
             background:
               'linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.05) 40%, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0.08) 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
           }}
         />
 
