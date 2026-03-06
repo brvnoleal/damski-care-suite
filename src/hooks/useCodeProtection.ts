@@ -52,11 +52,13 @@ export function useCodeProtection() {
       }
     `;
 
+    document.head.appendChild(style);
+
     return () => {
       document.removeEventListener("contextmenu", handleContextMenu);
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.userSelect = "";
-      document.body.style.webkitUserSelect = "";
+      const el = document.getElementById("code-protection-style");
+      if (el) el.remove();
     };
   }, []);
 }
