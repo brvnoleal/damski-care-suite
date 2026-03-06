@@ -128,8 +128,7 @@
   }
 
   .dark body {
-    background: linear-gradient(to right, #000000, #152331);
-    background-attachment: fixed;
+    background: #030712;
     min-height: 100vh;
   }
 
