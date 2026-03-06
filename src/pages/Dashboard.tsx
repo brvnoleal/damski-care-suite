@@ -43,14 +43,10 @@ const colorMap = {
   gold: { bg: "bg-[hsl(var(--gold))]/10", text: "text-[hsl(var(--gold))]" },
 };
 
-const revenueData = [
-  { month: "Set", value: 32000 },
-  { month: "Out", value: 35000 },
-  { month: "Nov", value: 38500 },
-  { month: "Dez", value: 41000 },
-  { month: "Jan", value: 39200 },
-  { month: "Fev", value: 44500 },
-  { month: "Mar", value: 47800 },
+const consultasPorStatus = [
+  { name: "Confirmadas", value: 38, color: "hsl(160, 84%, 39%)" },
+  { name: "Aguardando", value: 5, color: "hsl(40, 60%, 55%)" },
+  { name: "Canceladas", value: 2, color: "hsl(345, 45%, 45%)" },
 ];
 
 const sessionsWeekly = [
