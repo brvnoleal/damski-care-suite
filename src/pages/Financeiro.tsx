@@ -295,11 +295,53 @@ const Financeiro = () => {
               </PieChart>
             </ChartContainer>
             <div className="space-y-2 mt-2">
-              {receitaPorProcedimento.slice(0, 4).map((item, i) => (
+              {receitaPorProcedimento.map((item, i) => (
                 <div key={item.procedimento} className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: pieColors[i] }} />
+                    <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: pieColors[i % pieColors.length] }} />
                     <span className="text-muted-foreground">{item.procedimento}</span>
+                  </div>
+                  <span className="font-medium text-foreground">{item.porcentagem}%</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Formas de Pagamento */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Formas de Pagamento</CardTitle>
+            <CardDescription>Distribuição por método</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={procedimentoConfig} className="h-[220px] w-full">
+              <PieChart>
+                <Pie
+                  data={formasPagamento}
+                  dataKey="valor"
+                  nameKey="forma"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={80}
+                  paddingAngle={3}
+                >
+                  {formasPagamento.map((_, index) => (
+                    <Cell key={index} fill={pagamentoColors[index % pagamentoColors.length]} />
+                  ))}
+                </Pie>
+                <ChartTooltip content={<ChartTooltipContent formatter={(value) => `R$ ${Number(value).toLocaleString("pt-BR")}`} />} />
+              </PieChart>
+            </ChartContainer>
+            <div className="space-y-2 mt-2">
+              {formasPagamento.map((item, i) => (
+                <div key={item.forma} className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: pagamentoColors[i % pagamentoColors.length] }} />
+                    <span className="text-muted-foreground">{item.forma}</span>
                   </div>
                   <span className="font-medium text-foreground">{item.porcentagem}%</span>
                 </div>
