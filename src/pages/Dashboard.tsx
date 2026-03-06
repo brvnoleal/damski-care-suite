@@ -32,8 +32,8 @@ const scaleIn = (delay = 0) => ({
 const kpis = [
   { label: "Pacientes Ativos", value: "148", change: "+12 este mês", icon: Users, color: "primary" as const, trend: "up" },
   { label: "Sessões Hoje", value: "8", change: "3 concluídas", icon: Calendar, color: "info" as const, trend: "neutral" },
-  { label: "Faturamento Mensal", value: "R$ 47.8k", change: "+18%", icon: DollarSign, color: "success" as const, trend: "up" },
-  { label: "Taxa de Retorno", value: "82%", change: "+5%", icon: TrendingUp, color: "gold" as const, trend: "up" },
+  { label: "Insumos Críticos", value: "4", change: "1 vencido", icon: Package, color: "gold" as const, trend: "neutral" },
+  { label: "Consultas Semana", value: "45", change: "38 confirmadas", icon: FileCheck, color: "success" as const, trend: "up" },
 ];
 
 const colorMap = {
