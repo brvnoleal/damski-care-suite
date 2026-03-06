@@ -60,20 +60,20 @@ const receitaPorProcedimento = [
 ];
 
 const pieColors = [
-  "hsl(var(--primary))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
-  "hsl(var(--muted-foreground))",
+  "hsl(239 84% 67%)",       // indigo (primary)
+  "hsl(160 84% 39%)",       // emerald (success)
+  "hsl(38 92% 50%)",        // amber (warning)
+  "hsl(345 45% 40%)",       // burgundy
+  "hsl(217 91% 60%)",       // sky blue (info)
+  "hsl(280 60% 55%)",       // purple
 ];
 
 const pagamentoColors = [
-  "hsl(var(--chart-2))",
-  "hsl(var(--primary))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
+  "hsl(160 84% 39%)",       // emerald
+  "hsl(239 84% 67%)",       // indigo
+  "hsl(38 92% 50%)",        // amber
+  "hsl(0 72% 51%)",         // red (destructive)
+  "hsl(280 60% 55%)",       // purple
 ];
 
 const formasPagamento = [
