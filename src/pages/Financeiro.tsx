@@ -126,6 +126,30 @@ const procedimentoConfig: ChartConfig = {
 
 const Financeiro = () => {
   const [periodo, setPeriodo] = useState("mensal");
+  const [despesaOpen, setDespesaOpen] = useState(false);
+  const [novaDespesa, setNovaDespesa] = useState({
+    descricao: "",
+    categoria: "",
+    fornecedor: "",
+    valor: "",
+    formaPagamento: "",
+    vencimento: "",
+    observacoes: "",
+  });
+
+  const handleDespesaChange = (field: string, value: string) => {
+    setNovaDespesa((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSalvarDespesa = () => {
+    if (!novaDespesa.descricao || !novaDespesa.valor || !novaDespesa.vencimento) {
+      toast.error("Preencha os campos obrigatórios: Descrição, Valor e Vencimento.");
+      return;
+    }
+    toast.success("Despesa cadastrada com sucesso!");
+    setNovaDespesa({ descricao: "", categoria: "", fornecedor: "", valor: "", formaPagamento: "", vencimento: "", observacoes: "" });
+    setDespesaOpen(false);
+  };
 
   const receitaTotal = 280700;
   const despesaTotal = 158700;
