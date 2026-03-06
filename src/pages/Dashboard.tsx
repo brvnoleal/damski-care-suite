@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import {
-  Users, Calendar, Package, FileCheck, DollarSign, TrendingUp,
+  Users, Calendar, Package, FileCheck,
   AlertTriangle, ArrowUpRight, ChevronRight, Star, Activity,
   Smile, Clock,
 } from "lucide-react";
