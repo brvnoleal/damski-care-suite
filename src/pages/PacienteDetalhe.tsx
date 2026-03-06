@@ -295,7 +295,7 @@ const PacienteDetalhe = () => {
                   <p className="text-foreground">{session.substance}</p>
                 </div>
               </div>
-            </div>
+            </LiquidGlassCard>
           ))}
         </TabsContent>
 
