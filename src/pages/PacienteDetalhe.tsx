@@ -465,7 +465,7 @@ const PacienteDetalhe = () => {
         </TabsContent>
 
         <TabsContent value="insumos">
-          <div className="rounded-xl border border-border bg-card p-5 shadow-elegant">
+          <LiquidGlassCard draggable={false} className="p-5">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-xs text-muted-foreground border-b border-border">
