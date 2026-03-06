@@ -18,6 +18,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Paciente } from "@/types";
 import { pacienteService } from "@/services/pacienteService";
+import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
   nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "",
@@ -110,10 +111,10 @@ const Pacientes = () => {
         </Button>
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
+      <LiquidGlassCard className="overflow-hidden" draggable={false}>
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
+            <TableRow className="bg-white/5">
               <TableHead className="font-semibold">Nome</TableHead>
               <TableHead className="font-semibold hidden md:table-cell">CPF</TableHead>
               <TableHead className="font-semibold hidden lg:table-cell">Telefone</TableHead>
@@ -124,7 +125,7 @@ const Pacientes = () => {
           </TableHeader>
           <TableBody>
             {filtered.map((p) => (
-              <TableRow key={p.id} className="hover:bg-muted/30 transition-colors">
+              <TableRow key={p.id} className="hover:bg-white/5 transition-colors">
                 <TableCell className="font-medium">{p.nome}</TableCell>
                 <TableCell className="text-muted-foreground hidden md:table-cell">{p.cpf}</TableCell>
                 <TableCell className="text-muted-foreground hidden lg:table-cell">{p.telefone}</TableCell>
@@ -132,10 +133,10 @@ const Pacientes = () => {
                 <TableCell className="text-muted-foreground hidden sm:table-cell">{p.instagram || "—"}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <Link to={`/pacientes/${p.id}`} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                    <Link to={`/pacientes/${p.id}`} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
                       <Eye className="w-4 h-4" />
                     </Link>
-                    <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                    <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
                       <Edit className="w-4 h-4" />
                     </button>
                     <button onClick={() => { setDeletingId(p.id); setDeleteOpen(true); }} className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
@@ -154,7 +155,7 @@ const Pacientes = () => {
             )}
           </TableBody>
         </Table>
-      </div>
+      </LiquidGlassCard>
 
       {/* Create / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

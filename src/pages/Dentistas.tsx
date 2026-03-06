@@ -17,6 +17,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Dentista } from "@/types";
 import { dentistaService } from "@/services/dentistaService";
+import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 
 const emptyDentista = (): Omit<Dentista, "id" | "created_at"> => ({
   nome: "", especialidade: "", cro: "", telefone: "", email: "", instagram: "",
@@ -100,10 +101,10 @@ const Dentistas = () => {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
+      <LiquidGlassCard className="overflow-hidden" draggable={false}>
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
+            <TableRow className="bg-white/5">
               <TableHead className="font-semibold">Nome</TableHead>
               <TableHead className="font-semibold">CRO</TableHead>
               <TableHead className="font-semibold hidden md:table-cell">Especialidade</TableHead>
@@ -114,7 +115,7 @@ const Dentistas = () => {
           </TableHeader>
           <TableBody>
             {filtered.map((d) => (
-              <TableRow key={d.id} className="hover:bg-muted/30 transition-colors">
+              <TableRow key={d.id} className="hover:bg-white/5 transition-colors">
                 <TableCell className="font-medium">{d.nome}</TableCell>
                 <TableCell className="font-mono text-xs text-primary font-semibold">{d.cro}</TableCell>
                 <TableCell className="text-muted-foreground hidden md:table-cell">{d.especialidade}</TableCell>
@@ -126,7 +127,7 @@ const Dentistas = () => {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <button onClick={() => openEdit(d)} className="p-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                    <button onClick={() => openEdit(d)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
                       <Edit className="w-4 h-4" />
                     </button>
                     <button onClick={() => { setDeletingId(d.id); setDeleteOpen(true); }} className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
@@ -145,7 +146,7 @@ const Dentistas = () => {
             )}
           </TableBody>
         </Table>
-      </div>
+      </LiquidGlassCard>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">

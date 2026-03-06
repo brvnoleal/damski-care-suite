@@ -14,6 +14,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
+import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 
 interface Supply {
   id: string;
@@ -160,7 +161,7 @@ const Insumos = () => {
             Rastreabilidade por lote conforme RDC 1.002/2025
           </p>
         </div>
-        <Button onClick={openCreate} className="bg-primary text-primary-foreground hover:bg-burgundy-light gap-2">
+        <Button onClick={openCreate} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
           <Plus className="w-4 h-4" />
           Cadastrar Insumo
         </Button>
@@ -168,27 +169,33 @@ const Insumos = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4 flex items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-destructive" />
-          <div>
-            <p className="text-sm font-semibold text-foreground">{summaryStats.critical} Crítico{summaryStats.critical !== 1 ? "s" : ""}</p>
-            <p className="text-xs text-muted-foreground">Vencimento em até 15 dias</p>
+        <LiquidGlassCard draggable={false} className="p-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-destructive" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">{summaryStats.critical} Crítico{summaryStats.critical !== 1 ? "s" : ""}</p>
+              <p className="text-xs text-muted-foreground">Vencimento em até 15 dias</p>
+            </div>
           </div>
-        </div>
-        <div className="rounded-xl border border-warning/20 bg-warning/5 p-4 flex items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-warning" />
-          <div>
-            <p className="text-sm font-semibold text-foreground">{summaryStats.warning} Atenção</p>
-            <p className="text-xs text-muted-foreground">Vencimento em até 30 dias</p>
+        </LiquidGlassCard>
+        <LiquidGlassCard draggable={false} className="p-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-warning" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">{summaryStats.warning} Atenção</p>
+              <p className="text-xs text-muted-foreground">Vencimento em até 30 dias</p>
+            </div>
           </div>
-        </div>
-        <div className="rounded-xl border border-success/20 bg-success/5 p-4 flex items-center gap-3">
-          <CheckCircle className="w-5 h-5 text-success" />
-          <div>
-            <p className="text-sm font-semibold text-foreground">{summaryStats.ok} Em dia</p>
-            <p className="text-xs text-muted-foreground">Validade superior a 30 dias</p>
+        </LiquidGlassCard>
+        <LiquidGlassCard draggable={false} className="p-4">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-success" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">{summaryStats.ok} Em dia</p>
+              <p className="text-xs text-muted-foreground">Validade superior a 30 dias</p>
+            </div>
           </div>
-        </div>
+        </LiquidGlassCard>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -202,10 +209,10 @@ const Insumos = () => {
         </Button>
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-elegant overflow-hidden">
+      <LiquidGlassCard className="overflow-hidden" draggable={false}>
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
+            <TableRow className="bg-white/5">
               <TableHead className="font-semibold">Insumo</TableHead>
               <TableHead className="font-semibold hidden md:table-cell">Fabricante</TableHead>
               <TableHead className="font-semibold">Lote</TableHead>
@@ -220,7 +227,7 @@ const Insumos = () => {
             {filtered.map((supply) => {
               const status = getExpiryStatus(supply.daysLeft);
               return (
-                <TableRow key={supply.id} className="hover:bg-muted/30 transition-colors">
+                <TableRow key={supply.id} className="hover:bg-white/5 transition-colors">
                   <TableCell className="font-medium">{supply.name}</TableCell>
                   <TableCell className="text-muted-foreground hidden md:table-cell">{supply.manufacturer}</TableCell>
                   <TableCell className="font-mono text-xs text-gold-dark font-semibold">{supply.lot}</TableCell>
@@ -255,7 +262,7 @@ const Insumos = () => {
             })}
           </TableBody>
         </Table>
-      </div>
+      </LiquidGlassCard>
 
       {/* Dialog de Cadastro / Edição */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
