@@ -305,7 +305,7 @@ const PacienteDetalhe = () => {
             { name: "Contrato de Prestação de Serviços", status: "assinado" as const },
             { name: "Orçamento", status: "pendente" as const },
           ].map((doc, i) => (
-            <div key={i} className="rounded-xl border border-border bg-card p-4 shadow-elegant flex items-center justify-between gap-4">
+            <LiquidGlassCard key={i} draggable={false} className="p-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
                 <FileText className="w-5 h-5 text-muted-foreground shrink-0" />
                 <div className="min-w-0">
