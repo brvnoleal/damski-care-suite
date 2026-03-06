@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import {
-  Users, Calendar, Package, FileCheck, DollarSign, TrendingUp,
+  Users, Calendar, Package, FileCheck,
   AlertTriangle, ArrowUpRight, ChevronRight, Star, Activity,
   Smile, Clock,
 } from "lucide-react";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   PieChart, Pie, Tooltip, ResponsiveContainer, Cell,
-  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  XAxis, YAxis, CartesianGrid,
   BarChart, Bar,
 } from "recharts";
 import { motion } from "framer-motion";
@@ -32,8 +32,8 @@ const scaleIn = (delay = 0) => ({
 const kpis = [
   { label: "Pacientes Ativos", value: "148", change: "+12 este mês", icon: Users, color: "primary" as const, trend: "up" },
   { label: "Sessões Hoje", value: "8", change: "3 concluídas", icon: Calendar, color: "info" as const, trend: "neutral" },
-  { label: "Faturamento Mensal", value: "R$ 47.8k", change: "+18%", icon: DollarSign, color: "success" as const, trend: "up" },
-  { label: "Taxa de Retorno", value: "82%", change: "+5%", icon: TrendingUp, color: "gold" as const, trend: "up" },
+  { label: "Insumos Críticos", value: "4", change: "1 vencido", icon: Package, color: "gold" as const, trend: "neutral" },
+  { label: "Consultas Semana", value: "45", change: "38 confirmadas", icon: FileCheck, color: "success" as const, trend: "up" },
 ];
 
 const colorMap = {
@@ -43,14 +43,10 @@ const colorMap = {
   gold: { bg: "bg-[hsl(var(--gold))]/10", text: "text-[hsl(var(--gold))]" },
 };
 
-const revenueData = [
-  { month: "Set", value: 32000 },
-  { month: "Out", value: 35000 },
-  { month: "Nov", value: 38500 },
-  { month: "Dez", value: 41000 },
-  { month: "Jan", value: 39200 },
-  { month: "Fev", value: 44500 },
-  { month: "Mar", value: 47800 },
+const consultasPorStatus = [
+  { name: "Confirmadas", value: 38, color: "hsl(160, 84%, 39%)" },
+  { name: "Aguardando", value: 5, color: "hsl(40, 60%, 55%)" },
+  { name: "Canceladas", value: 2, color: "hsl(345, 45%, 45%)" },
 ];
 
 const sessionsWeekly = [
@@ -153,33 +149,46 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* ── Row 2: Revenue Chart + Google Calendar ── */}
+      {/* ── Row 2: Consultas por Status + Google Calendar ── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <motion.div {...scaleIn(0.35)} className="lg:col-span-2">
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-success" />
-                <h2 className="text-sm font-semibold text-foreground">Evolução de Faturamento</h2>
+                <FileCheck className="w-4 h-4 text-primary" />
+                <h2 className="text-sm font-semibold text-foreground">Consultas da Semana</h2>
               </div>
-              <Badge variant="outline" className="text-[10px] text-success border-success/30">+18%</Badge>
+              <Badge variant="outline" className="text-[10px]">45 total</Badge>
             </div>
-            <div className="p-4 flex-1">
-              <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={revenueData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(160, 84%, 39%)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(160, 84%, 39%)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v / 1000}k`} />
-                  <Tooltip formatter={(v: number) => [`R$ ${v.toLocaleString("pt-BR")}`, "Faturamento"]} contentStyle={glassTooltip} />
-                  <Area type="monotone" dataKey="value" stroke="hsl(160, 84%, 39%)" strokeWidth={2.5} fill="url(#revenueGrad)" />
-                </AreaChart>
+            <div className="p-4 flex-1 flex flex-col items-center justify-center">
+              <ResponsiveContainer width="100%" height={180}>
+                <PieChart>
+                  <Pie
+                    data={consultasPorStatus}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={70}
+                    innerRadius={35}
+                    strokeWidth={2}
+                    stroke="rgba(255,255,255,0.1)"
+                  >
+                    {consultasPorStatus.map((entry, i) => (
+                      <Cell key={i} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(v: number, name: string) => [`${v}`, name]} contentStyle={glassTooltip} />
+                </PieChart>
               </ResponsiveContainer>
+              <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-1">
+                {consultasPorStatus.map((s, i) => (
+                  <div key={i} className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+                    <span className="text-[11px] text-muted-foreground">{s.name}: <span className="font-semibold text-foreground">{s.value}</span></span>
+                  </div>
+                ))}
+              </div>
             </div>
           </LiquidGlassCard>
         </motion.div>
