@@ -10,6 +10,7 @@ import {
   Download,
   ArrowUpRight,
   ArrowDownRight,
+  Plus,
 } from "lucide-react";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
