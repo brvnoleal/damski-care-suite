@@ -10,6 +10,7 @@ import {
   Download,
   ArrowUpRight,
   ArrowDownRight,
+  Plus,
 } from "lucide-react";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,10 +18,24 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
   type ChartConfig,
 } from "@/components/ui/chart";
 import {
@@ -34,6 +49,7 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+import { toast } from "sonner";
 
 const faturamentoMensal = [
   { mes: "Jul", receita: 42500, despesas: 18200 },
@@ -110,6 +126,30 @@ const procedimentoConfig: ChartConfig = {
 
 const Financeiro = () => {
   const [periodo, setPeriodo] = useState("mensal");
+  const [despesaOpen, setDespesaOpen] = useState(false);
+  const [novaDespesa, setNovaDespesa] = useState({
+    descricao: "",
+    categoria: "",
+    fornecedor: "",
+    valor: "",
+    formaPagamento: "",
+    vencimento: "",
+    observacoes: "",
+  });
+
+  const handleDespesaChange = (field: string, value: string) => {
+    setNovaDespesa((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSalvarDespesa = () => {
+    if (!novaDespesa.descricao || !novaDespesa.valor || !novaDespesa.vencimento) {
+      toast.error("Preencha os campos obrigatórios: Descrição, Valor e Vencimento.");
+      return;
+    }
+    toast.success("Despesa cadastrada com sucesso!");
+    setNovaDespesa({ descricao: "", categoria: "", fornecedor: "", valor: "", formaPagamento: "", vencimento: "", observacoes: "" });
+    setDespesaOpen(false);
+  };
 
   const receitaTotal = 280700;
   const despesaTotal = 158700;
@@ -142,6 +182,83 @@ const Financeiro = () => {
             <Download className="w-4 h-4" />
             Exportar
           </Button>
+          <Dialog open={despesaOpen} onOpenChange={setDespesaOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="gap-2">
+                <Plus className="w-4 h-4" />
+                Adicionar Despesa
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[520px]">
+              <DialogHeader>
+                <DialogTitle>Nova Despesa</DialogTitle>
+                <DialogDescription>Cadastre uma nova despesa do consultório.</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="descricao">Descrição *</Label>
+                    <Input id="descricao" placeholder="Ex: Aluguel, Material..." value={novaDespesa.descricao} onChange={(e) => handleDespesaChange("descricao", e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="categoria">Categoria</Label>
+                    <Select value={novaDespesa.categoria} onValueChange={(v) => handleDespesaChange("categoria", v)}>
+                      <SelectTrigger id="categoria"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="aluguel">Aluguel</SelectItem>
+                        <SelectItem value="material">Material Odontológico</SelectItem>
+                        <SelectItem value="folha">Folha de Pagamento</SelectItem>
+                        <SelectItem value="equipamento">Equipamentos</SelectItem>
+                        <SelectItem value="utilidades">Utilidades (Água, Luz, Internet)</SelectItem>
+                        <SelectItem value="marketing">Marketing</SelectItem>
+                        <SelectItem value="manutencao">Manutenção</SelectItem>
+                        <SelectItem value="software">Software / Licenças</SelectItem>
+                        <SelectItem value="outros">Outros</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fornecedor">Fornecedor</Label>
+                    <Input id="fornecedor" placeholder="Nome do fornecedor" value={novaDespesa.fornecedor} onChange={(e) => handleDespesaChange("fornecedor", e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="valor">Valor (R$) *</Label>
+                    <Input id="valor" type="number" placeholder="0,00" value={novaDespesa.valor} onChange={(e) => handleDespesaChange("valor", e.target.value)} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="formaPagamento">Forma de Pagamento</Label>
+                    <Select value={novaDespesa.formaPagamento} onValueChange={(v) => handleDespesaChange("formaPagamento", v)}>
+                      <SelectTrigger id="formaPagamento"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pix">PIX</SelectItem>
+                        <SelectItem value="boleto">Boleto</SelectItem>
+                        <SelectItem value="credito">Cartão de Crédito</SelectItem>
+                        <SelectItem value="debito">Cartão de Débito</SelectItem>
+                        <SelectItem value="transferencia">Transferência Bancária</SelectItem>
+                        <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="vencimento">Vencimento *</Label>
+                    <Input id="vencimento" type="date" value={novaDespesa.vencimento} onChange={(e) => handleDespesaChange("vencimento", e.target.value)} />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="observacoes">Observações</Label>
+                  <Textarea id="observacoes" placeholder="Notas adicionais..." rows={3} value={novaDespesa.observacoes} onChange={(e) => handleDespesaChange("observacoes", e.target.value)} />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDespesaOpen(false)}>Cancelar</Button>
+                <Button onClick={handleSalvarDespesa}>Salvar Despesa</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -250,6 +367,7 @@ const Financeiro = () => {
                 <ChartTooltip content={<ChartTooltipContent formatter={(value) => `R$ ${Number(value).toLocaleString("pt-BR")}`} />} />
                 <Area type="monotone" dataKey="receita" stroke="hsl(var(--primary))" fill="url(#fillReceita)" strokeWidth={2} />
                 <Area type="monotone" dataKey="despesas" stroke="hsl(var(--destructive))" fill="url(#fillDespesas)" strokeWidth={2} />
+                <ChartLegend content={<ChartLegendContent />} />
               </AreaChart>
             </ChartContainer>
           </div>
