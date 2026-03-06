@@ -78,15 +78,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div className="h-screen flex overflow-hidden relative">
-      {/* Dark mode animated background */}
-      {darkMode && (
-        <LightWavesBackground
-          className="!fixed inset-0 z-0"
-          colors={["#0ea5e9", "#8b5cf6", "#06b6d4", "#a855f7", "#0284c7"]}
-          speed={0.8}
-          intensity={0.5}
-        />
-      )}
+
+
       {/* Hidden SVG Filter for sidebar/header glass */}
       <svg className="absolute w-0 h-0" aria-hidden="true">
         <defs>
