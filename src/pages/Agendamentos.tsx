@@ -105,7 +105,7 @@ const Agendamentos = () => {
             Gerenciamento de consultas e horários
           </p>
         </div>
-        <Button onClick={openCreate} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
+        <Button onClick={openCreate} className="gap-2 backdrop-blur-xl bg-primary/80 border border-white/20 text-primary-foreground shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_1px_1px_2px_rgba(255,255,255,0.25)] hover:bg-primary/90 hover:shadow-[0_4px_16px_rgba(0,0,0,0.2),inset_1px_1px_2px_rgba(255,255,255,0.3)] transition-all">
           <Plus className="w-4 h-4" />
           Nova Consulta
         </Button>
