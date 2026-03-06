@@ -309,7 +309,7 @@ const Financeiro = () => {
         </Card>
       </div>
 
-      {/* Formas de Pagamento */}
+      {/* Formas de Pagamento + Transações/Contas */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-2">
@@ -349,110 +349,85 @@ const Financeiro = () => {
             </div>
           </CardContent>
         </Card>
+
+        <div className="lg:col-span-2">
+          <Tabs defaultValue="transacoes">
+            <TabsList>
+              <TabsTrigger value="transacoes">Últimas Transações</TabsTrigger>
+              <TabsTrigger value="contas">Contas a Pagar</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="transacoes">
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Paciente</TableHead>
+                        <TableHead className="hidden sm:table-cell">Procedimento</TableHead>
+                        <TableHead>Valor</TableHead>
+                        <TableHead className="hidden md:table-cell">Forma</TableHead>
+                        <TableHead className="hidden md:table-cell">Data</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {ultimasTransacoes.map((t) => (
+                        <TableRow key={t.id}>
+                          <TableCell className="font-medium">{t.paciente}</TableCell>
+                          <TableCell className="hidden sm:table-cell text-muted-foreground">{t.procedimento}</TableCell>
+                          <TableCell>R$ {t.valor.toLocaleString("pt-BR")}</TableCell>
+                          <TableCell className="hidden md:table-cell text-muted-foreground">{t.forma}</TableCell>
+                          <TableCell className="hidden md:table-cell text-muted-foreground">{t.data}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={t.status === "pago" ? "default" : t.status === "pendente" ? "secondary" : "destructive"}
+                              className="text-[11px]"
+                            >
+                              {t.status === "pago" ? "Pago" : t.status === "pendente" ? "Pendente" : "Atrasado"}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="contas">
+              <Card>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Descrição</TableHead>
+                        <TableHead>Vencimento</TableHead>
+                        <TableHead>Valor</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {contasAPagar.map((c, i) => (
+                        <TableRow key={i}>
+                          <TableCell className="font-medium">{c.descricao}</TableCell>
+                          <TableCell className="text-muted-foreground">{c.vencimento}</TableCell>
+                          <TableCell>R$ {c.valor.toLocaleString("pt-BR")}</TableCell>
+                          <TableCell>
+                            <Badge variant={c.status === "pago" ? "default" : "secondary"} className="text-[11px]">
+                              {c.status === "pago" ? "Pago" : "Pendente"}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
-
-      {/* Tabs: Transações / Contas a Pagar / Formas de Pagamento */}
-      <Tabs defaultValue="transacoes">
-        <TabsList>
-          <TabsTrigger value="transacoes">Últimas Transações</TabsTrigger>
-          <TabsTrigger value="contas">Contas a Pagar</TabsTrigger>
-          <TabsTrigger value="pagamentos">Formas de Pagamento</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="transacoes">
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Paciente</TableHead>
-                    <TableHead className="hidden sm:table-cell">Procedimento</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead className="hidden md:table-cell">Forma</TableHead>
-                    <TableHead className="hidden md:table-cell">Data</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {ultimasTransacoes.map((t) => (
-                    <TableRow key={t.id}>
-                      <TableCell className="font-medium">{t.paciente}</TableCell>
-                      <TableCell className="hidden sm:table-cell text-muted-foreground">{t.procedimento}</TableCell>
-                      <TableCell>R$ {t.valor.toLocaleString("pt-BR")}</TableCell>
-                      <TableCell className="hidden md:table-cell text-muted-foreground">{t.forma}</TableCell>
-                      <TableCell className="hidden md:table-cell text-muted-foreground">{t.data}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={t.status === "pago" ? "default" : t.status === "pendente" ? "secondary" : "destructive"}
-                          className="text-[11px]"
-                        >
-                          {t.status === "pago" ? "Pago" : t.status === "pendente" ? "Pendente" : "Atrasado"}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="contas">
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Descrição</TableHead>
-                    <TableHead>Vencimento</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {contasAPagar.map((c, i) => (
-                    <TableRow key={i}>
-                      <TableCell className="font-medium">{c.descricao}</TableCell>
-                      <TableCell className="text-muted-foreground">{c.vencimento}</TableCell>
-                      <TableCell>R$ {c.valor.toLocaleString("pt-BR")}</TableCell>
-                      <TableCell>
-                        <Badge variant={c.status === "pago" ? "default" : "secondary"} className="text-[11px]">
-                          {c.status === "pago" ? "Pago" : "Pendente"}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="pagamentos">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-4">
-                {formasPagamento.map((fp) => (
-                  <div key={fp.forma} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-foreground font-medium">{fp.forma}</span>
-                      <span className="text-muted-foreground">
-                        R$ {fp.valor.toLocaleString("pt-BR")} ({fp.porcentagem}%)
-                      </span>
-                    </div>
-                    <div className="h-2 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-primary transition-all duration-500"
-                        style={{ width: `${fp.porcentagem}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
     </div>
   );
 };
