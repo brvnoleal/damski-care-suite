@@ -16,6 +16,8 @@ import {
   Bell,
   Search,
   CheckCheck,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -48,7 +50,24 @@ const navigation = [
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      return document.documentElement.classList.contains("dark") ||
+        localStorage.getItem("theme") === "dark";
+    }
+    return false;
+  });
   const location = useLocation();
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [darkMode]);
 
   const notifications = useSyncExternalStore(
     notificationStore.subscribe,
@@ -58,6 +77,27 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
   return (
     <div className="h-screen flex overflow-hidden">
+      {/* Hidden SVG Filter for sidebar/header glass */}
+      <svg className="absolute w-0 h-0" aria-hidden="true">
+        <defs>
+          <filter id="sidebar-glass-distortion">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.012"
+              numOctaves="3"
+              result="noise"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="noise"
+              scale="4"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </defs>
+      </svg>
+
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -66,15 +106,38 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar — Liquid Glass */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[260px] glass-sidebar flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto",
+          "fixed inset-y-0 left-0 z-50 w-[260px] flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto",
+          "relative overflow-hidden",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
+        {/* Glass layers */}
+        <div
+          className="pointer-events-none absolute inset-0 backdrop-blur-xl"
+          style={{ filter: "url(#sidebar-glass-distortion)" }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: darkMode
+              ? "linear-gradient(180deg, rgba(15, 20, 40, 0.85) 0%, rgba(10, 14, 30, 0.9) 100%)"
+              : "linear-gradient(180deg, rgba(15, 20, 40, 0.78) 0%, rgba(10, 14, 30, 0.85) 100%)",
+            boxShadow: "0 4px 4px rgba(0, 0, 0, 0.15), 0 0 24px rgba(255, 255, 255, 0.06)",
+            borderRight: "1px solid rgba(255, 255, 255, 0.08)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            boxShadow: "inset 1px 1px 2px 0 rgba(255, 255, 255, 0.08), inset -1px -1px 2px 0 rgba(255, 255, 255, 0.04)",
+          }}
+        />
+
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 h-16 border-b border-sidebar-border">
+        <div className="relative z-10 flex items-center gap-3 px-5 h-16 border-b border-white/[0.06]">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <span className="font-display font-bold text-sm text-primary-foreground">D</span>
           </div>
@@ -92,7 +155,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        <nav className="relative z-10 flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           {navigation.map((item) => {
             const isActive = location.pathname === item.href;
             return (
@@ -103,8 +166,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150",
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-foreground"
-                    : "text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                    ? "bg-white/[0.1] text-sidebar-foreground backdrop-blur-sm"
+                    : "text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-white/[0.06]"
                 )}
               >
                 <item.icon className="w-[18px] h-[18px]" />
@@ -115,7 +178,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </nav>
 
         {/* User */}
-        <div className="p-4 border-t border-sidebar-border">
+        <div className="relative z-10 p-4 border-t border-white/[0.06]">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
               <span className="text-xs font-semibold text-primary">DR</span>
@@ -135,10 +198,34 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Top bar */}
-        <header className="sticky top-0 z-30 glass-header px-4 lg:px-6 h-14 flex items-center gap-4">
+        {/* Top bar — Liquid Glass */}
+        <header className="sticky top-0 z-30 relative px-4 lg:px-6 h-14 flex items-center gap-4 overflow-hidden">
+          {/* Glass layers */}
+          <div
+            className="pointer-events-none absolute inset-0 backdrop-blur-xl"
+            style={{ filter: "url(#sidebar-glass-distortion)" }}
+          />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: darkMode
+                ? "linear-gradient(90deg, rgba(30, 35, 55, 0.7) 0%, rgba(30, 35, 55, 0.5) 100%)"
+                : "linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.4) 100%)",
+              boxShadow: "0 4px 4px rgba(0, 0, 0, 0.05), 0 0 16px rgba(255, 255, 255, 0.06)",
+              borderBottom: darkMode ? "1px solid rgba(255, 255, 255, 0.06)" : "1px solid rgba(255, 255, 255, 0.3)",
+            }}
+          />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              boxShadow: darkMode
+                ? "inset 0 1px 1px 0 rgba(255, 255, 255, 0.04)"
+                : "inset 0 1px 2px 0 rgba(255, 255, 255, 0.35)",
+            }}
+          />
+
           <button
-            className="lg:hidden text-muted-foreground hover:text-foreground"
+            className="relative z-10 lg:hidden text-muted-foreground hover:text-foreground"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu className="w-5 h-5" />
@@ -146,9 +233,18 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
           <div className="flex-1" />
 
+          {/* Dark mode toggle */}
+          <button
+            className="relative z-10 text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => setDarkMode(!darkMode)}
+            title={darkMode ? "Modo claro" : "Modo escuro"}
+          >
+            {darkMode ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
+          </button>
+
           <Popover>
             <PopoverTrigger asChild>
-              <button className="relative text-muted-foreground hover:text-foreground transition-colors">
+              <button className="relative z-10 text-muted-foreground hover:text-foreground transition-colors">
                 <Bell className="w-[18px] h-[18px]" />
                 {unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[10px] text-destructive-foreground flex items-center justify-center font-bold">
@@ -214,7 +310,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             </PopoverContent>
           </Popover>
 
-          <Badge variant="outline" className="text-[11px] font-medium hidden sm:flex">
+          <Badge variant="outline" className="relative z-10 text-[11px] font-medium hidden sm:flex">
             RDC 1.002/2025
           </Badge>
         </header>
