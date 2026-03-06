@@ -4,6 +4,7 @@ import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit,
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
