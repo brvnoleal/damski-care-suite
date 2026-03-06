@@ -45,7 +45,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  ResponsiveContainer,
   Area,
   AreaChart,
 } from "recharts";
@@ -414,13 +413,13 @@ const Financeiro = () => {
       </div>
 
       {/* Formas de Pagamento + Transações/Contas */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <LiquidGlassCard className="overflow-hidden" draggable={false}>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
+        <LiquidGlassCard className="overflow-hidden flex flex-col" draggable={false}>
           <div className="p-5 pb-2">
             <h3 className="text-base font-semibold text-foreground">Formas de Pagamento</h3>
             <p className="text-sm text-muted-foreground">Distribuição por método</p>
           </div>
-          <div className="px-5 pb-5">
+          <div className="px-5 pb-5 flex-1">
             <ChartContainer config={procedimentoConfig} className="h-[220px] w-full">
               <PieChart>
                 <Pie
@@ -441,7 +440,7 @@ const Financeiro = () => {
               </PieChart>
             </ChartContainer>
             <div className="space-y-2 mt-2">
-              {formasPagamento.map((item, i) => (
+              {formasPagamento.slice(0, 5).map((item, i) => (
                 <div key={item.forma} className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
                     <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: pagamentoColors[i % pagamentoColors.length] }} />
@@ -454,15 +453,15 @@ const Financeiro = () => {
           </div>
         </LiquidGlassCard>
 
-        <div className="lg:col-span-2">
-          <Tabs defaultValue="transacoes">
+        <div className="lg:col-span-2 flex flex-col">
+          <Tabs defaultValue="transacoes" className="flex flex-col flex-1">
             <TabsList>
               <TabsTrigger value="transacoes">Últimas Transações</TabsTrigger>
               <TabsTrigger value="contas">Contas a Pagar</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="transacoes">
-              <LiquidGlassCard className="overflow-hidden" draggable={false}>
+            <TabsContent value="transacoes" className="mt-2 flex-1">
+              <LiquidGlassCard className="overflow-hidden h-full" draggable={false}>
                 <div className="p-0">
                   <Table>
                     <TableHeader>
@@ -476,7 +475,7 @@ const Financeiro = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {ultimasTransacoes.map((t) => (
+                      {ultimasTransacoes.slice(0, 5).map((t) => (
                         <TableRow key={t.id}>
                           <TableCell className="font-medium">{t.paciente}</TableCell>
                           <TableCell className="hidden sm:table-cell text-muted-foreground">{t.procedimento}</TableCell>
@@ -499,8 +498,8 @@ const Financeiro = () => {
               </LiquidGlassCard>
             </TabsContent>
 
-            <TabsContent value="contas">
-              <LiquidGlassCard className="overflow-hidden" draggable={false}>
+            <TabsContent value="contas" className="mt-2 flex-1">
+              <LiquidGlassCard className="overflow-hidden h-full" draggable={false}>
                 <div className="p-0">
                   <Table>
                     <TableHeader>
@@ -512,7 +511,7 @@ const Financeiro = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {contasAPagar.map((c, i) => (
+                      {contasAPagar.slice(0, 5).map((c, i) => (
                         <TableRow key={i}>
                           <TableCell className="font-medium">{c.descricao}</TableCell>
                           <TableCell className="text-muted-foreground">{c.vencimento}</TableCell>
