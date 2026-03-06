@@ -77,7 +77,16 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const unreadCount = notifications.filter((n: any) => !n.read).length;
 
   return (
-    <div className="h-screen flex overflow-hidden">
+    <div className="h-screen flex overflow-hidden relative">
+      {/* Dark mode animated mesh gradient background */}
+      {darkMode && (
+        <MeshGradientBackground
+          className="!fixed inset-0 z-0 !min-h-0 h-full"
+          colors={["#7c3aed", "#2563eb", "#06b6d4", "#8b5cf6"]}
+          speed={0.5}
+          backgroundColor="#030014"
+        />
+      )}
       {/* Hidden SVG Filter for sidebar/header glass */}
       <svg className="absolute w-0 h-0" aria-hidden="true">
         <defs>
