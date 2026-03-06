@@ -323,7 +323,7 @@ const PacienteDetalhe = () => {
                   <FileText className="w-3.5 h-3.5" /> Ver Termo
                 </Button>
               </div>
-            </div>
+            </LiquidGlassCard>
           ))}
         </TabsContent>
 
