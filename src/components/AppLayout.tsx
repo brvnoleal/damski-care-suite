@@ -31,7 +31,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { notificationStore } from "@/stores/notificationStore";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { LightWavesBackground } from "@/components/ui/light-waves-background";
+
 
 interface AppLayoutProps {
   children: React.ReactNode;
