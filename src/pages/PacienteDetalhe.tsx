@@ -241,10 +241,10 @@ const PacienteDetalhe = () => {
           { label: "Email", value: patientData.email },
           { label: "Instagram", value: patientData.instagram || "—" },
         ].map((item, i) => (
-          <div key={i} className="rounded-lg border border-border bg-card p-4">
+          <LiquidGlassCard key={i} draggable={false} className="p-4">
             <p className="text-xs text-muted-foreground">{item.label}</p>
             <p className="text-sm font-medium text-foreground mt-1">{item.value}</p>
-          </div>
+          </LiquidGlassCard>
         ))}
       </div>
 
