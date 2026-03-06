@@ -229,7 +229,35 @@ const Agendamentos = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="sm:col-span-2">
+            <div>
+              <Label>Valor (R$) *</Label>
+              <Input type="number" min="0" step="0.01" value={form.valor || ""} onChange={(e) => setForm({ ...form, valor: parseFloat(e.target.value) || 0 })} placeholder="0,00" />
+            </div>
+            <div>
+              <Label>Forma de Pagamento *</Label>
+              <Select value={form.forma_pagamento} onValueChange={(v: FormaPagamento) => setForm({ ...form, forma_pagamento: v, parcelas: v === "credito" || v === "boleto" ? form.parcelas : 1 })}>
+                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <SelectContent>
+                  {Object.entries(formaPagamentoLabels).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {(form.forma_pagamento === "credito" || form.forma_pagamento === "boleto") && (
+              <div>
+                <Label>Parcelas</Label>
+                <Select value={String(form.parcelas)} onValueChange={(v) => setForm({ ...form, parcelas: parseInt(v) })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
+                      <SelectItem key={n} value={String(n)}>{n}x</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className={form.forma_pagamento === "credito" || form.forma_pagamento === "boleto" ? "" : "sm:col-span-2"}>
               <Label>Observações</Label>
               <Input value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} placeholder="Observações opcionais" />
             </div>
