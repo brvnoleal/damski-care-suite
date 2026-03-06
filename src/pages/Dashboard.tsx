@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   PieChart, Pie, Tooltip, ResponsiveContainer, Cell,
-  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  XAxis, YAxis, CartesianGrid,
   BarChart, Bar,
 } from "recharts";
 import { motion } from "framer-motion";
