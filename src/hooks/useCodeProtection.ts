@@ -38,9 +38,19 @@ export function useCodeProtection() {
     document.addEventListener("contextmenu", handleContextMenu);
     document.addEventListener("keydown", handleKeyDown);
 
-    // Desabilitar seleção de texto e drag via CSS
-    document.body.style.userSelect = "none";
-    document.body.style.webkitUserSelect = "none";
+    // Desabilitar seleção de texto via CSS (exceto inputs/textareas)
+    const style = document.createElement("style");
+    style.id = "code-protection-style";
+    style.textContent = `
+      *:not(input):not(textarea):not(select) {
+        -webkit-user-select: none !important;
+        user-select: none !important;
+      }
+      input, textarea, select {
+        -webkit-user-select: text !important;
+        user-select: text !important;
+      }
+    `;
 
     return () => {
       document.removeEventListener("contextmenu", handleContextMenu);
