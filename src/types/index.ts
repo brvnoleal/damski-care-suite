@@ -72,6 +72,16 @@ export const procedimentoConsultaLabels: Record<ProcedimentoConsulta, string> = 
   outro: "Outro",
 };
 
+export type FormaPagamento = "pix" | "credito" | "debito" | "dinheiro" | "boleto";
+
+export const formaPagamentoLabels: Record<FormaPagamento, string> = {
+  pix: "PIX",
+  credito: "Cartão de Crédito",
+  debito: "Cartão de Débito",
+  dinheiro: "Dinheiro",
+  boleto: "Boleto",
+};
+
 export interface Agendamento {
   id: string;
   data: string;
@@ -80,6 +90,9 @@ export interface Agendamento {
   dentista_id: string;
   procedimento: ProcedimentoConsulta;
   status: "agendado" | "confirmado" | "realizado" | "cancelado";
+  valor: number;
+  forma_pagamento: FormaPagamento;
+  parcelas: number;
   observacoes?: string;
   created_at?: string;
 }

@@ -18,13 +18,13 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Agendamento, ProcedimentoConsulta, procedimentoConsultaLabels } from "@/types";
+import { Agendamento, ProcedimentoConsulta, procedimentoConsultaLabels, FormaPagamento, formaPagamentoLabels } from "@/types";
 import { agendamentoService } from "@/services/agendamentoService";
 import { pacienteService } from "@/services/pacienteService";
 import { dentistaService } from "@/services/dentistaService";
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
-  data: "", horario: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", observacoes: "",
+  data: "", horario: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
 });
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -65,7 +65,7 @@ const Agendamentos = () => {
 
   const openEdit = (a: Agendamento) => {
     setEditingId(a.id);
-    setForm({ data: a.data, horario: a.horario, paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, observacoes: a.observacoes || "" });
+    setForm({ data: a.data, horario: a.horario, paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, observacoes: a.observacoes || "" });
     setDialogOpen(true);
   };
 
@@ -229,7 +229,35 @@ const Agendamentos = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="sm:col-span-2">
+            <div>
+              <Label>Valor (R$) *</Label>
+              <Input type="number" min="0" step="0.01" value={form.valor || ""} onChange={(e) => setForm({ ...form, valor: parseFloat(e.target.value) || 0 })} placeholder="0,00" />
+            </div>
+            <div>
+              <Label>Forma de Pagamento *</Label>
+              <Select value={form.forma_pagamento} onValueChange={(v: FormaPagamento) => setForm({ ...form, forma_pagamento: v, parcelas: v === "credito" || v === "boleto" ? form.parcelas : 1 })}>
+                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                <SelectContent>
+                  {Object.entries(formaPagamentoLabels).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {(form.forma_pagamento === "credito" || form.forma_pagamento === "boleto") && (
+              <div>
+                <Label>Parcelas</Label>
+                <Select value={String(form.parcelas)} onValueChange={(v) => setForm({ ...form, parcelas: parseInt(v) })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
+                      <SelectItem key={n} value={String(n)}>{n}x</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className={form.forma_pagamento === "credito" || form.forma_pagamento === "boleto" ? "" : "sm:col-span-2"}>
               <Label>Observações</Label>
               <Input value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} placeholder="Observações opcionais" />
             </div>
