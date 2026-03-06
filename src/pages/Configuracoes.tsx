@@ -1,9 +1,54 @@
-import { Shield, Users, Database, Key, Bell } from "lucide-react";
+import { useState } from "react";
+import { Shield, Users, Bell, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
+
+const roles = [
+  { value: "Responsável Técnico", color: "bg-primary/10 text-primary" },
+  { value: "Recepcionista", color: "bg-info/10 text-info" },
+  { value: "Administrador", color: "bg-gold/10 text-gold-dark" },
+];
+
+const getRoleColor = (role: string) => roles.find(r => r.value === role)?.color || "bg-muted text-muted-foreground";
 
 const Configuracoes = () => {
+  const [usuarios, setUsuarios] = useState([
+    { name: "Dra. Damski", role: "Responsável Técnico" },
+    { name: "Julia Santos", role: "Recepcionista" },
+    { name: "Admin Sistema", role: "Administrador" },
+  ]);
+
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [editRole, setEditRole] = useState("");
+  const [addOpen, setAddOpen] = useState(false);
+  const [novoNome, setNovoNome] = useState("");
+  const [novoRole, setNovoRole] = useState("");
+
+  const handleEditSave = () => {
+    if (editIndex === null) return;
+    setUsuarios(prev => prev.map((u, i) => i === editIndex ? { ...u, role: editRole } : u));
+    toast.success("Perfil atualizado com sucesso!");
+    setEditIndex(null);
+  };
+
+  const handleAddUser = () => {
+    if (!novoNome.trim() || !novoRole) {
+      toast.error("Preencha nome e perfil.");
+      return;
+    }
+    setUsuarios(prev => [...prev, { name: novoNome.trim(), role: novoRole }]);
+    toast.success("Usuário adicionado!");
+    setNovoNome("");
+    setNovoRole("");
+    setAddOpen(false);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -26,11 +71,7 @@ const Configuracoes = () => {
             </div>
 
             <div className="space-y-3">
-              {[
-                { name: "Dra. Damski", role: "Responsável Técnico", color: "bg-primary/10 text-primary" },
-                { name: "Julia Santos", role: "Recepcionista", color: "bg-info/10 text-info" },
-                { name: "Admin Sistema", role: "Administrador", color: "bg-gold/10 text-gold-dark" },
-              ].map((user, i) => (
+              {usuarios.map((user, i) => (
                 <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full gradient-burgundy flex items-center justify-center">
@@ -40,14 +81,16 @@ const Configuracoes = () => {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground">{user.name}</p>
-                      <Badge className={`text-[10px] ${user.color} border-0`}>{user.role}</Badge>
+                      <Badge className={`text-[10px] ${getRoleColor(user.role)} border-0`}>{user.role}</Badge>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-xs">Editar</Button>
+                  <Button variant="ghost" size="sm" className="text-xs" onClick={() => { setEditIndex(i); setEditRole(user.role); }}>Editar</Button>
                 </div>
               ))}
             </div>
-            <Button variant="outline" size="sm" className="w-full">Adicionar Usuário</Button>
+            <Button variant="outline" size="sm" className="w-full" onClick={() => setAddOpen(true)}>
+              <Plus className="w-3.5 h-3.5 mr-1" /> Adicionar Usuário
+            </Button>
           </div>
         </LiquidGlassCard>
 
@@ -112,27 +155,66 @@ const Configuracoes = () => {
             </div>
           </div>
         </LiquidGlassCard>
+      </div>
 
-        {/* Database */}
-        <LiquidGlassCard draggable={false} className="p-5">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-info/10 flex items-center justify-center">
-                <Database className="w-4.5 h-4.5 text-info" />
-              </div>
-              <div>
-                <h2 className="text-sm font-semibold text-foreground">Banco de Dados</h2>
-                <p className="text-xs text-muted-foreground">PostgreSQL</p>
+      {/* Edit Role Dialog */}
+      <Dialog open={editIndex !== null} onOpenChange={(open) => { if (!open) setEditIndex(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Perfil de Acesso</DialogTitle>
+          </DialogHeader>
+          {editIndex !== null && (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">Usuário: <span className="font-medium text-foreground">{usuarios[editIndex]?.name}</span></p>
+              <div className="space-y-2">
+                <Label>Perfil</Label>
+                <Select value={editRole} onValueChange={setEditRole}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {roles.map(r => (
+                      <SelectItem key={r.value} value={r.value}>{r.value}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditIndex(null)}>Cancelar</Button>
+            <Button onClick={handleEditSave}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>Para ativar o backend com banco de dados, autenticação e storage, habilite o <span className="font-medium text-foreground">Lovable Cloud</span>.</p>
-              <p className="text-xs">Isso permitirá persistir dados, gerenciar usuários e habilitar todas as funcionalidades do sistema.</p>
+      {/* Add User Dialog */}
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Adicionar Usuário</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nome</Label>
+              <Input value={novoNome} onChange={e => setNovoNome(e.target.value)} placeholder="Nome completo" />
+            </div>
+            <div className="space-y-2">
+              <Label>Perfil</Label>
+              <Select value={novoRole} onValueChange={setNovoRole}>
+                <SelectTrigger><SelectValue placeholder="Selecione o perfil" /></SelectTrigger>
+                <SelectContent>
+                  {roles.map(r => (
+                    <SelectItem key={r.value} value={r.value}>{r.value}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
-        </LiquidGlassCard>
-      </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddOpen(false)}>Cancelar</Button>
+            <Button onClick={handleAddUser}>Adicionar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
