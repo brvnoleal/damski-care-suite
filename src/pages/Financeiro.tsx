@@ -500,12 +500,12 @@ const Financeiro = () => {
 
             <TabsContent value="contas" className="mt-2 flex-1">
               <LiquidGlassCard className="overflow-hidden h-full" draggable={false}>
-                <div className="p-0">
+                <div className="p-0 overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Descrição</TableHead>
-                        <TableHead>Vencimento</TableHead>
+                        <TableHead className="hidden sm:table-cell">Vencimento</TableHead>
                         <TableHead>Valor</TableHead>
                         <TableHead>Status</TableHead>
                       </TableRow>
@@ -514,7 +514,7 @@ const Financeiro = () => {
                       {contasAPagar.slice(0, 5).map((c, i) => (
                         <TableRow key={i}>
                           <TableCell className="font-medium">{c.descricao}</TableCell>
-                          <TableCell className="text-muted-foreground">{c.vencimento}</TableCell>
+                          <TableCell className="text-muted-foreground hidden sm:table-cell">{c.vencimento}</TableCell>
                           <TableCell>R$ {c.valor.toLocaleString("pt-BR")}</TableCell>
                           <TableCell>
                             <Badge variant={c.status === "pago" ? "default" : "secondary"} className="text-[11px]">
