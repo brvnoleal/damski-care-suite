@@ -99,7 +99,11 @@ const glassTooltip = {
   border: "1px solid var(--glass-border)",
   borderRadius: "0.75rem",
   fontSize: 12,
-  color: "white",
+  color: "hsl(var(--foreground))",
+};
+
+const glassTooltipText = {
+  color: "hsl(var(--foreground))",
 };
 
 /* ───────── Component ───────── */
