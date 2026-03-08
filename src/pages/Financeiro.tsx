@@ -462,7 +462,7 @@ const Financeiro = () => {
 
             <TabsContent value="transacoes" className="mt-2 flex-1">
               <LiquidGlassCard className="overflow-hidden h-full" draggable={false}>
-                <div className="p-0">
+                <div className="p-0 overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
