@@ -122,26 +122,6 @@ export const LiquidGlassCard = ({
 
   return (
     <>
-      {/* Hidden SVG Filter */}
-      <svg className="absolute w-0 h-0" aria-hidden="true">
-        <defs>
-          <filter id="liquid-glass-distortion">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.015"
-              numOctaves="3"
-              result="noise"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="noise"
-              scale="6"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </defs>
-      </svg>
       <MotionComponent
         className={cn('relative overflow-hidden', className)}
         style={{
@@ -152,7 +132,7 @@ export const LiquidGlassCard = ({
         {...motionProps}
         {...props}
       >
-        {/* Bend Layer (Backdrop blur with distortion) */}
+        {/* Bend Layer (Backdrop blur) */}
         <div
           className={cn(
             'pointer-events-none absolute inset-0',
@@ -160,7 +140,6 @@ export const LiquidGlassCard = ({
           )}
           style={{
             borderRadius,
-            filter: 'url(#liquid-glass-distortion)',
           }}
         />
 
