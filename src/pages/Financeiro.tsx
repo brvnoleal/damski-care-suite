@@ -263,78 +263,78 @@ const Financeiro = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <LiquidGlassCard draggable={false} className="p-5">
+        <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Total</p>
-              <p className="text-2xl font-bold text-foreground mt-1">
+              <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Total</p>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
                 R$ {receitaTotal.toLocaleString("pt-BR")}
               </p>
               <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="w-3.5 h-3.5 text-success" />
-                <span className="text-xs font-medium text-success">+12.5%</span>
-                <span className="text-xs text-muted-foreground">vs mês anterior</span>
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-success" />
+                <span className="text-[10px] sm:text-xs font-medium text-success">+12.5%</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">vs mês anterior</span>
               </div>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-primary" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             </div>
           </div>
         </LiquidGlassCard>
 
-        <LiquidGlassCard draggable={false} className="p-5">
+        <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Despesas</p>
-              <p className="text-2xl font-bold text-foreground mt-1">
+              <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Despesas</p>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
                 R$ {despesaTotal.toLocaleString("pt-BR")}
               </p>
               <div className="flex items-center gap-1 mt-1">
-                <ArrowDownRight className="w-3.5 h-3.5 text-destructive" />
-                <span className="text-xs font-medium text-destructive">+3.2%</span>
-                <span className="text-xs text-muted-foreground">vs mês anterior</span>
+                <ArrowDownRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-destructive" />
+                <span className="text-[10px] sm:text-xs font-medium text-destructive">+3.2%</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">vs mês anterior</span>
               </div>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
-              <TrendingDown className="w-5 h-5 text-destructive" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
+              <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
             </div>
           </div>
         </LiquidGlassCard>
 
-        <LiquidGlassCard draggable={false} className="p-5">
+        <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Lucro Líquido</p>
-              <p className="text-2xl font-bold text-foreground mt-1">
+              <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Lucro Líquido</p>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
                 R$ {lucroLiquido.toLocaleString("pt-BR")}
               </p>
               <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="w-3.5 h-3.5 text-success" />
-                <span className="text-xs font-medium text-success">+18.7%</span>
-                <span className="text-xs text-muted-foreground">margem 43.4%</span>
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-success" />
+                <span className="text-[10px] sm:text-xs font-medium text-success">+18.7%</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">margem 43.4%</span>
               </div>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-success" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-success/10 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-success" />
             </div>
           </div>
         </LiquidGlassCard>
 
-        <LiquidGlassCard draggable={false} className="p-5">
+        <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Ticket Médio</p>
-              <p className="text-2xl font-bold text-foreground mt-1">
+              <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Ticket Médio</p>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
                 R$ {ticketMedio.toLocaleString("pt-BR")}
               </p>
               <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="w-3.5 h-3.5 text-success" />
-                <span className="text-xs font-medium text-success">+5.3%</span>
-                <span className="text-xs text-muted-foreground">vs mês anterior</span>
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-success" />
+                <span className="text-[10px] sm:text-xs font-medium text-success">+5.3%</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">vs mês anterior</span>
               </div>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Receipt className="w-5 h-5 text-primary" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             </div>
           </div>
         </LiquidGlassCard>
