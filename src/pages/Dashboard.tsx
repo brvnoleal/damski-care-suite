@@ -211,7 +211,7 @@ const Dashboard = () => {
             </div>
             <iframe
               src="https://calendar.google.com/calendar/embed?src=brunolealcavalcante%40gmail.com&ctz=America%2FSao_Paulo"
-              className="w-full border-0"
+              className="w-full border-0 dark:invert dark:hue-rotate-180"
               height="260"
               scrolling="no"
               title="Google Calendar"
