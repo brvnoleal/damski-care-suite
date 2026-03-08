@@ -119,65 +119,67 @@ const Agendamentos = () => {
       </div>
 
       <LiquidGlassCard className="overflow-hidden" draggable={false}>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-white/5">
-              <TableHead className="font-semibold">Data</TableHead>
-              <TableHead className="font-semibold">Horário</TableHead>
-              <TableHead className="font-semibold">Paciente</TableHead>
-              <TableHead className="font-semibold hidden md:table-cell">Dentista</TableHead>
-              <TableHead className="font-semibold">Procedimento</TableHead>
-              <TableHead className="font-semibold">Status</TableHead>
-              <TableHead className="font-semibold text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((a) => {
-              const st = statusConfig[a.status] || statusConfig.agendado;
-              return (
-                <TableRow key={a.id} className="hover:bg-white/5 transition-colors">
-                  <TableCell>
-                    <span className="flex items-center gap-1.5 text-sm">
-                      <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                      {a.data}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="flex items-center gap-1.5 text-sm font-mono">
-                      <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                      {a.horario}
-                    </span>
-                  </TableCell>
-                  <TableCell className="font-medium">{getPacienteNome(a.paciente_id)}</TableCell>
-                  <TableCell className="text-muted-foreground hidden md:table-cell">{getDentistaNome(a.dentista_id)}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="font-medium">{procedimentoConsultaLabels[a.procedimento]}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={st.className}>{st.label}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <button onClick={() => openEdit(a)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => { setDeletingId(a.id); setDeleteOpen(true); }} className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-white/5">
+                <TableHead className="font-semibold">Data</TableHead>
+                <TableHead className="font-semibold">Horário</TableHead>
+                <TableHead className="font-semibold">Paciente</TableHead>
+                <TableHead className="font-semibold hidden md:table-cell">Dentista</TableHead>
+                <TableHead className="font-semibold hidden sm:table-cell">Procedimento</TableHead>
+                <TableHead className="font-semibold">Status</TableHead>
+                <TableHead className="font-semibold text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((a) => {
+                const st = statusConfig[a.status] || statusConfig.agendado;
+                return (
+                  <TableRow key={a.id} className="hover:bg-white/5 transition-colors">
+                    <TableCell>
+                      <span className="flex items-center gap-1.5 text-sm">
+                        <Calendar className="w-3.5 h-3.5 text-muted-foreground hidden sm:inline" />
+                        {a.data}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="flex items-center gap-1.5 text-sm font-mono">
+                        <Clock className="w-3.5 h-3.5 text-muted-foreground hidden sm:inline" />
+                        {a.horario}
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-medium">{getPacienteNome(a.paciente_id)}</TableCell>
+                    <TableCell className="text-muted-foreground hidden md:table-cell">{getDentistaNome(a.dentista_id)}</TableCell>
+                    <TableCell className="hidden sm:table-cell">
+                      <Badge variant="outline" className="font-medium">{procedimentoConsultaLabels[a.procedimento]}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={st.className}>{st.label}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button onClick={() => openEdit(a)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => { setDeletingId(a.id); setDeleteOpen(true); }} className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+              {filtered.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                    Nenhum agendamento encontrado.
                   </TableCell>
                 </TableRow>
-              );
-            })}
-            {filtered.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                  Nenhum agendamento encontrado.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </LiquidGlassCard>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

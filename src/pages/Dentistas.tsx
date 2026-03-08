@@ -102,50 +102,52 @@ const Dentistas = () => {
       </div>
 
       <LiquidGlassCard className="overflow-hidden" draggable={false}>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-white/5">
-              <TableHead className="font-semibold">Nome</TableHead>
-              <TableHead className="font-semibold">CRO</TableHead>
-              <TableHead className="font-semibold hidden md:table-cell">Especialidade</TableHead>
-              <TableHead className="font-semibold hidden lg:table-cell">Telefone</TableHead>
-              <TableHead className="font-semibold">Status</TableHead>
-              <TableHead className="font-semibold text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((d) => (
-              <TableRow key={d.id} className="hover:bg-white/5 transition-colors">
-                <TableCell className="font-medium">{d.nome}</TableCell>
-                <TableCell className="font-mono text-xs text-primary font-semibold">{d.cro}</TableCell>
-                <TableCell className="text-muted-foreground hidden md:table-cell">{d.especialidade}</TableCell>
-                <TableCell className="text-muted-foreground hidden lg:table-cell">{d.telefone}</TableCell>
-                <TableCell>
-                  <Badge className={d.status === "ativo" ? "bg-success/10 text-success border-success/20" : "bg-muted text-muted-foreground"}>
-                    {d.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <button onClick={() => openEdit(d)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => { setDeletingId(d.id); setDeleteOpen(true); }} className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-white/5">
+                <TableHead className="font-semibold">Nome</TableHead>
+                <TableHead className="font-semibold">CRO</TableHead>
+                <TableHead className="font-semibold hidden md:table-cell">Especialidade</TableHead>
+                <TableHead className="font-semibold hidden lg:table-cell">Telefone</TableHead>
+                <TableHead className="font-semibold">Status</TableHead>
+                <TableHead className="font-semibold text-right">Ações</TableHead>
               </TableRow>
-            ))}
-            {filtered.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                  Nenhum dentista encontrado.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((d) => (
+                <TableRow key={d.id} className="hover:bg-white/5 transition-colors">
+                  <TableCell className="font-medium">{d.nome}</TableCell>
+                  <TableCell className="font-mono text-xs text-primary font-semibold">{d.cro}</TableCell>
+                  <TableCell className="text-muted-foreground hidden md:table-cell">{d.especialidade}</TableCell>
+                  <TableCell className="text-muted-foreground hidden lg:table-cell">{d.telefone}</TableCell>
+                  <TableCell>
+                    <Badge className={d.status === "ativo" ? "bg-success/10 text-success border-success/20" : "bg-muted text-muted-foreground"}>
+                      {d.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => openEdit(d)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => { setDeletingId(d.id); setDeleteOpen(true); }} className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filtered.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    Nenhum dentista encontrado.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </LiquidGlassCard>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
