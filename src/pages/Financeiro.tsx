@@ -158,14 +158,14 @@ const Financeiro = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Financeiro</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Visão geral das finanças da clínica
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Select value={periodo} onValueChange={setPeriodo}>
             <SelectTrigger className="w-[140px] h-9 text-sm">
               <SelectValue />
@@ -179,22 +179,22 @@ const Financeiro = () => {
           </Select>
           <Button variant="outline" size="sm" className="gap-2">
             <Download className="w-4 h-4" />
-            Exportar
+            <span className="hidden sm:inline">Exportar</span>
           </Button>
           <Dialog open={despesaOpen} onOpenChange={setDespesaOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-2">
                 <Plus className="w-4 h-4" />
-                Adicionar Despesa
+                <span className="hidden sm:inline">Adicionar</span> Despesa
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[520px]">
+            <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Nova Despesa</DialogTitle>
                 <DialogDescription>Cadastre uma nova despesa do consultório.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="descricao">Descrição *</Label>
                     <Input id="descricao" placeholder="Ex: Aluguel, Material..." value={novaDespesa.descricao} onChange={(e) => handleDespesaChange("descricao", e.target.value)} />
@@ -217,7 +217,7 @@ const Financeiro = () => {
                     </Select>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="fornecedor">Fornecedor</Label>
                     <Input id="fornecedor" placeholder="Nome do fornecedor" value={novaDespesa.fornecedor} onChange={(e) => handleDespesaChange("fornecedor", e.target.value)} />
@@ -227,7 +227,7 @@ const Financeiro = () => {
                     <Input id="valor" type="number" placeholder="0,00" value={novaDespesa.valor} onChange={(e) => handleDespesaChange("valor", e.target.value)} />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="formaPagamento">Forma de Pagamento</Label>
                     <Select value={novaDespesa.formaPagamento} onValueChange={(v) => handleDespesaChange("formaPagamento", v)}>
