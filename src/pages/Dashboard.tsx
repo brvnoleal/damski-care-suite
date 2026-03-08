@@ -99,6 +99,7 @@ const glassTooltip = {
   border: "1px solid var(--glass-border)",
   borderRadius: "0.75rem",
   fontSize: 12,
+  color: "white",
 };
 
 /* ───────── Component ───────── */
