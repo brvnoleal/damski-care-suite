@@ -183,7 +183,7 @@ const Dashboard = () => {
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(v: number, name: string) => [`${v}`, name]} contentStyle={glassTooltip} />
+                  <Tooltip formatter={(v: number, name: string) => [`${v}`, name]} contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-1">
