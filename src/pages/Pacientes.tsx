@@ -112,49 +112,51 @@ const Pacientes = () => {
       </div>
 
       <LiquidGlassCard className="overflow-hidden" draggable={false}>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-white/5">
-              <TableHead className="font-semibold">Nome</TableHead>
-              <TableHead className="font-semibold hidden md:table-cell">CPF</TableHead>
-              <TableHead className="font-semibold hidden lg:table-cell">Telefone</TableHead>
-              <TableHead className="font-semibold hidden sm:table-cell">Email</TableHead>
-              <TableHead className="font-semibold hidden sm:table-cell">Instagram</TableHead>
-              <TableHead className="font-semibold text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((p) => (
-              <TableRow key={p.id} className="hover:bg-white/5 transition-colors">
-                <TableCell className="font-medium">{p.nome}</TableCell>
-                <TableCell className="text-muted-foreground hidden md:table-cell">{p.cpf}</TableCell>
-                <TableCell className="text-muted-foreground hidden lg:table-cell">{p.telefone}</TableCell>
-                <TableCell className="text-muted-foreground hidden sm:table-cell">{p.email}</TableCell>
-                <TableCell className="text-muted-foreground hidden sm:table-cell">{p.instagram || "—"}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Link to={`/pacientes/${p.id}`} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
-                      <Eye className="w-4 h-4" />
-                    </Link>
-                    <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => { setDeletingId(p.id); setDeleteOpen(true); }} className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-white/5">
+                <TableHead className="font-semibold">Nome</TableHead>
+                <TableHead className="font-semibold hidden md:table-cell">CPF</TableHead>
+                <TableHead className="font-semibold hidden lg:table-cell">Telefone</TableHead>
+                <TableHead className="font-semibold hidden sm:table-cell">Email</TableHead>
+                <TableHead className="font-semibold hidden sm:table-cell">Instagram</TableHead>
+                <TableHead className="font-semibold text-right">Ações</TableHead>
               </TableRow>
-            ))}
-            {filtered.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                  Nenhum paciente encontrado.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((p) => (
+                <TableRow key={p.id} className="hover:bg-white/5 transition-colors">
+                  <TableCell className="font-medium">{p.nome}</TableCell>
+                  <TableCell className="text-muted-foreground hidden md:table-cell">{p.cpf}</TableCell>
+                  <TableCell className="text-muted-foreground hidden lg:table-cell">{p.telefone}</TableCell>
+                  <TableCell className="text-muted-foreground hidden sm:table-cell">{p.email}</TableCell>
+                  <TableCell className="text-muted-foreground hidden sm:table-cell">{p.instagram || "—"}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Link to={`/pacientes/${p.id}`} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
+                        <Eye className="w-4 h-4" />
+                      </Link>
+                      <button onClick={() => openEdit(p)} className="p-1.5 rounded-md hover:bg-white/10 transition-colors text-muted-foreground hover:text-foreground">
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => { setDeletingId(p.id); setDeleteOpen(true); }} className="p-1.5 rounded-md hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {filtered.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    Nenhum paciente encontrado.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </LiquidGlassCard>
 
       {/* Create / Edit Dialog */}

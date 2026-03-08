@@ -158,14 +158,14 @@ const Financeiro = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Financeiro</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Visão geral das finanças da clínica
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Select value={periodo} onValueChange={setPeriodo}>
             <SelectTrigger className="w-[140px] h-9 text-sm">
               <SelectValue />
@@ -179,22 +179,22 @@ const Financeiro = () => {
           </Select>
           <Button variant="outline" size="sm" className="gap-2">
             <Download className="w-4 h-4" />
-            Exportar
+            <span className="hidden sm:inline">Exportar</span>
           </Button>
           <Dialog open={despesaOpen} onOpenChange={setDespesaOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-2">
                 <Plus className="w-4 h-4" />
-                Adicionar Despesa
+                <span className="hidden sm:inline">Adicionar</span> Despesa
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[520px]">
+            <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Nova Despesa</DialogTitle>
                 <DialogDescription>Cadastre uma nova despesa do consultório.</DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="descricao">Descrição *</Label>
                     <Input id="descricao" placeholder="Ex: Aluguel, Material..." value={novaDespesa.descricao} onChange={(e) => handleDespesaChange("descricao", e.target.value)} />
@@ -217,7 +217,7 @@ const Financeiro = () => {
                     </Select>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="fornecedor">Fornecedor</Label>
                     <Input id="fornecedor" placeholder="Nome do fornecedor" value={novaDespesa.fornecedor} onChange={(e) => handleDespesaChange("fornecedor", e.target.value)} />
@@ -227,7 +227,7 @@ const Financeiro = () => {
                     <Input id="valor" type="number" placeholder="0,00" value={novaDespesa.valor} onChange={(e) => handleDespesaChange("valor", e.target.value)} />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="formaPagamento">Forma de Pagamento</Label>
                     <Select value={novaDespesa.formaPagamento} onValueChange={(v) => handleDespesaChange("formaPagamento", v)}>
@@ -262,79 +262,79 @@ const Financeiro = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <LiquidGlassCard draggable={false} className="p-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Total</p>
-              <p className="text-2xl font-bold text-foreground mt-1">
+              <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Total</p>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
                 R$ {receitaTotal.toLocaleString("pt-BR")}
               </p>
               <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="w-3.5 h-3.5 text-success" />
-                <span className="text-xs font-medium text-success">+12.5%</span>
-                <span className="text-xs text-muted-foreground">vs mês anterior</span>
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-success" />
+                <span className="text-[10px] sm:text-xs font-medium text-success">+12.5%</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">vs mês anterior</span>
               </div>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-primary" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             </div>
           </div>
         </LiquidGlassCard>
 
-        <LiquidGlassCard draggable={false} className="p-5">
+        <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Despesas</p>
-              <p className="text-2xl font-bold text-foreground mt-1">
+              <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Despesas</p>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
                 R$ {despesaTotal.toLocaleString("pt-BR")}
               </p>
               <div className="flex items-center gap-1 mt-1">
-                <ArrowDownRight className="w-3.5 h-3.5 text-destructive" />
-                <span className="text-xs font-medium text-destructive">+3.2%</span>
-                <span className="text-xs text-muted-foreground">vs mês anterior</span>
+                <ArrowDownRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-destructive" />
+                <span className="text-[10px] sm:text-xs font-medium text-destructive">+3.2%</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">vs mês anterior</span>
               </div>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
-              <TrendingDown className="w-5 h-5 text-destructive" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
+              <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
             </div>
           </div>
         </LiquidGlassCard>
 
-        <LiquidGlassCard draggable={false} className="p-5">
+        <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Lucro Líquido</p>
-              <p className="text-2xl font-bold text-foreground mt-1">
+              <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Lucro Líquido</p>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
                 R$ {lucroLiquido.toLocaleString("pt-BR")}
               </p>
               <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="w-3.5 h-3.5 text-success" />
-                <span className="text-xs font-medium text-success">+18.7%</span>
-                <span className="text-xs text-muted-foreground">margem 43.4%</span>
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-success" />
+                <span className="text-[10px] sm:text-xs font-medium text-success">+18.7%</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">margem 43.4%</span>
               </div>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-success" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-success/10 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-success" />
             </div>
           </div>
         </LiquidGlassCard>
 
-        <LiquidGlassCard draggable={false} className="p-5">
+        <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Ticket Médio</p>
-              <p className="text-2xl font-bold text-foreground mt-1">
+              <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Ticket Médio</p>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
                 R$ {ticketMedio.toLocaleString("pt-BR")}
               </p>
               <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="w-3.5 h-3.5 text-success" />
-                <span className="text-xs font-medium text-success">+5.3%</span>
-                <span className="text-xs text-muted-foreground">vs mês anterior</span>
+                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-success" />
+                <span className="text-[10px] sm:text-xs font-medium text-success">+5.3%</span>
+                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">vs mês anterior</span>
               </div>
             </div>
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Receipt className="w-5 h-5 text-primary" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             </div>
           </div>
         </LiquidGlassCard>
@@ -462,7 +462,7 @@ const Financeiro = () => {
 
             <TabsContent value="transacoes" className="mt-2 flex-1">
               <LiquidGlassCard className="overflow-hidden h-full" draggable={false}>
-                <div className="p-0">
+                <div className="p-0 overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -500,12 +500,12 @@ const Financeiro = () => {
 
             <TabsContent value="contas" className="mt-2 flex-1">
               <LiquidGlassCard className="overflow-hidden h-full" draggable={false}>
-                <div className="p-0">
+                <div className="p-0 overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Descrição</TableHead>
-                        <TableHead>Vencimento</TableHead>
+                        <TableHead className="hidden sm:table-cell">Vencimento</TableHead>
                         <TableHead>Valor</TableHead>
                         <TableHead>Status</TableHead>
                       </TableRow>
@@ -514,7 +514,7 @@ const Financeiro = () => {
                       {contasAPagar.slice(0, 5).map((c, i) => (
                         <TableRow key={i}>
                           <TableCell className="font-medium">{c.descricao}</TableCell>
-                          <TableCell className="text-muted-foreground">{c.vencimento}</TableCell>
+                          <TableCell className="text-muted-foreground hidden sm:table-cell">{c.vencimento}</TableCell>
                           <TableCell>R$ {c.valor.toLocaleString("pt-BR")}</TableCell>
                           <TableCell>
                             <Badge variant={c.status === "pago" ? "default" : "secondary"} className="text-[11px]">

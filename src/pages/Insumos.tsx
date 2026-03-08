@@ -210,58 +210,60 @@ const Insumos = () => {
       </div>
 
       <LiquidGlassCard className="overflow-hidden" draggable={false}>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-white/5">
-              <TableHead className="font-semibold">Insumo</TableHead>
-              <TableHead className="font-semibold hidden md:table-cell">Fabricante</TableHead>
-              <TableHead className="font-semibold">Lote</TableHead>
-              <TableHead className="font-semibold hidden sm:table-cell">Validade</TableHead>
-              <TableHead className="font-semibold text-center">Qtd</TableHead>
-              <TableHead className="font-semibold">Status</TableHead>
-              <TableHead className="font-semibold text-center hidden lg:table-cell">Pacientes</TableHead>
-              <TableHead className="font-semibold w-10"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((supply) => {
-              const status = getExpiryStatus(supply.daysLeft);
-              return (
-                <TableRow key={supply.id} className="hover:bg-white/5 transition-colors">
-                  <TableCell className="font-medium">{supply.name}</TableCell>
-                  <TableCell className="text-muted-foreground hidden md:table-cell">{supply.manufacturer}</TableCell>
-                  <TableCell className="font-mono text-xs text-gold-dark font-semibold">{supply.lot}</TableCell>
-                  <TableCell className="text-muted-foreground hidden sm:table-cell">
-                    {supply.expiry}
-                    <span className="text-xs ml-1">({supply.daysLeft}d)</span>
-                  </TableCell>
-                  <TableCell className="text-center">{supply.qty}</TableCell>
-                  <TableCell>
-                    <Badge className={status.className}>{status.label}</Badge>
-                  </TableCell>
-                  <TableCell className="text-center hidden lg:table-cell">{supply.usedBy}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => openEdit(supply)} className="gap-2">
-                          <Pencil className="h-4 w-4" /> Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => openDelete(supply)} className="gap-2 text-destructive focus:text-destructive">
-                          <Trash2 className="h-4 w-4" /> Excluir
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-white/5">
+                <TableHead className="font-semibold">Insumo</TableHead>
+                <TableHead className="font-semibold hidden md:table-cell">Fabricante</TableHead>
+                <TableHead className="font-semibold hidden sm:table-cell">Lote</TableHead>
+                <TableHead className="font-semibold hidden sm:table-cell">Validade</TableHead>
+                <TableHead className="font-semibold text-center">Qtd</TableHead>
+                <TableHead className="font-semibold">Status</TableHead>
+                <TableHead className="font-semibold text-center hidden lg:table-cell">Pacientes</TableHead>
+                <TableHead className="font-semibold w-10"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((supply) => {
+                const status = getExpiryStatus(supply.daysLeft);
+                return (
+                  <TableRow key={supply.id} className="hover:bg-white/5 transition-colors">
+                    <TableCell className="font-medium">{supply.name}</TableCell>
+                    <TableCell className="text-muted-foreground hidden md:table-cell">{supply.manufacturer}</TableCell>
+                    <TableCell className="font-mono text-xs text-gold-dark font-semibold hidden sm:table-cell">{supply.lot}</TableCell>
+                    <TableCell className="text-muted-foreground hidden sm:table-cell">
+                      {supply.expiry}
+                      <span className="text-xs ml-1">({supply.daysLeft}d)</span>
+                    </TableCell>
+                    <TableCell className="text-center">{supply.qty}</TableCell>
+                    <TableCell>
+                      <Badge className={status.className}>{status.label}</Badge>
+                    </TableCell>
+                    <TableCell className="text-center hidden lg:table-cell">{supply.usedBy}</TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => openEdit(supply)} className="gap-2">
+                            <Pencil className="h-4 w-4" /> Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => openDelete(supply)} className="gap-2 text-destructive focus:text-destructive">
+                            <Trash2 className="h-4 w-4" /> Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </LiquidGlassCard>
 
       {/* Dialog de Cadastro / Edição */}
