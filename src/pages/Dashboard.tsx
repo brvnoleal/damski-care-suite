@@ -234,7 +234,7 @@ const Dashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
                   <XAxis dataKey="day" tick={{ fontSize: 11, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 10, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={glassTooltip} formatter={(v: number) => [`${v}`, "Sessões"]} />
+                  <Tooltip contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} formatter={(v: number) => [`${v}`, "Sessões"]} />
                   <Bar dataKey="sessoes" radius={[6, 6, 0, 0]} barSize={28}>
                     {sessionsWeekly.map((_, i) => (
                       <Cell key={i} fill={i === 3 ? "hsl(239, 84%, 67%)" : "hsl(239, 84%, 67%, 0.35)"} />
