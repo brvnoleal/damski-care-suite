@@ -99,7 +99,11 @@ const glassTooltip = {
   border: "1px solid var(--glass-border)",
   borderRadius: "0.75rem",
   fontSize: 12,
-  color: "white",
+  color: "hsl(var(--foreground))",
+};
+
+const glassTooltipText = {
+  color: "hsl(var(--foreground))",
 };
 
 /* ───────── Component ───────── */
@@ -179,7 +183,7 @@ const Dashboard = () => {
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(v: number, name: string) => [`${v}`, name]} contentStyle={glassTooltip} />
+                  <Tooltip formatter={(v: number, name: string) => [`${v}`, name]} contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-1">
@@ -230,7 +234,7 @@ const Dashboard = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
                   <XAxis dataKey="day" tick={{ fontSize: 11, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 10, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={glassTooltip} formatter={(v: number) => [`${v}`, "Sessões"]} />
+                  <Tooltip contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} formatter={(v: number) => [`${v}`, "Sessões"]} />
                   <Bar dataKey="sessoes" radius={[6, 6, 0, 0]} barSize={28}>
                     {sessionsWeekly.map((_, i) => (
                       <Cell key={i} fill={i === 3 ? "hsl(239, 84%, 67%)" : "hsl(239, 84%, 67%, 0.35)"} />
@@ -266,7 +270,7 @@ const Dashboard = () => {
                       <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(v: number, name: string) => [`${v}x`, name]} contentStyle={glassTooltip} />
+                  <Tooltip formatter={(v: number, name: string) => [`${v}x`, name]} contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-1">
