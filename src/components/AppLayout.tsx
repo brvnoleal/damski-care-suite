@@ -150,7 +150,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             </h1>
           </div>
           <button
-            className="lg:hidden text-sidebar-foreground/50 hover:text-sidebar-foreground"
+            className="xl:hidden text-sidebar-foreground/50 hover:text-sidebar-foreground"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="w-5 h-5" />
