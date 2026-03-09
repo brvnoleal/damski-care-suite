@@ -1,50 +1,59 @@
 /**
  * Camada de serviço — Pacientes
- * Abstrai operações CRUD. Atualmente usa dados mock.
- * Preparado para integração com banco de dados relacional (PostgreSQL via Lovable Cloud).
+ * Operações CRUD via Supabase.
  */
+import { supabase } from "@/integrations/supabase/client";
 import { Paciente } from "@/types";
-import { mockPacientes } from "@/data/mockPacientes";
-import { notificationStore } from "@/stores/notificationStore";
 
-let pacientes: Paciente[] = [...mockPacientes];
+const mapRow = (row: any): Paciente => ({
+  id: row.id,
+  nome: row.nome,
+  cpf: row.cpf,
+  telefone: row.telefone || "",
+  email: row.email || "",
+  instagram: row.instagram || undefined,
+  data_nascimento: row.data_nascimento,
+  cep: row.cep || undefined,
+  estado: row.estado || undefined,
+  cidade: row.cidade || undefined,
+  bairro: row.bairro || undefined,
+  rua: row.rua || undefined,
+  numero: row.numero || undefined,
+  complemento: row.complemento || undefined,
+  ponto_referencia: row.ponto_referencia || undefined,
+  status: row.status,
+  created_at: row.created_at,
+});
 
 export const pacienteService = {
-  listar: (): Paciente[] => {
-    return [...pacientes];
+  listar: async (): Promise<Paciente[]> => {
+    const { data, error } = await supabase.from("paciente").select("*").order("nome");
+    if (error) throw error;
+    return (data || []).map(mapRow);
   },
 
-  buscarPorId: (id: string): Paciente | undefined => {
-    return pacientes.find((p) => p.id === id);
+  buscarPorId: async (id: string): Promise<Paciente | null> => {
+    const { data, error } = await supabase.from("paciente").select("*").eq("id", id).maybeSingle();
+    if (error) throw error;
+    return data ? mapRow(data) : null;
   },
 
-  criar: (dados: Omit<Paciente, "id" | "created_at">): Paciente => {
-    const novo: Paciente = {
-      ...dados,
-      id: String(Date.now()),
-      created_at: new Date().toISOString(),
-    };
-    pacientes = [...pacientes, novo];
-    notificationStore.add("create", "paciente", "Novo paciente cadastrado", `${novo.nome} foi adicionado ao sistema.`);
-    return novo;
+  criar: async (dados: Omit<Paciente, "id" | "created_at">): Promise<Paciente> => {
+    const { data, error } = await supabase.from("paciente").insert(dados).select().single();
+    if (error) throw error;
+    return mapRow(data);
   },
 
-  atualizar: (id: string, dados: Partial<Paciente>): Paciente | null => {
-    const index = pacientes.findIndex((p) => p.id === id);
-    if (index === -1) return null;
-    pacientes[index] = { ...pacientes[index], ...dados };
-    pacientes = [...pacientes];
-    notificationStore.add("update", "paciente", "Paciente atualizado", `${pacientes[index].nome} teve dados alterados.`);
-    return pacientes[index];
+  atualizar: async (id: string, dados: Partial<Paciente>): Promise<Paciente | null> => {
+    const { created_at, id: _, ...updateData } = dados as any;
+    const { data, error } = await supabase.from("paciente").update({ ...updateData, updated_at: new Date().toISOString() }).eq("id", id).select().single();
+    if (error) throw error;
+    return data ? mapRow(data) : null;
   },
 
-  excluir: (id: string): boolean => {
-    const paciente = pacientes.find((p) => p.id === id);
-    const len = pacientes.length;
-    pacientes = pacientes.filter((p) => p.id !== id);
-    if (pacientes.length < len && paciente) {
-      notificationStore.add("delete", "paciente", "Paciente excluído", `${paciente.nome} foi removido do sistema.`);
-    }
-    return pacientes.length < len;
+  excluir: async (id: string): Promise<boolean> => {
+    const { error } = await supabase.from("paciente").delete().eq("id", id);
+    if (error) throw error;
+    return true;
   },
 };
