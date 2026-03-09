@@ -1,16 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-  DollarSign,
-  TrendingUp,
-  TrendingDown,
-  CreditCard,
-  Receipt,
-  Calendar,
-  Filter,
-  Download,
-  ArrowUpRight,
-  ArrowDownRight,
-  Plus,
+  DollarSign, TrendingUp, TrendingDown, CreditCard, Receipt,
+  Calendar, Filter, Download, ArrowUpRight, ArrowDownRight, Plus,
 } from "lucide-react";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,154 +13,179 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
-  type ChartConfig,
+  ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig,
 } from "@/components/ui/chart";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Area,
-  AreaChart,
-} from "recharts";
+import { PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Area, AreaChart } from "recharts";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { despesaService } from "@/services/despesaService";
+import { procedimentoConsultaLabels, formaPagamentoLabels } from "@/types";
 
-const faturamentoMensal = [
-  { mes: "Jul", receita: 42500, despesas: 18200 },
-  { mes: "Ago", receita: 38900, despesas: 16800 },
-  { mes: "Set", receita: 51200, despesas: 19500 },
-  { mes: "Out", receita: 47800, despesas: 17900 },
-  { mes: "Nov", receita: 55300, despesas: 21200 },
-  { mes: "Dez", receita: 49100, despesas: 20800 },
-  { mes: "Jan", receita: 61200, despesas: 22500 },
-  { mes: "Fev", receita: 58700, despesas: 21800 },
-];
-
-const receitaPorProcedimento = [
-  { procedimento: "Harmonização Facial", valor: 89500, porcentagem: 32 },
-  { procedimento: "Clareamento Dental", valor: 45200, porcentagem: 16 },
-  { procedimento: "Facetas de Porcelana", valor: 67800, porcentagem: 24 },
-  { procedimento: "Botox", valor: 38900, porcentagem: 14 },
-  { procedimento: "Preenchimento Labial", valor: 25600, porcentagem: 9 },
-  { procedimento: "Outros", valor: 13700, porcentagem: 5 },
-];
-
-const pieColors = [
-  "hsl(239 84% 67%)",
-  "hsl(160 84% 39%)",
-  "hsl(38 92% 50%)",
-  "hsl(345 45% 40%)",
-  "hsl(217 91% 60%)",
-  "hsl(280 60% 55%)",
-];
-
-const pagamentoColors = [
-  "hsl(160 84% 39%)",
-  "hsl(239 84% 67%)",
-  "hsl(38 92% 50%)",
-  "hsl(0 72% 51%)",
-  "hsl(280 60% 55%)",
-];
-
-const formasPagamento = [
-  { forma: "Cartão de Crédito", valor: 112300, porcentagem: 40 },
-  { forma: "PIX", valor: 95400, porcentagem: 34 },
-  { forma: "Cartão de Débito", valor: 42100, porcentagem: 15 },
-  { forma: "Boleto", valor: 19500, porcentagem: 7 },
-  { forma: "Dinheiro", valor: 11400, porcentagem: 4 },
-];
-
-const ultimasTransacoes = [
-  { id: 1, paciente: "Maria Silva", procedimento: "Harmonização Facial", valor: 3500, forma: "PIX", data: "25/02/2026", status: "pago" },
-  { id: 2, paciente: "João Santos", procedimento: "Clareamento Dental", valor: 1800, forma: "Crédito 3x", data: "24/02/2026", status: "pago" },
-  { id: 3, paciente: "Ana Oliveira", procedimento: "Facetas de Porcelana", valor: 12000, forma: "Crédito 10x", data: "24/02/2026", status: "pendente" },
-  { id: 4, paciente: "Carlos Lima", procedimento: "Botox", valor: 2200, forma: "PIX", data: "23/02/2026", status: "pago" },
-  { id: 5, paciente: "Fernanda Costa", procedimento: "Preenchimento Labial", valor: 2800, forma: "Débito", data: "23/02/2026", status: "pago" },
-  { id: 6, paciente: "Roberto Almeida", procedimento: "Harmonização Facial", valor: 4200, forma: "Crédito 6x", data: "22/02/2026", status: "atrasado" },
-  { id: 7, paciente: "Luciana Pires", procedimento: "Clareamento Dental", valor: 1500, forma: "Dinheiro", data: "22/02/2026", status: "pago" },
-];
-
-const contasAPagar = [
-  { descricao: "Aluguel consultório", vencimento: "05/03/2026", valor: 8500, status: "pendente" },
-  { descricao: "Material odontológico", vencimento: "10/03/2026", valor: 4200, status: "pendente" },
-  { descricao: "Folha de pagamento", vencimento: "01/03/2026", valor: 12800, status: "pendente" },
-  { descricao: "Energia elétrica", vencimento: "15/03/2026", valor: 1350, status: "pendente" },
-  { descricao: "Internet / Telefone", vencimento: "12/03/2026", valor: 450, status: "pendente" },
-  { descricao: "Software de gestão", vencimento: "01/03/2026", valor: 299, status: "pago" },
-];
+const pieColors = ["hsl(239 84% 67%)", "hsl(160 84% 39%)", "hsl(38 92% 50%)", "hsl(345 45% 40%)", "hsl(217 91% 60%)", "hsl(280 60% 55%)"];
+const pagamentoColors = ["hsl(160 84% 39%)", "hsl(239 84% 67%)", "hsl(38 92% 50%)", "hsl(0 72% 51%)", "hsl(280 60% 55%)"];
 
 const faturamentoConfig: ChartConfig = {
   receita: { label: "Receita", color: "hsl(var(--primary))" },
   despesas: { label: "Despesas", color: "hsl(var(--destructive))" },
 };
-
-const procedimentoConfig: ChartConfig = {
-  valor: { label: "Valor", color: "hsl(var(--primary))" },
-};
+const procedimentoConfig: ChartConfig = { valor: { label: "Valor", color: "hsl(var(--primary))" } };
 
 const Financeiro = () => {
   const [periodo, setPeriodo] = useState("mensal");
   const [despesaOpen, setDespesaOpen] = useState(false);
-  const [novaDespesa, setNovaDespesa] = useState({
-    descricao: "",
-    categoria: "",
-    fornecedor: "",
-    valor: "",
-    formaPagamento: "",
-    vencimento: "",
-    observacoes: "",
-  });
+  const [novaDespesa, setNovaDespesa] = useState({ descricao: "", categoria: "", fornecedor: "", valor: "", formaPagamento: "", vencimento: "", observacoes: "" });
+  const [loading, setLoading] = useState(true);
 
-  const handleDespesaChange = (field: string, value: string) => {
-    setNovaDespesa((prev) => ({ ...prev, [field]: value }));
-  };
+  // Data from Supabase
+  const [receitaTotal, setReceitaTotal] = useState(0);
+  const [despesaTotal, setDespesaTotal] = useState(0);
+  const [faturamentoMensal, setFaturamentoMensal] = useState<{mes: string; receita: number; despesas: number}[]>([]);
+  const [receitaPorProcedimento, setReceitaPorProcedimento] = useState<{procedimento: string; valor: number; porcentagem: number}[]>([]);
+  const [formasPagamento, setFormasPagamento] = useState<{forma: string; valor: number; porcentagem: number}[]>([]);
+  const [ultimasTransacoes, setUltimasTransacoes] = useState<any[]>([]);
+  const [contasAPagar, setContasAPagar] = useState<any[]>([]);
 
-  const handleSalvarDespesa = () => {
+  useEffect(() => {
+    const loadFinanceiro = async () => {
+      try {
+        const [agRes, despRes, pacRes] = await Promise.all([
+          supabase.from("agendamento").select("*").in("status", ["realizado", "confirmado", "agendado"]),
+          supabase.from("despesa").select("*"),
+          supabase.from("paciente").select("id, nome"),
+        ]);
+
+        const agendamentos = agRes.data || [];
+        const despesas = despRes.data || [];
+        const pacientes = pacRes.data || [];
+        const pacMap = Object.fromEntries(pacientes.map((p: any) => [p.id, p.nome]));
+
+        // Revenue = sum of valor from realized appointments
+        const realizados = agendamentos.filter((a: any) => a.status === "realizado");
+        const totalReceita = realizados.reduce((s: number, a: any) => s + Number(a.valor), 0);
+        const totalDespesa = despesas.reduce((s: number, d: any) => s + Number(d.valor), 0);
+        setReceitaTotal(totalReceita);
+        setDespesaTotal(totalDespesa);
+
+        // Monthly chart (last 3 months)
+        const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+        const monthlyData: Record<string, {receita: number; despesas: number}> = {};
+        realizados.forEach((a: any) => {
+          const m = months[new Date(a.data + "T00:00:00").getMonth()];
+          if (!monthlyData[m]) monthlyData[m] = { receita: 0, despesas: 0 };
+          monthlyData[m].receita += Number(a.valor);
+        });
+        despesas.forEach((d: any) => {
+          const m = months[new Date(d.vencimento + "T00:00:00").getMonth()];
+          if (!monthlyData[m]) monthlyData[m] = { receita: 0, despesas: 0 };
+          monthlyData[m].despesas += Number(d.valor);
+        });
+        const chartData = Object.entries(monthlyData).map(([mes, data]) => ({ mes, ...data }));
+        setFaturamentoMensal(chartData);
+
+        // Revenue by procedure
+        const procTotals: Record<string, number> = {};
+        realizados.forEach((a: any) => {
+          const label = (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento;
+          procTotals[label] = (procTotals[label] || 0) + Number(a.valor);
+        });
+        const procArr = Object.entries(procTotals).sort((a, b) => b[1] - a[1]);
+        const procTotal = procArr.reduce((s, [, v]) => s + v, 0);
+        setReceitaPorProcedimento(procArr.map(([procedimento, valor]) => ({
+          procedimento, valor, porcentagem: procTotal > 0 ? Math.round((valor / procTotal) * 100) : 0,
+        })));
+
+        // Payment methods
+        const payTotals: Record<string, number> = {};
+        realizados.forEach((a: any) => {
+          const label = (formaPagamentoLabels as any)[a.forma_pagamento] || a.forma_pagamento;
+          payTotals[label] = (payTotals[label] || 0) + Number(a.valor);
+        });
+        const payArr = Object.entries(payTotals).sort((a, b) => b[1] - a[1]);
+        const payTotal = payArr.reduce((s, [, v]) => s + v, 0);
+        setFormasPagamento(payArr.map(([forma, valor]) => ({
+          forma, valor, porcentagem: payTotal > 0 ? Math.round((valor / payTotal) * 100) : 0,
+        })));
+
+        // Last transactions
+        const lastTrans = realizados
+          .sort((a: any, b: any) => b.data.localeCompare(a.data))
+          .slice(0, 5)
+          .map((a: any) => ({
+            id: a.id,
+            paciente: pacMap[a.paciente_id] || "—",
+            procedimento: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
+            valor: Number(a.valor),
+            forma: (formaPagamentoLabels as any)[a.forma_pagamento] || a.forma_pagamento,
+            data: new Date(a.data + "T00:00:00").toLocaleDateString("pt-BR"),
+            status: "pago",
+          }));
+        setUltimasTransacoes(lastTrans);
+
+        // Bills to pay
+        const bills = despesas
+          .filter((d: any) => d.status === "pendente")
+          .sort((a: any, b: any) => a.vencimento.localeCompare(b.vencimento))
+          .slice(0, 5)
+          .map((d: any) => ({
+            descricao: d.descricao,
+            vencimento: new Date(d.vencimento + "T00:00:00").toLocaleDateString("pt-BR"),
+            valor: Number(d.valor),
+            status: d.status,
+          }));
+        setContasAPagar(bills);
+      } catch (err) {
+        console.error("Erro ao carregar financeiro:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadFinanceiro();
+  }, []);
+
+  const lucroLiquido = receitaTotal - despesaTotal;
+  const ticketMedio = ultimasTransacoes.length > 0 ? Math.round(receitaTotal / ultimasTransacoes.length) : 0;
+
+  const handleDespesaChange = (field: string, value: string) => setNovaDespesa((prev) => ({ ...prev, [field]: value }));
+
+  const handleSalvarDespesa = async () => {
     if (!novaDespesa.descricao || !novaDespesa.valor || !novaDespesa.vencimento) {
-      toast.error("Preencha os campos obrigatórios: Descrição, Valor e Vencimento.");
+      toast.error("Preencha os campos obrigatórios.");
       return;
     }
-    toast.success("Despesa cadastrada com sucesso!");
-    setNovaDespesa({ descricao: "", categoria: "", fornecedor: "", valor: "", formaPagamento: "", vencimento: "", observacoes: "" });
-    setDespesaOpen(false);
+    try {
+      await despesaService.criar({
+        descricao: novaDespesa.descricao,
+        categoria: novaDespesa.categoria || undefined,
+        fornecedor: novaDespesa.fornecedor || undefined,
+        valor: parseFloat(novaDespesa.valor),
+        forma_pagamento: novaDespesa.formaPagamento || undefined,
+        vencimento: novaDespesa.vencimento,
+        observacoes: novaDespesa.observacoes || undefined,
+        status: "pendente",
+      });
+      toast.success("Despesa cadastrada com sucesso!");
+      setNovaDespesa({ descricao: "", categoria: "", fornecedor: "", valor: "", formaPagamento: "", vencimento: "", observacoes: "" });
+      setDespesaOpen(false);
+      // Reload
+      window.location.reload();
+    } catch {
+      toast.error("Erro ao salvar despesa.");
+    }
   };
-
-  const receitaTotal = 280700;
-  const despesaTotal = 158700;
-  const lucroLiquido = receitaTotal - despesaTotal;
-  const ticketMedio = 3250;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Financeiro</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Visão geral das finanças da clínica
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">Visão geral das finanças da clínica</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Select value={periodo} onValueChange={setPeriodo}>
-            <SelectTrigger className="w-[140px] h-9 text-sm">
-              <SelectValue />
-            </SelectTrigger>
+            <SelectTrigger className="w-[140px] h-9 text-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="semanal">Semanal</SelectItem>
               <SelectItem value="mensal">Mensal</SelectItem>
@@ -177,16 +193,10 @@ const Financeiro = () => {
               <SelectItem value="anual">Anual</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Exportar</span>
-          </Button>
+          <Button variant="outline" size="sm" className="gap-2"><Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span></Button>
           <Dialog open={despesaOpen} onOpenChange={setDespesaOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="gap-2">
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Adicionar</span> Despesa
-              </Button>
+              <Button size="sm" className="gap-2"><Plus className="w-4 h-4" /><span className="hidden sm:inline">Adicionar</span> Despesa</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
@@ -195,62 +205,44 @@ const Financeiro = () => {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2"><Label>Descrição *</Label><Input placeholder="Ex: Aluguel, Material..." value={novaDespesa.descricao} onChange={(e) => handleDespesaChange("descricao", e.target.value)} /></div>
                   <div className="space-y-2">
-                    <Label htmlFor="descricao">Descrição *</Label>
-                    <Input id="descricao" placeholder="Ex: Aluguel, Material..." value={novaDespesa.descricao} onChange={(e) => handleDespesaChange("descricao", e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="categoria">Categoria</Label>
+                    <Label>Categoria</Label>
                     <Select value={novaDespesa.categoria} onValueChange={(v) => handleDespesaChange("categoria", v)}>
-                      <SelectTrigger id="categoria"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="aluguel">Aluguel</SelectItem>
                         <SelectItem value="material">Material Odontológico</SelectItem>
                         <SelectItem value="folha">Folha de Pagamento</SelectItem>
-                        <SelectItem value="equipamento">Equipamentos</SelectItem>
-                        <SelectItem value="utilidades">Utilidades (Água, Luz, Internet)</SelectItem>
+                        <SelectItem value="utilidades">Utilidades</SelectItem>
                         <SelectItem value="marketing">Marketing</SelectItem>
-                        <SelectItem value="manutencao">Manutenção</SelectItem>
-                        <SelectItem value="software">Software / Licenças</SelectItem>
+                        <SelectItem value="software">Software</SelectItem>
                         <SelectItem value="outros">Outros</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="fornecedor">Fornecedor</Label>
-                    <Input id="fornecedor" placeholder="Nome do fornecedor" value={novaDespesa.fornecedor} onChange={(e) => handleDespesaChange("fornecedor", e.target.value)} />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="valor">Valor (R$) *</Label>
-                    <Input id="valor" type="number" placeholder="0,00" value={novaDespesa.valor} onChange={(e) => handleDespesaChange("valor", e.target.value)} />
-                  </div>
+                  <div className="space-y-2"><Label>Fornecedor</Label><Input placeholder="Nome do fornecedor" value={novaDespesa.fornecedor} onChange={(e) => handleDespesaChange("fornecedor", e.target.value)} /></div>
+                  <div className="space-y-2"><Label>Valor (R$) *</Label><Input type="number" placeholder="0,00" value={novaDespesa.valor} onChange={(e) => handleDespesaChange("valor", e.target.value)} /></div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="formaPagamento">Forma de Pagamento</Label>
+                    <Label>Forma de Pagamento</Label>
                     <Select value={novaDespesa.formaPagamento} onValueChange={(v) => handleDespesaChange("formaPagamento", v)}>
-                      <SelectTrigger id="formaPagamento"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="pix">PIX</SelectItem>
                         <SelectItem value="boleto">Boleto</SelectItem>
                         <SelectItem value="credito">Cartão de Crédito</SelectItem>
                         <SelectItem value="debito">Cartão de Débito</SelectItem>
-                        <SelectItem value="transferencia">Transferência Bancária</SelectItem>
                         <SelectItem value="dinheiro">Dinheiro</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="vencimento">Vencimento *</Label>
-                    <Input id="vencimento" type="date" value={novaDespesa.vencimento} onChange={(e) => handleDespesaChange("vencimento", e.target.value)} />
-                  </div>
+                  <div className="space-y-2"><Label>Vencimento *</Label><Input type="date" value={novaDespesa.vencimento} onChange={(e) => handleDespesaChange("vencimento", e.target.value)} /></div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="observacoes">Observações</Label>
-                  <Textarea id="observacoes" placeholder="Notas adicionais..." rows={3} value={novaDespesa.observacoes} onChange={(e) => handleDespesaChange("observacoes", e.target.value)} />
-                </div>
+                <div className="space-y-2"><Label>Observações</Label><Textarea rows={3} value={novaDespesa.observacoes} onChange={(e) => handleDespesaChange("observacoes", e.target.value)} /></div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setDespesaOpen(false)}>Cancelar</Button>
@@ -261,91 +253,50 @@ const Financeiro = () => {
         </div>
       </div>
 
-      {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Total</p>
-              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
-                R$ {receitaTotal.toLocaleString("pt-BR")}
-              </p>
-              <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-success" />
-                <span className="text-[10px] sm:text-xs font-medium text-success">+12.5%</span>
-                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">vs mês anterior</span>
-              </div>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {receitaTotal.toLocaleString("pt-BR")}</p>
             </div>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-            </div>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
           </div>
         </LiquidGlassCard>
-
         <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Despesas</p>
-              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
-                R$ {despesaTotal.toLocaleString("pt-BR")}
-              </p>
-              <div className="flex items-center gap-1 mt-1">
-                <ArrowDownRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-destructive" />
-                <span className="text-[10px] sm:text-xs font-medium text-destructive">+3.2%</span>
-                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">vs mês anterior</span>
-              </div>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {despesaTotal.toLocaleString("pt-BR")}</p>
             </div>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
-              <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" />
-            </div>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-destructive/10 flex items-center justify-center"><TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" /></div>
           </div>
         </LiquidGlassCard>
-
         <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Lucro Líquido</p>
-              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
-                R$ {lucroLiquido.toLocaleString("pt-BR")}
-              </p>
-              <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-success" />
-                <span className="text-[10px] sm:text-xs font-medium text-success">+18.7%</span>
-                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">margem 43.4%</span>
-              </div>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {lucroLiquido.toLocaleString("pt-BR")}</p>
             </div>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-success/10 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-success" />
-            </div>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-success/10 flex items-center justify-center"><TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-success" /></div>
           </div>
         </LiquidGlassCard>
-
         <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Ticket Médio</p>
-              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">
-                R$ {ticketMedio.toLocaleString("pt-BR")}
-              </p>
-              <div className="flex items-center gap-1 mt-1">
-                <ArrowUpRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-success" />
-                <span className="text-[10px] sm:text-xs font-medium text-success">+5.3%</span>
-                <span className="text-[10px] sm:text-xs text-muted-foreground hidden sm:inline">vs mês anterior</span>
-              </div>
+              <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {ticketMedio.toLocaleString("pt-BR")}</p>
             </div>
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-            </div>
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
           </div>
         </LiquidGlassCard>
       </div>
 
-      {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <LiquidGlassCard className="lg:col-span-2 overflow-hidden" draggable={false}>
           <div className="p-5 pb-2">
             <h3 className="text-base font-semibold text-foreground">Receita vs Despesas</h3>
-            <p className="text-sm text-muted-foreground">Últimos 8 meses</p>
+            <p className="text-sm text-muted-foreground">Por mês</p>
           </div>
           <div className="px-5 pb-5">
             <ChartContainer config={faturamentoConfig} className="h-[300px] w-full">
@@ -380,19 +331,8 @@ const Financeiro = () => {
           <div className="px-5 pb-5">
             <ChartContainer config={procedimentoConfig} className="h-[220px] w-full">
               <PieChart>
-                <Pie
-                  data={receitaPorProcedimento}
-                  dataKey="valor"
-                  nameKey="procedimento"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
-                  paddingAngle={3}
-                >
-                  {receitaPorProcedimento.map((_, index) => (
-                    <Cell key={index} fill={pieColors[index % pieColors.length]} />
-                  ))}
+                <Pie data={receitaPorProcedimento} dataKey="valor" nameKey="procedimento" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3}>
+                  {receitaPorProcedimento.map((_, index) => <Cell key={index} fill={pieColors[index % pieColors.length]} />)}
                 </Pie>
                 <ChartTooltip content={<ChartTooltipContent formatter={(value) => `R$ ${Number(value).toLocaleString("pt-BR")}`} />} />
               </PieChart>
@@ -412,7 +352,6 @@ const Financeiro = () => {
         </LiquidGlassCard>
       </div>
 
-      {/* Formas de Pagamento + Transações/Contas */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
         <LiquidGlassCard className="overflow-hidden flex flex-col" draggable={false}>
           <div className="p-5 pb-2">
@@ -422,19 +361,8 @@ const Financeiro = () => {
           <div className="px-5 pb-5 flex-1">
             <ChartContainer config={procedimentoConfig} className="h-[220px] w-full">
               <PieChart>
-                <Pie
-                  data={formasPagamento}
-                  dataKey="valor"
-                  nameKey="forma"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={50}
-                  outerRadius={80}
-                  paddingAngle={3}
-                >
-                  {formasPagamento.map((_, index) => (
-                    <Cell key={index} fill={pagamentoColors[index % pagamentoColors.length]} />
-                  ))}
+                <Pie data={formasPagamento} dataKey="valor" nameKey="forma" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3}>
+                  {formasPagamento.map((_, index) => <Cell key={index} fill={pagamentoColors[index % pagamentoColors.length]} />)}
                 </Pie>
                 <ChartTooltip content={<ChartTooltipContent formatter={(value) => `R$ ${Number(value).toLocaleString("pt-BR")}`} />} />
               </PieChart>
@@ -459,7 +387,6 @@ const Financeiro = () => {
               <TabsTrigger value="transacoes">Últimas Transações</TabsTrigger>
               <TabsTrigger value="contas">Contas a Pagar</TabsTrigger>
             </TabsList>
-
             <TabsContent value="transacoes" className="mt-2 flex-1">
               <LiquidGlassCard className="overflow-hidden h-full" draggable={false}>
                 <div className="p-0 overflow-x-auto">
@@ -475,21 +402,14 @@ const Financeiro = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {ultimasTransacoes.slice(0, 5).map((t) => (
+                      {ultimasTransacoes.map((t: any) => (
                         <TableRow key={t.id}>
                           <TableCell className="font-medium">{t.paciente}</TableCell>
                           <TableCell className="hidden sm:table-cell text-muted-foreground">{t.procedimento}</TableCell>
                           <TableCell>R$ {t.valor.toLocaleString("pt-BR")}</TableCell>
                           <TableCell className="hidden md:table-cell text-muted-foreground">{t.forma}</TableCell>
                           <TableCell className="hidden md:table-cell text-muted-foreground">{t.data}</TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={t.status === "pago" ? "default" : t.status === "pendente" ? "secondary" : "destructive"}
-                              className="text-[11px]"
-                            >
-                              {t.status === "pago" ? "Pago" : t.status === "pendente" ? "Pendente" : "Atrasado"}
-                            </Badge>
-                          </TableCell>
+                          <TableCell><Badge variant="default" className="text-[11px]">Pago</Badge></TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -497,7 +417,6 @@ const Financeiro = () => {
                 </div>
               </LiquidGlassCard>
             </TabsContent>
-
             <TabsContent value="contas" className="mt-2 flex-1">
               <LiquidGlassCard className="overflow-hidden h-full" draggable={false}>
                 <div className="p-0 overflow-x-auto">
@@ -511,16 +430,12 @@ const Financeiro = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {contasAPagar.slice(0, 5).map((c, i) => (
+                      {contasAPagar.map((c: any, i: number) => (
                         <TableRow key={i}>
                           <TableCell className="font-medium">{c.descricao}</TableCell>
                           <TableCell className="text-muted-foreground hidden sm:table-cell">{c.vencimento}</TableCell>
                           <TableCell>R$ {c.valor.toLocaleString("pt-BR")}</TableCell>
-                          <TableCell>
-                            <Badge variant={c.status === "pago" ? "default" : "secondary"} className="text-[11px]">
-                              {c.status === "pago" ? "Pago" : "Pendente"}
-                            </Badge>
-                          </TableCell>
+                          <TableCell><Badge variant="secondary" className="text-[11px]">Pendente</Badge></TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
