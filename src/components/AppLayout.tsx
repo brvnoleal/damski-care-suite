@@ -104,7 +104,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm xl:hidden"
+          className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -112,7 +112,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Sidebar — Liquid Glass */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[260px] flex flex-col transition-transform duration-300 xl:translate-x-0 xl:static xl:z-auto",
+          "fixed inset-y-0 left-0 z-50 w-[260px] flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto",
           "relative overflow-hidden",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
@@ -150,7 +150,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             </h1>
           </div>
           <button
-            className="xl:hidden text-sidebar-foreground/50 hover:text-sidebar-foreground"
+            className="lg:hidden text-sidebar-foreground/50 hover:text-sidebar-foreground"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="w-5 h-5" />
@@ -228,7 +228,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           />
 
           <button
-            className="relative z-10 xl:hidden text-muted-foreground hover:text-foreground"
+            className="relative z-10 lg:hidden text-muted-foreground hover:text-foreground"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu className="w-5 h-5" />
