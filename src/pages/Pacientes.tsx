@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, Plus, Filter, Eye, Edit, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -29,12 +29,26 @@ const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
 const Pacientes = () => {
   const { toast } = useToast();
   const [search, setSearch] = useState("");
-  const [pacientes, setPacientes] = useState<Paciente[]>(pacienteService.listar());
+  const [pacientes, setPacientes] = useState<Paciente[]>([]);
+  const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyPaciente());
+
+  const loadData = async () => {
+    try {
+      const data = await pacienteService.listar();
+      setPacientes(data);
+    } catch (err) {
+      toast({ title: "Erro ao carregar pacientes", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { loadData(); }, []);
 
   const filtered = pacientes.filter(
     (p) =>
@@ -59,27 +73,35 @@ const Pacientes = () => {
     setDialogOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.nome || !form.cpf || !form.data_nascimento) {
       toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
       return;
     }
-    if (editingId) {
-      pacienteService.atualizar(editingId, form);
-      toast({ title: "Paciente atualizado com sucesso" });
-    } else {
-      pacienteService.criar(form);
-      toast({ title: "Paciente cadastrado com sucesso" });
+    try {
+      if (editingId) {
+        await pacienteService.atualizar(editingId, form);
+        toast({ title: "Paciente atualizado com sucesso" });
+      } else {
+        await pacienteService.criar(form);
+        toast({ title: "Paciente cadastrado com sucesso" });
+      }
+      await loadData();
+      setDialogOpen(false);
+    } catch (err) {
+      toast({ title: "Erro ao salvar paciente", variant: "destructive" });
     }
-    setPacientes(pacienteService.listar());
-    setDialogOpen(false);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deletingId) {
-      pacienteService.excluir(deletingId);
-      setPacientes(pacienteService.listar());
-      toast({ title: "Paciente excluído" });
+      try {
+        await pacienteService.excluir(deletingId);
+        await loadData();
+        toast({ title: "Paciente excluído" });
+      } catch (err) {
+        toast({ title: "Erro ao excluir paciente", variant: "destructive" });
+      }
     }
     setDeleteOpen(false);
     setDeletingId(null);
@@ -125,7 +147,11 @@ const Pacientes = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((p) => (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
+                </TableRow>
+              ) : filtered.map((p) => (
                 <TableRow key={p.id} className="hover:bg-white/5 transition-colors">
                   <TableCell className="font-medium">{p.nome}</TableCell>
                   <TableCell className="text-muted-foreground hidden md:table-cell">{p.cpf}</TableCell>
@@ -147,7 +173,7 @@ const Pacientes = () => {
                   </TableCell>
                 </TableRow>
               ))}
-              {filtered.length === 0 && (
+              {!loading && filtered.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     Nenhum paciente encontrado.

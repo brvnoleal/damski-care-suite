@@ -1,49 +1,59 @@
 /**
  * Camada de serviço — Dentistas
- * Abstrai operações CRUD. Atualmente usa dados mock.
+ * Operações CRUD via Supabase.
  */
+import { supabase } from "@/integrations/supabase/client";
 import { Dentista } from "@/types";
-import { mockDentistas } from "@/data/mockDentistas";
-import { notificationStore } from "@/stores/notificationStore";
 
-let dentistas: Dentista[] = [...mockDentistas];
+const mapRow = (row: any): Dentista => ({
+  id: row.id,
+  nome: row.nome,
+  especialidade: row.especialidade,
+  cro: row.cro,
+  telefone: row.telefone || undefined,
+  email: row.email || undefined,
+  instagram: row.instagram || undefined,
+  cep: row.cep || undefined,
+  estado: row.estado || undefined,
+  cidade: row.cidade || undefined,
+  bairro: row.bairro || undefined,
+  rua: row.rua || undefined,
+  numero: row.numero || undefined,
+  complemento: row.complemento || undefined,
+  ponto_referencia: row.ponto_referencia || undefined,
+  status: row.status,
+  created_at: row.created_at,
+});
 
 export const dentistaService = {
-  listar: (): Dentista[] => {
-    return [...dentistas];
+  listar: async (): Promise<Dentista[]> => {
+    const { data, error } = await supabase.from("dentista").select("*").order("nome");
+    if (error) throw error;
+    return (data || []).map(mapRow);
   },
 
-  buscarPorId: (id: string): Dentista | undefined => {
-    return dentistas.find((d) => d.id === id);
+  buscarPorId: async (id: string): Promise<Dentista | null> => {
+    const { data, error } = await supabase.from("dentista").select("*").eq("id", id).maybeSingle();
+    if (error) throw error;
+    return data ? mapRow(data) : null;
   },
 
-  criar: (dados: Omit<Dentista, "id" | "created_at">): Dentista => {
-    const novo: Dentista = {
-      ...dados,
-      id: String(Date.now()),
-      created_at: new Date().toISOString(),
-    };
-    dentistas = [...dentistas, novo];
-    notificationStore.add("create", "dentista", "Novo dentista cadastrado", `${novo.nome} foi adicionado.`);
-    return novo;
+  criar: async (dados: Omit<Dentista, "id" | "created_at">): Promise<Dentista> => {
+    const { data, error } = await supabase.from("dentista").insert(dados).select().single();
+    if (error) throw error;
+    return mapRow(data);
   },
 
-  atualizar: (id: string, dados: Partial<Dentista>): Dentista | null => {
-    const index = dentistas.findIndex((d) => d.id === id);
-    if (index === -1) return null;
-    dentistas[index] = { ...dentistas[index], ...dados };
-    dentistas = [...dentistas];
-    notificationStore.add("update", "dentista", "Dentista atualizado", `${dentistas[index].nome} teve dados alterados.`);
-    return dentistas[index];
+  atualizar: async (id: string, dados: Partial<Dentista>): Promise<Dentista | null> => {
+    const { created_at, id: _, ...updateData } = dados as any;
+    const { data, error } = await supabase.from("dentista").update({ ...updateData, updated_at: new Date().toISOString() }).eq("id", id).select().single();
+    if (error) throw error;
+    return data ? mapRow(data) : null;
   },
 
-  excluir: (id: string): boolean => {
-    const dentista = dentistas.find((d) => d.id === id);
-    const len = dentistas.length;
-    dentistas = dentistas.filter((d) => d.id !== id);
-    if (dentistas.length < len && dentista) {
-      notificationStore.add("delete", "dentista", "Dentista excluído", `${dentista.nome} foi removido.`);
-    }
-    return dentistas.length < len;
+  excluir: async (id: string): Promise<boolean> => {
+    const { error } = await supabase.from("dentista").delete().eq("id", id);
+    if (error) throw error;
+    return true;
   },
 };

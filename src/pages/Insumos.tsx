@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Plus, Filter, AlertTriangle, CheckCircle, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,29 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
-
-interface Supply {
-  id: string;
-  name: string;
-  manufacturer: string;
-  lot: string;
-  expiry: string;
-  qty: number;
-  daysLeft: number;
-  usedBy: number;
-}
-
-let idCounter = 0;
-const makeId = () => `supply-${++idCounter}`;
-
-const initialSupplies: Supply[] = [
-  { id: makeId(), name: "Ácido Hialurônico 20mg/ml", manufacturer: "Galderma", lot: "AH2024-089", expiry: "15/03/2026", qty: 3, daysLeft: 24, usedBy: 2 },
-  { id: makeId(), name: "Toxina Botulínica 100U", manufacturer: "Allergan", lot: "TB2024-156", expiry: "22/03/2026", qty: 8, daysLeft: 31, usedBy: 5 },
-  { id: makeId(), name: "Ácido Hialurônico 24mg/ml", manufacturer: "Galderma", lot: "AH2024-112", expiry: "10/06/2026", qty: 12, daysLeft: 111, usedBy: 0 },
-  { id: makeId(), name: "Bioestimulador PLLA", manufacturer: "Sinclair", lot: "BIO2024-034", expiry: "01/09/2026", qty: 6, daysLeft: 194, usedBy: 3 },
-  { id: makeId(), name: "Fio PDO Espiculado", manufacturer: "Croma", lot: "PDO2024-067", expiry: "28/02/2026", qty: 15, daysLeft: 9, usedBy: 1 },
-  { id: makeId(), name: "Enzima Hialuronidase", manufacturer: "Hylenex", lot: "HYA2024-023", expiry: "15/04/2026", qty: 4, daysLeft: 55, usedBy: 0 },
-];
+import { insumoService, Insumo } from "@/services/insumoService";
 
 const getExpiryStatus = (days: number) => {
   if (days <= 15) return { label: "Crítico", className: "bg-destructive/10 text-destructive border-destructive/20" };
@@ -45,37 +23,51 @@ const getExpiryStatus = (days: number) => {
   return { label: "OK", className: "bg-success/10 text-success border-success/20" };
 };
 
-const calcDaysLeft = (expiryDate: string): number => {
-  const [day, month, year] = expiryDate.split("/").map(Number);
-  const expiry = new Date(year, month - 1, day);
+const calcDaysLeft = (validadeISO: string): number => {
+  const expiry = new Date(validadeISO + "T00:00:00");
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 };
 
-const toInputDate = (ddmmyyyy: string) => {
-  const [d, m, y] = ddmmyyyy.split("/");
-  return `${y}-${m}-${d}`;
+const formatDateBR = (iso: string) => {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
 };
 
 const Insumos = () => {
   const [search, setSearch] = useState("");
-  const [supplies, setSupplies] = useState<Supply[]>(initialSupplies);
+  const [supplies, setSupplies] = useState<Insumo[]>([]);
+  const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [editingSupply, setEditingSupply] = useState<Supply | null>(null);
-  const [deletingSupply, setDeletingSupply] = useState<Supply | null>(null);
-  const [form, setForm] = useState({ name: "", manufacturer: "", lot: "", expiry: "", qty: "" });
+  const [editingSupply, setEditingSupply] = useState<Insumo | null>(null);
+  const [deletingSupply, setDeletingSupply] = useState<Insumo | null>(null);
+  const [form, setForm] = useState({ nome: "", fabricante: "", lote: "", validade: "", quantidade: "" });
+
+  const loadData = async () => {
+    try {
+      const data = await insumoService.listar();
+      setSupplies(data);
+    } catch {
+      toast({ title: "Erro ao carregar insumos", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { loadData(); }, []);
 
   const filtered = supplies.filter((s) =>
-    s.name.toLowerCase().includes(search.toLowerCase()) ||
-    s.lot.toLowerCase().includes(search.toLowerCase())
+    s.nome.toLowerCase().includes(search.toLowerCase()) ||
+    s.lote.toLowerCase().includes(search.toLowerCase())
   );
 
   const summaryStats = supplies.reduce(
     (acc, s) => {
-      if (s.daysLeft <= 15) acc.critical++;
-      else if (s.daysLeft <= 30) acc.warning++;
+      const days = calcDaysLeft(s.validade);
+      if (days <= 15) acc.critical++;
+      else if (days <= 30) acc.warning++;
       else acc.ok++;
       return acc;
     },
@@ -84,72 +76,61 @@ const Insumos = () => {
 
   const openCreate = () => {
     setEditingSupply(null);
-    setForm({ name: "", manufacturer: "", lot: "", expiry: "", qty: "" });
+    setForm({ nome: "", fabricante: "", lote: "", validade: "", quantidade: "" });
     setDialogOpen(true);
   };
 
-  const openEdit = (supply: Supply) => {
+  const openEdit = (supply: Insumo) => {
     setEditingSupply(supply);
     setForm({
-      name: supply.name,
-      manufacturer: supply.manufacturer,
-      lot: supply.lot,
-      expiry: toInputDate(supply.expiry),
-      qty: String(supply.qty),
+      nome: supply.nome, fabricante: supply.fabricante, lote: supply.lote,
+      validade: supply.validade, quantidade: String(supply.quantidade),
     });
     setDialogOpen(true);
   };
 
-  const openDelete = (supply: Supply) => {
+  const openDelete = (supply: Insumo) => {
     setDeletingSupply(supply);
     setDeleteDialogOpen(true);
   };
 
-  const handleSubmit = () => {
-    if (!form.name || !form.manufacturer || !form.lot || !form.expiry || !form.qty) {
+  const handleSubmit = async () => {
+    if (!form.nome || !form.fabricante || !form.lote || !form.validade || !form.quantidade) {
       toast({ title: "Preencha todos os campos", variant: "destructive" });
       return;
     }
-
-    const [y, m, d] = form.expiry.split("-");
-    const expiryFormatted = `${d}/${m}/${y}`;
-    const daysLeft = calcDaysLeft(expiryFormatted);
-
-    if (editingSupply) {
-      setSupplies((prev) =>
-        prev.map((s) =>
-          s.id === editingSupply.id
-            ? { ...s, name: form.name, manufacturer: form.manufacturer, lot: form.lot, expiry: expiryFormatted, qty: parseInt(form.qty, 10), daysLeft }
-            : s
-        )
-      );
-      toast({ title: "Insumo atualizado com sucesso!" });
-    } else {
-      const newSupply: Supply = {
-        id: makeId(),
-        name: form.name,
-        manufacturer: form.manufacturer,
-        lot: form.lot,
-        expiry: expiryFormatted,
-        qty: parseInt(form.qty, 10),
-        daysLeft,
-        usedBy: 0,
-      };
-      setSupplies((prev) => [newSupply, ...prev]);
-      toast({ title: "Insumo cadastrado com sucesso!" });
+    try {
+      if (editingSupply) {
+        await insumoService.atualizar(editingSupply.id, {
+          nome: form.nome, fabricante: form.fabricante, lote: form.lote,
+          validade: form.validade, quantidade: parseInt(form.quantidade, 10),
+        });
+        toast({ title: "Insumo atualizado com sucesso!" });
+      } else {
+        await insumoService.criar({
+          nome: form.nome, fabricante: form.fabricante, lote: form.lote,
+          validade: form.validade, quantidade: parseInt(form.quantidade, 10), pacientes_vinculados: 0,
+        });
+        toast({ title: "Insumo cadastrado com sucesso!" });
+      }
+      await loadData();
+      setDialogOpen(false);
+    } catch {
+      toast({ title: "Erro ao salvar insumo", variant: "destructive" });
     }
-
-    setForm({ name: "", manufacturer: "", lot: "", expiry: "", qty: "" });
-    setEditingSupply(null);
-    setDialogOpen(false);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deletingSupply) return;
-    setSupplies((prev) => prev.filter((s) => s.id !== deletingSupply.id));
+    try {
+      await insumoService.excluir(deletingSupply.id);
+      await loadData();
+      toast({ title: "Insumo excluído com sucesso!" });
+    } catch {
+      toast({ title: "Erro ao excluir", variant: "destructive" });
+    }
     setDeleteDialogOpen(false);
     setDeletingSupply(null);
-    toast({ title: "Insumo excluído com sucesso!" });
   };
 
   return (
@@ -167,7 +148,6 @@ const Insumos = () => {
         </Button>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <LiquidGlassCard draggable={false} className="p-4">
           <div className="flex items-center gap-3">
@@ -225,22 +205,27 @@ const Insumos = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((supply) => {
-                const status = getExpiryStatus(supply.daysLeft);
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
+                </TableRow>
+              ) : filtered.map((supply) => {
+                const daysLeft = calcDaysLeft(supply.validade);
+                const status = getExpiryStatus(daysLeft);
                 return (
                   <TableRow key={supply.id} className="hover:bg-white/5 transition-colors">
-                    <TableCell className="font-medium">{supply.name}</TableCell>
-                    <TableCell className="text-muted-foreground hidden md:table-cell">{supply.manufacturer}</TableCell>
-                    <TableCell className="font-mono text-xs text-gold-dark font-semibold hidden sm:table-cell">{supply.lot}</TableCell>
+                    <TableCell className="font-medium">{supply.nome}</TableCell>
+                    <TableCell className="text-muted-foreground hidden md:table-cell">{supply.fabricante}</TableCell>
+                    <TableCell className="font-mono text-xs text-gold-dark font-semibold hidden sm:table-cell">{supply.lote}</TableCell>
                     <TableCell className="text-muted-foreground hidden sm:table-cell">
-                      {supply.expiry}
-                      <span className="text-xs ml-1">({supply.daysLeft}d)</span>
+                      {formatDateBR(supply.validade)}
+                      <span className="text-xs ml-1">({daysLeft}d)</span>
                     </TableCell>
-                    <TableCell className="text-center">{supply.qty}</TableCell>
+                    <TableCell className="text-center">{supply.quantidade}</TableCell>
                     <TableCell>
                       <Badge className={status.className}>{status.label}</Badge>
                     </TableCell>
-                    <TableCell className="text-center hidden lg:table-cell">{supply.usedBy}</TableCell>
+                    <TableCell className="text-center hidden lg:table-cell">{supply.pacientes_vinculados}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -266,7 +251,6 @@ const Insumos = () => {
         </div>
       </LiquidGlassCard>
 
-      {/* Dialog de Cadastro / Edição */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -275,25 +259,25 @@ const Insumos = () => {
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label htmlFor="supply-name">Nome do Insumo</Label>
-              <Input id="supply-name" placeholder="Ex: Ácido Hialurônico 20mg/ml" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              <Input id="supply-name" placeholder="Ex: Ácido Hialurônico 20mg/ml" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="supply-manufacturer">Fabricante</Label>
-              <Input id="supply-manufacturer" placeholder="Ex: Galderma" value={form.manufacturer} onChange={(e) => setForm({ ...form, manufacturer: e.target.value })} />
+              <Input id="supply-manufacturer" placeholder="Ex: Galderma" value={form.fabricante} onChange={(e) => setForm({ ...form, fabricante: e.target.value })} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="supply-lot">Lote</Label>
-                <Input id="supply-lot" placeholder="Ex: AH2024-089" value={form.lot} onChange={(e) => setForm({ ...form, lot: e.target.value })} />
+                <Input id="supply-lot" placeholder="Ex: AH2024-089" value={form.lote} onChange={(e) => setForm({ ...form, lote: e.target.value })} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="supply-qty">Quantidade</Label>
-                <Input id="supply-qty" type="number" min="1" placeholder="0" value={form.qty} onChange={(e) => setForm({ ...form, qty: e.target.value })} />
+                <Input id="supply-qty" type="number" min="1" placeholder="0" value={form.quantidade} onChange={(e) => setForm({ ...form, quantidade: e.target.value })} />
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="supply-expiry">Validade</Label>
-              <Input id="supply-expiry" type="date" value={form.expiry} onChange={(e) => setForm({ ...form, expiry: e.target.value })} />
+              <Input id="supply-expiry" type="date" value={form.validade} onChange={(e) => setForm({ ...form, validade: e.target.value })} />
             </div>
           </div>
           <DialogFooter>
@@ -303,13 +287,12 @@ const Insumos = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog de Exclusão */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Excluir Insumo</DialogTitle>
             <DialogDescription>
-              Tem certeza que deseja excluir <strong>{deletingSupply?.name}</strong> (Lote: {deletingSupply?.lot})?
+              Tem certeza que deseja excluir <strong>{deletingSupply?.nome}</strong> (Lote: {deletingSupply?.lote})?
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

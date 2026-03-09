@@ -14,7 +14,270 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      agendamento: {
+        Row: {
+          created_at: string
+          data: string
+          dentista_id: string
+          forma_pagamento: string
+          horario: string
+          id: string
+          observacoes: string | null
+          paciente_id: string
+          parcelas: number
+          procedimento: string
+          status: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          created_at?: string
+          data: string
+          dentista_id: string
+          forma_pagamento?: string
+          horario: string
+          id?: string
+          observacoes?: string | null
+          paciente_id: string
+          parcelas?: number
+          procedimento?: string
+          status?: string
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          dentista_id?: string
+          forma_pagamento?: string
+          horario?: string
+          id?: string
+          observacoes?: string | null
+          paciente_id?: string
+          parcelas?: number
+          procedimento?: string
+          status?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agendamento_dentista_id_fkey"
+            columns: ["dentista_id"]
+            isOneToOne: false
+            referencedRelation: "dentista"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agendamento_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "paciente"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dentista: {
+        Row: {
+          bairro: string | null
+          cep: string | null
+          cidade: string | null
+          complemento: string | null
+          created_at: string
+          cro: string
+          email: string | null
+          especialidade: string
+          estado: string | null
+          id: string
+          instagram: string | null
+          nome: string
+          numero: string | null
+          ponto_referencia: string | null
+          rua: string | null
+          status: string
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          complemento?: string | null
+          created_at?: string
+          cro: string
+          email?: string | null
+          especialidade: string
+          estado?: string | null
+          id?: string
+          instagram?: string | null
+          nome: string
+          numero?: string | null
+          ponto_referencia?: string | null
+          rua?: string | null
+          status?: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          complemento?: string | null
+          created_at?: string
+          cro?: string
+          email?: string | null
+          especialidade?: string
+          estado?: string | null
+          id?: string
+          instagram?: string | null
+          nome?: string
+          numero?: string | null
+          ponto_referencia?: string | null
+          rua?: string | null
+          status?: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      despesa: {
+        Row: {
+          categoria: string | null
+          created_at: string
+          descricao: string
+          forma_pagamento: string | null
+          fornecedor: string | null
+          id: string
+          observacoes: string | null
+          status: string
+          valor: number
+          vencimento: string
+        }
+        Insert: {
+          categoria?: string | null
+          created_at?: string
+          descricao: string
+          forma_pagamento?: string | null
+          fornecedor?: string | null
+          id?: string
+          observacoes?: string | null
+          status?: string
+          valor: number
+          vencimento: string
+        }
+        Update: {
+          categoria?: string | null
+          created_at?: string
+          descricao?: string
+          forma_pagamento?: string | null
+          fornecedor?: string | null
+          id?: string
+          observacoes?: string | null
+          status?: string
+          valor?: number
+          vencimento?: string
+        }
+        Relationships: []
+      }
+      insumo: {
+        Row: {
+          created_at: string
+          fabricante: string
+          id: string
+          lote: string
+          nome: string
+          pacientes_vinculados: number
+          quantidade: number
+          updated_at: string
+          validade: string
+        }
+        Insert: {
+          created_at?: string
+          fabricante: string
+          id?: string
+          lote: string
+          nome: string
+          pacientes_vinculados?: number
+          quantidade?: number
+          updated_at?: string
+          validade: string
+        }
+        Update: {
+          created_at?: string
+          fabricante?: string
+          id?: string
+          lote?: string
+          nome?: string
+          pacientes_vinculados?: number
+          quantidade?: number
+          updated_at?: string
+          validade?: string
+        }
+        Relationships: []
+      }
+      paciente: {
+        Row: {
+          bairro: string | null
+          cep: string | null
+          cidade: string | null
+          complemento: string | null
+          cpf: string
+          created_at: string
+          data_nascimento: string
+          email: string | null
+          estado: string | null
+          id: string
+          instagram: string | null
+          nome: string
+          numero: string | null
+          ponto_referencia: string | null
+          rua: string | null
+          status: string
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          complemento?: string | null
+          cpf: string
+          created_at?: string
+          data_nascimento: string
+          email?: string | null
+          estado?: string | null
+          id?: string
+          instagram?: string | null
+          nome: string
+          numero?: string | null
+          ponto_referencia?: string | null
+          rua?: string | null
+          status?: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bairro?: string | null
+          cep?: string | null
+          cidade?: string | null
+          complemento?: string | null
+          cpf?: string
+          created_at?: string
+          data_nascimento?: string
+          email?: string | null
+          estado?: string | null
+          id?: string
+          instagram?: string | null
+          nome?: string
+          numero?: string | null
+          ponto_referencia?: string | null
+          rua?: string | null
+          status?: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
