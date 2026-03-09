@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { pacienteService } from "@/services/pacienteService";
+import { Paciente } from "@/types";
 
 interface Sessao {
   id: string;
@@ -28,30 +29,9 @@ interface Sessao {
 }
 
 const initialSessions: Sessao[] = [
-  {
-    id: "s1",
-    date: "12/02/2026",
-    proc: "Harmonização Facial — Preenchimento Labial",
-    tech: "Cânula 25G, técnica retroinjeção",
-    substance: "Ácido Hialurônico 20mg/ml — Lote AH2024-089 — 1ml",
-    signed: true,
-  },
-  {
-    id: "s2",
-    date: "08/01/2026",
-    proc: "Toxina Botulínica — Terço Superior",
-    tech: "Agulha 30G, técnica intramuscular",
-    substance: "Toxina Botulínica 100U — Lote TB2024-156 — 32U",
-    signed: true,
-  },
-  {
-    id: "s3",
-    date: "15/12/2025",
-    proc: "Avaliação e Planejamento",
-    tech: "Análise facial, fotografias, planejamento digital",
-    substance: "N/A",
-    signed: false,
-  },
+  { id: "s1", date: "12/02/2026", proc: "Harmonização Facial — Preenchimento Labial", tech: "Cânula 25G, técnica retroinjeção", substance: "Ácido Hialurônico 20mg/ml — Lote AH2024-089 — 1ml", signed: true },
+  { id: "s2", date: "08/01/2026", proc: "Toxina Botulínica — Terço Superior", tech: "Agulha 30G, técnica intramuscular", substance: "Toxina Botulínica 100U — Lote TB2024-156 — 32U", signed: true },
+  { id: "s3", date: "15/12/2025", proc: "Avaliação e Planejamento", tech: "Análise facial, fotografias, planejamento digital", substance: "N/A", signed: false },
 ];
 
 const formatDateBR = (iso: string) => {
@@ -63,29 +43,20 @@ const PacienteDetalhe = () => {
   const { id } = useParams();
   const { toast } = useToast();
 
-  // Patient data
-  const paciente = pacienteService.buscarPorId(id || "");
+  const [patientData, setPatientData] = useState<Paciente | null>(null);
+  const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
   const [editForm, setEditForm] = useState({
     nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo" as "ativo" | "inativo",
   });
 
-  // Sessions
   const [sessions, setSessions] = useState<Sessao[]>(initialSessions);
   const [sessionOpen, setSessionOpen] = useState(false);
-  const [sessionForm, setSessionForm] = useState({
-    date: "", proc: "", tech: "", substance: "", signed: false,
-  });
+  const [sessionForm, setSessionForm] = useState({ date: "", proc: "", tech: "", substance: "", signed: false });
 
-  // Photos
   interface Foto {
-    id: string;
-    url: string;
-    name: string;
-    date: string;
-    label: string;
-    categoria: "antes" | "depois" | "durante" | "outro";
-    descricao: string;
+    id: string; url: string; name: string; date: string; label: string;
+    categoria: "antes" | "depois" | "durante" | "outro"; descricao: string;
   }
   const [fotos, setFotos] = useState<Foto[]>([]);
   const [previewFoto, setPreviewFoto] = useState<Foto | null>(null);
@@ -94,8 +65,20 @@ const PacienteDetalhe = () => {
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [fotoMeta, setFotoMeta] = useState<{ categoria: Foto["categoria"]; descricao: string }>({ categoria: "antes", descricao: "" });
 
-  // Refresh patient data
-  const [patientData, setPatientData] = useState(paciente);
+  useEffect(() => {
+    const load = async () => {
+      if (!id) return;
+      try {
+        const data = await pacienteService.buscarPorId(id);
+        setPatientData(data);
+      } catch {
+        toast({ title: "Erro ao carregar paciente", variant: "destructive" });
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [id]);
 
   const initials = patientData?.nome
     ? patientData.nome.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
@@ -104,26 +87,26 @@ const PacienteDetalhe = () => {
   const openEditDialog = () => {
     if (!patientData) return;
     setEditForm({
-      nome: patientData.nome,
-      cpf: patientData.cpf,
-      telefone: patientData.telefone,
-      email: patientData.email,
-      instagram: patientData.instagram || "",
-      data_nascimento: patientData.data_nascimento,
-      status: patientData.status,
+      nome: patientData.nome, cpf: patientData.cpf, telefone: patientData.telefone,
+      email: patientData.email, instagram: patientData.instagram || "",
+      data_nascimento: patientData.data_nascimento, status: patientData.status,
     });
     setEditOpen(true);
   };
 
-  const handleEditSave = () => {
+  const handleEditSave = async () => {
     if (!id || !editForm.nome || !editForm.cpf) {
       toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
       return;
     }
-    pacienteService.atualizar(id, editForm);
-    setPatientData(pacienteService.buscarPorId(id));
-    setEditOpen(false);
-    toast({ title: "Paciente atualizado com sucesso" });
+    try {
+      const updated = await pacienteService.atualizar(id, editForm);
+      setPatientData(updated);
+      setEditOpen(false);
+      toast({ title: "Paciente atualizado com sucesso" });
+    } catch {
+      toast({ title: "Erro ao atualizar", variant: "destructive" });
+    }
   };
 
   const openSessionDialog = () => {
@@ -137,12 +120,9 @@ const PacienteDetalhe = () => {
       return;
     }
     const newSession: Sessao = {
-      id: `s${Date.now()}`,
-      date: formatDateBR(sessionForm.date),
-      proc: sessionForm.proc,
-      tech: sessionForm.tech || "N/A",
-      substance: sessionForm.substance || "N/A",
-      signed: sessionForm.signed,
+      id: `s${Date.now()}`, date: formatDateBR(sessionForm.date),
+      proc: sessionForm.proc, tech: sessionForm.tech || "N/A",
+      substance: sessionForm.substance || "N/A", signed: sessionForm.signed,
     };
     setSessions([newSession, ...sessions]);
     setSessionOpen(false);
@@ -151,10 +131,7 @@ const PacienteDetalhe = () => {
 
   const openFotoDialog = (files: File[]) => {
     const imageFiles = files.filter((f) => f.type.startsWith("image/"));
-    if (imageFiles.length === 0) {
-      toast({ title: "Selecione arquivos de imagem válidos", variant: "destructive" });
-      return;
-    }
+    if (imageFiles.length === 0) { toast({ title: "Selecione arquivos de imagem válidos", variant: "destructive" }); return; }
     setPendingFiles(imageFiles);
     setFotoMeta({ categoria: "antes", descricao: "" });
     setFotoDialogOpen(true);
@@ -163,18 +140,13 @@ const PacienteDetalhe = () => {
   const handleFotoSave = () => {
     const today = new Date();
     const dateBR = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
-
     pendingFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const newFoto: Foto = {
           id: `f${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-          url: e.target?.result as string,
-          name: file.name,
-          date: dateBR,
-          label: file.name.replace(/\.[^.]+$/, ""),
-          categoria: fotoMeta.categoria,
-          descricao: fotoMeta.descricao,
+          url: e.target?.result as string, name: file.name, date: dateBR,
+          label: file.name.replace(/\.[^.]+$/, ""), categoria: fotoMeta.categoria, descricao: fotoMeta.descricao,
         };
         setFotos((prev) => [newFoto, ...prev]);
       };
@@ -184,6 +156,17 @@ const PacienteDetalhe = () => {
     setFotoDialogOpen(false);
     setPendingFiles([]);
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Link to="/pacientes" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Voltar para Pacientes
+        </Link>
+        <p className="text-muted-foreground">Carregando...</p>
+      </div>
+    );
+  }
 
   if (!patientData) {
     return (
@@ -206,7 +189,6 @@ const PacienteDetalhe = () => {
         <ArrowLeft className="w-4 h-4" /> Voltar para Pacientes
       </Link>
 
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-xl gradient-burgundy flex items-center justify-center">
@@ -232,7 +214,6 @@ const PacienteDetalhe = () => {
         </div>
       </div>
 
-      {/* Info Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {[
           { label: "Data de Nascimento", value: nascFormatted },
@@ -248,7 +229,6 @@ const PacienteDetalhe = () => {
         ))}
       </div>
 
-      {/* Tabs */}
       <Tabs defaultValue="evolucoes" className="space-y-4">
         <TabsList className="bg-muted/50 p-1 flex flex-wrap gap-1 h-auto">
           <TabsTrigger value="evolucoes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
@@ -328,36 +308,20 @@ const PacienteDetalhe = () => {
         </TabsContent>
 
         <TabsContent value="fotos" className="space-y-4">
-          {/* Upload area */}
           <div
             className="rounded-xl border-2 border-dashed border-border bg-card p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors"
             onClick={() => fileInputRef.current?.click()}
             onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              openFotoDialog(Array.from(e.dataTransfer.files));
-            }}
+            onDrop={(e) => { e.preventDefault(); e.stopPropagation(); openFotoDialog(Array.from(e.dataTransfer.files)); }}
           >
             <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm font-medium text-foreground">Clique ou arraste imagens aqui</p>
             <p className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP — antes/depois dos procedimentos</p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={(e) => {
-                if (e.target.files) {
-                  openFotoDialog(Array.from(e.target.files));
-                  e.target.value = "";
-                }
-              }}
+            <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden"
+              onChange={(e) => { if (e.target.files) { openFotoDialog(Array.from(e.target.files)); e.target.value = ""; } }}
             />
           </div>
 
-          {/* Grid de fotos */}
           {fotos.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {fotos.map((foto) => (
@@ -381,21 +345,12 @@ const PacienteDetalhe = () => {
                     {foto.descricao && <p className="text-[11px] text-muted-foreground truncate">{foto.descricao}</p>}
                     <p className="text-xs text-muted-foreground">{foto.date}</p>
                   </div>
-                  {/* Overlay actions */}
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => setPreviewFoto(foto)}
-                      className="p-2 rounded-full bg-card/90 text-foreground hover:bg-card transition-colors"
-                    >
+                    <button onClick={() => setPreviewFoto(foto)} className="p-2 rounded-full bg-card/90 text-foreground hover:bg-card transition-colors">
                       <ZoomIn className="w-4 h-4" />
                     </button>
-                    <button
-                      onClick={() => {
-                        setFotos((prev) => prev.filter((f) => f.id !== foto.id));
-                        toast({ title: "Foto removida" });
-                      }}
-                      className="p-2 rounded-full bg-destructive/90 text-destructive-foreground hover:bg-destructive transition-colors"
-                    >
+                    <button onClick={() => { setFotos((prev) => prev.filter((f) => f.id !== foto.id)); toast({ title: "Foto removida" }); }}
+                      className="p-2 rounded-full bg-destructive/90 text-destructive-foreground hover:bg-destructive transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -403,140 +358,56 @@ const PacienteDetalhe = () => {
               ))}
             </div>
           )}
+          {fotos.length === 0 && <p className="text-center text-xs text-muted-foreground">Nenhuma foto adicionada ainda.</p>}
 
-          {fotos.length === 0 && (
-            <p className="text-center text-xs text-muted-foreground">Nenhuma foto adicionada ainda.</p>
-          )}
-
-          {/* Preview modal */}
           {previewFoto && (
             <Dialog open={!!previewFoto} onOpenChange={() => setPreviewFoto(null)}>
-              <DialogContent className="sm:max-w-2xl p-4">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    {previewFoto.label || previewFoto.name}
-                    <Badge variant="outline" className="text-xs">{previewFoto.categoria.charAt(0).toUpperCase() + previewFoto.categoria.slice(1)}</Badge>
-                  </DialogTitle>
-                  <DialogDescription>{previewFoto.descricao || "Sem descrição"} — {previewFoto.date}</DialogDescription>
-                </DialogHeader>
-                <img src={previewFoto.url} alt={previewFoto.name} className="w-full h-auto rounded-lg" />
+              <DialogContent className="sm:max-w-3xl p-0 overflow-hidden">
+                <div className="relative">
+                  <img src={previewFoto.url} alt={previewFoto.name} className="w-full max-h-[80vh] object-contain bg-black" />
+                  <button onClick={() => setPreviewFoto(null)} className="absolute top-3 right-3 p-2 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                    <p className="text-white text-sm font-medium">{previewFoto.label || previewFoto.name}</p>
+                    {previewFoto.descricao && <p className="text-white/70 text-xs mt-0.5">{previewFoto.descricao}</p>}
+                    <p className="text-white/50 text-xs mt-0.5">{previewFoto.date} · {previewFoto.categoria}</p>
+                  </div>
+                </div>
               </DialogContent>
             </Dialog>
           )}
-
-          {/* Upload metadata dialog */}
-          <Dialog open={fotoDialogOpen} onOpenChange={setFotoDialogOpen}>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Detalhes da Foto</DialogTitle>
-                <DialogDescription>
-                  {pendingFiles.length} arquivo(s) selecionado(s). Defina a categoria e descrição.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div>
-                  <Label>Categoria</Label>
-                  <Select value={fotoMeta.categoria} onValueChange={(v) => setFotoMeta({ ...fotoMeta, categoria: v as Foto["categoria"] })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="antes">Antes</SelectItem>
-                      <SelectItem value="durante">Durante</SelectItem>
-                      <SelectItem value="depois">Depois</SelectItem>
-                      <SelectItem value="outro">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Descrição</Label>
-                  <Textarea
-                    value={fotoMeta.descricao}
-                    onChange={(e) => setFotoMeta({ ...fotoMeta, descricao: e.target.value })}
-                    placeholder="Ex: Região labial antes do preenchimento"
-                    rows={3}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => { setFotoDialogOpen(false); setPendingFiles([]); }}>Cancelar</Button>
-                <Button onClick={handleFotoSave}>Salvar Fotos</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </TabsContent>
 
-        <TabsContent value="insumos">
-          <LiquidGlassCard draggable={false} className="p-5">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs text-muted-foreground border-b border-border">
-                  <th className="pb-2 font-medium">Insumo</th>
-                  <th className="pb-2 font-medium">Lote</th>
-                  <th className="pb-2 font-medium hidden sm:table-cell">Validade</th>
-                  <th className="pb-2 font-medium">Qtd</th>
-                  <th className="pb-2 font-medium hidden sm:table-cell">Data Uso</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                <tr>
-                  <td className="py-2.5 font-medium">Ácido Hialurônico 20mg/ml</td>
-                  <td className="py-2.5 font-mono text-xs text-gold-dark">AH2024-089</td>
-                  <td className="py-2.5 hidden sm:table-cell">15/03/2026</td>
-                  <td className="py-2.5">1ml</td>
-                  <td className="py-2.5 hidden sm:table-cell">12/02/2026</td>
-                </tr>
-                <tr>
-                  <td className="py-2.5 font-medium">Toxina Botulínica 100U</td>
-                  <td className="py-2.5 font-mono text-xs text-gold-dark">TB2024-156</td>
-                  <td className="py-2.5 hidden sm:table-cell">22/03/2026</td>
-                  <td className="py-2.5">32U</td>
-                  <td className="py-2.5 hidden sm:table-cell">08/01/2026</td>
-                </tr>
-              </tbody>
-            </table>
-          </LiquidGlassCard>
+        <TabsContent value="insumos" className="space-y-4">
+          <div className="rounded-xl border border-border bg-card p-8 text-center">
+            <Syringe className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">Rastreabilidade de insumos vinculados às sessões do paciente.</p>
+          </div>
         </TabsContent>
       </Tabs>
 
-      {/* Edit Patient Dialog */}
+      {/* Edit Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Editar Paciente</DialogTitle>
             <DialogDescription>Atualize os dados do paciente.</DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-            <div className="sm:col-span-2">
-              <Label>Nome *</Label>
-              <Input value={editForm.nome} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} />
+          <div className="space-y-4 py-2">
+            <div className="space-y-2"><Label>Nome *</Label><Input value={editForm.nome} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} /></div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2"><Label>CPF *</Label><Input value={editForm.cpf} onChange={(e) => setEditForm({ ...editForm, cpf: e.target.value })} /></div>
+              <div className="space-y-2"><Label>Data Nasc.</Label><Input type="date" value={editForm.data_nascimento} onChange={(e) => setEditForm({ ...editForm, data_nascimento: e.target.value })} /></div>
             </div>
-            <div>
-              <Label>CPF *</Label>
-              <Input value={editForm.cpf} onChange={(e) => setEditForm({ ...editForm, cpf: e.target.value })} />
-            </div>
-            <div>
-              <Label>Data de Nascimento</Label>
-              <Input type="date" value={editForm.data_nascimento} onChange={(e) => setEditForm({ ...editForm, data_nascimento: e.target.value })} />
-            </div>
-            <div>
-              <Label>Telefone</Label>
-              <Input value={editForm.telefone} onChange={(e) => setEditForm({ ...editForm, telefone: e.target.value })} />
-            </div>
-            <div>
-              <Label>Email</Label>
-              <Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} />
-            </div>
-            <div>
-              <Label>Instagram</Label>
-              <Input value={editForm.instagram} onChange={(e) => setEditForm({ ...editForm, instagram: e.target.value })} />
-            </div>
-            <div>
+            <div className="space-y-2"><Label>Telefone</Label><Input value={editForm.telefone} onChange={(e) => setEditForm({ ...editForm, telefone: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Email</Label><Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Instagram</Label><Input value={editForm.instagram} onChange={(e) => setEditForm({ ...editForm, instagram: e.target.value })} /></div>
+            <div className="space-y-2">
               <Label>Status</Label>
-              <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v as "ativo" | "inativo" })}>
+              <Select value={editForm.status} onValueChange={(v: "ativo" | "inativo") => setEditForm({ ...editForm, status: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ativo">Ativo</SelectItem>
-                  <SelectItem value="inativo">Inativo</SelectItem>
-                </SelectContent>
+                <SelectContent><SelectItem value="ativo">Ativo</SelectItem><SelectItem value="inativo">Inativo</SelectItem></SelectContent>
               </Select>
             </div>
           </div>
@@ -547,44 +418,54 @@ const PacienteDetalhe = () => {
         </DialogContent>
       </Dialog>
 
-      {/* New Session Dialog */}
+      {/* Session Dialog */}
       <Dialog open={sessionOpen} onOpenChange={setSessionOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Nova Sessão</DialogTitle>
-            <DialogDescription>Registre o procedimento realizado.</DialogDescription>
+            <DialogTitle>Registrar Sessão</DialogTitle>
+            <DialogDescription>Registre um novo procedimento.</DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-            <div className="sm:col-span-2">
-              <Label>Procedimento *</Label>
-              <Input value={sessionForm.proc} onChange={(e) => setSessionForm({ ...sessionForm, proc: e.target.value })} placeholder="Ex: Harmonização Facial — Preenchimento Labial" />
-            </div>
-            <div>
-              <Label>Data *</Label>
-              <Input type="date" value={sessionForm.date} onChange={(e) => setSessionForm({ ...sessionForm, date: e.target.value })} />
-            </div>
-            <div>
-              <Label>Técnica</Label>
-              <Input value={sessionForm.tech} onChange={(e) => setSessionForm({ ...sessionForm, tech: e.target.value })} placeholder="Ex: Cânula 25G, técnica retroinjeção" />
-            </div>
-            <div className="sm:col-span-2">
-              <Label>Substância / Lote / Quantidade</Label>
-              <Input value={sessionForm.substance} onChange={(e) => setSessionForm({ ...sessionForm, substance: e.target.value })} placeholder="Ex: Ácido Hialurônico 20mg/ml — Lote AH2024-089 — 1ml" />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="signed"
-                checked={sessionForm.signed}
-                onChange={(e) => setSessionForm({ ...sessionForm, signed: e.target.checked })}
-                className="rounded border-border"
-              />
-              <Label htmlFor="signed" className="cursor-pointer">Assinado digitalmente</Label>
-            </div>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2"><Label>Procedimento *</Label><Input value={sessionForm.proc} onChange={(e) => setSessionForm({ ...sessionForm, proc: e.target.value })} placeholder="Ex: Harmonização Facial" /></div>
+            <div className="space-y-2"><Label>Data *</Label><Input type="date" value={sessionForm.date} onChange={(e) => setSessionForm({ ...sessionForm, date: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Técnica</Label><Input value={sessionForm.tech} onChange={(e) => setSessionForm({ ...sessionForm, tech: e.target.value })} placeholder="Técnica utilizada" /></div>
+            <div className="space-y-2"><Label>Substância / Lote</Label><Input value={sessionForm.substance} onChange={(e) => setSessionForm({ ...sessionForm, substance: e.target.value })} placeholder="Substância e lote" /></div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setSessionOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSessionSave}>Registrar Sessão</Button>
+            <Button onClick={handleSessionSave}>Registrar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Foto Metadata Dialog */}
+      <Dialog open={fotoDialogOpen} onOpenChange={setFotoDialogOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Detalhes da Foto</DialogTitle>
+            <DialogDescription>{pendingFiles.length} foto(s) selecionada(s)</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>Categoria</Label>
+              <Select value={fotoMeta.categoria} onValueChange={(v: Foto["categoria"]) => setFotoMeta({ ...fotoMeta, categoria: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="antes">Antes</SelectItem>
+                  <SelectItem value="depois">Depois</SelectItem>
+                  <SelectItem value="durante">Durante</SelectItem>
+                  <SelectItem value="outro">Outro</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Descrição (opcional)</Label>
+              <Textarea rows={2} value={fotoMeta.descricao} onChange={(e) => setFotoMeta({ ...fotoMeta, descricao: e.target.value })} placeholder="Ex: Vista frontal, sorriso..." />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setFotoDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={handleFotoSave}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

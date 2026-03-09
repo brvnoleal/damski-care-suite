@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Plus, Edit, Trash2, Calendar, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Agendamento, ProcedimentoConsulta, procedimentoConsultaLabels, FormaPagamento, formaPagamentoLabels } from "@/types";
+import { Agendamento, Paciente, Dentista, ProcedimentoConsulta, procedimentoConsultaLabels, FormaPagamento, formaPagamentoLabels } from "@/types";
 import { agendamentoService } from "@/services/agendamentoService";
 import { pacienteService } from "@/services/pacienteService";
 import { dentistaService } from "@/services/dentistaService";
@@ -38,15 +38,34 @@ const statusConfig: Record<string, { label: string; className: string }> = {
 const Agendamentos = () => {
   const { toast } = useToast();
   const [search, setSearch] = useState("");
-  const [agendamentos, setAgendamentos] = useState<Agendamento[]>(agendamentoService.listar());
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [pacientes, setPacientes] = useState<Paciente[]>([]);
+  const [dentistas, setDentistas] = useState<Dentista[]>([]);
+  const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyAgendamento());
 
-  const pacientes = pacienteService.listar();
-  const dentistas = dentistaService.listar();
+  const loadData = async () => {
+    try {
+      const [ag, pac, den] = await Promise.all([
+        agendamentoService.listar(),
+        pacienteService.listar(),
+        dentistaService.listar(),
+      ]);
+      setAgendamentos(ag);
+      setPacientes(pac);
+      setDentistas(den);
+    } catch (err) {
+      toast({ title: "Erro ao carregar dados", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { loadData(); }, []);
 
   const getPacienteNome = (id: string) => pacientes.find((p) => p.id === id)?.nome || "—";
   const getDentistaNome = (id: string) => dentistas.find((d) => d.id === id)?.nome || "—";
@@ -70,27 +89,35 @@ const Agendamentos = () => {
     setDialogOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.data || !form.horario || !form.paciente_id || !form.dentista_id) {
       toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
       return;
     }
-    if (editingId) {
-      agendamentoService.atualizar(editingId, form);
-      toast({ title: "Agendamento atualizado com sucesso" });
-    } else {
-      agendamentoService.criar(form);
-      toast({ title: "Agendamento criado com sucesso" });
+    try {
+      if (editingId) {
+        await agendamentoService.atualizar(editingId, form);
+        toast({ title: "Agendamento atualizado com sucesso" });
+      } else {
+        await agendamentoService.criar(form);
+        toast({ title: "Agendamento criado com sucesso" });
+      }
+      await loadData();
+      setDialogOpen(false);
+    } catch (err) {
+      toast({ title: "Erro ao salvar agendamento", variant: "destructive" });
     }
-    setAgendamentos(agendamentoService.listar());
-    setDialogOpen(false);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deletingId) {
-      agendamentoService.excluir(deletingId);
-      setAgendamentos(agendamentoService.listar());
-      toast({ title: "Agendamento excluído" });
+      try {
+        await agendamentoService.excluir(deletingId);
+        await loadData();
+        toast({ title: "Agendamento excluído" });
+      } catch (err) {
+        toast({ title: "Erro ao excluir", variant: "destructive" });
+      }
     }
     setDeleteOpen(false);
     setDeletingId(null);
@@ -133,7 +160,11 @@ const Agendamentos = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((a) => {
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
+                </TableRow>
+              ) : filtered.map((a) => {
                 const st = statusConfig[a.status] || statusConfig.agendado;
                 return (
                   <TableRow key={a.id} className="hover:bg-white/5 transition-colors">
@@ -170,7 +201,7 @@ const Agendamentos = () => {
                   </TableRow>
                 );
               })}
-              {filtered.length === 0 && (
+              {!loading && filtered.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                     Nenhum agendamento encontrado.
