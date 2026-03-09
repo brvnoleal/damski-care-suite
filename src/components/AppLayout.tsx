@@ -104,7 +104,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm xl:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
