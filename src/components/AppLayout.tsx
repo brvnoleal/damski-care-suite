@@ -228,7 +228,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           />
 
           <button
-            className="relative z-10 lg:hidden text-muted-foreground hover:text-foreground"
+            className="relative z-10 xl:hidden text-muted-foreground hover:text-foreground"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu className="w-5 h-5" />
