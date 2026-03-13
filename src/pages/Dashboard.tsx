@@ -343,24 +343,24 @@ const Dashboard = () => {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <motion.div {...fadeUp(0.8)}>
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-warning" />
-                <h2 className="text-sm font-semibold text-foreground">Insumos Críticos</h2>
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Insumos Críticos</h2>
               </div>
               <Link to="/insumos" className="text-xs text-primary hover:underline flex items-center gap-0.5">
                 Ver todos <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-white/5 max-h-[220px] overflow-y-auto">
               {criticalSupplies.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-6">Nenhum insumo crítico</p>
               )}
               {criticalSupplies.map((s, i) => (
-                <div key={i} className="flex items-center gap-3 px-5 py-2.5">
+                <div key={i} className="flex items-center gap-3 px-4 sm:px-5 py-2.5">
                   <div className={cn("w-2 h-2 rounded-full shrink-0", s.daysLeft <= 0 ? "bg-destructive" : s.daysLeft <= 5 ? "bg-warning" : "bg-success")} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
@@ -377,16 +377,15 @@ const Dashboard = () => {
 
         <motion.div {...fadeUp(0.9)}>
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <FileCheck className="w-4 h-4 text-warning" />
-                <h2 className="text-sm font-semibold text-foreground">Receita da Semana</h2>
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Receita da Semana</h2>
               </div>
             </div>
-            <div className="px-5 py-4">
-              <p className="text-2xl font-bold text-foreground">
+            <div className="px-4 sm:px-5 py-4">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">
                 R$ {(() => {
-                  // Will be computed from state
                   return "—";
                 })()}
               </p>
