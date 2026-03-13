@@ -163,11 +163,11 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{greeting}, Dra. Damski</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{greeting}, Dra. Damski</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             {now.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
         </div>
@@ -178,22 +178,22 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {kpis.map((kpi, i) => {
           const colors = colorMap[kpi.color];
           return (
             <motion.div key={kpi.label} {...fadeUp(i * 0.08)}>
-              <LiquidGlassCard className="p-4 sm:p-5" draggable={false}>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <p className="text-[11px] sm:text-[13px] text-muted-foreground font-medium">{kpi.label}</p>
-                    <p className="text-xl sm:text-2xl font-display font-bold text-foreground">{kpi.value}</p>
-                    <p className={cn("text-[10px] sm:text-xs font-medium", kpi.trend === "up" ? "text-success" : "text-muted-foreground")}>
+              <LiquidGlassCard className="p-3 sm:p-5" draggable={false}>
+                <div className="flex items-start justify-between gap-1">
+                  <div className="space-y-0.5 sm:space-y-1 min-w-0">
+                    <p className="text-[10px] sm:text-[13px] text-muted-foreground font-medium truncate">{kpi.label}</p>
+                    <p className="text-lg sm:text-2xl font-display font-bold text-foreground">{kpi.value}</p>
+                    <p className={cn("text-[9px] sm:text-xs font-medium truncate", kpi.trend === "up" ? "text-success" : "text-muted-foreground")}>
                       {kpi.change}
                     </p>
                   </div>
-                  <div className={cn("w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center", colors.bg)}>
-                    <kpi.icon className={cn("w-4 h-4 sm:w-5 sm:h-5", colors.text)} />
+                  <div className={cn("w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0", colors.bg)}>
+                    <kpi.icon className={cn("w-3.5 h-3.5 sm:w-5 sm:h-5", colors.text)} />
                   </div>
                 </div>
               </LiquidGlassCard>
@@ -202,30 +202,30 @@ const Dashboard = () => {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 sm:gap-4">
         <motion.div {...scaleIn(0.35)} className="lg:col-span-2">
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <FileCheck className="w-4 h-4 text-primary" />
-                <h2 className="text-sm font-semibold text-foreground">Consultas da Semana</h2>
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Consultas da Semana</h2>
               </div>
               <Badge variant="outline" className="text-[10px]">{consultasPorStatus.reduce((s, c) => s + c.value, 0)} total</Badge>
             </div>
-            <div className="p-4 flex-1 flex flex-col items-center justify-center">
-              <ResponsiveContainer width="100%" height={180}>
+            <div className="p-3 sm:p-4 flex-1 flex flex-col items-center justify-center">
+              <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
-                  <Pie data={consultasPorStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} innerRadius={35} strokeWidth={2} stroke="rgba(255,255,255,0.1)">
+                  <Pie data={consultasPorStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={55} innerRadius={28} strokeWidth={2} stroke="rgba(255,255,255,0.1)">
                     {consultasPorStatus.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                   </Pie>
                   <Tooltip formatter={(v: number, name: string) => [`${v}`, name]} contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-1">
+              <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-1">
                 {consultasPorStatus.map((s, i) => (
                   <div key={i} className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
-                    <span className="text-[11px] text-muted-foreground">{s.name}: <span className="font-semibold text-foreground">{s.value}</span></span>
+                    <span className="text-[10px] sm:text-[11px] text-muted-foreground">{s.name}: <span className="font-semibold text-foreground">{s.value}</span></span>
                   </div>
                 ))}
               </div>
@@ -235,10 +235,10 @@ const Dashboard = () => {
 
         <motion.div {...scaleIn(0.45)} className="lg:col-span-3">
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
-                <h2 className="text-sm font-semibold text-foreground">Agenda</h2>
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Agenda</h2>
               </div>
               <Link to="/agendamentos" className="text-xs text-primary hover:underline flex items-center gap-0.5">
                 Ver completa <ChevronRight className="w-3 h-3" />
@@ -247,7 +247,7 @@ const Dashboard = () => {
             <iframe
               src="https://calendar.google.com/calendar/embed?src=brunolealcavalcante%40gmail.com&ctz=America%2FSao_Paulo"
               className="w-full border-0 dark:invert dark:hue-rotate-180"
-              height="260"
+              height="240"
               scrolling="no"
               title="Google Calendar"
             />
@@ -255,21 +255,21 @@ const Dashboard = () => {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <motion.div {...fadeUp(0.5)}>
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-white/10">
+            <div className="flex items-center gap-2 px-4 sm:px-5 py-3 border-b border-white/10">
               <Clock className="w-4 h-4 text-info" />
-              <h2 className="text-sm font-semibold text-foreground">Sessões da Semana</h2>
+              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Sessões da Semana</h2>
             </div>
-            <div className="p-4 flex-1">
-              <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={sessionsWeekly} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+            <div className="p-3 sm:p-4 flex-1">
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={sessionsWeekly} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
-                  <XAxis dataKey="day" tick={{ fontSize: 11, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 10, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} formatter={(v: number) => [`${v}`, "Sessões"]} />
-                  <Bar dataKey="sessoes" radius={[6, 6, 0, 0]} barSize={28}>
+                  <Bar dataKey="sessoes" radius={[6, 6, 0, 0]} barSize={22}>
                     {sessionsWeekly.map((entry, i) => (
                       <Cell key={i} fill={entry.sessoes === Math.max(...sessionsWeekly.map(s => s.sessoes)) ? "hsl(239, 84%, 67%)" : "hsl(239, 84%, 67%, 0.35)"} />
                     ))}
@@ -282,16 +282,16 @@ const Dashboard = () => {
 
         <motion.div {...fadeUp(0.6)}>
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-white/10">
+            <div className="flex items-center gap-2 px-4 sm:px-5 py-3 border-b border-white/10">
               <Star className="w-4 h-4 text-[hsl(var(--gold))]" />
-              <h2 className="text-sm font-semibold text-foreground">Top Procedimentos</h2>
+              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Top Procedimentos</h2>
             </div>
-            <div className="p-3 flex-1 flex flex-col items-center justify-center">
+            <div className="p-3 sm:p-4 flex-1 flex flex-col items-center justify-center">
               {topProcedures.length > 0 ? (
                 <>
-                  <ResponsiveContainer width="100%" height={160}>
+                  <ResponsiveContainer width="100%" height={140}>
                     <PieChart>
-                      <Pie data={topProcedures} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={65} innerRadius={32} strokeWidth={2} stroke="rgba(255,255,255,0.1)">
+                      <Pie data={topProcedures} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={50} innerRadius={25} strokeWidth={2} stroke="rgba(255,255,255,0.1)">
                         {topProcedures.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
                       </Pie>
                       <Tooltip formatter={(v: number, name: string) => [`${v}x`, name]} contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} />
@@ -301,7 +301,7 @@ const Dashboard = () => {
                     {topProcedures.map((p, i) => (
                       <div key={i} className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[i] }} />
-                        <span className="text-[10px] text-muted-foreground">{p.name}</span>
+                        <span className="text-[9px] sm:text-[10px] text-muted-foreground">{p.name}</span>
                       </div>
                     ))}
                   </div>
@@ -313,21 +313,21 @@ const Dashboard = () => {
           </LiquidGlassCard>
         </motion.div>
 
-        <motion.div {...fadeUp(0.7)}>
+        <motion.div {...fadeUp(0.7)} className="sm:col-span-2 lg:col-span-1">
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <Smile className="w-4 h-4 text-primary" />
-                <h2 className="text-sm font-semibold text-foreground">Próximos Atendimentos</h2>
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Próximos Atendimentos</h2>
               </div>
               <Badge variant="outline" className="text-[10px]">{nextAppointments.length}</Badge>
             </div>
-            <div className="divide-y divide-white/5 flex-1 overflow-y-auto">
+            <div className="divide-y divide-white/5 flex-1 overflow-y-auto max-h-[220px]">
               {nextAppointments.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-8">Nenhum atendimento hoje</p>
+                <p className="text-sm text-muted-foreground text-center py-6">Nenhum atendimento hoje</p>
               )}
               {nextAppointments.map((a, i) => (
-                <div key={i} className="flex items-center gap-3 px-5 py-2.5">
+                <div key={i} className="flex items-center gap-3 px-4 sm:px-5 py-2.5">
                   <span className="text-xs font-mono font-semibold text-primary w-10 shrink-0">{a.time}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{a.patient}</p>
@@ -343,24 +343,24 @@ const Dashboard = () => {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <motion.div {...fadeUp(0.8)}>
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-warning" />
-                <h2 className="text-sm font-semibold text-foreground">Insumos Críticos</h2>
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Insumos Críticos</h2>
               </div>
               <Link to="/insumos" className="text-xs text-primary hover:underline flex items-center gap-0.5">
                 Ver todos <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-white/5 max-h-[220px] overflow-y-auto">
               {criticalSupplies.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-6">Nenhum insumo crítico</p>
               )}
               {criticalSupplies.map((s, i) => (
-                <div key={i} className="flex items-center gap-3 px-5 py-2.5">
+                <div key={i} className="flex items-center gap-3 px-4 sm:px-5 py-2.5">
                   <div className={cn("w-2 h-2 rounded-full shrink-0", s.daysLeft <= 0 ? "bg-destructive" : s.daysLeft <= 5 ? "bg-warning" : "bg-success")} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
@@ -377,16 +377,15 @@ const Dashboard = () => {
 
         <motion.div {...fadeUp(0.9)}>
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <FileCheck className="w-4 h-4 text-warning" />
-                <h2 className="text-sm font-semibold text-foreground">Receita da Semana</h2>
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Receita da Semana</h2>
               </div>
             </div>
-            <div className="px-5 py-4">
-              <p className="text-2xl font-bold text-foreground">
+            <div className="px-4 sm:px-5 py-4">
+              <p className="text-xl sm:text-2xl font-bold text-foreground">
                 R$ {(() => {
-                  // Will be computed from state
                   return "—";
                 })()}
               </p>
