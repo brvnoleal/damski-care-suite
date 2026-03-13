@@ -112,8 +112,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Sidebar — Liquid Glass */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[260px] flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto",
-          "relative overflow-hidden",
+          "fixed inset-y-0 left-0 z-50 w-[260px] flex flex-col transition-transform duration-300 lg:relative lg:translate-x-0 lg:z-auto",
+          "overflow-hidden shrink-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
