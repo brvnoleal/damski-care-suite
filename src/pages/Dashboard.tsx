@@ -255,21 +255,21 @@ const Dashboard = () => {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <motion.div {...fadeUp(0.5)}>
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-white/10">
+            <div className="flex items-center gap-2 px-4 sm:px-5 py-3 border-b border-white/10">
               <Clock className="w-4 h-4 text-info" />
-              <h2 className="text-sm font-semibold text-foreground">Sessões da Semana</h2>
+              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Sessões da Semana</h2>
             </div>
-            <div className="p-4 flex-1">
-              <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={sessionsWeekly} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+            <div className="p-3 sm:p-4 flex-1">
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={sessionsWeekly} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
-                  <XAxis dataKey="day" tick={{ fontSize: 11, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 10, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} formatter={(v: number) => [`${v}`, "Sessões"]} />
-                  <Bar dataKey="sessoes" radius={[6, 6, 0, 0]} barSize={28}>
+                  <Bar dataKey="sessoes" radius={[6, 6, 0, 0]} barSize={22}>
                     {sessionsWeekly.map((entry, i) => (
                       <Cell key={i} fill={entry.sessoes === Math.max(...sessionsWeekly.map(s => s.sessoes)) ? "hsl(239, 84%, 67%)" : "hsl(239, 84%, 67%, 0.35)"} />
                     ))}
@@ -282,16 +282,16 @@ const Dashboard = () => {
 
         <motion.div {...fadeUp(0.6)}>
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-white/10">
+            <div className="flex items-center gap-2 px-4 sm:px-5 py-3 border-b border-white/10">
               <Star className="w-4 h-4 text-[hsl(var(--gold))]" />
-              <h2 className="text-sm font-semibold text-foreground">Top Procedimentos</h2>
+              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Top Procedimentos</h2>
             </div>
-            <div className="p-3 flex-1 flex flex-col items-center justify-center">
+            <div className="p-3 sm:p-4 flex-1 flex flex-col items-center justify-center">
               {topProcedures.length > 0 ? (
                 <>
-                  <ResponsiveContainer width="100%" height={160}>
+                  <ResponsiveContainer width="100%" height={140}>
                     <PieChart>
-                      <Pie data={topProcedures} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={65} innerRadius={32} strokeWidth={2} stroke="rgba(255,255,255,0.1)">
+                      <Pie data={topProcedures} dataKey="count" nameKey="name" cx="50%" cy="50%" outerRadius={50} innerRadius={25} strokeWidth={2} stroke="rgba(255,255,255,0.1)">
                         {topProcedures.map((_, i) => <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />)}
                       </Pie>
                       <Tooltip formatter={(v: number, name: string) => [`${v}x`, name]} contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} />
@@ -301,7 +301,7 @@ const Dashboard = () => {
                     {topProcedures.map((p, i) => (
                       <div key={i} className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: CHART_COLORS[i] }} />
-                        <span className="text-[10px] text-muted-foreground">{p.name}</span>
+                        <span className="text-[9px] sm:text-[10px] text-muted-foreground">{p.name}</span>
                       </div>
                     ))}
                   </div>
@@ -313,21 +313,21 @@ const Dashboard = () => {
           </LiquidGlassCard>
         </motion.div>
 
-        <motion.div {...fadeUp(0.7)}>
+        <motion.div {...fadeUp(0.7)} className="sm:col-span-2 lg:col-span-1">
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <Smile className="w-4 h-4 text-primary" />
-                <h2 className="text-sm font-semibold text-foreground">Próximos Atendimentos</h2>
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Próximos Atendimentos</h2>
               </div>
               <Badge variant="outline" className="text-[10px]">{nextAppointments.length}</Badge>
             </div>
-            <div className="divide-y divide-white/5 flex-1 overflow-y-auto">
+            <div className="divide-y divide-white/5 flex-1 overflow-y-auto max-h-[220px]">
               {nextAppointments.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-8">Nenhum atendimento hoje</p>
+                <p className="text-sm text-muted-foreground text-center py-6">Nenhum atendimento hoje</p>
               )}
               {nextAppointments.map((a, i) => (
-                <div key={i} className="flex items-center gap-3 px-5 py-2.5">
+                <div key={i} className="flex items-center gap-3 px-4 sm:px-5 py-2.5">
                   <span className="text-xs font-mono font-semibold text-primary w-10 shrink-0">{a.time}</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{a.patient}</p>
