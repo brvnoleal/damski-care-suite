@@ -202,30 +202,30 @@ const Dashboard = () => {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 sm:gap-4">
         <motion.div {...scaleIn(0.35)} className="lg:col-span-2">
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <FileCheck className="w-4 h-4 text-primary" />
-                <h2 className="text-sm font-semibold text-foreground">Consultas da Semana</h2>
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Consultas da Semana</h2>
               </div>
               <Badge variant="outline" className="text-[10px]">{consultasPorStatus.reduce((s, c) => s + c.value, 0)} total</Badge>
             </div>
-            <div className="p-4 flex-1 flex flex-col items-center justify-center">
-              <ResponsiveContainer width="100%" height={180}>
+            <div className="p-3 sm:p-4 flex-1 flex flex-col items-center justify-center">
+              <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
-                  <Pie data={consultasPorStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} innerRadius={35} strokeWidth={2} stroke="rgba(255,255,255,0.1)">
+                  <Pie data={consultasPorStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={55} innerRadius={28} strokeWidth={2} stroke="rgba(255,255,255,0.1)">
                     {consultasPorStatus.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                   </Pie>
                   <Tooltip formatter={(v: number, name: string) => [`${v}`, name]} contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-1">
+              <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-1">
                 {consultasPorStatus.map((s, i) => (
                   <div key={i} className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
-                    <span className="text-[11px] text-muted-foreground">{s.name}: <span className="font-semibold text-foreground">{s.value}</span></span>
+                    <span className="text-[10px] sm:text-[11px] text-muted-foreground">{s.name}: <span className="font-semibold text-foreground">{s.value}</span></span>
                   </div>
                 ))}
               </div>
@@ -235,10 +235,10 @@ const Dashboard = () => {
 
         <motion.div {...scaleIn(0.45)} className="lg:col-span-3">
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
-                <h2 className="text-sm font-semibold text-foreground">Agenda</h2>
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Agenda</h2>
               </div>
               <Link to="/agendamentos" className="text-xs text-primary hover:underline flex items-center gap-0.5">
                 Ver completa <ChevronRight className="w-3 h-3" />
@@ -247,7 +247,7 @@ const Dashboard = () => {
             <iframe
               src="https://calendar.google.com/calendar/embed?src=brunolealcavalcante%40gmail.com&ctz=America%2FSao_Paulo"
               className="w-full border-0 dark:invert dark:hue-rotate-180"
-              height="260"
+              height="240"
               scrolling="no"
               title="Google Calendar"
             />
