@@ -163,11 +163,11 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{greeting}, Dra. Damski</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{greeting}, Dra. Damski</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             {now.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
         </div>
@@ -178,22 +178,22 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {kpis.map((kpi, i) => {
           const colors = colorMap[kpi.color];
           return (
             <motion.div key={kpi.label} {...fadeUp(i * 0.08)}>
-              <LiquidGlassCard className="p-4 sm:p-5" draggable={false}>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <p className="text-[11px] sm:text-[13px] text-muted-foreground font-medium">{kpi.label}</p>
-                    <p className="text-xl sm:text-2xl font-display font-bold text-foreground">{kpi.value}</p>
-                    <p className={cn("text-[10px] sm:text-xs font-medium", kpi.trend === "up" ? "text-success" : "text-muted-foreground")}>
+              <LiquidGlassCard className="p-3 sm:p-5" draggable={false}>
+                <div className="flex items-start justify-between gap-1">
+                  <div className="space-y-0.5 sm:space-y-1 min-w-0">
+                    <p className="text-[10px] sm:text-[13px] text-muted-foreground font-medium truncate">{kpi.label}</p>
+                    <p className="text-lg sm:text-2xl font-display font-bold text-foreground">{kpi.value}</p>
+                    <p className={cn("text-[9px] sm:text-xs font-medium truncate", kpi.trend === "up" ? "text-success" : "text-muted-foreground")}>
                       {kpi.change}
                     </p>
                   </div>
-                  <div className={cn("w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center", colors.bg)}>
-                    <kpi.icon className={cn("w-4 h-4 sm:w-5 sm:h-5", colors.text)} />
+                  <div className={cn("w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0", colors.bg)}>
+                    <kpi.icon className={cn("w-3.5 h-3.5 sm:w-5 sm:h-5", colors.text)} />
                   </div>
                 </div>
               </LiquidGlassCard>
