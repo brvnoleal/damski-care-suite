@@ -3,17 +3,18 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import AppLayout from "./components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Pacientes from "./pages/Pacientes";
 import PacienteDetalhe from "./pages/PacienteDetalhe";
 import Dentistas from "./pages/Dentistas";
 import Agendamentos from "./pages/Agendamentos";
-
 import Insumos from "./pages/Insumos";
 import Financeiro from "./pages/Financeiro";
-
 import Configuracoes from "./pages/Configuracoes";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { useCodeProtection } from "./hooks/useCodeProtection";
 
@@ -23,34 +24,39 @@ const App = () => {
   useCodeProtection();
 
   return (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/*"
-            element={
-              <AppLayout>
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/pacientes" element={<Pacientes />} />
-                  <Route path="/pacientes/:id" element={<PacienteDetalhe />} />
-                  <Route path="/dentistas" element={<Dentistas />} />
-                  <Route path="/agendamentos" element={<Agendamentos />} />
-                  <Route path="/insumos" element={<Insumos />} />
-                  <Route path="/financeiro" element={<Financeiro />} />
-                  <Route path="/configuracoes" element={<Configuracoes />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </AppLayout>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/*"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Routes>
+                        <Route path="/" element={<Dashboard />} />
+                        <Route path="/pacientes" element={<Pacientes />} />
+                        <Route path="/pacientes/:id" element={<PacienteDetalhe />} />
+                        <Route path="/dentistas" element={<Dentistas />} />
+                        <Route path="/agendamentos" element={<Agendamentos />} />
+                        <Route path="/insumos" element={<Insumos />} />
+                        <Route path="/financeiro" element={<Financeiro />} />
+                        <Route path="/configuracoes" element={<Configuracoes />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 };
 
