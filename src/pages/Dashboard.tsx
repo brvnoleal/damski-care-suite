@@ -54,8 +54,10 @@ const glassTooltip = {
 const glassTooltipText = { color: "hsl(var(--foreground))" };
 
 const Dashboard = () => {
+  const { profile, user } = useAuth();
   const now = new Date();
   const greeting = now.getHours() < 12 ? "Bom dia" : now.getHours() < 18 ? "Boa tarde" : "Boa noite";
+  const displayName = profile?.nome || user?.email || "Usuário";
 
   const [kpis, setKpis] = useState([
     { label: "Pacientes Ativos", value: "—", change: "carregando...", icon: Users, color: "primary" as const, trend: "neutral" },
