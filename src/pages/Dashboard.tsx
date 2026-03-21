@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import {
   Users, Calendar, Package, FileCheck,
@@ -54,8 +55,10 @@ const glassTooltip = {
 const glassTooltipText = { color: "hsl(var(--foreground))" };
 
 const Dashboard = () => {
+  const { profile, user } = useAuth();
   const now = new Date();
   const greeting = now.getHours() < 12 ? "Bom dia" : now.getHours() < 18 ? "Boa tarde" : "Boa noite";
+  const displayName = profile?.nome || user?.email || "Usuário";
 
   const [kpis, setKpis] = useState([
     { label: "Pacientes Ativos", value: "—", change: "carregando...", icon: Users, color: "primary" as const, trend: "neutral" },
@@ -166,7 +169,7 @@ const Dashboard = () => {
     <div className="space-y-4 sm:space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{greeting}, Dra. Damski</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{greeting}, {displayName}</h1>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
             {now.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
