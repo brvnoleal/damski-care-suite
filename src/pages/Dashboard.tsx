@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import {
   Users, Calendar, Package, FileCheck,
