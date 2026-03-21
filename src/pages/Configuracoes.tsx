@@ -4,50 +4,95 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { Database } from "@/integrations/supabase/types";
 
-const roles = [
-  { value: "Responsável Técnico", color: "bg-primary/10 text-primary" },
-  { value: "Recepcionista", color: "bg-info/10 text-info" },
-  { value: "Administrador", color: "bg-gold/10 text-gold-dark" },
-];
+type AppRole = Database["public"]["Enums"]["app_role"];
 
-const getRoleColor = (role: string) => roles.find(r => r.value === role)?.color || "bg-muted text-muted-foreground";
+const roleLabels: Record<AppRole, string> = {
+  admin: "Administrador",
+  responsavel_tecnico: "Responsável Técnico",
+  recepcionista: "Recepcionista",
+};
+
+const roleColors: Record<AppRole, string> = {
+  admin: "bg-gold/10 text-gold-dark",
+  responsavel_tecnico: "bg-primary/10 text-primary",
+  recepcionista: "bg-info/10 text-info",
+};
+
+interface UserWithRole {
+  id: string;
+  user_id: string;
+  role: AppRole;
+  nome: string;
+}
 
 const Configuracoes = () => {
-  const [usuarios, setUsuarios] = useState([
-    { name: "Dra. Damski", role: "Responsável Técnico" },
-    { name: "Julia Santos", role: "Recepcionista" },
-    { name: "Admin Sistema", role: "Administrador" },
-  ]);
+  const { role: currentUserRole } = useAuth();
+  const queryClient = useQueryClient();
 
-  const [editIndex, setEditIndex] = useState<number | null>(null);
-  const [editRole, setEditRole] = useState("");
-  const [addOpen, setAddOpen] = useState(false);
-  const [novoNome, setNovoNome] = useState("");
-  const [novoRole, setNovoRole] = useState("");
+  const [editItem, setEditItem] = useState<UserWithRole | null>(null);
+  const [editRole, setEditRole] = useState<AppRole>("recepcionista");
+
+  const isAdmin = currentUserRole === "admin";
+
+  const { data: usersWithRoles = [], isLoading } = useQuery({
+    queryKey: ["user_roles_with_profiles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("id, user_id, role, profiles(nome)");
+      if (error) throw error;
+      return (data || []).map((row: any) => ({
+        id: row.id,
+        user_id: row.user_id,
+        role: row.role as AppRole,
+        nome: row.profiles?.nome || "Sem nome",
+      })) as UserWithRole[];
+    },
+    enabled: isAdmin,
+  });
+
+  const updateRoleMutation = useMutation({
+    mutationFn: async ({ id, role }: { id: string; role: AppRole }) => {
+      const { error } = await supabase
+        .from("user_roles")
+        .update({ role })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user_roles_with_profiles"] });
+      toast.success("Perfil atualizado com sucesso!");
+      setEditItem(null);
+    },
+    onError: () => toast.error("Erro ao atualizar perfil."),
+  });
 
   const handleEditSave = () => {
-    if (editIndex === null) return;
-    setUsuarios(prev => prev.map((u, i) => i === editIndex ? { ...u, role: editRole } : u));
-    toast.success("Perfil atualizado com sucesso!");
-    setEditIndex(null);
+    if (!editItem) return;
+    updateRoleMutation.mutate({ id: editItem.id, role: editRole });
   };
 
-  const handleAddUser = () => {
-    if (!novoNome.trim() || !novoRole) {
-      toast.error("Preencha nome e perfil.");
-      return;
-    }
-    setUsuarios(prev => [...prev, { name: novoNome.trim(), role: novoRole }]);
-    toast.success("Usuário adicionado!");
-    setNovoNome("");
-    setNovoRole("");
-    setAddOpen(false);
-  };
+  if (!isAdmin) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <LiquidGlassCard draggable={false} className="p-8 text-center max-w-md">
+          <Shield className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-lg font-semibold text-foreground">Acesso Restrito</h2>
+          <p className="text-sm text-muted-foreground mt-2">
+            Apenas administradores podem acessar as configurações do sistema.
+          </p>
+        </LiquidGlassCard>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -70,27 +115,39 @@ const Configuracoes = () => {
               </div>
             </div>
 
-            <div className="space-y-3">
-              {usuarios.map((user, i) => (
-                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full gradient-burgundy flex items-center justify-center">
-                      <span className="text-xs font-bold text-primary-foreground">
-                        {user.name.split(" ").map(n => n[0]).join("")}
-                      </span>
+            {isLoading ? (
+              <p className="text-sm text-muted-foreground">Carregando...</p>
+            ) : usersWithRoles.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nenhum usuário com perfil atribuído.</p>
+            ) : (
+              <div className="space-y-3">
+                {usersWithRoles.map((user) => (
+                  <div key={user.id} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full gradient-burgundy flex items-center justify-center">
+                        <span className="text-xs font-bold text-primary-foreground">
+                          {user.nome.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{user.nome}</p>
+                        <Badge className={`text-[10px] ${roleColors[user.role]} border-0`}>
+                          {roleLabels[user.role]}
+                        </Badge>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{user.name}</p>
-                      <Badge className={`text-[10px] ${getRoleColor(user.role)} border-0`}>{user.role}</Badge>
-                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => { setEditItem(user); setEditRole(user.role); }}
+                    >
+                      Editar
+                    </Button>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-xs" onClick={() => { setEditIndex(i); setEditRole(user.role); }}>Editar</Button>
-                </div>
-              ))}
-            </div>
-            <Button variant="outline" size="sm" className="w-full" onClick={() => setAddOpen(true)}>
-              <Plus className="w-3.5 h-3.5 mr-1" /> Adicionar Usuário
-            </Button>
+                ))}
+              </div>
+            )}
           </div>
         </LiquidGlassCard>
 
@@ -111,7 +168,7 @@ const Configuracoes = () => {
               {[
                 { label: "Criptografia de dados", status: "Ativo", ok: true },
                 { label: "Backup automático semanal", status: "Ativo", ok: true },
-                { label: "Logs de auditoria", status: "1.247 registros", ok: true },
+                { label: "Logs de auditoria", status: "Ativo", ok: true },
                 { label: "Versionamento de registros", status: "Ativo", ok: true },
                 { label: "Exclusão definitiva", status: "Bloqueada", ok: true },
               ].map((item, i) => (
@@ -158,21 +215,23 @@ const Configuracoes = () => {
       </div>
 
       {/* Edit Role Dialog */}
-      <Dialog open={editIndex !== null} onOpenChange={(open) => { if (!open) setEditIndex(null); }}>
+      <Dialog open={editItem !== null} onOpenChange={(open) => { if (!open) setEditItem(null); }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Perfil de Acesso</DialogTitle>
           </DialogHeader>
-          {editIndex !== null && (
+          {editItem && (
             <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">Usuário: <span className="font-medium text-foreground">{usuarios[editIndex]?.name}</span></p>
+              <p className="text-sm text-muted-foreground">
+                Usuário: <span className="font-medium text-foreground">{editItem.nome}</span>
+              </p>
               <div className="space-y-2">
                 <Label>Perfil</Label>
-                <Select value={editRole} onValueChange={setEditRole}>
+                <Select value={editRole} onValueChange={(v) => setEditRole(v as AppRole)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {roles.map(r => (
-                      <SelectItem key={r.value} value={r.value}>{r.value}</SelectItem>
+                    {(Object.keys(roleLabels) as AppRole[]).map(r => (
+                      <SelectItem key={r} value={r}>{roleLabels[r]}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -180,38 +239,8 @@ const Configuracoes = () => {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditIndex(null)}>Cancelar</Button>
-            <Button onClick={handleEditSave}>Salvar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Add User Dialog */}
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Adicionar Usuário</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Nome</Label>
-              <Input value={novoNome} onChange={e => setNovoNome(e.target.value)} placeholder="Nome completo" />
-            </div>
-            <div className="space-y-2">
-              <Label>Perfil</Label>
-              <Select value={novoRole} onValueChange={setNovoRole}>
-                <SelectTrigger><SelectValue placeholder="Selecione o perfil" /></SelectTrigger>
-                <SelectContent>
-                  {roles.map(r => (
-                    <SelectItem key={r.value} value={r.value}>{r.value}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setAddOpen(false)}>Cancelar</Button>
-            <Button onClick={handleAddUser}>Adicionar</Button>
+            <Button variant="outline" onClick={() => setEditItem(null)}>Cancelar</Button>
+            <Button onClick={handleEditSave} disabled={updateRoleMutation.isPending}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
