@@ -11,6 +11,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -185,123 +186,126 @@ const Pacientes = () => {
         </div>
       </LiquidGlassCard>
 
-      {/* Create / Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingId ? "Editar Paciente" : "Novo Paciente"}</DialogTitle>
-            <DialogDescription>
-              {editingId ? "Atualize os dados do paciente." : "Preencha os dados para cadastrar um novo paciente."}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-            <div className="sm:col-span-2">
-              <Label>Nome *</Label>
-              <Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Nome completo" />
-            </div>
-            <div>
-              <Label>CPF *</Label>
-              <Input value={form.cpf} onChange={(e) => {
-                const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
-                const formatted = raw
-                  .replace(/(\d{3})(\d)/, "$1.$2")
-                  .replace(/(\d{3})(\d)/, "$1.$2")
-                  .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-                setForm({ ...form, cpf: formatted });
-              }} placeholder="000.000.000-00" />
-            </div>
-            <div>
-              <Label>Data de Nascimento *</Label>
-              <Input type="date" value={form.data_nascimento} onChange={(e) => setForm({ ...form, data_nascimento: e.target.value })} />
-            </div>
-            <div>
-              <Label>Telefone</Label>
-              <Input value={form.telefone} onChange={(e) => {
-                const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
-                const formatted = raw.length <= 10
-                  ? raw.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2")
-                  : raw.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2");
-                setForm({ ...form, telefone: formatted });
-              }} placeholder="(11) 99999-0000" />
-            </div>
-            <div>
-              <Label>Email</Label>
-              <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@exemplo.com" />
-            </div>
-            <div>
-              <Label>Instagram</Label>
-              <Input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@usuario" />
-            </div>
+      <ResponsiveDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title={editingId ? "Editar Paciente" : "Novo Paciente"}
+        description={editingId ? "Atualize os dados do paciente." : "Preencha os dados para cadastrar um novo paciente."}
+        className="sm:max-w-2xl"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button onClick={handleSave} className="flex-1 sm:flex-none">{editingId ? "Salvar" : "Cadastrar"}</Button>
+          </>
+        }
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nome *</Label>
+            <Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Nome completo" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">CPF *</Label>
+            <Input value={form.cpf} onChange={(e) => {
+              const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
+              const formatted = raw
+                .replace(/(\d{3})(\d)/, "$1.$2")
+                .replace(/(\d{3})(\d)/, "$1.$2")
+                .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+              setForm({ ...form, cpf: formatted });
+            }} placeholder="000.000.000-00" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Data de Nascimento *</Label>
+            <Input type="date" value={form.data_nascimento} onChange={(e) => setForm({ ...form, data_nascimento: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Telefone</Label>
+            <Input value={form.telefone} onChange={(e) => {
+              const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
+              const formatted = raw.length <= 10
+                ? raw.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2")
+                : raw.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2");
+              setForm({ ...form, telefone: formatted });
+            }} placeholder="(11) 99999-0000" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Email</Label>
+            <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@exemplo.com" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Instagram</Label>
+            <Input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@usuario" />
+          </div>
 
-            {/* Endereço */}
-            <div className="sm:col-span-2 pt-2">
-              <p className="text-sm font-semibold text-foreground border-b border-border pb-1">Endereço</p>
-            </div>
-            <div>
-              <Label>CEP</Label>
-              <Input
-                value={form.cep}
-                onChange={(e) => {
-                  const raw = e.target.value.replace(/\D/g, "").slice(0, 8);
-                  const masked = raw.length > 5 ? raw.slice(0, 5) + "-" + raw.slice(5) : raw;
-                  setForm({ ...form, cep: masked });
-                  if (raw.length === 8) {
-                    fetch(`https://viacep.com.br/ws/${raw}/json/`)
-                      .then((r) => r.json())
-                      .then((data) => {
-                        if (!data.erro) {
-                          setForm((prev) => ({
-                            ...prev,
-                            cep: masked,
-                            estado: data.uf || prev.estado,
-                            cidade: data.localidade || prev.cidade,
-                            bairro: data.bairro || prev.bairro,
-                            rua: data.logradouro || prev.rua,
-                            complemento: data.complemento || prev.complemento,
-                          }));
-                        }
-                      })
-                      .catch(() => {});
-                  }
-                }}
-                placeholder="00000-000"
-              />
-            </div>
-            <div>
-              <Label>Estado</Label>
-              <Input value={form.estado} onChange={(e) => setForm({ ...form, estado: e.target.value })} placeholder="SP" />
-            </div>
-            <div>
-              <Label>Cidade</Label>
-              <Input value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} placeholder="São Paulo" />
-            </div>
-            <div>
-              <Label>Bairro</Label>
-              <Input value={form.bairro} onChange={(e) => setForm({ ...form, bairro: e.target.value })} placeholder="Centro" />
-            </div>
-            <div className="sm:col-span-2">
-              <Label>Rua</Label>
-              <Input value={form.rua} onChange={(e) => setForm({ ...form, rua: e.target.value })} placeholder="Rua Exemplo" />
-            </div>
-            <div>
-              <Label>Número</Label>
-              <Input value={form.numero} onChange={(e) => setForm({ ...form, numero: e.target.value })} placeholder="123" />
-            </div>
-            <div>
-              <Label>Complemento</Label>
-              <Input value={form.complemento} onChange={(e) => setForm({ ...form, complemento: e.target.value })} placeholder="Apto 45" />
-            </div>
-            <div className="sm:col-span-2">
-              <Label>Ponto de Referência</Label>
-              <Input value={form.ponto_referencia} onChange={(e) => setForm({ ...form, ponto_referencia: e.target.value })} placeholder="Próximo ao mercado" />
+          {/* Endereço */}
+          <div className="sm:col-span-2 pt-3">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Endereço</span>
+              <div className="h-px flex-1 bg-border" />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSave}>{editingId ? "Salvar" : "Cadastrar"}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">CEP</Label>
+            <Input
+              value={form.cep}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/\D/g, "").slice(0, 8);
+                const masked = raw.length > 5 ? raw.slice(0, 5) + "-" + raw.slice(5) : raw;
+                setForm({ ...form, cep: masked });
+                if (raw.length === 8) {
+                  fetch(`https://viacep.com.br/ws/${raw}/json/`)
+                    .then((r) => r.json())
+                    .then((data) => {
+                      if (!data.erro) {
+                        setForm((prev) => ({
+                          ...prev,
+                          cep: masked,
+                          estado: data.uf || prev.estado,
+                          cidade: data.localidade || prev.cidade,
+                          bairro: data.bairro || prev.bairro,
+                          rua: data.logradouro || prev.rua,
+                          complemento: data.complemento || prev.complemento,
+                        }));
+                      }
+                    })
+                    .catch(() => {});
+                }
+              }}
+              placeholder="00000-000"
+            />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Estado</Label>
+            <Input value={form.estado} onChange={(e) => setForm({ ...form, estado: e.target.value })} placeholder="SP" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Cidade</Label>
+            <Input value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} placeholder="São Paulo" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Bairro</Label>
+            <Input value={form.bairro} onChange={(e) => setForm({ ...form, bairro: e.target.value })} placeholder="Centro" />
+          </div>
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Rua</Label>
+            <Input value={form.rua} onChange={(e) => setForm({ ...form, rua: e.target.value })} placeholder="Rua Exemplo" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Número</Label>
+            <Input value={form.numero} onChange={(e) => setForm({ ...form, numero: e.target.value })} placeholder="123" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Complemento</Label>
+            <Input value={form.complemento} onChange={(e) => setForm({ ...form, complemento: e.target.value })} placeholder="Apto 45" />
+          </div>
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Ponto de Referência</Label>
+            <Input value={form.ponto_referencia} onChange={(e) => setForm({ ...form, ponto_referencia: e.target.value })} placeholder="Próximo ao mercado" />
+          </div>
+        </div>
+      </ResponsiveDialog>
 
       {/* Delete Confirmation */}
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>

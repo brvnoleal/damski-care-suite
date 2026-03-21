@@ -13,6 +13,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -213,95 +214,103 @@ const Agendamentos = () => {
         </div>
       </LiquidGlassCard>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{editingId ? "Editar Consulta" : "Nova Consulta"}</DialogTitle>
-            <DialogDescription>
-              {editingId ? "Atualize os dados da consulta." : "Preencha os dados para criar uma nova consulta."}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-            <div>
-              <Label>Data *</Label>
-              <Input type="date" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} />
-            </div>
-            <div>
-              <Label>Horário *</Label>
-              <Input type="time" value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} />
-            </div>
-            <div>
-              <Label>Paciente *</Label>
-              <Select value={form.paciente_id} onValueChange={(v) => setForm({ ...form, paciente_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                <SelectContent>
-                  {pacientes.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Dentista *</Label>
-              <Select value={form.dentista_id} onValueChange={(v) => setForm({ ...form, dentista_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                <SelectContent>
-                  {dentistas.map((d) => (
-                    <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="sm:col-span-2">
-              <Label>Procedimento *</Label>
-              <Select value={form.procedimento} onValueChange={(v: ProcedimentoConsulta) => setForm({ ...form, procedimento: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecione o procedimento..." /></SelectTrigger>
-                <SelectContent>
-                  {Object.entries(procedimentoConsultaLabels).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Valor (R$) *</Label>
-              <Input type="number" min="0" step="0.01" value={form.valor || ""} onChange={(e) => setForm({ ...form, valor: parseFloat(e.target.value) || 0 })} placeholder="0,00" />
-            </div>
-            <div>
-              <Label>Forma de Pagamento *</Label>
-              <Select value={form.forma_pagamento} onValueChange={(v: FormaPagamento) => setForm({ ...form, forma_pagamento: v, parcelas: v === "credito" || v === "boleto" ? form.parcelas : 1 })}>
-                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                <SelectContent>
-                  {Object.entries(formaPagamentoLabels).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {(form.forma_pagamento === "credito" || form.forma_pagamento === "boleto") && (
-              <div>
-                <Label>Parcelas</Label>
-                <Select value={String(form.parcelas)} onValueChange={(v) => setForm({ ...form, parcelas: parseInt(v) })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
-                      <SelectItem key={n} value={String(n)}>{n}x</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            <div className={form.forma_pagamento === "credito" || form.forma_pagamento === "boleto" ? "" : "sm:col-span-2"}>
-              <Label>Observações</Label>
-              <Input value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} placeholder="Observações opcionais" />
+      <ResponsiveDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title={editingId ? "Editar Consulta" : "Nova Consulta"}
+        description={editingId ? "Atualize os dados da consulta." : "Preencha os dados para criar uma nova consulta."}
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button onClick={handleSave} className="flex-1 sm:flex-none">{editingId ? "Salvar" : "Agendar"}</Button>
+          </>
+        }
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Data *</Label>
+            <Input type="date" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário *</Label>
+            <Input type="time" value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Paciente *</Label>
+            <Select value={form.paciente_id} onValueChange={(v) => setForm({ ...form, paciente_id: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+              <SelectContent>
+                {pacientes.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Dentista *</Label>
+            <Select value={form.dentista_id} onValueChange={(v) => setForm({ ...form, dentista_id: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+              <SelectContent>
+                {dentistas.map((d) => (
+                  <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
+            <Select value={form.procedimento} onValueChange={(v: ProcedimentoConsulta) => setForm({ ...form, procedimento: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione o procedimento..." /></SelectTrigger>
+              <SelectContent>
+                {Object.entries(procedimentoConsultaLabels).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="sm:col-span-2 pt-1">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pagamento</span>
+              <div className="h-px flex-1 bg-border" />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSave}>{editingId ? "Salvar" : "Agendar"}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Valor (R$) *</Label>
+            <Input type="number" min="0" step="0.01" value={form.valor || ""} onChange={(e) => setForm({ ...form, valor: parseFloat(e.target.value) || 0 })} placeholder="0,00" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Forma de Pagamento *</Label>
+            <Select value={form.forma_pagamento} onValueChange={(v: FormaPagamento) => setForm({ ...form, forma_pagamento: v, parcelas: v === "credito" || v === "boleto" ? form.parcelas : 1 })}>
+              <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+              <SelectContent>
+                {Object.entries(formaPagamentoLabels).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {(form.forma_pagamento === "credito" || form.forma_pagamento === "boleto") && (
+            <div>
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Parcelas</Label>
+              <Select value={String(form.parcelas)} onValueChange={(v) => setForm({ ...form, parcelas: parseInt(v) })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
+                    <SelectItem key={n} value={String(n)}>{n}x</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          <div className={form.forma_pagamento === "credito" || form.forma_pagamento === "boleto" ? "" : "sm:col-span-2"}>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Observações</Label>
+            <Input value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} placeholder="Observações opcionais" />
+          </div>
+        </div>
+      </ResponsiveDialog>
 
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
