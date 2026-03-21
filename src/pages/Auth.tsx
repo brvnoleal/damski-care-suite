@@ -45,13 +45,6 @@ const Auth = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin },
-    });
-    if (error) toast.error(error.message);
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
