@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Shield, Users, Bell, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -39,6 +40,14 @@ const Configuracoes = () => {
 
   const [editItem, setEditItem] = useState<UserWithRole | null>(null);
   const [editRole, setEditRole] = useState<AppRole>("recepcionista");
+
+  // Add user dialog state
+  const [addOpen, setAddOpen] = useState(false);
+  const [newNome, setNewNome] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newCpf, setNewCpf] = useState("");
+  const [newRole, setNewRole] = useState<AppRole>("recepcionista");
+  const [creating, setCreating] = useState(false);
 
   const isAdmin = currentUserRole === "admin";
 
@@ -80,6 +89,52 @@ const Configuracoes = () => {
     updateRoleMutation.mutate({ id: editItem.id, role: editRole });
   };
 
+  const handleCreateUser = async () => {
+    if (!newNome || !newEmail || !newCpf || !newRole) {
+      toast.error("Preencha todos os campos.");
+      return;
+    }
+
+    const cpfDigits = newCpf.replace(/\D/g, "");
+    if (cpfDigits.length < 6) {
+      toast.error("CPF deve ter pelo menos 6 dígitos.");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      const response = await supabase.functions.invoke("create-user", {
+        body: { nome: newNome, email: newEmail, cpf: newCpf, role: newRole },
+      });
+
+      if (response.error) throw new Error(response.error.message);
+      if (response.data?.error) throw new Error(response.data.error);
+
+      toast.success(`Usuário ${newNome} criado! Senha: primeiros 6 dígitos do CPF.`);
+      queryClient.invalidateQueries({ queryKey: ["user_roles_with_profiles"] });
+      setAddOpen(false);
+      setNewNome("");
+      setNewEmail("");
+      setNewCpf("");
+      setNewRole("recepcionista");
+    } catch (error: any) {
+      toast.error(error.message || "Erro ao criar usuário.");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const formatCpf = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    return digits
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d)/, "$1.$2")
+      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+  };
+
   if (!isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -105,14 +160,20 @@ const Configuracoes = () => {
         {/* Users */}
         <LiquidGlassCard draggable={false} className="p-5">
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Users className="w-4.5 h-4.5 text-primary" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Users className="w-4.5 h-4.5 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-semibold text-foreground">Controle de Acesso</h2>
+                  <p className="text-xs text-muted-foreground">Perfis e permissões</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-sm font-semibold text-foreground">Controle de Acesso</h2>
-                <p className="text-xs text-muted-foreground">Perfis e permissões</p>
-              </div>
+              <Button size="sm" className="gap-1.5" onClick={() => setAddOpen(true)}>
+                <Plus className="w-4 h-4" />
+                Novo Usuário
+              </Button>
             </div>
 
             {isLoading ? (
@@ -241,6 +302,52 @@ const Configuracoes = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditItem(null)}>Cancelar</Button>
             <Button onClick={handleEditSave} disabled={updateRoleMutation.isPending}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add User Dialog */}
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Novo Usuário</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nome completo</Label>
+              <Input value={newNome} onChange={(e) => setNewNome(e.target.value)} placeholder="Dr(a). Nome" />
+            </div>
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="email@exemplo.com" />
+            </div>
+            <div className="space-y-2">
+              <Label>CPF</Label>
+              <Input
+                value={newCpf}
+                onChange={(e) => setNewCpf(formatCpf(e.target.value))}
+                placeholder="000.000.000-00"
+                maxLength={14}
+              />
+              <p className="text-xs text-muted-foreground">A senha inicial será os 6 primeiros dígitos do CPF.</p>
+            </div>
+            <div className="space-y-2">
+              <Label>Perfil de acesso</Label>
+              <Select value={newRole} onValueChange={(v) => setNewRole(v as AppRole)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(roleLabels) as AppRole[]).map(r => (
+                    <SelectItem key={r} value={r}>{roleLabels[r]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddOpen(false)}>Cancelar</Button>
+            <Button onClick={handleCreateUser} disabled={creating}>
+              {creating ? "Criando..." : "Criar Usuário"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
