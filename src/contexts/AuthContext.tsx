@@ -45,8 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase.rpc("get_user_role", { _user_id: userId }),
       ]);
 
-      setProfile(profileRes.data ? (profileRes.data as Profile) : null);
-      setRole(roleRes.data ? (roleRes.data as AppRole) : null);
+      setProfile(profileRes.data ? (profileRes.data as unknown as Profile) : null);
+      setRole(roleRes.data ? (roleRes.data as unknown as AppRole) : null);
     } catch {
       setProfile(null);
       setRole(null);
