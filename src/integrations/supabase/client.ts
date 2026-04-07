@@ -5,6 +5,12 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://aylkfgmvncucsojrclbj.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5bGtmZ212bmN1Y3NvanJjbGJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNjA5ODAsImV4cCI6MjA4ODYzNjk4MH0.FNa9_WLKlYPyVAGtOavOJzIzBdIvBYqz_PL7c9-h7xw";
 
+const noOpAuthLock = async <T,>(
+  _name: string,
+  _acquireTimeout: number,
+  fn: () => Promise<T>
+) => await fn();
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
@@ -13,5 +19,7 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
+    lock: noOpAuthLock,
+    lockAcquireTimeout: 2000,
   }
 });

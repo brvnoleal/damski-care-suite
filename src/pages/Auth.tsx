@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { clearStoredAuthSession, isAuthNetworkError } from "@/lib/auth-session";
+import { clearStoredAuthSession, isAuthNetworkError, withTimeout } from "@/lib/auth-session";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -20,10 +20,13 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      await supabase.auth.signOut({ scope: "local" });
       clearStoredAuthSession();
 
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await withTimeout(
+        supabase.auth.signInWithPassword({ email, password }),
+        12000,
+        "O login demorou mais do que o esperado. Tente novamente."
+      );
       if (error) throw error;
 
       toast.success("Login realizado com sucesso!");
