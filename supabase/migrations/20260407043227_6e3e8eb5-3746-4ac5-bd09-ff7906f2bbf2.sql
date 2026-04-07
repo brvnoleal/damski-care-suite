@@ -1,0 +1,2 @@
+INSERT INTO public.profiles (id, nome) VALUES ('02212ee6-4ea7-4ee1-add4-a39b5f66780f', 'Admin') ON CONFLICT (id) DO UPDATE SET nome = 'Admin';
+INSERT INTO public.user_roles (user_id, role) VALUES ('02212ee6-4ea7-4ee1-add4-a39b5f66780f', 'admin') ON CONFLICT (user_id, role) DO NOTHING;
