@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { clearStoredAuthSession, isAuthNetworkError } from "@/lib/auth-session";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -19,12 +20,23 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      await supabase.auth.signOut({ scope: "local" });
+      clearStoredAuthSession();
+
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+
       toast.success("Login realizado com sucesso!");
       navigate("/");
-    } catch (error: any) {
-      toast.error(error.message || "Erro na autenticação");
+    } catch (error: unknown) {
+      if (isAuthNetworkError(error)) {
+        clearStoredAuthSession();
+        toast.error("Sessão antiga inválida removida. Tente entrar novamente.");
+        return;
+      }
+
+      const message = error instanceof Error ? error.message : "Erro na autenticação";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
