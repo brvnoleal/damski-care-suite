@@ -1,6 +1,5 @@
 import { useState, useEffect, useSyncExternalStore } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -11,7 +10,6 @@ import {
   Settings,
   Menu,
   X,
-  LogOut,
   Bell,
   CheckCheck,
   Moon,
@@ -49,8 +47,6 @@ const navigation = [
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { profile, role, signOut, user } = useAuth();
-  const navigate = useNavigate();
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== "undefined") {
       return document.documentElement.classList.contains("dark") ||
@@ -180,31 +176,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           })}
         </nav>
 
-        {/* User */}
-        <div className="relative z-10 p-4 border-t border-white/[0.06]">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <span className="text-xs font-semibold text-primary">
-                {(profile?.nome || user?.email || "U").substring(0, 2).toUpperCase()}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">
-                {profile?.nome || user?.email || "Usuário"}
-              </p>
-              <p className="text-[11px] text-sidebar-foreground/40">
-                {role === "admin" ? "Administrador" : role === "responsavel_tecnico" ? "Resp. Técnico" : role === "recepcionista" ? "Recepcionista" : "Sem papel"}
-              </p>
-            </div>
-            <LogOut
-              className="w-4 h-4 text-sidebar-foreground/30 cursor-pointer hover:text-sidebar-foreground/60 transition-colors"
-              onClick={async () => {
-                await signOut();
-                navigate("/auth");
-              }}
-            />
-          </div>
-        </div>
       </aside>
 
       {/* Main */}

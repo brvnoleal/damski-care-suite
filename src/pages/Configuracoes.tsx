@@ -8,7 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
@@ -35,7 +34,6 @@ interface UserWithRole {
 }
 
 const Configuracoes = () => {
-  const { role: currentUserRole } = useAuth();
   const queryClient = useQueryClient();
 
   const [editItem, setEditItem] = useState<UserWithRole | null>(null);
@@ -49,7 +47,7 @@ const Configuracoes = () => {
   const [newRole, setNewRole] = useState<AppRole>("recepcionista");
   const [creating, setCreating] = useState(false);
 
-  const isAdmin = currentUserRole === "admin";
+  const isAdmin = true;
 
   const { data: usersWithRoles = [], isLoading } = useQuery({
     queryKey: ["user_roles_with_profiles"],
