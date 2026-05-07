@@ -1,5 +1,5 @@
 // ============================================
-// Tipos do domínio — Damski Odonto SaaS
+// Tipos do domínio — SaaS Odonto SaaS
 // Arquitetura em camadas: Types → Services → Pages
 // ============================================
 

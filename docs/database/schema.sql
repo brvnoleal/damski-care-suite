@@ -1,5 +1,5 @@
 -- ============================================
--- Damski Odonto — Script de Criação do Banco de Dados
+-- SaaS Odonto — Script de Criação do Banco de Dados
 -- SGBD: PostgreSQL 15+
 -- Projeto Integrador — Desenvolvimento Web
 -- ============================================

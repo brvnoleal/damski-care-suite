@@ -1,4 +1,4 @@
-# 📄 Documentação Acadêmica — Damski Odonto
+# 📄 Documentação Acadêmica — SaaS Odonto
 
 ## Projeto Integrador: Desenvolvimento Web com Banco de Dados e Controle de Versão
 
@@ -6,7 +6,7 @@
 
 ## 1. Introdução
 
-O presente documento descreve o desenvolvimento do sistema **Damski Odonto**, uma aplicação web do tipo SaaS (Software as a Service) para gestão de clínicas odontológicas. O projeto foi desenvolvido como parte do componente curricular **Projeto Integrador**, integrando conhecimentos de desenvolvimento web, banco de dados relacional e controle de versão.
+O presente documento descreve o desenvolvimento do sistema **SaaS Odonto**, uma aplicação web do tipo SaaS (Software as a Service) para gestão de clínicas odontológicas. O projeto foi desenvolvido como parte do componente curricular **Projeto Integrador**, integrando conhecimentos de desenvolvimento web, banco de dados relacional e controle de versão.
 
 O sistema aborda problemas reais enfrentados por clínicas odontológicas, como o gerenciamento de pacientes, profissionais, agendamentos, controle financeiro e rastreabilidade de insumos, aplicando conceitos de engenharia de software em um cenário prático.
 
@@ -224,7 +224,7 @@ A biblioteca **Framer Motion** é utilizada para animações de entrada (mount a
 
 ## 11. Conclusão
 
-O projeto **Damski Odonto** atingiu os objetivos propostos, resultando em uma aplicação web funcional que demonstra a integração entre desenvolvimento frontend moderno, modelagem de banco de dados relacional e práticas de controle de versão.
+O projeto **SaaS Odonto** atingiu os objetivos propostos, resultando em uma aplicação web funcional que demonstra a integração entre desenvolvimento frontend moderno, modelagem de banco de dados relacional e práticas de controle de versão.
 
 As principais entregas incluem:
 
