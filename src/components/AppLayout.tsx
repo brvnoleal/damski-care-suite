@@ -142,7 +142,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           </div>
           <div className="flex-1">
             <h1 className="font-display text-[15px] font-semibold text-sidebar-foreground">
-              Damski Odonto
+              SaaS Odonto
             </h1>
           </div>
           <button

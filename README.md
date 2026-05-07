@@ -1,4 +1,4 @@
-# Damski Odonto — Sistema de Gestão Odontológica
+# SaaS Odonto — Sistema de Gestão Odontológica
 
 ## 📋 Descrição
 
@@ -135,7 +135,7 @@ Usuário → React Router → Página (View)
 git clone <URL_DO_REPOSITORIO>
 
 # 2. Acessar a pasta do projeto
-cd damski-odonto
+cd saas-odonto
 
 # 3. Instalar dependências
 npm install

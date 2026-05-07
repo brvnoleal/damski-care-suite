@@ -1,6 +1,6 @@
 # Diagrama Entidade-Relacionamento (DER)
 
-## Modelo Conceitual — Damski Odonto
+## Modelo Conceitual — SaaS Odonto
 
 ```
 ┌──────────────────┐       ┌──────────────────────┐       ┌──────────────────┐

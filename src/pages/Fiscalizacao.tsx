@@ -89,10 +89,10 @@ const Fiscalizacao = () => {
         </div>
         <div className="divide-y divide-border">
           {[
-            { action: "Evolução criada", user: "Dra. Damski", target: "PRN-0001 — Sessão #1247", time: "12/02/2026 14:32" },
+            { action: "Evolução criada", user: "Dra. Amanda", target: "PRN-0001 — Sessão #1247", time: "12/02/2026 14:32" },
             { action: "TCLE anexado", user: "Recepção", target: "PRN-0003 — Ana Costa", time: "11/02/2026 09:15" },
-            { action: "Insumo registrado", user: "Dra. Damski", target: "Lote AH2024-089", time: "10/02/2026 16:45" },
-            { action: "Prontuário editado", user: "Dra. Damski", target: "PRN-0002 — João Oliveira", time: "09/02/2026 11:20" },
+            { action: "Insumo registrado", user: "Dra. Amanda", target: "Lote AH2024-089", time: "10/02/2026 16:45" },
+            { action: "Prontuário editado", user: "Dra. Amanda", target: "PRN-0002 — João Oliveira", time: "09/02/2026 11:20" },
             { action: "Backup automático", user: "Sistema", target: "Banco de dados completo", time: "09/02/2026 03:00" },
           ].map((log, i) => (
             <div key={i} className="px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-sm">
