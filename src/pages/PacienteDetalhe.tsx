@@ -54,8 +54,14 @@ const PacienteDetalhe = () => {
     const load = async () => {
       if (!id) return;
       try {
-        const data = await pacienteService.buscarPorId(id);
-        setPatientData(data);
+        const [paciente, sessoes, fotosList] = await Promise.all([
+          pacienteService.buscarPorId(id),
+          sessaoService.listarPorPaciente(id),
+          pacienteFotoService.listarPorPaciente(id),
+        ]);
+        setPatientData(paciente);
+        setSessions(sessoes);
+        setFotos(fotosList);
       } catch {
         toast({ title: "Erro ao carregar paciente", variant: "destructive" });
       } finally {
@@ -99,19 +105,26 @@ const PacienteDetalhe = () => {
     setSessionOpen(true);
   };
 
-  const handleSessionSave = () => {
-    if (!sessionForm.date || !sessionForm.proc) {
+  const handleSessionSave = async () => {
+    if (!id || !sessionForm.date || !sessionForm.proc) {
       toast({ title: "Preencha procedimento e data", variant: "destructive" });
       return;
     }
-    const newSession: Sessao = {
-      id: `s${Date.now()}`, date: formatDateBR(sessionForm.date),
-      proc: sessionForm.proc, tech: sessionForm.tech || "N/A",
-      substance: sessionForm.substance || "N/A", signed: sessionForm.signed,
-    };
-    setSessions([newSession, ...sessions]);
-    setSessionOpen(false);
-    toast({ title: "Sessão registrada com sucesso" });
+    try {
+      const created = await sessaoService.criar({
+        paciente_id: id,
+        data: sessionForm.date,
+        procedimento: sessionForm.proc,
+        tecnica: sessionForm.tech || null,
+        substancia_lote: sessionForm.substance || null,
+        assinado: sessionForm.signed,
+      });
+      setSessions((prev) => [created, ...prev]);
+      setSessionOpen(false);
+      toast({ title: "Sessão registrada com sucesso" });
+    } catch {
+      toast({ title: "Erro ao salvar sessão", variant: "destructive" });
+    }
   };
 
   const openFotoDialog = (files: File[]) => {
@@ -122,24 +135,35 @@ const PacienteDetalhe = () => {
     setFotoDialogOpen(true);
   };
 
-  const handleFotoSave = () => {
-    const today = new Date();
-    const dateBR = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
-    pendingFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const newFoto: Foto = {
-          id: `f${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-          url: e.target?.result as string, name: file.name, date: dateBR,
-          label: file.name.replace(/\.[^.]+$/, ""), categoria: fotoMeta.categoria, descricao: fotoMeta.descricao,
-        };
-        setFotos((prev) => [newFoto, ...prev]);
-      };
-      reader.readAsDataURL(file);
-    });
-    toast({ title: `${pendingFiles.length} foto(s) adicionada(s)` });
-    setFotoDialogOpen(false);
-    setPendingFiles([]);
+  const handleFotoSave = async () => {
+    if (!id) return;
+    try {
+      const uploaded = await Promise.all(
+        pendingFiles.map((file) =>
+          pacienteFotoService.upload(id, file, {
+            categoria: fotoMeta.categoria,
+            descricao: fotoMeta.descricao,
+          }),
+        ),
+      );
+      setFotos((prev) => [...uploaded, ...prev]);
+      toast({ title: `${uploaded.length} foto(s) adicionada(s)` });
+    } catch {
+      toast({ title: "Erro ao enviar fotos", variant: "destructive" });
+    } finally {
+      setFotoDialogOpen(false);
+      setPendingFiles([]);
+    }
+  };
+
+  const handleFotoDelete = async (foto: PacienteFoto) => {
+    try {
+      await pacienteFotoService.excluir(foto);
+      setFotos((prev) => prev.filter((f) => f.id !== foto.id));
+      toast({ title: "Foto removida" });
+    } catch {
+      toast({ title: "Erro ao remover foto", variant: "destructive" });
+    }
   };
 
   if (loading) {
