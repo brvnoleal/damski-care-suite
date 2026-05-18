@@ -152,6 +152,14 @@ const Configuracoes = () => {
       .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
   };
 
+  if (isLoadingRole) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-sm text-muted-foreground">Carregando…</p>
+      </div>
+    );
+  }
+
   if (!isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
