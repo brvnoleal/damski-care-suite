@@ -46,8 +46,25 @@ const Configuracoes = () => {
   const [newCpf, setNewCpf] = useState("");
   const [newRole, setNewRole] = useState<AppRole>("recepcionista");
   const [creating, setCreating] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
 
-  const isAdmin = true;
+  const { data: isAdminData, isLoading: isLoadingRole } = useQuery({
+    queryKey: ["current_user_is_admin"],
+    queryFn: async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user?.id;
+      if (!userId) return false;
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (error) return false;
+      return !!data;
+    },
+  });
+  const isAdmin = !!isAdminData;
 
   const { data: usersWithRoles = [], isLoading } = useQuery({
     queryKey: ["user_roles_with_profiles"],
@@ -111,7 +128,9 @@ const Configuracoes = () => {
       if (response.error) throw new Error(response.error.message);
       if (response.data?.error) throw new Error(response.data.error);
 
-      toast.success(`Usuário ${newNome} criado! Senha: primeiros 6 dígitos do CPF.`);
+      const tempPassword = response.data?.password as string | undefined;
+      setGeneratedPassword(tempPassword || null);
+      toast.success(`Usuário ${newNome} criado com sucesso.`);
       queryClient.invalidateQueries({ queryKey: ["user_roles_with_profiles"] });
       setAddOpen(false);
       setNewNome("");
@@ -132,6 +151,14 @@ const Configuracoes = () => {
       .replace(/(\d{3})(\d)/, "$1.$2")
       .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
   };
+
+  if (isLoadingRole) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-sm text-muted-foreground">Carregando…</p>
+      </div>
+    );
+  }
 
   if (!isAdmin) {
     return (
@@ -327,7 +354,7 @@ const Configuracoes = () => {
                 placeholder="000.000.000-00"
                 maxLength={14}
               />
-              <p className="text-xs text-muted-foreground">A senha inicial será os 6 primeiros dígitos do CPF.</p>
+              <p className="text-xs text-muted-foreground">Uma senha temporária aleatória será gerada e exibida uma única vez após a criação.</p>
             </div>
             <div className="space-y-2">
               <Label>Perfil de acesso</Label>
@@ -346,6 +373,38 @@ const Configuracoes = () => {
             <Button onClick={handleCreateUser} disabled={creating}>
               {creating ? "Criando..." : "Criar Usuário"}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Generated password dialog */}
+      <Dialog open={!!generatedPassword} onOpenChange={(o) => !o && setGeneratedPassword(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Senha temporária gerada</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Copie e compartilhe com o usuário de forma segura. Esta senha não será exibida novamente.
+              O usuário deve alterá-la no primeiro acesso.
+            </p>
+            <div className="flex items-center gap-2">
+              <Input readOnly value={generatedPassword ?? ""} className="font-mono" />
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (generatedPassword) {
+                    navigator.clipboard.writeText(generatedPassword);
+                    toast.success("Senha copiada.");
+                  }
+                }}
+              >
+                Copiar
+              </Button>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setGeneratedPassword(null)}>Fechar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

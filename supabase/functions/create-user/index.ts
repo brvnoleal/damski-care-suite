@@ -37,7 +37,13 @@ Deno.serve(async (req) => {
     const cpfDigits = cpf.replace(/\D/g, "");
     if (cpfDigits.length < 6) throw new Error("CPF inválido");
 
-    const password = cpfDigits.substring(0, 6);
+    // Generate cryptographically random temporary password (16 chars, URL-safe)
+    const randomBytes = new Uint8Array(12);
+    crypto.getRandomValues(randomBytes);
+    const password = btoa(String.fromCharCode(...randomBytes))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
 
     // Create user
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
@@ -55,7 +61,7 @@ Deno.serve(async (req) => {
     if (roleError) throw roleError;
 
     return new Response(
-      JSON.stringify({ success: true, user_id: newUser.user.id }),
+      JSON.stringify({ success: true, user_id: newUser.user.id, password }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error: any) {
