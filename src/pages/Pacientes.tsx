@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Paciente } from "@/types";
 import { pacienteService } from "@/services/pacienteService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
+import { maskCpf } from "@/lib/utils";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
   nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "",
@@ -155,7 +156,7 @@ const Pacientes = () => {
               ) : filtered.map((p) => (
                 <TableRow key={p.id} className="hover:bg-white/5 transition-colors">
                   <TableCell className="font-medium">{p.nome}</TableCell>
-                  <TableCell className="text-muted-foreground hidden md:table-cell">{p.cpf}</TableCell>
+                  <TableCell className="text-muted-foreground hidden md:table-cell">{maskCpf(p.cpf)}</TableCell>
                   <TableCell className="text-muted-foreground hidden lg:table-cell">{p.telefone}</TableCell>
                   <TableCell className="text-muted-foreground hidden sm:table-cell">{p.email}</TableCell>
                   <TableCell className="text-muted-foreground hidden sm:table-cell">{p.instagram || "—"}</TableCell>
