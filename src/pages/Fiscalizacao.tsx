@@ -18,7 +18,7 @@ const Fiscalizacao = () => {
             <Download className="w-4 h-4" />
             Exportar PDF
           </Button>
-          <Button className="bg-primary text-primary-foreground hover:bg-burgundy-light gap-2">
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2">
             <Eye className="w-4 h-4" />
             Ativar Modo
           </Button>
@@ -26,9 +26,9 @@ const Fiscalizacao = () => {
       </div>
 
       {/* Status Banner */}
-      <div className="rounded-xl gradient-burgundy p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-gold/20 flex items-center justify-center">
-          <Shield className="w-6 h-6 text-gold" />
+      <div className="rounded-xl bg-primary p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div className="w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
+          <Shield className="w-6 h-6 text-primary" />
         </div>
         <div className="flex-1">
           <h2 className="text-lg font-display font-semibold text-primary-foreground">
@@ -39,7 +39,7 @@ const Fiscalizacao = () => {
             logs de auditoria e rastreabilidade completa.
           </p>
         </div>
-        <Badge className="bg-gold/20 text-gold border-gold/30 text-sm px-3 py-1">
+        <Badge className="bg-accent text-primary border-border text-sm px-3 py-1">
           ✓ Conforme
         </Badge>
       </div>

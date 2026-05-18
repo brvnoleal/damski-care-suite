@@ -34,7 +34,7 @@ const colorMap = {
   primary: { bg: "bg-primary/10", text: "text-primary" },
   info: { bg: "bg-info/10", text: "text-info" },
   success: { bg: "bg-success/10", text: "text-success" },
-  gold: { bg: "bg-[hsl(var(--gold))]/10", text: "text-[hsl(var(--gold))]" },
+  gold: { bg: "bg-accent", text: "text-primary" },
 };
 
 const CHART_COLORS = [
@@ -45,7 +45,7 @@ const CHART_COLORS = [
 const glassTooltip = {
   background: "var(--glass-bg-strong)",
   backdropFilter: "blur(16px)",
-  border: "1px solid var(--glass-border)",
+  border: "1px solid hsl(var(--border))",
   borderRadius: "0.75rem",
   fontSize: 12,
   color: "hsl(var(--foreground))",
@@ -266,7 +266,7 @@ const Dashboard = () => {
             <div className="p-3 sm:p-4 flex-1">
               <ResponsiveContainer width="100%" height={160}>
                 <BarChart data={sessionsWeekly} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-border)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis dataKey="day" tick={{ fontSize: 10, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 10, fill: "hsl(215, 16%, 47%)" }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} formatter={(v: number) => [`${v}`, "Sessões"]} />
@@ -284,7 +284,7 @@ const Dashboard = () => {
         <motion.div {...fadeUp(0.6)}>
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center gap-2 px-4 sm:px-5 py-3 border-b border-white/10">
-              <Star className="w-4 h-4 text-[hsl(var(--gold))]" />
+              <Star className="w-4 h-4 text-primary" />
               <h2 className="text-xs sm:text-sm font-semibold text-foreground">Top Procedimentos</h2>
             </div>
             <div className="p-3 sm:p-4 flex-1 flex flex-col items-center justify-center">

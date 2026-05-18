@@ -216,7 +216,7 @@ const Insumos = () => {
                   <TableRow key={supply.id} className="hover:bg-white/5 transition-colors">
                     <TableCell className="font-medium">{supply.nome}</TableCell>
                     <TableCell className="text-muted-foreground hidden md:table-cell">{supply.fabricante}</TableCell>
-                    <TableCell className="font-mono text-xs text-gold-dark font-semibold hidden sm:table-cell">{supply.lote}</TableCell>
+                    <TableCell className="font-mono text-xs text-primary font-semibold hidden sm:table-cell">{supply.lote}</TableCell>
                     <TableCell className="text-muted-foreground hidden sm:table-cell">
                       {formatDateBR(supply.validade)}
                       <span className="text-xs ml-1">({daysLeft}d)</span>
