@@ -19,22 +19,11 @@ import { useToast } from "@/hooks/use-toast";
 import { pacienteService } from "@/services/pacienteService";
 import { Paciente } from "@/types";
 
-interface Sessao {
-  id: string;
-  date: string;
-  proc: string;
-  tech: string;
-  substance: string;
-  signed: boolean;
-}
-
-const initialSessions: Sessao[] = [
-  { id: "s1", date: "12/02/2026", proc: "Harmonização Facial — Preenchimento Labial", tech: "Cânula 25G, técnica retroinjeção", substance: "Ácido Hialurônico 20mg/ml — Lote AH2024-089 — 1ml", signed: true },
-  { id: "s2", date: "08/01/2026", proc: "Toxina Botulínica — Terço Superior", tech: "Agulha 30G, técnica intramuscular", substance: "Toxina Botulínica 100U — Lote TB2024-156 — 32U", signed: true },
-  { id: "s3", date: "15/12/2025", proc: "Avaliação e Planejamento", tech: "Análise facial, fotografias, planejamento digital", substance: "N/A", signed: false },
-];
+import { sessaoService, type Sessao } from "@/services/sessaoService";
+import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/services/pacienteFotoService";
 
 const formatDateBR = (iso: string) => {
+  if (!iso) return "";
   const [y, m, d] = iso.split("-");
   return `${d}/${m}/${y}`;
 };
@@ -50,20 +39,16 @@ const PacienteDetalhe = () => {
     nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo" as "ativo" | "inativo",
   });
 
-  const [sessions, setSessions] = useState<Sessao[]>(initialSessions);
+  const [sessions, setSessions] = useState<Sessao[]>([]);
   const [sessionOpen, setSessionOpen] = useState(false);
   const [sessionForm, setSessionForm] = useState({ date: "", proc: "", tech: "", substance: "", signed: false });
 
-  interface Foto {
-    id: string; url: string; name: string; date: string; label: string;
-    categoria: "antes" | "depois" | "durante" | "outro"; descricao: string;
-  }
-  const [fotos, setFotos] = useState<Foto[]>([]);
-  const [previewFoto, setPreviewFoto] = useState<Foto | null>(null);
+  const [fotos, setFotos] = useState<PacienteFoto[]>([]);
+  const [previewFoto, setPreviewFoto] = useState<PacienteFoto | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fotoDialogOpen, setFotoDialogOpen] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
-  const [fotoMeta, setFotoMeta] = useState<{ categoria: Foto["categoria"]; descricao: string }>({ categoria: "antes", descricao: "" });
+  const [fotoMeta, setFotoMeta] = useState<{ categoria: FotoCategoria; descricao: string }>({ categoria: "antes", descricao: "" });
 
   useEffect(() => {
     const load = async () => {
