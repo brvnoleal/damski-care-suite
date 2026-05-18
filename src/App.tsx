@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AppLayout from "./components/AppLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Pacientes from "./pages/Pacientes";
 import PacienteDetalhe from "./pages/PacienteDetalhe";
@@ -12,6 +13,7 @@ import Agendamentos from "./pages/Agendamentos";
 import Insumos from "./pages/Insumos";
 import Financeiro from "./pages/Financeiro";
 import Configuracoes from "./pages/Configuracoes";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { useCodeProtection } from "./hooks/useCodeProtection";
 
@@ -26,19 +28,29 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AppLayout>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/pacientes" element={<Pacientes />} />
-              <Route path="/pacientes/:id" element={<PacienteDetalhe />} />
-              <Route path="/dentistas" element={<Dentistas />} />
-              <Route path="/agendamentos" element={<Agendamentos />} />
-              <Route path="/insumos" element={<Insumos />} />
-              <Route path="/financeiro" element={<Financeiro />} />
-              <Route path="/configuracoes" element={<Configuracoes />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AppLayout>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/*"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Routes>
+                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/pacientes" element={<Pacientes />} />
+                      <Route path="/pacientes/:id" element={<PacienteDetalhe />} />
+                      <Route path="/dentistas" element={<Dentistas />} />
+                      <Route path="/agendamentos" element={<Agendamentos />} />
+                      <Route path="/insumos" element={<Insumos />} />
+                      <Route path="/financeiro" element={<Financeiro />} />
+                      <Route path="/configuracoes" element={<Configuracoes />} />
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
