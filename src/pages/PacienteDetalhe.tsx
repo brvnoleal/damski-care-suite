@@ -265,11 +265,11 @@ const PacienteDetalhe = () => {
             <LiquidGlassCard key={session.id} draggable={false} className="p-5 space-y-3">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-foreground">{session.proc}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{session.date}</p>
+                  <p className="text-sm font-semibold text-foreground">{session.procedimento}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{formatDateBR(session.data)}</p>
                 </div>
-                <Badge className={session.signed ? "bg-success/10 text-success border-success/20" : "bg-warning/10 text-warning border-warning/20"}>
-                  {session.signed ? (
+                <Badge className={session.assinado ? "bg-success/10 text-success border-success/20" : "bg-warning/10 text-warning border-warning/20"}>
+                  {session.assinado ? (
                     <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> Assinado</span>
                   ) : "Pendente"}
                 </Badge>
@@ -277,11 +277,11 @@ const PacienteDetalhe = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                 <div>
                   <p className="text-xs text-muted-foreground">Técnica</p>
-                  <p className="text-foreground">{session.tech}</p>
+                  <p className="text-foreground">{session.tecnica || "—"}</p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Substância / Lote</p>
-                  <p className="text-foreground">{session.substance}</p>
+                  <p className="text-foreground">{session.substancia_lote || "—"}</p>
                 </div>
               </div>
             </LiquidGlassCard>
