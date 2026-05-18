@@ -197,7 +197,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </header>
 
         {/* Content */}
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto bg-background">
+        <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
           <div className="animate-fade-in">{children}</div>
         </main>
       </div>
