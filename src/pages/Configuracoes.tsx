@@ -128,7 +128,9 @@ const Configuracoes = () => {
       if (response.error) throw new Error(response.error.message);
       if (response.data?.error) throw new Error(response.data.error);
 
-      toast.success(`Usuário ${newNome} criado! Senha: primeiros 6 dígitos do CPF.`);
+      const tempPassword = response.data?.password as string | undefined;
+      setGeneratedPassword(tempPassword || null);
+      toast.success(`Usuário ${newNome} criado com sucesso.`);
       queryClient.invalidateQueries({ queryKey: ["user_roles_with_profiles"] });
       setAddOpen(false);
       setNewNome("");
