@@ -336,7 +336,7 @@ const PacienteDetalhe = () => {
               {fotos.map((foto) => (
                 <div key={foto.id} className="group relative rounded-xl glass overflow-hidden shadow-elegant">
                   <div className="aspect-square overflow-hidden">
-                    <img src={foto.url} alt={foto.name} className="w-full h-full object-cover" />
+                    <img src={foto.url} alt={foto.nome_arquivo} className="w-full h-full object-cover" />
                   </div>
                   <div className="p-2">
                     <div className="flex items-center gap-1.5 mb-0.5">
@@ -350,15 +350,15 @@ const PacienteDetalhe = () => {
                         {foto.categoria.charAt(0).toUpperCase() + foto.categoria.slice(1)}
                       </Badge>
                     </div>
-                    <p className="text-xs font-medium text-foreground truncate">{foto.label || foto.name}</p>
+                    <p className="text-xs font-medium text-foreground truncate">{foto.nome_arquivo}</p>
                     {foto.descricao && <p className="text-[11px] text-muted-foreground truncate">{foto.descricao}</p>}
-                    <p className="text-xs text-muted-foreground">{foto.date}</p>
+                    <p className="text-xs text-muted-foreground">{formatDateBR(foto.data)}</p>
                   </div>
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <button onClick={() => setPreviewFoto(foto)} className="p-2 rounded-full bg-card/90 text-foreground hover:bg-card transition-colors">
                       <ZoomIn className="w-4 h-4" />
                     </button>
-                    <button onClick={() => { setFotos((prev) => prev.filter((f) => f.id !== foto.id)); toast({ title: "Foto removida" }); }}
+                    <button onClick={() => handleFotoDelete(foto)}
                       className="p-2 rounded-full bg-destructive/90 text-destructive-foreground hover:bg-destructive transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -373,14 +373,14 @@ const PacienteDetalhe = () => {
             <Dialog open={!!previewFoto} onOpenChange={() => setPreviewFoto(null)}>
               <DialogContent className="sm:max-w-3xl p-0 overflow-hidden">
                 <div className="relative">
-                  <img src={previewFoto.url} alt={previewFoto.name} className="w-full max-h-[80vh] object-contain bg-black" />
+                  <img src={previewFoto.url} alt={previewFoto.nome_arquivo} className="w-full max-h-[80vh] object-contain bg-black" />
                   <button onClick={() => setPreviewFoto(null)} className="absolute top-3 right-3 p-2 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                    <p className="text-white text-sm font-medium">{previewFoto.label || previewFoto.name}</p>
+                    <p className="text-white text-sm font-medium">{previewFoto.nome_arquivo}</p>
                     {previewFoto.descricao && <p className="text-white/70 text-xs mt-0.5">{previewFoto.descricao}</p>}
-                    <p className="text-white/50 text-xs mt-0.5">{previewFoto.date} · {previewFoto.categoria}</p>
+                    <p className="text-white/50 text-xs mt-0.5">{formatDateBR(previewFoto.data)} · {previewFoto.categoria}</p>
                   </div>
                 </div>
               </DialogContent>
