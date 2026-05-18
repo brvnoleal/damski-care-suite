@@ -376,6 +376,38 @@ const Configuracoes = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Generated password dialog */}
+      <Dialog open={!!generatedPassword} onOpenChange={(o) => !o && setGeneratedPassword(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Senha temporária gerada</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Copie e compartilhe com o usuário de forma segura. Esta senha não será exibida novamente.
+              O usuário deve alterá-la no primeiro acesso.
+            </p>
+            <div className="flex items-center gap-2">
+              <Input readOnly value={generatedPassword ?? ""} className="font-mono" />
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (generatedPassword) {
+                    navigator.clipboard.writeText(generatedPassword);
+                    toast.success("Senha copiada.");
+                  }
+                }}
+              >
+                Copiar
+              </Button>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setGeneratedPassword(null)}>Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
