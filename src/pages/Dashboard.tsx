@@ -43,12 +43,12 @@ const CHART_COLORS = [
 ];
 
 const glassTooltip = {
-  background: "var(--glass-bg-strong)",
-  backdropFilter: "blur(16px)",
+  background: "hsl(var(--card))",
   border: "1px solid hsl(var(--border))",
-  borderRadius: "0.75rem",
+  borderRadius: "0.5rem",
   fontSize: 12,
   color: "hsl(var(--foreground))",
+  boxShadow: "0 4px 12px -2px rgba(6, 20, 27, 0.08)",
 };
 
 const glassTooltipText = { color: "hsl(var(--foreground))" };
