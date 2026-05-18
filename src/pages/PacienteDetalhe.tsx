@@ -457,7 +457,7 @@ const PacienteDetalhe = () => {
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label>Categoria</Label>
-              <Select value={fotoMeta.categoria} onValueChange={(v: Foto["categoria"]) => setFotoMeta({ ...fotoMeta, categoria: v })}>
+              <Select value={fotoMeta.categoria} onValueChange={(v: FotoCategoria) => setFotoMeta({ ...fotoMeta, categoria: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="antes">Antes</SelectItem>
