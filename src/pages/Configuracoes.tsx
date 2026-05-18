@@ -354,7 +354,7 @@ const Configuracoes = () => {
                 placeholder="000.000.000-00"
                 maxLength={14}
               />
-              <p className="text-xs text-muted-foreground">A senha inicial será os 6 primeiros dígitos do CPF.</p>
+              <p className="text-xs text-muted-foreground">Uma senha temporária aleatória será gerada e exibida uma única vez após a criação.</p>
             </div>
             <div className="space-y-2">
               <Label>Perfil de acesso</Label>
