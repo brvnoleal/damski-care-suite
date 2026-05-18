@@ -55,16 +55,16 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-foreground/40 lg:hidden"
+          className="fixed inset-0 z-40 bg-foreground/30 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar — solid dark surface */}
+      {/* Sidebar — liquid glass dark surface */}
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-[260px] flex flex-col transition-transform duration-300 lg:relative lg:translate-x-0 lg:z-auto shrink-0",
-          "bg-sidebar text-sidebar-foreground border-r border-sidebar-border",
+          "glass-sidebar text-sidebar-foreground",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
@@ -113,7 +113,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         {/* Top bar — clean white */}
-        <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 flex items-center gap-4 bg-card border-b border-border">
+        <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 flex items-center gap-4 glass-header">
           <button
             className="lg:hidden text-muted-foreground hover:text-foreground"
             onClick={() => setSidebarOpen(true)}
