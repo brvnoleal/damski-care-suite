@@ -46,8 +46,25 @@ const Configuracoes = () => {
   const [newCpf, setNewCpf] = useState("");
   const [newRole, setNewRole] = useState<AppRole>("recepcionista");
   const [creating, setCreating] = useState(false);
+  const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
 
-  const isAdmin = true;
+  const { data: isAdminData, isLoading: isLoadingRole } = useQuery({
+    queryKey: ["current_user_is_admin"],
+    queryFn: async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData.session?.user?.id;
+      if (!userId) return false;
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (error) return false;
+      return !!data;
+    },
+  });
+  const isAdmin = !!isAdminData;
 
   const { data: usersWithRoles = [], isLoading } = useQuery({
     queryKey: ["user_roles_with_profiles"],
