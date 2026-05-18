@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Liquid Glass surfaces > Card structure snapshot 1`] = `
+<div
+  class="rounded-lg glass text-card-foreground"
+>
+  snap
+</div>
+`;
+
+exports[`Liquid Glass surfaces > LiquidGlassCard structure snapshot 1`] = `
+<div
+  class="relative glass-strong glass-hover rounded-xl"
+>
+  <p>
+    snapshot
+  </p>
+</div>
+`;
