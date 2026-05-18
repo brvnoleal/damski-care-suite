@@ -18,8 +18,9 @@ interface LiquidGlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Solid SaaS card — preserves LiquidGlassCard API for backward compatibility.
- * All glassmorphism removed; renders a clean white card with soft border + subtle shadow.
+ * Liquid Glass card — translucent surface with backdrop blur,
+ * luminous inner border and soft elevated shadow.
+ * Preserves legacy API; extra props are accepted and ignored.
  */
 export const LiquidGlassCard = ({
   children,
@@ -27,7 +28,6 @@ export const LiquidGlassCard = ({
   borderRadius,
   width,
   height,
-  // ignored legacy props
   draggable: _d,
   expandable: _e,
   expandedWidth: _ew,
@@ -40,7 +40,7 @@ export const LiquidGlassCard = ({
   return (
     <div
       className={cn(
-        'relative bg-card border border-border rounded-lg shadow-sm transition-shadow hover:shadow-md',
+        'relative glass-strong glass-hover rounded-xl',
         className
       )}
       style={{

@@ -247,7 +247,7 @@ const PacienteDetalhe = () => {
 
         <TabsContent value="evolucoes" className="space-y-4">
           {sessions.length === 0 && (
-            <div className="rounded-xl border border-border bg-card p-8 text-center">
+            <div className="rounded-xl glass p-8 text-center">
               <ClipboardList className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
               <p className="text-sm text-muted-foreground">Nenhuma sessão registrada ainda.</p>
             </div>
@@ -325,7 +325,7 @@ const PacienteDetalhe = () => {
           {fotos.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {fotos.map((foto) => (
-                <div key={foto.id} className="group relative rounded-xl border border-border bg-card overflow-hidden shadow-elegant">
+                <div key={foto.id} className="group relative rounded-xl glass overflow-hidden shadow-elegant">
                   <div className="aspect-square overflow-hidden">
                     <img src={foto.url} alt={foto.name} className="w-full h-full object-cover" />
                   </div>
@@ -380,7 +380,7 @@ const PacienteDetalhe = () => {
         </TabsContent>
 
         <TabsContent value="insumos" className="space-y-4">
-          <div className="rounded-xl border border-border bg-card p-8 text-center">
+          <div className="rounded-xl glass p-8 text-center">
             <Syringe className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">Rastreabilidade de insumos vinculados às sessões do paciente.</p>
           </div>
