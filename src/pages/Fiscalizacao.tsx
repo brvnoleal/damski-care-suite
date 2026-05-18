@@ -71,7 +71,7 @@ const Fiscalizacao = () => {
         ].map((feature, i) => (
           <div
             key={i}
-            className="rounded-xl border border-border bg-card p-5 shadow-elegant hover:shadow-lg transition-shadow"
+            className="rounded-xl glass p-5 shadow-elegant hover:shadow-lg transition-shadow"
           >
             <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
               <feature.icon className="w-4.5 h-4.5 text-primary" />
@@ -83,7 +83,7 @@ const Fiscalizacao = () => {
       </div>
 
       {/* Audit Log Preview */}
-      <div className="rounded-xl border border-border bg-card shadow-elegant">
+      <div className="rounded-xl glass">
         <div className="p-4 border-b border-border">
           <h3 className="text-sm font-semibold text-foreground">Últimos Registros de Auditoria</h3>
         </div>
