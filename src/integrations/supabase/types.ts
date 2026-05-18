@@ -278,6 +278,39 @@ export type Database = {
         }
         Relationships: []
       }
+      paciente_foto: {
+        Row: {
+          categoria: Database["public"]["Enums"]["foto_categoria"]
+          created_at: string
+          data: string
+          descricao: string | null
+          id: string
+          nome_arquivo: string
+          paciente_id: string
+          storage_path: string
+        }
+        Insert: {
+          categoria?: Database["public"]["Enums"]["foto_categoria"]
+          created_at?: string
+          data?: string
+          descricao?: string | null
+          id?: string
+          nome_arquivo: string
+          paciente_id: string
+          storage_path: string
+        }
+        Update: {
+          categoria?: Database["public"]["Enums"]["foto_categoria"]
+          created_at?: string
+          data?: string
+          descricao?: string | null
+          id?: string
+          nome_arquivo?: string
+          paciente_id?: string
+          storage_path?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -298,6 +331,51 @@ export type Database = {
           created_at?: string
           id?: string
           nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sessao: {
+        Row: {
+          agendamento_id: string | null
+          assinado: boolean
+          created_at: string
+          data: string
+          dentista_id: string | null
+          id: string
+          observacoes: string | null
+          paciente_id: string
+          procedimento: string
+          substancia_lote: string | null
+          tecnica: string | null
+          updated_at: string
+        }
+        Insert: {
+          agendamento_id?: string | null
+          assinado?: boolean
+          created_at?: string
+          data: string
+          dentista_id?: string | null
+          id?: string
+          observacoes?: string | null
+          paciente_id: string
+          procedimento: string
+          substancia_lote?: string | null
+          tecnica?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agendamento_id?: string | null
+          assinado?: boolean
+          created_at?: string
+          data?: string
+          dentista_id?: string | null
+          id?: string
+          observacoes?: string | null
+          paciente_id?: string
+          procedimento?: string
+          substancia_lote?: string | null
+          tecnica?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -339,6 +417,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "responsavel_tecnico" | "recepcionista"
+      foto_categoria: "antes" | "depois" | "durante" | "outro"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -467,6 +546,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "responsavel_tecnico", "recepcionista"],
+      foto_categoria: ["antes", "depois", "durante", "outro"],
     },
   },
 } as const
