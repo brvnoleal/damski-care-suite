@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
     if (roleError) throw roleError;
 
     return new Response(
-      JSON.stringify({ success: true, user_id: newUser.user.id }),
+      JSON.stringify({ success: true, user_id: newUser.user.id, password }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
   } catch (error: any) {
