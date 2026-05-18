@@ -191,13 +191,13 @@ const PacienteDetalhe = () => {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl gradient-burgundy flex items-center justify-center">
+          <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center">
             <span className="text-xl font-display font-bold text-primary-foreground">{initials}</span>
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">{patientData.nome}</h1>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs font-mono text-gold-dark font-semibold">{id}</span>
+              <span className="text-xs font-mono text-primary font-semibold">{id}</span>
               <Badge className={patientData.status === "ativo" ? "bg-success/10 text-success border-success/20 text-xs" : "bg-muted text-muted-foreground text-xs"}>
                 {patientData.status === "ativo" ? "Ativo" : "Inativo"}
               </Badge>

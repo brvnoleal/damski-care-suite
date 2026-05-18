@@ -142,7 +142,7 @@ const Insumos = () => {
             Rastreabilidade por lote conforme RDC 1.002/2025
           </p>
         </div>
-        <Button onClick={openCreate} className="gap-2 backdrop-blur-xl bg-primary/80 border border-white/20 text-primary-foreground shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_1px_1px_2px_rgba(255,255,255,0.25)] hover:bg-primary/90 hover:shadow-[0_4px_16px_rgba(0,0,0,0.2),inset_1px_1px_2px_rgba(255,255,255,0.3)] transition-all">
+        <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
           <Plus className="w-4 h-4" />
           Cadastrar Insumo
         </Button>
@@ -216,7 +216,7 @@ const Insumos = () => {
                   <TableRow key={supply.id} className="hover:bg-white/5 transition-colors">
                     <TableCell className="font-medium">{supply.nome}</TableCell>
                     <TableCell className="text-muted-foreground hidden md:table-cell">{supply.fabricante}</TableCell>
-                    <TableCell className="font-mono text-xs text-gold-dark font-semibold hidden sm:table-cell">{supply.lote}</TableCell>
+                    <TableCell className="font-mono text-xs text-primary font-semibold hidden sm:table-cell">{supply.lote}</TableCell>
                     <TableCell className="text-muted-foreground hidden sm:table-cell">
                       {formatDateBR(supply.validade)}
                       <span className="text-xs ml-1">({daysLeft}d)</span>

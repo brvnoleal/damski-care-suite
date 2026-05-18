@@ -21,7 +21,7 @@ const roleLabels: Record<AppRole, string> = {
 };
 
 const roleColors: Record<AppRole, string> = {
-  admin: "bg-gold/10 text-gold-dark",
+  admin: "bg-accent text-primary",
   responsavel_tecnico: "bg-primary/10 text-primary",
   recepcionista: "bg-info/10 text-info",
 };
@@ -183,7 +183,7 @@ const Configuracoes = () => {
                 {usersWithRoles.map((user) => (
                   <div key={user.id} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full gradient-burgundy flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                         <span className="text-xs font-bold text-primary-foreground">
                           {user.nome.split(" ").map(n => n[0]).join("").slice(0, 2)}
                         </span>
