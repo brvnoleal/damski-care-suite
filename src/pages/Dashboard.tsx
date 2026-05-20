@@ -293,12 +293,12 @@ const Dashboard = () => {
               const monthLabel = now.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
               const selected = selectedDay ? monthAgendamentos[selectedDay] : null;
               return (
-                <div className="p-3 sm:p-4">
-                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 capitalize">{monthLabel}</p>
-                  <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-muted-foreground mb-1">
+                <div className="p-2 sm:p-3">
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5 capitalize">{monthLabel}</p>
+                  <div className="grid grid-cols-7 gap-0.5 text-center text-[9px] text-muted-foreground mb-0.5">
                     {["D", "S", "T", "Q", "Q", "S", "S"].map((w, i) => <div key={i}>{w}</div>)}
                   </div>
-                  <div className="grid grid-cols-7 gap-1">
+                  <div className="grid grid-cols-7 gap-0.5">
                     {cells.map((iso, i) => {
                       if (!iso) return <div key={i} />;
                       const day = Number(iso.slice(-2));
@@ -310,7 +310,7 @@ const Dashboard = () => {
                           key={i}
                           onClick={() => setSelectedDay(isSelected ? null : iso)}
                           className={cn(
-                            "aspect-square rounded-md flex flex-col items-center justify-center text-xs transition-colors relative",
+                            "aspect-square rounded flex items-center justify-center text-[10px] transition-colors relative",
                             isSelected ? "bg-primary text-primary-foreground" :
                             isToday ? "bg-primary/15 text-primary font-semibold" :
                             info ? "bg-info/10 text-foreground hover:bg-info/20" :
@@ -319,28 +319,25 @@ const Dashboard = () => {
                         >
                           <span>{day}</span>
                           {info && !isSelected && (
-                            <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-info" />
+                            <span className="absolute bottom-0 w-0.5 h-0.5 rounded-full bg-info" />
                           )}
                         </button>
                       );
                     })}
                   </div>
                   {selected && (
-                    <div className="mt-3 pt-3 border-t border-white/10 space-y-1.5 max-h-32 overflow-y-auto">
-                      <p className="text-[11px] text-muted-foreground">
-                        {new Date(selectedDay + "T00:00:00").toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })} — {selected.count} consulta{selected.count > 1 ? "s" : ""}
+                    <div className="mt-2 pt-2 border-t border-white/10 space-y-1 max-h-24 overflow-y-auto">
+                      <p className="text-[10px] text-muted-foreground">
+                        {new Date(selectedDay + "T00:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" })} — {selected.count} consulta{selected.count > 1 ? "s" : ""}
                       </p>
                       {selected.items.map((it, idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-xs">
+                        <div key={idx} className="flex items-center gap-1.5 text-[10px]">
                           <span className="font-mono text-primary">{it.horario}</span>
                           <span className="text-foreground truncate flex-1">{it.paciente}</span>
                           <span className="text-muted-foreground truncate">{it.proc}</span>
                         </div>
                       ))}
                     </div>
-                  )}
-                  {!selected && (
-                    <p className="text-[11px] text-muted-foreground mt-3 text-center">Clique em um dia para ver as consultas.</p>
                   )}
                 </div>
               );
