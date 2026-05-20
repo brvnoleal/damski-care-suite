@@ -45,6 +45,13 @@ const navigation = [
 const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    setSidebarOpen(false);
+    await supabase.auth.signOut();
+    navigate("/login", { replace: true });
+  };
 
   const notifications = useSyncExternalStore(
     notificationStore.subscribe,
