@@ -119,6 +119,19 @@ const Dashboard = () => {
         { label: "Consultas Semana", value: String(weekAg.length), change: `${weekConfirmed} confirmadas`, icon: FileCheck, color: "success", trend: "up" },
       ]);
 
+      // Receita da Semana
+      const realizadasAg = weekAg.filter((a: any) => a.status === "realizado");
+      const previstasAg = weekAg.filter((a: any) => ["agendado", "confirmado"].includes(a.status));
+      const totalRealizado = realizadasAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
+      const totalPrevisto = previstasAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
+      const procMap: Record<string, number> = {};
+      realizadasAg.forEach((a: any) => {
+        const k = (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento;
+        procMap[k] = (procMap[k] || 0) + Number(a.valor || 0);
+      });
+      const procItems = Object.entries(procMap).sort((a, b) => b[1] - a[1]).map(([proc, valor]) => ({ proc, valor }));
+      setReceitaSemana({ total: totalRealizado, realizadas: realizadasAg.length, previstas: totalPrevisto, items: procItems });
+
       // Consultas por status
       const confirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
       const pending = weekAg.filter((a: any) => a.status === "agendado").length;
