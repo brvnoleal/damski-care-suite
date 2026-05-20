@@ -81,6 +81,7 @@ const Dashboard = () => {
   const [topProcedures, setTopProcedures] = useState<{name: string; count: number}[]>([]);
   const [nextAppointments, setNextAppointments] = useState<{time: string; patient: string; proc: string; status: string}[]>([]);
   const [criticalSupplies, setCriticalSupplies] = useState<{name: string; lot: string; expiry: string; daysLeft: number}[]>([]);
+  const [receitaSemana, setReceitaSemana] = useState({ total: 0, realizadas: 0, previstas: 0, items: [] as { proc: string; valor: number }[] });
   const [monthAgendamentos, setMonthAgendamentos] = useState<Record<string, { count: number; items: { horario: string; paciente: string; proc: string; status: string }[] }>>({});
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
@@ -117,6 +118,19 @@ const Dashboard = () => {
         { label: "Insumos Críticos", value: String(criticalCount), change: "", icon: Package, color: "gold", trend: "neutral" },
         { label: "Consultas Semana", value: String(weekAg.length), change: `${weekConfirmed} confirmadas`, icon: FileCheck, color: "success", trend: "up" },
       ]);
+
+      // Receita da Semana
+      const realizadasAg = weekAg.filter((a: any) => a.status === "realizado");
+      const previstasAg = weekAg.filter((a: any) => ["agendado", "confirmado"].includes(a.status));
+      const totalRealizado = realizadasAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
+      const totalPrevisto = previstasAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
+      const procMap: Record<string, number> = {};
+      realizadasAg.forEach((a: any) => {
+        const k = (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento;
+        procMap[k] = (procMap[k] || 0) + Number(a.valor || 0);
+      });
+      const procItems = Object.entries(procMap).sort((a, b) => b[1] - a[1]).map(([proc, valor]) => ({ proc, valor }));
+      setReceitaSemana({ total: totalRealizado, realizadas: realizadasAg.length, previstas: totalPrevisto, items: procItems });
 
       // Consultas por status
       const confirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
@@ -434,9 +448,9 @@ const Dashboard = () => {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        <motion.div {...fadeUp(0.8)}>
-          <LiquidGlassCard className="overflow-hidden" draggable={false}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 items-stretch">
+        <motion.div {...fadeUp(0.8)} className="h-full">
+          <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-warning" />
@@ -446,7 +460,7 @@ const Dashboard = () => {
                 Ver todos <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
-            <div className="divide-y divide-white/5 max-h-[220px] overflow-y-auto">
+            <div className="divide-y divide-white/5 flex-1 overflow-y-auto">
               {criticalSupplies.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-6">Nenhum insumo crítico</p>
               )}
@@ -466,21 +480,37 @@ const Dashboard = () => {
           </LiquidGlassCard>
         </motion.div>
 
-        <motion.div {...fadeUp(0.9)}>
-          <LiquidGlassCard className="overflow-hidden" draggable={false}>
+        <motion.div {...fadeUp(0.9)} className="h-full">
+          <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <FileCheck className="w-4 h-4 text-warning" />
                 <h2 className="text-xs sm:text-sm font-semibold text-foreground">Receita da Semana</h2>
               </div>
+              <Link to="/financeiro" className="text-xs text-primary hover:underline flex items-center gap-0.5">
+                Ver mais <ChevronRight className="w-3 h-3" />
+              </Link>
             </div>
-            <div className="px-4 sm:px-5 py-4">
+            <div className="px-4 sm:px-5 py-3 border-b border-white/5">
               <p className="text-xl sm:text-2xl font-bold text-foreground">
-                R$ {(() => {
-                  return "—";
-                })()}
+                {receitaSemana.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
               </p>
-              <p className="text-xs text-muted-foreground mt-1">Baseado nos agendamentos realizados</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                {receitaSemana.realizadas} consulta{receitaSemana.realizadas !== 1 ? "s" : ""} realizada{receitaSemana.realizadas !== 1 ? "s" : ""} · previsto {receitaSemana.previstas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </p>
+            </div>
+            <div className="divide-y divide-white/5 flex-1 overflow-y-auto">
+              {receitaSemana.items.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-6">Nenhuma consulta realizada nesta semana</p>
+              )}
+              {receitaSemana.items.map((it, i) => (
+                <div key={i} className="flex items-center justify-between gap-3 px-4 sm:px-5 py-2.5">
+                  <p className="text-sm text-foreground truncate">{it.proc}</p>
+                  <p className="text-sm font-semibold text-success shrink-0">
+                    {it.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                  </p>
+                </div>
+              ))}
             </div>
           </LiquidGlassCard>
         </motion.div>
