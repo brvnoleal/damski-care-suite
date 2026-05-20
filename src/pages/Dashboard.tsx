@@ -81,6 +81,8 @@ const Dashboard = () => {
   const [topProcedures, setTopProcedures] = useState<{name: string; count: number}[]>([]);
   const [nextAppointments, setNextAppointments] = useState<{time: string; patient: string; proc: string; status: string}[]>([]);
   const [criticalSupplies, setCriticalSupplies] = useState<{name: string; lot: string; expiry: string; daysLeft: number}[]>([]);
+  const [monthAgendamentos, setMonthAgendamentos] = useState<Record<string, { count: number; items: { horario: string; paciente: string; proc: string; status: string }[] }>>({});
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   useEffect(() => {
     const loadDashboard = async () => {
