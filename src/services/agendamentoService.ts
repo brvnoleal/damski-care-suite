@@ -22,7 +22,7 @@ const mapRow = (row: any): Agendamento => ({
 
 export const agendamentoService = {
   listar: async (): Promise<Agendamento[]> => {
-    const { data, error } = await supabase.from("agendamento").select("*").order("data", { ascending: false }).order("horario", { ascending: true });
+    const { data, error } = await supabase.from("agendamento").select("*").order("data", { ascending: false }).order("horario", { ascending: false });
     if (error) throw error;
     return (data || []).map(mapRow);
   },
