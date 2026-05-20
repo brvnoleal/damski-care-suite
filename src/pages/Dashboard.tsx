@@ -269,7 +269,7 @@ const Dashboard = () => {
         </motion.div>
 
         <motion.div {...scaleIn(0.45)} className="lg:col-span-3">
-          <LiquidGlassCard className="overflow-hidden" draggable={false}>
+          <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
@@ -310,7 +310,7 @@ const Dashboard = () => {
                           key={i}
                           onClick={() => setSelectedDay(isSelected ? null : iso)}
                           className={cn(
-                            "aspect-square rounded flex items-center justify-center text-[10px] transition-colors relative",
+                            "h-6 sm:h-7 rounded flex items-center justify-center text-[10px] transition-colors relative",
                             isSelected ? "bg-primary text-primary-foreground" :
                             isToday ? "bg-primary/15 text-primary font-semibold" :
                             info ? "bg-info/10 text-foreground hover:bg-info/20" :
@@ -326,13 +326,13 @@ const Dashboard = () => {
                     })}
                   </div>
                   {selected && (
-                    <div className="mt-2 pt-2 border-t border-white/10 space-y-1 max-h-24 overflow-y-auto">
-                      <p className="text-[10px] text-muted-foreground">
-                        {new Date(selectedDay + "T00:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" })} — {selected.count} consulta{selected.count > 1 ? "s" : ""}
+                    <div className="mt-2 pt-2 border-t border-white/10 space-y-1.5 max-h-32 overflow-y-auto">
+                      <p className="text-xs font-medium text-foreground">
+                        {new Date(selectedDay + "T00:00:00").toLocaleDateString("pt-BR", { weekday: "short", day: "numeric", month: "short" })} — {selected.count} consulta{selected.count > 1 ? "s" : ""}
                       </p>
                       {selected.items.map((it, idx) => (
-                        <div key={idx} className="flex items-center gap-1.5 text-[10px]">
-                          <span className="font-mono text-primary">{it.horario}</span>
+                        <div key={idx} className="flex items-center gap-2 text-xs sm:text-[13px]">
+                          <span className="font-mono font-semibold text-primary">{it.horario}</span>
                           <span className="text-foreground truncate flex-1">{it.paciente}</span>
                           <span className="text-muted-foreground truncate">{it.proc}</span>
                         </div>
