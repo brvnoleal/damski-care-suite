@@ -1,5 +1,6 @@
 import { useState, useSyncExternalStore } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard,
   Users,
@@ -12,6 +13,7 @@ import {
   X,
   Bell,
   CheckCheck,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +45,13 @@ const navigation = [
 const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    setSidebarOpen(false);
+    await supabase.auth.signOut();
+    navigate("/login", { replace: true });
+  };
 
   const notifications = useSyncExternalStore(
     notificationStore.subscribe,
@@ -107,6 +116,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
               </Link>
             );
           })}
+
+          <button
+            onClick={handleLogout}
+            className="w-full mt-2 pt-3 border-t border-sidebar-border flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
+          >
+            <LogOut className="w-[18px] h-[18px]" />
+            Sair
+          </button>
         </nav>
       </aside>
 
