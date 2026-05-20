@@ -326,13 +326,13 @@ const Dashboard = () => {
                     })}
                   </div>
                   {selected && (
-                    <div className="mt-2 pt-2 border-t border-white/10 space-y-1 max-h-24 overflow-y-auto">
-                      <p className="text-[10px] text-muted-foreground">
-                        {new Date(selectedDay + "T00:00:00").toLocaleDateString("pt-BR", { day: "numeric", month: "short" })} — {selected.count} consulta{selected.count > 1 ? "s" : ""}
+                    <div className="mt-2 pt-2 border-t border-white/10 space-y-1.5 max-h-32 overflow-y-auto">
+                      <p className="text-xs font-medium text-foreground">
+                        {new Date(selectedDay + "T00:00:00").toLocaleDateString("pt-BR", { weekday: "short", day: "numeric", month: "short" })} — {selected.count} consulta{selected.count > 1 ? "s" : ""}
                       </p>
                       {selected.items.map((it, idx) => (
-                        <div key={idx} className="flex items-center gap-1.5 text-[10px]">
-                          <span className="font-mono text-primary">{it.horario}</span>
+                        <div key={idx} className="flex items-center gap-2 text-xs sm:text-[13px]">
+                          <span className="font-mono font-semibold text-primary">{it.horario}</span>
                           <span className="text-foreground truncate flex-1">{it.paciente}</span>
                           <span className="text-muted-foreground truncate">{it.proc}</span>
                         </div>
