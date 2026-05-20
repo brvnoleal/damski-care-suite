@@ -56,7 +56,18 @@ const glassTooltipText = { color: "hsl(var(--foreground))" };
 const Dashboard = () => {
   const now = new Date();
   const greeting = now.getHours() < 12 ? "Bom dia" : now.getHours() < 18 ? "Boa tarde" : "Boa noite";
-  const displayName = "Usuário";
+  const [displayName, setDisplayName] = useState("");
+
+  useEffect(() => {
+    const loadName = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: profile } = await supabase.from("profiles").select("nome").eq("id", user.id).maybeSingle();
+      const nome = profile?.nome?.trim() || (user.user_metadata as any)?.nome || (user.user_metadata as any)?.full_name || user.email?.split("@")[0] || "";
+      setDisplayName(nome);
+    };
+    loadName();
+  }, []);
 
   const [kpis, setKpis] = useState([
     { label: "Pacientes Ativos", value: "—", change: "carregando...", icon: Users, color: "primary" as const, trend: "neutral" },
