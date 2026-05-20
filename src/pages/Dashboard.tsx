@@ -269,7 +269,7 @@ const Dashboard = () => {
         </motion.div>
 
         <motion.div {...scaleIn(0.45)} className="lg:col-span-3">
-          <LiquidGlassCard className="overflow-hidden" draggable={false}>
+          <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
