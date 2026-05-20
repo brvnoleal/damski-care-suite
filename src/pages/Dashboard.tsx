@@ -279,13 +279,72 @@ const Dashboard = () => {
                 Ver completa <ChevronRight className="w-3 h-3" />
               </Link>
             </div>
-            <iframe
-              src="https://calendar.google.com/calendar/embed?src=brunolealcavalcante%40gmail.com&ctz=America%2FSao_Paulo"
-              className="w-full border-0 dark:invert dark:hue-rotate-180"
-              height="240"
-              scrolling="no"
-              title="Google Calendar"
-            />
+            {(() => {
+              const year = now.getFullYear();
+              const month = now.getMonth();
+              const firstDow = new Date(year, month, 1).getDay();
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              const todayStr = now.toISOString().split("T")[0];
+              const cells: (string | null)[] = [];
+              for (let i = 0; i < firstDow; i++) cells.push(null);
+              for (let d = 1; d <= daysInMonth; d++) {
+                cells.push(`${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`);
+              }
+              const monthLabel = now.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+              const selected = selectedDay ? monthAgendamentos[selectedDay] : null;
+              return (
+                <div className="p-3 sm:p-4">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2 capitalize">{monthLabel}</p>
+                  <div className="grid grid-cols-7 gap-1 text-center text-[10px] text-muted-foreground mb-1">
+                    {["D", "S", "T", "Q", "Q", "S", "S"].map((w, i) => <div key={i}>{w}</div>)}
+                  </div>
+                  <div className="grid grid-cols-7 gap-1">
+                    {cells.map((iso, i) => {
+                      if (!iso) return <div key={i} />;
+                      const day = Number(iso.slice(-2));
+                      const info = monthAgendamentos[iso];
+                      const isToday = iso === todayStr;
+                      const isSelected = iso === selectedDay;
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => setSelectedDay(isSelected ? null : iso)}
+                          className={cn(
+                            "aspect-square rounded-md flex flex-col items-center justify-center text-xs transition-colors relative",
+                            isSelected ? "bg-primary text-primary-foreground" :
+                            isToday ? "bg-primary/15 text-primary font-semibold" :
+                            info ? "bg-info/10 text-foreground hover:bg-info/20" :
+                            "text-muted-foreground hover:bg-muted/40"
+                          )}
+                        >
+                          <span>{day}</span>
+                          {info && !isSelected && (
+                            <span className="absolute bottom-0.5 w-1 h-1 rounded-full bg-info" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {selected && (
+                    <div className="mt-3 pt-3 border-t border-white/10 space-y-1.5 max-h-32 overflow-y-auto">
+                      <p className="text-[11px] text-muted-foreground">
+                        {new Date(selectedDay + "T00:00:00").toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })} — {selected.count} consulta{selected.count > 1 ? "s" : ""}
+                      </p>
+                      {selected.items.map((it, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-xs">
+                          <span className="font-mono text-primary">{it.horario}</span>
+                          <span className="text-foreground truncate flex-1">{it.paciente}</span>
+                          <span className="text-muted-foreground truncate">{it.proc}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {!selected && (
+                    <p className="text-[11px] text-muted-foreground mt-3 text-center">Clique em um dia para ver as consultas.</p>
+                  )}
+                </div>
+              );
+            })()}
           </LiquidGlassCard>
         </motion.div>
       </div>
