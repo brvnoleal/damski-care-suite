@@ -310,7 +310,7 @@ const Dashboard = () => {
                           key={i}
                           onClick={() => setSelectedDay(isSelected ? null : iso)}
                           className={cn(
-                            "aspect-square rounded flex items-center justify-center text-[10px] transition-colors relative",
+                            "h-6 sm:h-7 rounded flex items-center justify-center text-[10px] transition-colors relative",
                             isSelected ? "bg-primary text-primary-foreground" :
                             isToday ? "bg-primary/15 text-primary font-semibold" :
                             info ? "bg-info/10 text-foreground hover:bg-info/20" :
