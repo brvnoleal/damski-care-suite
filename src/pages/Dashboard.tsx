@@ -64,7 +64,7 @@ const Dashboard = () => {
       if (!user) return;
       const { data: profile } = await supabase.from("profiles").select("nome").eq("id", user.id).maybeSingle();
       const nome = profile?.nome?.trim() || (user.user_metadata as any)?.nome || (user.user_metadata as any)?.full_name || user.email?.split("@")[0] || "";
-      setDisplayName(nome);
+      setDisplayName(nome.split(" ")[0]);
     };
     loadName();
   }, []);
