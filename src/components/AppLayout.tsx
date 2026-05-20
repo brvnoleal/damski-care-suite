@@ -116,6 +116,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
               </Link>
             );
           })}
+
+          <button
+            onClick={handleLogout}
+            className="w-full mt-2 pt-3 border-t border-sidebar-border flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
+          >
+            <LogOut className="w-[18px] h-[18px]" />
+            Sair
+          </button>
         </nav>
       </aside>
 
