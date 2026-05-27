@@ -137,24 +137,24 @@ const Agenda = () => {
           </div>
 
           <div className="p-2 sm:p-3">
-            <div className="grid grid-cols-7 gap-1 mb-1">
+            <div className="grid grid-cols-7">
               {weekDays.map((w) => (
-                <div key={w} className="text-[10px] sm:text-xs font-semibold text-muted-foreground text-center py-1.5 uppercase tracking-wider">
+                <div key={w} className="text-[10px] sm:text-xs font-semibold text-muted-foreground text-center py-2 uppercase tracking-wider border border-white/[0.04]">
                   {w}
                 </div>
               ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7">
               {cells.map((cell, i) => {
-                if (!cell) return <div key={`e-${i}`} className="min-h-[80px] sm:min-h-[110px] rounded-md bg-white/[0.02]" />;
+                if (!cell) return <div key={`e-${i}`} className="min-h-[80px] sm:min-h-[110px] bg-white/[0.015] border border-white/[0.04]" />;
                 const items = agendamentosPorDia.get(cell.key) || [];
                 const isToday = cell.key === today;
                 return (
                   <div
                     key={cell.key}
-                    className={`min-h-[80px] sm:min-h-[110px] rounded-md border p-1 sm:p-1.5 flex flex-col gap-0.5 transition-colors ${
-                      isToday ? "border-primary/60 bg-primary/5" : "border-white/10 bg-white/[0.03]"
+                    className={`min-h-[80px] sm:min-h-[110px] border p-1 sm:p-1.5 flex flex-col gap-0.5 transition-colors ${
+                      isToday ? "border-primary/40 bg-primary/[0.04]" : "border-white/[0.04] bg-white/[0.02]"
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -172,7 +172,7 @@ const Agenda = () => {
                           <button
                             key={a.id}
                             onClick={() => setSelected(a)}
-                            className="group flex items-center gap-1 px-1 py-0.5 rounded text-left hover:bg-white/10 transition-colors"
+                            className="group flex items-center gap-1 px-1 py-0.5 text-left hover:bg-white/10 transition-colors"
                           >
                             <span className="text-[11px] sm:text-sm font-mono text-muted-foreground shrink-0 hidden sm:inline">{a.horario}</span>
                             <span className="text-[11px] sm:text-sm truncate text-foreground group-hover:text-primary">{nome}</span>
