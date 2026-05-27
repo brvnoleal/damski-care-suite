@@ -30,11 +30,46 @@ const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
   data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
 });
 
-const formatDataBR = (data: string) => {
-  if (!data) return "—";
-  const [y, m, d] = data.split("-");
-  if (!y || !m || !d) return data;
-  return `${d}/${m}/${y}`;
+type RepetirTipo = "nao" | "diario" | "semanal" | "mensal" | "anual" | "personalizado";
+
+const repetirLabels: Record<RepetirTipo, string> = {
+  nao: "Não repetir",
+  diario: "Todos os dias",
+  semanal: "Semanal",
+  mensal: "Mensal",
+  anual: "Anual",
+  personalizado: "Personalizado",
+};
+
+const toISO = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+const gerarDatasSugeridas = (tipo: RepetirTipo, base: string): string[] => {
+  if (!base) return [];
+  const [y, m, d] = base.split("-").map(Number);
+  const start = new Date(y, m - 1, d);
+  const result: string[] = [];
+  if (tipo === "diario") {
+    // próxima semana — 7 dias após a data base
+    for (let i = 1; i <= 7; i++) {
+      const dt = new Date(start); dt.setDate(start.getDate() + i); result.push(toISO(dt));
+    }
+  } else if (tipo === "semanal") {
+    // mesmo dia da semana — próximas 4 semanas
+    for (let i = 1; i <= 4; i++) {
+      const dt = new Date(start); dt.setDate(start.getDate() + i * 7); result.push(toISO(dt));
+    }
+  } else if (tipo === "mensal") {
+    // mesmo dia do mês — próximos 6 meses
+    for (let i = 1; i <= 6; i++) {
+      const dt = new Date(start); dt.setMonth(start.getMonth() + i); result.push(toISO(dt));
+    }
+  } else if (tipo === "anual") {
+    // mesma data — próximos 3 anos
+    for (let i = 1; i <= 3; i++) {
+      const dt = new Date(start); dt.setFullYear(start.getFullYear() + i); result.push(toISO(dt));
+    }
+  }
+  return result;
 };
 
 const statusConfig: Record<string, { label: string; className: string }> = {
