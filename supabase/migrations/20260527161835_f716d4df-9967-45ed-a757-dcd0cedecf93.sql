@@ -1,0 +1,1 @@
+ALTER TABLE public.agendamento ADD COLUMN IF NOT EXISTS horario_fim TIME;

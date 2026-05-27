@@ -21,6 +21,7 @@ export type Database = {
           dentista_id: string
           forma_pagamento: string
           horario: string
+          horario_fim: string | null
           id: string
           observacoes: string | null
           paciente_id: string
@@ -36,6 +37,7 @@ export type Database = {
           dentista_id: string
           forma_pagamento?: string
           horario: string
+          horario_fim?: string | null
           id?: string
           observacoes?: string | null
           paciente_id: string
@@ -51,6 +53,7 @@ export type Database = {
           dentista_id?: string
           forma_pagamento?: string
           horario?: string
+          horario_fim?: string | null
           id?: string
           observacoes?: string | null
           paciente_id?: string

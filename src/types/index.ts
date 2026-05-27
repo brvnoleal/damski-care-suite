@@ -86,6 +86,7 @@ export interface Agendamento {
   id: string;
   data: string;
   horario: string;
+  horario_fim?: string;
   paciente_id: string;
   dentista_id: string;
   procedimento: ProcedimentoConsulta;

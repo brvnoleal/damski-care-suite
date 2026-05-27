@@ -9,6 +9,7 @@ const mapRow = (row: any): Agendamento => ({
   id: row.id,
   data: row.data,
   horario: typeof row.horario === "string" ? row.horario.slice(0, 5) : row.horario,
+  horario_fim: row.horario_fim ? (typeof row.horario_fim === "string" ? row.horario_fim.slice(0, 5) : row.horario_fim) : undefined,
   paciente_id: row.paciente_id,
   dentista_id: row.dentista_id,
   procedimento: row.procedimento,
