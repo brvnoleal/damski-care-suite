@@ -53,6 +53,7 @@ const Agenda = () => {
   const [filtroDentista, setFiltroDentista] = useState<string>("todos");
   const [filtroStatus, setFiltroStatus] = useState<string>("todos");
   const [filtroData, setFiltroData] = useState<string>("");
+  const [view, setView] = useState<"mes" | "dia">("mes");
 
   useEffect(() => {
     (async () => {
@@ -119,9 +120,15 @@ const Agenda = () => {
 
   const today = formatDateKey(new Date());
 
-  const goPrev = () => setCurrentDate(new Date(year, month - 1, 1));
-  const goNext = () => setCurrentDate(new Date(year, month + 1, 1));
+  const goPrev = () => setCurrentDate(view === "mes" ? new Date(year, month - 1, 1) : new Date(year, month, currentDate.getDate() - 1));
+  const goNext = () => setCurrentDate(view === "mes" ? new Date(year, month + 1, 1) : new Date(year, month, currentDate.getDate() + 1));
   const goToday = () => setCurrentDate(new Date());
+
+  const diaKey = formatDateKey(currentDate);
+  const itensDoDia = agendamentosPorDia.get(diaKey) || [];
+  const headerLabel = view === "mes"
+    ? `${monthNames[month]} ${year}`
+    : currentDate.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 
   const selectedPaciente = selected ? getPaciente(selected.paciente_id) : null;
   const selectedDentista = selected ? getDentista(selected.dentista_id) : null;
@@ -135,14 +142,24 @@ const Agenda = () => {
             Visualize os agendamentos da clínica por dia
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex rounded-md border border-white/10 overflow-hidden">
+            <button
+              onClick={() => setView("mes")}
+              className={`px-3 h-8 text-xs font-medium transition-colors ${view === "mes" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-white/5"}`}
+            >Mês</button>
+            <button
+              onClick={() => setView("dia")}
+              className={`px-3 h-8 text-xs font-medium transition-colors ${view === "dia" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-white/5"}`}
+            >Dia</button>
+          </div>
           <Button variant="outline" size="sm" onClick={goToday}>Hoje</Button>
           <div className="flex items-center gap-1">
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <div className="min-w-[160px] text-center text-sm font-semibold capitalize">
-              {monthNames[month]} {year}
+            <div className="min-w-[200px] text-center text-sm font-semibold capitalize">
+              {headerLabel}
             </div>
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={goNext}>
               <ChevronRight className="w-4 h-4" />
@@ -150,6 +167,7 @@ const Agenda = () => {
           </div>
         </div>
       </motion.div>
+
 
       <motion.div {...fadeUp(0.05)}>
         <LiquidGlassCard className="p-3 sm:p-4" draggable={false}>
@@ -205,56 +223,71 @@ const Agenda = () => {
           </div>
 
           <div className="p-2 sm:p-3">
-            <div className="grid grid-cols-7">
-              {weekDays.map((w) => (
-                <div key={w} className="text-[10px] sm:text-xs font-semibold text-muted-foreground text-center py-2 uppercase tracking-wider border border-white/[0.04]">
-                  {w}
+            {view === "mes" ? (
+              <>
+                <div className="grid grid-cols-7">
+                  {weekDays.map((w) => (
+                    <div key={w} className="text-[10px] sm:text-xs font-semibold text-muted-foreground text-center py-2 uppercase tracking-wider border border-white/[0.04]">
+                      {w}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            <div className="grid grid-cols-7">
-              {cells.map((cell, i) => {
-                if (!cell) return <div key={`e-${i}`} className="min-h-[80px] sm:min-h-[110px] bg-white/[0.015] border border-white/[0.04]" />;
-                const items = agendamentosPorDia.get(cell.key) || [];
-                const isToday = cell.key === today;
-                return (
-                  <div
-                    key={cell.key}
-                    className={`min-h-[80px] sm:min-h-[110px] border p-1 sm:p-1.5 flex flex-col gap-0.5 transition-colors ${
-                      isToday ? "border-primary/40 bg-primary/[0.04]" : "border-white/[0.04] bg-white/[0.02]"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className={`text-[11px] sm:text-xs font-semibold ${isToday ? "text-primary" : "text-foreground"}`}>
-                        {cell.date.getDate()}
-                      </span>
-                      {items.length > 0 && (
-                        <span className="text-[9px] sm:text-[10px] text-muted-foreground">{items.length}</span>
-                      )}
-                    </div>
-                    <div className="flex-1 flex flex-col gap-0.5 overflow-hidden">
-                      {items.slice(0, 3).map((a) => {
-                        const nome = getPaciente(a.paciente_id)?.nome || "—";
-                        return (
-                          <button
-                            key={a.id}
-                            onClick={() => setSelected(a)}
-                            className="group flex items-center gap-1 px-1 py-0.5 text-left hover:bg-white/10 transition-colors"
-                          >
-                            <span className="text-[11px] sm:text-sm font-mono text-muted-foreground shrink-0 hidden sm:inline">{a.horario}</span>
-                            <span className="text-[11px] sm:text-sm truncate text-foreground group-hover:text-primary">{nome}</span>
-                          </button>
-                        );
-                      })}
-                      {items.length > 3 && (
-                        <span className="text-[9px] sm:text-[10px] text-muted-foreground pl-1">+{items.length - 3} mais</span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                <div className="grid grid-cols-7">
+                  {cells.map((cell, i) => {
+                    if (!cell) return <div key={`e-${i}`} className="min-h-[80px] sm:min-h-[110px] bg-white/[0.015] border border-white/[0.04]" />;
+                    const items = agendamentosPorDia.get(cell.key) || [];
+                    const isToday = cell.key === today;
+                    return (
+                      <div
+                        key={cell.key}
+                        onClick={() => { setCurrentDate(cell.date); setView("dia"); }}
+                        className={`min-h-[80px] sm:min-h-[110px] border p-1 sm:p-1.5 flex flex-col gap-0.5 transition-colors cursor-pointer ${
+                          isToday ? "border-primary/40 bg-primary/[0.04]" : "border-white/[0.04] bg-white/[0.02]"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className={`text-[11px] sm:text-xs font-semibold ${isToday ? "text-primary" : "text-foreground"}`}>
+                            {cell.date.getDate()}
+                          </span>
+                          {items.length > 0 && (
+                            <span className="text-[9px] sm:text-[10px] text-muted-foreground">{items.length}</span>
+                          )}
+                        </div>
+                        <div className="flex-1 flex flex-col gap-0.5 overflow-hidden">
+                          {items.slice(0, 3).map((a) => {
+                            const nome = getPaciente(a.paciente_id)?.nome || "—";
+                            const st = statusConfig[a.status];
+                            return (
+                              <button
+                                key={a.id}
+                                onClick={(e) => { e.stopPropagation(); setSelected(a); }}
+                                className="group flex items-center gap-1 px-1 py-0.5 text-left hover:bg-white/10 transition-colors"
+                              >
+                                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st?.dot}`} />
+                                <span className="text-[11px] sm:text-sm font-mono text-muted-foreground shrink-0 hidden sm:inline">{a.horario}</span>
+                                <span className="text-[11px] sm:text-sm truncate text-foreground group-hover:text-primary">{nome}</span>
+                              </button>
+                            );
+                          })}
+                          {items.length > 3 && (
+                            <span className="text-[9px] sm:text-[10px] text-muted-foreground pl-1">+{items.length - 3} mais</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <DayView
+                date={currentDate}
+                items={itensDoDia}
+                getPaciente={getPaciente}
+                getDentista={getDentista}
+                onSelect={setSelected}
+              />
+            )}
 
             {loading && (
               <div className="text-center text-xs text-muted-foreground py-4">Carregando agenda...</div>
@@ -311,5 +344,70 @@ const DetalheItem = ({ icon, label, value, sub }: { icon: React.ReactNode; label
     </div>
   </div>
 );
+
+const DayView = ({
+  date,
+  items,
+  getPaciente,
+  getDentista,
+  onSelect,
+}: {
+  date: Date;
+  items: Agendamento[];
+  getPaciente: (id: string) => Paciente | undefined;
+  getDentista: (id: string) => Dentista | undefined;
+  onSelect: (a: Agendamento) => void;
+}) => {
+  const hours = Array.from({ length: 13 }, (_, i) => i + 7); // 07h - 19h
+  const itemsPorHora = new Map<number, Agendamento[]>();
+  for (const a of items) {
+    const h = parseInt(a.horario.slice(0, 2), 10);
+    const arr = itemsPorHora.get(h) || [];
+    arr.push(a);
+    itemsPorHora.set(h, arr);
+  }
+
+  return (
+    <div className="flex flex-col">
+      {items.length === 0 && (
+        <div className="text-center text-xs text-muted-foreground py-8 border border-dashed border-white/10 rounded-md mb-2">
+          Nenhum agendamento para este dia
+        </div>
+      )}
+      {hours.map((h) => {
+        const slot = (itemsPorHora.get(h) || []).sort((a, b) => a.horario.localeCompare(b.horario));
+        return (
+          <div key={h} className="grid grid-cols-[64px_1fr] border border-white/[0.04] min-h-[56px]">
+            <div className="px-2 py-2 text-xs font-mono text-muted-foreground border-r border-white/[0.04] bg-white/[0.015] flex items-start justify-end">
+              {String(h).padStart(2, "0")}:00
+            </div>
+            <div className="p-1.5 flex flex-col gap-1">
+              {slot.map((a) => {
+                const st = statusConfig[a.status];
+                const pac = getPaciente(a.paciente_id);
+                const den = getDentista(a.dentista_id);
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => onSelect(a)}
+                    className={`group text-left px-2 py-1.5 rounded-md border transition-colors hover:bg-white/10 ${st?.className}`}
+                  >
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`w-1.5 h-1.5 rounded-full ${st?.dot}`} />
+                      <span className="text-xs font-mono">{a.horario}</span>
+                      <span className="text-sm font-semibold text-foreground truncate">{pac?.nome || "—"}</span>
+                      <Badge variant="outline" className="text-[10px] h-5">{st?.label}</Badge>
+                      {den && <span className="text-[11px] text-muted-foreground truncate">• {den.nome}</span>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 export default Agenda;
