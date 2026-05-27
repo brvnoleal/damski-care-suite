@@ -232,9 +232,6 @@ const Relatorios = () => {
           </Select>
           <Button variant="outline" size="sm" className="gap-2"><Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span></Button>
           <Dialog open={despesaOpen} onOpenChange={setDespesaOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-2"><Plus className="w-4 h-4" /><span className="hidden sm:inline">Adicionar</span> Despesa</Button>
-            </DialogTrigger>
             <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Nova Despesa</DialogTitle>
@@ -502,9 +499,12 @@ const Relatorios = () => {
           </LiquidGlassCard>
 
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
-            <div className="p-5 pb-2">
-              <h3 className="text-base font-semibold text-foreground">Histórico de Saídas</h3>
-              <p className="text-sm text-muted-foreground">Despesas registradas</p>
+            <div className="p-5 pb-2 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-semibold text-foreground">Histórico de Saídas</h3>
+                <p className="text-sm text-muted-foreground">Despesas registradas</p>
+              </div>
+              <Button size="sm" className="gap-2" onClick={() => setDespesaOpen(true)}><Plus className="w-4 h-4" /><span className="hidden sm:inline">Adicionar</span> Despesa</Button>
             </div>
             <div className="px-5 pb-5 overflow-x-auto">
               <Table>
