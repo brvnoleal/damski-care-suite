@@ -23,7 +23,9 @@ import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { maskCpf } from "@/lib/utils";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
-  nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "",
+  nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", situacao_profissional: "",
+  plano: "", numero_plano: "", numero_prontuario: "",
+  telefone: "", email: "", instagram: "", data_nascimento: "",
   cep: "", estado: "", cidade: "", bairro: "", rua: "", numero: "", complemento: "", ponto_referencia: "",
   status: "ativo",
 });
@@ -67,7 +69,11 @@ const Pacientes = () => {
   const openEdit = (p: Paciente) => {
     setEditingId(p.id);
     setForm({
-      nome: p.nome, cpf: p.cpf, telefone: p.telefone, email: p.email, instagram: p.instagram || "",
+      nome: p.nome, cpf: p.cpf,
+      rg: p.rg || "", emissor: p.emissor || "", sexo: p.sexo || "",
+      estado_civil: p.estado_civil || "", situacao_profissional: p.situacao_profissional || "",
+      plano: p.plano || "", numero_plano: p.numero_plano || "", numero_prontuario: p.numero_prontuario || "",
+      telefone: p.telefone, email: p.email, instagram: p.instagram || "",
       data_nascimento: p.data_nascimento, cep: p.cep || "", estado: p.estado || "", cidade: p.cidade || "",
       bairro: p.bairro || "", rua: p.rua || "", numero: p.numero || "", complemento: p.complemento || "",
       ponto_referencia: p.ponto_referencia || "", status: p.status,
