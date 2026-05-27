@@ -256,7 +256,14 @@ const Pacientes = () => {
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">RG</Label>
-            <Input value={form.rg} onChange={(e) => setForm({ ...form, rg: e.target.value })} placeholder="00.000.000-0" />
+            <Input value={form.rg} onChange={(e) => {
+              const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
+              const formatted = raw
+                .replace(/(\d{2})(\d)/, "$1.$2")
+                .replace(/(\d{3})(\d)/, "$1.$2")
+                .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+              setForm({ ...form, rg: formatted });
+            }} placeholder="00.000.000-0" />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Órgão Emissor</Label>
