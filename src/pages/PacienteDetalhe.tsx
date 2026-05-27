@@ -234,6 +234,64 @@ const PacienteDetalhe = () => {
     }
   };
 
+  const openDebitoDialog = () => {
+    setDebitoForm({ descricao: "", valor: "", forma_pagamento: "", data_vencimento: "", modalidade: "avista", parcelas: "1" });
+    setDebitoOpen(true);
+  };
+
+  const handleDebitoSave = async () => {
+    if (!id || !debitoForm.descricao || !debitoForm.valor || !debitoForm.data_vencimento) {
+      toast({ title: "Preencha descrição, valor e vencimento", variant: "destructive" });
+      return;
+    }
+    try {
+      const created = await pacienteDebitoService.criar({
+        paciente_id: id,
+        descricao: debitoForm.descricao,
+        valor: Number(debitoForm.valor.replace(",", ".")),
+        forma_pagamento: debitoForm.forma_pagamento || null,
+        data_vencimento: debitoForm.data_vencimento,
+        modalidade: debitoForm.modalidade,
+        parcelas: debitoForm.modalidade === "parcelado" ? Math.max(1, Number(debitoForm.parcelas) || 1) : 1,
+      });
+      setDebitos((prev) => [created, ...prev]);
+      setDebitoOpen(false);
+      toast({ title: "Débito registrado" });
+    } catch {
+      toast({ title: "Erro ao salvar débito", variant: "destructive" });
+    }
+  };
+
+  const openEvolucaoDialog = () => {
+    setEvolucaoForm({ data: today, dentista_id: "", conteudo: "" });
+    setEvolucaoOpen(true);
+  };
+
+  const handleEvolucaoSave = async () => {
+    if (!id || !evolucaoForm.conteudo.trim()) {
+      toast({ title: "Escreva a evolução clínica", variant: "destructive" });
+      return;
+    }
+    try {
+      const created = await evolucaoService.criar({
+        paciente_id: id,
+        dentista_id: evolucaoForm.dentista_id || null,
+        data: evolucaoForm.data,
+        conteudo: evolucaoForm.conteudo.trim(),
+      });
+      setEvolucoes((prev) => [created, ...prev]);
+      setEvolucaoOpen(false);
+      toast({ title: "Evolução registrada" });
+    } catch {
+      toast({ title: "Erro ao salvar evolução", variant: "destructive" });
+    }
+  };
+
+  const totalRecebido = debitos.filter((d) => d.status === "pago").reduce((s, d) => s + d.valor, 0);
+  const totalAtrasado = debitos.filter((d) => isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
+  const totalAReceber = debitos.filter((d) => d.status === "pendente" && !isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
+
+
   if (loading) {
     return (
       <div className="space-y-6">
