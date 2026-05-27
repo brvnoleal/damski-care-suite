@@ -4,6 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -15,15 +19,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
-import { insumoService, Insumo } from "@/services/insumoService";
+import {
+  insumoService, Insumo,
+  InsumoCategoria, insumoCategoriaLabels,
+  InsumoUnidadeMedida, insumoUnidadeMedidaLabels,
+} from "@/services/insumoService";
 
-const getExpiryStatus = (days: number) => {
+const getExpiryStatus = (days: number | null) => {
+  if (days === null) return { label: "Sem validade", className: "bg-muted/30 text-muted-foreground border-muted/40" };
   if (days <= 15) return { label: "Crítico", className: "bg-destructive/10 text-destructive border-destructive/20" };
   if (days <= 30) return { label: "Atenção", className: "bg-warning/10 text-warning border-warning/20" };
   return { label: "OK", className: "bg-success/10 text-success border-success/20" };
 };
 
-const calcDaysLeft = (validadeISO: string): number => {
+const calcDaysLeft = (validadeISO: string | null): number | null => {
+  if (!validadeISO) return null;
   const expiry = new Date(validadeISO + "T00:00:00");
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -35,6 +45,22 @@ const formatDateBR = (iso: string) => {
   return `${d}/${m}/${y}`;
 };
 
+interface FormState {
+  nome: string;
+  fabricante: string;
+  lote: string;
+  validade: string;
+  sem_validade: boolean;
+  quantidade: string;
+  categoria: InsumoCategoria | "";
+  unidade_medida: InsumoUnidadeMedida | "";
+}
+
+const emptyForm = (): FormState => ({
+  nome: "", fabricante: "", lote: "", validade: "", sem_validade: false,
+  quantidade: "", categoria: "", unidade_medida: "",
+});
+
 const Insumos = () => {
   const [search, setSearch] = useState("");
   const [supplies, setSupplies] = useState<Insumo[]>([]);
@@ -43,7 +69,7 @@ const Insumos = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editingSupply, setEditingSupply] = useState<Insumo | null>(null);
   const [deletingSupply, setDeletingSupply] = useState<Insumo | null>(null);
-  const [form, setForm] = useState({ nome: "", fabricante: "", lote: "", validade: "", quantidade: "" });
+  const [form, setForm] = useState<FormState>(emptyForm());
 
   const loadData = async () => {
     try {
@@ -66,7 +92,8 @@ const Insumos = () => {
   const summaryStats = supplies.reduce(
     (acc, s) => {
       const days = calcDaysLeft(s.validade);
-      if (days <= 15) acc.critical++;
+      if (days === null) acc.ok++;
+      else if (days <= 15) acc.critical++;
       else if (days <= 30) acc.warning++;
       else acc.ok++;
       return acc;
@@ -76,7 +103,7 @@ const Insumos = () => {
 
   const openCreate = () => {
     setEditingSupply(null);
-    setForm({ nome: "", fabricante: "", lote: "", validade: "", quantidade: "" });
+    setForm(emptyForm());
     setDialogOpen(true);
   };
 
@@ -84,7 +111,10 @@ const Insumos = () => {
     setEditingSupply(supply);
     setForm({
       nome: supply.nome, fabricante: supply.fabricante, lote: supply.lote,
-      validade: supply.validade, quantidade: String(supply.quantidade),
+      validade: supply.validade ?? "", sem_validade: supply.sem_validade,
+      quantidade: String(supply.quantidade),
+      categoria: (supply.categoria as InsumoCategoria) ?? "",
+      unidade_medida: (supply.unidade_medida as InsumoUnidadeMedida) ?? "",
     });
     setDialogOpen(true);
   };
@@ -95,22 +125,30 @@ const Insumos = () => {
   };
 
   const handleSubmit = async () => {
-    if (!form.nome || !form.fabricante || !form.lote || !form.validade || !form.quantidade) {
-      toast({ title: "Preencha todos os campos", variant: "destructive" });
+    if (!form.nome || !form.fabricante || !form.lote || !form.quantidade || !form.categoria || !form.unidade_medida) {
+      toast({ title: "Preencha todos os campos obrigatórios", variant: "destructive" });
       return;
     }
+    if (!form.sem_validade && !form.validade) {
+      toast({ title: "Informe a validade ou marque 'Sem validade'", variant: "destructive" });
+      return;
+    }
+    const payload = {
+      nome: form.nome,
+      fabricante: form.fabricante,
+      lote: form.lote,
+      validade: form.sem_validade ? null : form.validade,
+      sem_validade: form.sem_validade,
+      quantidade: parseInt(form.quantidade, 10),
+      categoria: form.categoria as InsumoCategoria,
+      unidade_medida: form.unidade_medida as InsumoUnidadeMedida,
+    };
     try {
       if (editingSupply) {
-        await insumoService.atualizar(editingSupply.id, {
-          nome: form.nome, fabricante: form.fabricante, lote: form.lote,
-          validade: form.validade, quantidade: parseInt(form.quantidade, 10),
-        });
+        await insumoService.atualizar(editingSupply.id, payload);
         toast({ title: "Insumo atualizado com sucesso!" });
       } else {
-        await insumoService.criar({
-          nome: form.nome, fabricante: form.fabricante, lote: form.lote,
-          validade: form.validade, quantidade: parseInt(form.quantidade, 10), pacientes_vinculados: 0,
-        });
+        await insumoService.criar({ ...payload, pacientes_vinculados: 0 });
         toast({ title: "Insumo cadastrado com sucesso!" });
       }
       await loadData();
@@ -172,7 +210,7 @@ const Insumos = () => {
             <CheckCircle className="w-5 h-5 text-success" />
             <div>
               <p className="text-sm font-semibold text-foreground">{summaryStats.ok} Em dia</p>
-              <p className="text-xs text-muted-foreground">Validade superior a 30 dias</p>
+              <p className="text-xs text-muted-foreground">Validade superior a 30 dias ou sem validade</p>
             </div>
           </div>
         </LiquidGlassCard>
@@ -195,19 +233,20 @@ const Insumos = () => {
             <TableHeader>
               <TableRow className="bg-white/5">
                 <TableHead className="font-semibold">Insumo</TableHead>
+                <TableHead className="font-semibold hidden md:table-cell">Categoria</TableHead>
                 <TableHead className="font-semibold hidden md:table-cell">Fabricante</TableHead>
                 <TableHead className="font-semibold hidden sm:table-cell">Lote</TableHead>
                 <TableHead className="font-semibold hidden sm:table-cell">Validade</TableHead>
                 <TableHead className="font-semibold text-center">Qtd</TableHead>
+                <TableHead className="font-semibold hidden lg:table-cell">Unidade</TableHead>
                 <TableHead className="font-semibold">Status</TableHead>
-                <TableHead className="font-semibold text-center hidden lg:table-cell">Pacientes</TableHead>
                 <TableHead className="font-semibold w-10"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
                 </TableRow>
               ) : filtered.map((supply) => {
                 const daysLeft = calcDaysLeft(supply.validade);
@@ -215,17 +254,28 @@ const Insumos = () => {
                 return (
                   <TableRow key={supply.id} className="hover:bg-white/5 transition-colors">
                     <TableCell className="font-medium">{supply.nome}</TableCell>
+                    <TableCell className="text-muted-foreground hidden md:table-cell">
+                      {supply.categoria ? insumoCategoriaLabels[supply.categoria] : "—"}
+                    </TableCell>
                     <TableCell className="text-muted-foreground hidden md:table-cell">{supply.fabricante}</TableCell>
                     <TableCell className="font-mono text-xs text-primary font-semibold hidden sm:table-cell">{supply.lote}</TableCell>
                     <TableCell className="text-muted-foreground hidden sm:table-cell">
-                      {formatDateBR(supply.validade)}
-                      <span className="text-xs ml-1">({daysLeft}d)</span>
+                      {supply.validade ? (
+                        <>
+                          {formatDateBR(supply.validade)}
+                          {daysLeft !== null && <span className="text-xs ml-1">({daysLeft}d)</span>}
+                        </>
+                      ) : (
+                        <span className="text-xs italic">Sem validade</span>
+                      )}
                     </TableCell>
                     <TableCell className="text-center">{supply.quantidade}</TableCell>
+                    <TableCell className="text-muted-foreground hidden lg:table-cell">
+                      {supply.unidade_medida ? insumoUnidadeMedidaLabels[supply.unidade_medida] : "—"}
+                    </TableCell>
                     <TableCell>
                       <Badge className={status.className}>{status.label}</Badge>
                     </TableCell>
-                    <TableCell className="text-center hidden lg:table-cell">{supply.pacientes_vinculados}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -252,7 +302,7 @@ const Insumos = () => {
       </LiquidGlassCard>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingSupply ? "Editar Insumo" : "Cadastrar Insumo"}</DialogTitle>
           </DialogHeader>
@@ -267,6 +317,30 @@ const Insumos = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
+                <Label>Categoria</Label>
+                <Select value={form.categoria} onValueChange={(v) => setForm({ ...form, categoria: v as InsumoCategoria })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(insumoCategoriaLabels).map(([v, l]) => (
+                      <SelectItem key={v} value={v}>{l}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Unidade de Medida</Label>
+                <Select value={form.unidade_medida} onValueChange={(v) => setForm({ ...form, unidade_medida: v as InsumoUnidadeMedida })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(insumoUnidadeMedidaLabels).map(([v, l]) => (
+                      <SelectItem key={v} value={v}>{l}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label htmlFor="supply-lot">Lote</Label>
                 <Input id="supply-lot" placeholder="Ex: AH2024-089" value={form.lote} onChange={(e) => setForm({ ...form, lote: e.target.value })} />
               </div>
@@ -277,7 +351,23 @@ const Insumos = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="supply-expiry">Validade</Label>
-              <Input id="supply-expiry" type="date" value={form.validade} onChange={(e) => setForm({ ...form, validade: e.target.value })} />
+              <Input
+                id="supply-expiry"
+                type="date"
+                value={form.validade}
+                disabled={form.sem_validade}
+                onChange={(e) => setForm({ ...form, validade: e.target.value })}
+              />
+              <div className="flex items-center gap-2 pt-1">
+                <Checkbox
+                  id="sem-validade"
+                  checked={form.sem_validade}
+                  onCheckedChange={(c) => setForm({ ...form, sem_validade: !!c, validade: c ? "" : form.validade })}
+                />
+                <Label htmlFor="sem-validade" className="cursor-pointer text-sm font-normal">
+                  Sem validade
+                </Label>
+              </div>
             </div>
           </div>
           <DialogFooter>
