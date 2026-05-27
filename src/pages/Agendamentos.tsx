@@ -98,6 +98,11 @@ const Agendamentos = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyAgendamento());
+  const [repetir, setRepetir] = useState<RepetirTipo>("nao");
+  const [datasSelecionadas, setDatasSelecionadas] = useState<string[]>([]);
+  const [datasPersonalizadas, setDatasPersonalizadas] = useState<string[]>([]);
+
+  const datasSugeridas = repetir !== "nao" && repetir !== "personalizado" ? gerarDatasSugeridas(repetir, form.data) : [];
 
   const loadData = async () => {
     try {
@@ -128,17 +133,40 @@ const Agendamentos = () => {
       a.data.includes(search)
   );
 
+  const resetRepetir = () => {
+    setRepetir("nao");
+    setDatasSelecionadas([]);
+    setDatasPersonalizadas([]);
+  };
+
   const openCreate = () => {
     setEditingId(null);
     setForm(emptyAgendamento());
+    resetRepetir();
     setDialogOpen(true);
   };
 
   const openEdit = (a: Agendamento) => {
     setEditingId(a.id);
-    setForm({ data: a.data, horario: a.horario, paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, observacoes: a.observacoes || "" });
+    setForm({ data: a.data, horario: a.horario, horario_fim: a.horario_fim || "", paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, observacoes: a.observacoes || "" });
+    resetRepetir();
     setDialogOpen(true);
   };
+
+  // sincroniza seleção quando muda tipo de repetição ou data base
+  useEffect(() => {
+    if (repetir !== "nao" && repetir !== "personalizado") {
+      setDatasSelecionadas(gerarDatasSugeridas(repetir, form.data));
+    }
+  }, [repetir, form.data]);
+
+  const toggleData = (d: string) => {
+    setDatasSelecionadas((prev) => prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]);
+  };
+
+  const addDataPersonalizada = () => setDatasPersonalizadas((prev) => [...prev, ""]);
+  const setDataPersonalizada = (i: number, v: string) => setDatasPersonalizadas((prev) => prev.map((x, idx) => idx === i ? v : x));
+  const removeDataPersonalizada = (i: number) => setDatasPersonalizadas((prev) => prev.filter((_, idx) => idx !== i));
 
   const handleSave = async () => {
     if (!form.data || !form.horario || !form.paciente_id || !form.dentista_id) {
@@ -150,8 +178,16 @@ const Agendamentos = () => {
         await agendamentoService.atualizar(editingId, form);
         toast({ title: "Agendamento atualizado com sucesso" });
       } else {
-        await agendamentoService.criar(form);
-        toast({ title: "Agendamento criado com sucesso" });
+        const datasExtras = repetir === "personalizado"
+          ? datasPersonalizadas.filter((d) => d && d !== form.data)
+          : repetir !== "nao" ? datasSelecionadas.filter((d) => d !== form.data) : [];
+        const lista = [form, ...datasExtras.map((d) => ({ ...form, data: d }))];
+        if (lista.length === 1) {
+          await agendamentoService.criar(form);
+        } else {
+          await agendamentoService.criarVarios(lista);
+        }
+        toast({ title: lista.length > 1 ? `${lista.length} agendamentos criados` : "Agendamento criado com sucesso" });
       }
       await loadData();
       setDialogOpen(false);
@@ -159,6 +195,7 @@ const Agendamentos = () => {
       toast({ title: "Erro ao salvar agendamento", variant: "destructive" });
     }
   };
+
 
   const handleDelete = async () => {
     if (deletingId) {
