@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -55,11 +56,14 @@ const PacienteDetalhe = () => {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
-  const [editForm, setEditForm] = useState({
+  const emptyEditForm = (): Omit<Paciente, "id" | "created_at"> => ({
     nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", situacao_profissional: "",
     plano: "", numero_plano: "", numero_prontuario: "",
-    telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo" as "ativo" | "inativo",
+    telefone: "", email: "", instagram: "", data_nascimento: "",
+    cep: "", estado: "", cidade: "", bairro: "", rua: "", numero: "", complemento: "", ponto_referencia: "",
+    status: "ativo",
   });
+  const [editForm, setEditForm] = useState<Omit<Paciente, "id" | "created_at">>(emptyEditForm());
 
   const [sessions, setSessions] = useState<Sessao[]>([]);
   const [sessionOpen, setSessionOpen] = useState(false);
@@ -137,9 +141,12 @@ const PacienteDetalhe = () => {
       rg: patientData.rg || "", emissor: patientData.emissor || "", sexo: patientData.sexo || "",
       estado_civil: patientData.estado_civil || "", situacao_profissional: patientData.situacao_profissional || "",
       plano: patientData.plano || "", numero_plano: patientData.numero_plano || "", numero_prontuario: patientData.numero_prontuario || "",
-      telefone: patientData.telefone,
-      email: patientData.email, instagram: patientData.instagram || "",
-      data_nascimento: patientData.data_nascimento, status: patientData.status,
+      telefone: patientData.telefone, email: patientData.email, instagram: patientData.instagram || "",
+      data_nascimento: patientData.data_nascimento,
+      cep: patientData.cep || "", estado: patientData.estado || "", cidade: patientData.cidade || "",
+      bairro: patientData.bairro || "", rua: patientData.rua || "", numero: patientData.numero || "",
+      complemento: patientData.complemento || "", ponto_referencia: patientData.ponto_referencia || "",
+      status: patientData.status,
     });
     setEditOpen(true);
   };
@@ -646,87 +653,215 @@ const PacienteDetalhe = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Edit Dialog */}
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Editar Paciente</DialogTitle>
-            <DialogDescription>Atualize os dados do paciente.</DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
-            <div className="space-y-2 sm:col-span-2"><Label>Nome *</Label><Input value={editForm.nome} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} /></div>
-            <div className="space-y-2"><Label>CPF *</Label><Input value={editForm.cpf} onChange={(e) => setEditForm({ ...editForm, cpf: e.target.value })} /></div>
-            <div className="space-y-2"><Label>Data Nasc.</Label><Input type="date" value={editForm.data_nascimento} onChange={(e) => setEditForm({ ...editForm, data_nascimento: e.target.value })} /></div>
-            <div className="space-y-2"><Label>RG</Label><Input value={editForm.rg} onChange={(e) => {
+      {/* Edit Dialog — mesmos campos do cadastro em Pacientes */}
+      <ResponsiveDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        title="Editar Paciente"
+        description="Atualize os dados do paciente."
+        className="sm:max-w-2xl"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setEditOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button onClick={handleEditSave} className="flex-1 sm:flex-none">Salvar</Button>
+          </>
+        }
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nome *</Label>
+            <Input value={editForm.nome} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} placeholder="Nome completo" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">CPF *</Label>
+            <Input value={editForm.cpf} onChange={(e) => {
+              const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
+              const formatted = raw
+                .replace(/(\d{3})(\d)/, "$1.$2")
+                .replace(/(\d{3})(\d)/, "$1.$2")
+                .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+              setEditForm({ ...editForm, cpf: formatted });
+            }} placeholder="000.000.000-00" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Data de Nascimento *</Label>
+            <Input type="date" value={editForm.data_nascimento} onChange={(e) => setEditForm({ ...editForm, data_nascimento: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Telefone</Label>
+            <Input value={editForm.telefone} onChange={(e) => {
+              const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
+              const formatted = raw.length <= 10
+                ? raw.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2")
+                : raw.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2");
+              setEditForm({ ...editForm, telefone: formatted });
+            }} placeholder="(11) 99999-0000" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Email</Label>
+            <Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} placeholder="email@exemplo.com" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Instagram</Label>
+            <Input value={editForm.instagram} onChange={(e) => setEditForm({ ...editForm, instagram: e.target.value })} placeholder="@usuario" />
+          </div>
+
+          {/* Documentos & Dados Pessoais */}
+          <div className="sm:col-span-2 pt-3">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Documentos & Dados Pessoais</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">RG</Label>
+            <Input value={editForm.rg} onChange={(e) => {
               const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
               const formatted = raw
                 .replace(/(\d{2})(\d)/, "$1.$2")
                 .replace(/(\d{3})(\d)/, "$1.$2")
                 .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
               setEditForm({ ...editForm, rg: formatted });
-            }} placeholder="00.000.000-0" /></div>
-            <div className="space-y-2"><Label>Órgão Emissor</Label><Input value={editForm.emissor} onChange={(e) => setEditForm({ ...editForm, emissor: e.target.value })} placeholder="SSP/SP" /></div>
-            <div className="space-y-2">
-              <Label>Sexo</Label>
-              <Select value={editForm.sexo} onValueChange={(v) => setEditForm({ ...editForm, sexo: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="feminino">Feminino</SelectItem>
-                  <SelectItem value="masculino">Masculino</SelectItem>
-                  <SelectItem value="outro">Outro</SelectItem>
-                  <SelectItem value="nao_informar">Prefiro não informar</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Estado Civil</Label>
-              <Select value={editForm.estado_civil} onValueChange={(v) => setEditForm({ ...editForm, estado_civil: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="solteiro">Solteiro(a)</SelectItem>
-                  <SelectItem value="casado">Casado(a)</SelectItem>
-                  <SelectItem value="divorciado">Divorciado(a)</SelectItem>
-                  <SelectItem value="viuvo">Viúvo(a)</SelectItem>
-                  <SelectItem value="uniao_estavel">União Estável</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label>Situação Profissional</Label>
-              <Select value={editForm.situacao_profissional} onValueChange={(v) => setEditForm({ ...editForm, situacao_profissional: v })}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="clt">CLT</SelectItem>
-                  <SelectItem value="autonomo">Autônomo</SelectItem>
-                  <SelectItem value="empresario">Empresário</SelectItem>
-                  <SelectItem value="servidor_publico">Servidor Público</SelectItem>
-                  <SelectItem value="aposentado">Aposentado</SelectItem>
-                  <SelectItem value="estudante">Estudante</SelectItem>
-                  <SelectItem value="desempregado">Desempregado</SelectItem>
-                  <SelectItem value="outro">Outro</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2"><Label>Plano</Label><Input value={editForm.plano} onChange={(e) => setEditForm({ ...editForm, plano: e.target.value })} /></div>
-            <div className="space-y-2"><Label>Nº do Plano</Label><Input value={editForm.numero_plano} onChange={(e) => setEditForm({ ...editForm, numero_plano: e.target.value })} /></div>
-            <div className="space-y-2"><Label>Nº do Prontuário</Label><Input value={editForm.numero_prontuario} onChange={(e) => setEditForm({ ...editForm, numero_prontuario: e.target.value })} /></div>
-            <div className="space-y-2"><Label>Telefone</Label><Input value={editForm.telefone} onChange={(e) => setEditForm({ ...editForm, telefone: e.target.value })} /></div>
-            <div className="space-y-2"><Label>Email</Label><Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} /></div>
-            <div className="space-y-2"><Label>Instagram</Label><Input value={editForm.instagram} onChange={(e) => setEditForm({ ...editForm, instagram: e.target.value })} /></div>
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select value={editForm.status} onValueChange={(v: "ativo" | "inativo") => setEditForm({ ...editForm, status: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent><SelectItem value="ativo">Ativo</SelectItem><SelectItem value="inativo">Inativo</SelectItem></SelectContent>
-              </Select>
+            }} placeholder="00.000.000-0" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Órgão Emissor</Label>
+            <Input value={editForm.emissor} onChange={(e) => setEditForm({ ...editForm, emissor: e.target.value })} placeholder="SSP/SP" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Sexo</Label>
+            <Select value={editForm.sexo || ""} onValueChange={(v) => setEditForm({ ...editForm, sexo: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="feminino">Feminino</SelectItem>
+                <SelectItem value="masculino">Masculino</SelectItem>
+                <SelectItem value="outro">Outro</SelectItem>
+                <SelectItem value="nao_informar">Prefiro não informar</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Estado Civil</Label>
+            <Select value={editForm.estado_civil || ""} onValueChange={(v) => setEditForm({ ...editForm, estado_civil: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="solteiro">Solteiro(a)</SelectItem>
+                <SelectItem value="casado">Casado(a)</SelectItem>
+                <SelectItem value="divorciado">Divorciado(a)</SelectItem>
+                <SelectItem value="viuvo">Viúvo(a)</SelectItem>
+                <SelectItem value="uniao_estavel">União Estável</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Situação Profissional</Label>
+            <Select value={editForm.situacao_profissional || ""} onValueChange={(v) => setEditForm({ ...editForm, situacao_profissional: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="clt">CLT</SelectItem>
+                <SelectItem value="autonomo">Autônomo</SelectItem>
+                <SelectItem value="empresario">Empresário</SelectItem>
+                <SelectItem value="servidor_publico">Servidor Público</SelectItem>
+                <SelectItem value="aposentado">Aposentado</SelectItem>
+                <SelectItem value="estudante">Estudante</SelectItem>
+                <SelectItem value="desempregado">Desempregado</SelectItem>
+                <SelectItem value="outro">Outro</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Plano</Label>
+            <Input value={editForm.plano} onChange={(e) => setEditForm({ ...editForm, plano: e.target.value })} placeholder="Nome do plano" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Número do Plano</Label>
+            <Input value={editForm.numero_plano} onChange={(e) => setEditForm({ ...editForm, numero_plano: e.target.value })} placeholder="000000" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Número do Prontuário</Label>
+            <Input value={editForm.numero_prontuario} onChange={(e) => setEditForm({ ...editForm, numero_prontuario: e.target.value })} placeholder="000000" />
+          </div>
+
+          {/* Endereço */}
+          <div className="sm:col-span-2 pt-3">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Endereço</span>
+              <div className="h-px flex-1 bg-border" />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancelar</Button>
-            <Button onClick={handleEditSave}>Salvar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">CEP</Label>
+            <Input
+              value={editForm.cep}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/\D/g, "").slice(0, 8);
+                const masked = raw.length > 5 ? raw.slice(0, 5) + "-" + raw.slice(5) : raw;
+                setEditForm({ ...editForm, cep: masked });
+                if (raw.length === 8) {
+                  fetch(`https://viacep.com.br/ws/${raw}/json/`)
+                    .then((r) => r.json())
+                    .then((data) => {
+                      if (!data.erro) {
+                        setEditForm((prev) => ({
+                          ...prev,
+                          cep: masked,
+                          estado: data.uf || prev.estado,
+                          cidade: data.localidade || prev.cidade,
+                          bairro: data.bairro || prev.bairro,
+                          rua: data.logradouro || prev.rua,
+                          complemento: data.complemento || prev.complemento,
+                        }));
+                      }
+                    })
+                    .catch(() => {});
+                }
+              }}
+              placeholder="00000-000"
+            />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Estado</Label>
+            <Input value={editForm.estado} onChange={(e) => setEditForm({ ...editForm, estado: e.target.value })} placeholder="SP" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Cidade</Label>
+            <Input value={editForm.cidade} onChange={(e) => setEditForm({ ...editForm, cidade: e.target.value })} placeholder="São Paulo" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Bairro</Label>
+            <Input value={editForm.bairro} onChange={(e) => setEditForm({ ...editForm, bairro: e.target.value })} placeholder="Centro" />
+          </div>
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Rua</Label>
+            <Input value={editForm.rua} onChange={(e) => setEditForm({ ...editForm, rua: e.target.value })} placeholder="Rua Exemplo" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Número</Label>
+            <Input value={editForm.numero} onChange={(e) => setEditForm({ ...editForm, numero: e.target.value })} placeholder="123" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Complemento</Label>
+            <Input value={editForm.complemento} onChange={(e) => setEditForm({ ...editForm, complemento: e.target.value })} placeholder="Apto 45" />
+          </div>
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Ponto de Referência</Label>
+            <Input value={editForm.ponto_referencia} onChange={(e) => setEditForm({ ...editForm, ponto_referencia: e.target.value })} placeholder="Próximo ao mercado" />
+          </div>
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Status</Label>
+            <Select value={editForm.status} onValueChange={(v: "ativo" | "inativo") => setEditForm({ ...editForm, status: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ativo">Ativo</SelectItem>
+                <SelectItem value="inativo">Inativo</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </ResponsiveDialog>
+
 
       {/* Session Dialog */}
       <Dialog open={sessionOpen} onOpenChange={setSessionOpen}>
