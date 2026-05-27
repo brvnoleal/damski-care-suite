@@ -141,9 +141,12 @@ const PacienteDetalhe = () => {
       rg: patientData.rg || "", emissor: patientData.emissor || "", sexo: patientData.sexo || "",
       estado_civil: patientData.estado_civil || "", situacao_profissional: patientData.situacao_profissional || "",
       plano: patientData.plano || "", numero_plano: patientData.numero_plano || "", numero_prontuario: patientData.numero_prontuario || "",
-      telefone: patientData.telefone,
-      email: patientData.email, instagram: patientData.instagram || "",
-      data_nascimento: patientData.data_nascimento, status: patientData.status,
+      telefone: patientData.telefone, email: patientData.email, instagram: patientData.instagram || "",
+      data_nascimento: patientData.data_nascimento,
+      cep: patientData.cep || "", estado: patientData.estado || "", cidade: patientData.cidade || "",
+      bairro: patientData.bairro || "", rua: patientData.rua || "", numero: patientData.numero || "",
+      complemento: patientData.complemento || "", ponto_referencia: patientData.ponto_referencia || "",
+      status: patientData.status,
     });
     setEditOpen(true);
   };
