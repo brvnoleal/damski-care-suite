@@ -120,9 +120,15 @@ const Agenda = () => {
 
   const today = formatDateKey(new Date());
 
-  const goPrev = () => setCurrentDate(new Date(year, month - 1, 1));
-  const goNext = () => setCurrentDate(new Date(year, month + 1, 1));
+  const goPrev = () => setCurrentDate(view === "mes" ? new Date(year, month - 1, 1) : new Date(year, month, currentDate.getDate() - 1));
+  const goNext = () => setCurrentDate(view === "mes" ? new Date(year, month + 1, 1) : new Date(year, month, currentDate.getDate() + 1));
   const goToday = () => setCurrentDate(new Date());
+
+  const diaKey = formatDateKey(currentDate);
+  const itensDoDia = agendamentosPorDia.get(diaKey) || [];
+  const headerLabel = view === "mes"
+    ? `${monthNames[month]} ${year}`
+    : currentDate.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 
   const selectedPaciente = selected ? getPaciente(selected.paciente_id) : null;
   const selectedDentista = selected ? getDentista(selected.dentista_id) : null;
