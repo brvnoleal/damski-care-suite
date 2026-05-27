@@ -167,7 +167,6 @@ const Agenda = () => {
                     </div>
                     <div className="flex-1 flex flex-col gap-0.5 overflow-hidden">
                       {items.slice(0, 3).map((a) => {
-                        const st = statusConfig[a.status] || statusConfig.agendado;
                         const nome = getPaciente(a.paciente_id)?.nome || "—";
                         return (
                           <button
