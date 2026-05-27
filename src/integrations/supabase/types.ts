@@ -214,6 +214,7 @@ export type Database = {
       }
       insumo: {
         Row: {
+          categoria: string | null
           created_at: string
           fabricante: string
           id: string
@@ -221,10 +222,13 @@ export type Database = {
           nome: string
           pacientes_vinculados: number
           quantidade: number
+          sem_validade: boolean
+          unidade_medida: string | null
           updated_at: string
-          validade: string
+          validade: string | null
         }
         Insert: {
+          categoria?: string | null
           created_at?: string
           fabricante: string
           id?: string
@@ -232,10 +236,13 @@ export type Database = {
           nome: string
           pacientes_vinculados?: number
           quantidade?: number
+          sem_validade?: boolean
+          unidade_medida?: string | null
           updated_at?: string
-          validade: string
+          validade?: string | null
         }
         Update: {
+          categoria?: string | null
           created_at?: string
           fabricante?: string
           id?: string
@@ -243,8 +250,10 @@ export type Database = {
           nome?: string
           pacientes_vinculados?: number
           quantidade?: number
+          sem_validade?: boolean
+          unidade_medida?: string | null
           updated_at?: string
-          validade?: string
+          validade?: string | null
         }
         Relationships: []
       }

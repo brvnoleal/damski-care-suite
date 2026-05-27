@@ -4,12 +4,36 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 
+export type InsumoCategoria = "epi" | "instrumento" | "material_consumo" | "medicamento" | "outros";
+
+export const insumoCategoriaLabels: Record<InsumoCategoria, string> = {
+  epi: "EPI",
+  instrumento: "Instrumento",
+  material_consumo: "Material de Consumo",
+  medicamento: "Medicamento",
+  outros: "Outros",
+};
+
+export type InsumoUnidadeMedida = "caixa" | "cartela" | "mililitros" | "pacote" | "rolo" | "unidade";
+
+export const insumoUnidadeMedidaLabels: Record<InsumoUnidadeMedida, string> = {
+  caixa: "Caixa",
+  cartela: "Cartela",
+  mililitros: "Mililitros",
+  pacote: "Pacote",
+  rolo: "Rolo",
+  unidade: "Unidade",
+};
+
 export interface Insumo {
   id: string;
   nome: string;
   fabricante: string;
   lote: string;
-  validade: string;
+  validade: string | null;
+  sem_validade: boolean;
+  categoria?: InsumoCategoria | null;
+  unidade_medida?: InsumoUnidadeMedida | null;
   quantidade: number;
   pacientes_vinculados: number;
   created_at?: string;
@@ -21,6 +45,9 @@ const mapRow = (row: any): Insumo => ({
   fabricante: row.fabricante,
   lote: row.lote,
   validade: row.validade,
+  sem_validade: !!row.sem_validade,
+  categoria: row.categoria ?? null,
+  unidade_medida: row.unidade_medida ?? null,
   quantidade: row.quantidade,
   pacientes_vinculados: row.pacientes_vinculados,
   created_at: row.created_at,
@@ -28,13 +55,13 @@ const mapRow = (row: any): Insumo => ({
 
 export const insumoService = {
   listar: async (): Promise<Insumo[]> => {
-    const { data, error } = await supabase.from("insumo").select("*").order("validade");
+    const { data, error } = await supabase.from("insumo").select("*").order("validade", { nullsFirst: false });
     if (error) throw error;
     return (data || []).map(mapRow);
   },
 
   criar: async (dados: Omit<Insumo, "id" | "created_at">): Promise<Insumo> => {
-    const { data, error } = await supabase.from("insumo").insert(dados).select().single();
+    const { data, error } = await supabase.from("insumo").insert(dados as any).select().single();
     if (error) throw error;
     return mapRow(data);
   },
