@@ -407,9 +407,6 @@ const PacienteDetalhe = () => {
           <Button variant="outline" size="sm" className="gap-1.5" onClick={openEditDialog}>
             <Edit className="w-3.5 h-3.5" /> Editar
           </Button>
-          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5" onClick={openSessionDialog}>
-            <Syringe className="w-3.5 h-3.5" /> Nova Sessão
-          </Button>
         </div>
       </div>
 
