@@ -461,7 +461,14 @@ const PacienteDetalhe = () => {
             <div className="space-y-2 sm:col-span-2"><Label>Nome *</Label><Input value={editForm.nome} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} /></div>
             <div className="space-y-2"><Label>CPF *</Label><Input value={editForm.cpf} onChange={(e) => setEditForm({ ...editForm, cpf: e.target.value })} /></div>
             <div className="space-y-2"><Label>Data Nasc.</Label><Input type="date" value={editForm.data_nascimento} onChange={(e) => setEditForm({ ...editForm, data_nascimento: e.target.value })} /></div>
-            <div className="space-y-2"><Label>RG</Label><Input value={editForm.rg} onChange={(e) => setEditForm({ ...editForm, rg: e.target.value })} /></div>
+            <div className="space-y-2"><Label>RG</Label><Input value={editForm.rg} onChange={(e) => {
+              const raw = e.target.value.replace(/\D/g, "").slice(0, 9);
+              const formatted = raw
+                .replace(/(\d{2})(\d)/, "$1.$2")
+                .replace(/(\d{3})(\d)/, "$1.$2")
+                .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+              setEditForm({ ...editForm, rg: formatted });
+            }} placeholder="00.000.000-0" /></div>
             <div className="space-y-2"><Label>Órgão Emissor</Label><Input value={editForm.emissor} onChange={(e) => setEditForm({ ...editForm, emissor: e.target.value })} placeholder="SSP/SP" /></div>
             <div className="space-y-2">
               <Label>Sexo</Label>
