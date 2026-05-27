@@ -227,9 +227,28 @@ const PacienteDetalhe = () => {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center">
-            <span className="text-xl font-display font-bold text-primary-foreground">{initials}</span>
-          </div>
+          <button
+            type="button"
+            onClick={() => avatarInputRef.current?.click()}
+            className="group relative w-16 h-16 rounded-xl bg-primary overflow-hidden flex items-center justify-center hover:opacity-90 transition"
+            title="Alterar foto de perfil"
+          >
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={patientData.nome} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-xl font-display font-bold text-primary-foreground">{initials}</span>
+            )}
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+              <Camera className="w-5 h-5 text-white" />
+            </div>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleAvatarChange(f); e.target.value = ""; }}
+            />
+          </button>
           <div>
             <h1 className="text-2xl font-bold text-foreground">{patientData.nome}</h1>
             <div className="flex items-center gap-2 mt-1">
@@ -250,20 +269,28 @@ const PacienteDetalhe = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {[
+          { label: "Nº Prontuário", value: patientData.numero_prontuario || "—" },
           { label: "Data de Nascimento", value: nascFormatted },
           { label: "CPF", value: patientData.cpf ? patientData.cpf.slice(0, 3) + ".•••.•••-••" : "—" },
-          { label: "Telefone", value: patientData.telefone },
-          { label: "Email", value: patientData.email },
+          { label: "RG", value: patientData.rg ? `${patientData.rg}${patientData.emissor ? " — " + patientData.emissor : ""}` : "—" },
+          { label: "Sexo", value: patientData.sexo ? patientData.sexo.charAt(0).toUpperCase() + patientData.sexo.slice(1).replace("_", " ") : "—" },
+          { label: "Estado Civil", value: patientData.estado_civil ? patientData.estado_civil.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+          { label: "Situação Profissional", value: patientData.situacao_profissional ? patientData.situacao_profissional.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+          { label: "Telefone", value: patientData.telefone || "—" },
+          { label: "Email", value: patientData.email || "—" },
           { label: "Instagram", value: patientData.instagram || "—" },
+          { label: "Plano", value: patientData.plano || "—" },
+          { label: "Nº do Plano", value: patientData.numero_plano || "—" },
         ].map((item, i) => (
           <LiquidGlassCard key={i} draggable={false} className="p-4">
             <p className="text-xs text-muted-foreground">{item.label}</p>
-            <p className="text-sm font-medium text-foreground mt-1">{item.value}</p>
+            <p className="text-sm font-medium text-foreground mt-1 break-words">{item.value}</p>
           </LiquidGlassCard>
         ))}
       </div>
+
 
       <Tabs defaultValue="evolucoes" className="space-y-4">
         <TabsList className="bg-muted/50 p-1 flex flex-wrap gap-1 h-auto">
