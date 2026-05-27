@@ -151,7 +151,53 @@ const Agenda = () => {
         </div>
       </motion.div>
 
+      <motion.div {...fadeUp(0.05)}>
+        <LiquidGlassCard className="p-3 sm:p-4" draggable={false}>
+          <div className="flex items-center gap-2 mb-3">
+            <Filter className="w-4 h-4 text-primary" />
+            <h2 className="text-xs sm:text-sm font-semibold text-foreground">Filtros</h2>
+            {filtrosAtivos && (
+              <Button variant="ghost" size="sm" className="h-7 ml-auto text-xs" onClick={limparFiltros}>
+                <X className="w-3 h-3 mr-1" /> Limpar
+              </Button>
+            )}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Dentista</Label>
+              <Select value={filtroDentista} onValueChange={setFiltroDentista}>
+                <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Todos" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os dentistas</SelectItem>
+                  {dentistas.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Status</Label>
+              <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+                <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Todos" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os status</SelectItem>
+                  <SelectItem value="agendado">Agendado</SelectItem>
+                  <SelectItem value="confirmado">Confirmado</SelectItem>
+                  <SelectItem value="realizado">Realizado</SelectItem>
+                  <SelectItem value="cancelado">Cancelado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Data</Label>
+              <Input type="date" value={filtroData} onChange={(e) => setFiltroData(e.target.value)} className="h-9 text-sm" />
+            </div>
+          </div>
+        </LiquidGlassCard>
+      </motion.div>
+
       <motion.div {...fadeUp(0.1)}>
+
         <LiquidGlassCard className="overflow-hidden" draggable={false}>
           <div className="flex items-center gap-2 px-4 sm:px-5 py-3 border-b border-white/10">
             <CalendarDays className="w-4 h-4 text-primary" />
