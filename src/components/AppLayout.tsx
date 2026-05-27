@@ -42,7 +42,7 @@ const navigation = [
   { name: "Pacientes", href: "/pacientes", icon: Users },
   { name: "Dentistas", href: "/dentistas", icon: UserCog },
   { name: "Insumos", href: "/insumos", icon: Package },
-  { name: "Financeiro", href: "/financeiro", icon: DollarSign },
+  { name: "Relatórios", href: "/financeiro", icon: DollarSign },
 ];
 
 const AppLayout = ({ children }: AppLayoutProps) => {
