@@ -773,7 +773,102 @@ const PacienteDetalhe = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Débito Dialog */}
+      <Dialog open={debitoOpen} onOpenChange={setDebitoOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Novo Débito</DialogTitle>
+            <DialogDescription>Registre um novo débito do paciente.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2"><Label>Descrição *</Label>
+              <Input value={debitoForm.descricao} onChange={(e) => setDebitoForm({ ...debitoForm, descricao: e.target.value })} placeholder="Ex: Harmonização facial" />
+            </div>
+            <div className="space-y-2"><Label>Valor (R$) *</Label>
+              <Input type="number" step="0.01" min="0" value={debitoForm.valor} onChange={(e) => setDebitoForm({ ...debitoForm, valor: e.target.value })} placeholder="0,00" />
+            </div>
+            <div className="space-y-2">
+              <Label>Forma de pagamento</Label>
+              <Select value={debitoForm.forma_pagamento} onValueChange={(v) => setDebitoForm({ ...debitoForm, forma_pagamento: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pix">PIX</SelectItem>
+                  <SelectItem value="credito">Cartão de Crédito</SelectItem>
+                  <SelectItem value="debito">Cartão de Débito</SelectItem>
+                  <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                  <SelectItem value="boleto">Boleto</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2"><Label>Data de Vencimento *</Label>
+              <Input type="date" value={debitoForm.data_vencimento} onChange={(e) => setDebitoForm({ ...debitoForm, data_vencimento: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>Modalidade</Label>
+                <Select value={debitoForm.modalidade} onValueChange={(v: "avista" | "parcelado") => setDebitoForm({ ...debitoForm, modalidade: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="avista">À vista</SelectItem>
+                    <SelectItem value="parcelado">Parcelado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {debitoForm.modalidade === "parcelado" && (
+                <div className="space-y-2">
+                  <Label>Nº de parcelas</Label>
+                  <Input type="number" min="2" max="24" value={debitoForm.parcelas} onChange={(e) => setDebitoForm({ ...debitoForm, parcelas: e.target.value })} />
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDebitoOpen(false)}>Cancelar</Button>
+            <Button onClick={handleDebitoSave}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Evolução Dialog */}
+      <Dialog open={evolucaoOpen} onOpenChange={setEvolucaoOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Nova Evolução</DialogTitle>
+            <DialogDescription>Registre a evolução clínica do paciente.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2"><Label>Data de criação</Label>
+                <Input type="date" value={evolucaoForm.data} onChange={(e) => setEvolucaoForm({ ...evolucaoForm, data: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Dentista responsável</Label>
+                <Select value={evolucaoForm.dentista_id} onValueChange={(v) => setEvolucaoForm({ ...evolucaoForm, dentista_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectContent>
+                    {dentistas.map((d) => (
+                      <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2"><Label>Paciente</Label>
+              <Input value={patientData.nome} disabled />
+            </div>
+            <div className="space-y-2"><Label>Evolução Clínica *</Label>
+              <Textarea rows={6} value={evolucaoForm.conteudo} onChange={(e) => setEvolucaoForm({ ...evolucaoForm, conteudo: e.target.value })} placeholder="Descreva a evolução clínica do paciente..." />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEvolucaoOpen(false)}>Cancelar</Button>
+            <Button onClick={handleEvolucaoSave}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 };
 
