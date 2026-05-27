@@ -26,8 +26,15 @@ import { dentistaService } from "@/services/dentistaService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
-  data: "", horario: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
+  data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
 });
+
+const formatDataBR = (data: string) => {
+  if (!data) return "—";
+  const [y, m, d] = data.split("-");
+  if (!y || !m || !d) return data;
+  return `${d}/${m}/${y}`;
+};
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   agendado: { label: "Agendado", className: "bg-info/10 text-info border-info/20" },
@@ -172,14 +179,19 @@ const Agendamentos = () => {
                     <TableCell>
                       <span className="flex items-center gap-1.5 text-sm">
                         <Calendar className="w-3.5 h-3.5 text-muted-foreground hidden sm:inline" />
-                        {a.data}
+                        {formatDataBR(a.data)}
                       </span>
                     </TableCell>
                     <TableCell>
-                      <span className="flex items-center gap-1.5 text-sm font-mono">
+                      <div className="flex items-center gap-1.5 text-sm font-mono">
                         <Clock className="w-3.5 h-3.5 text-muted-foreground hidden sm:inline" />
-                        {a.horario}
-                      </span>
+                        <div className="flex flex-col leading-tight">
+                          <span>{a.horario}</span>
+                          {a.horario_fim && (
+                            <span className="text-xs text-muted-foreground">{a.horario_fim}</span>
+                          )}
+                        </div>
+                      </div>
                     </TableCell>
                     <TableCell className="font-medium">{getPacienteNome(a.paciente_id)}</TableCell>
                     <TableCell className="text-muted-foreground hidden md:table-cell">{getDentistaNome(a.dentista_id)}</TableCell>
@@ -232,8 +244,12 @@ const Agendamentos = () => {
             <Input type="date" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} />
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário *</Label>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Início *</Label>
             <Input type="time" value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Término</Label>
+            <Input type="time" value={form.horario_fim || ""} onChange={(e) => setForm({ ...form, horario_fim: e.target.value })} />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Paciente *</Label>
