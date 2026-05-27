@@ -312,6 +312,26 @@ const PacienteDetalhe = () => {
     }
   };
 
+  const openConsultaDialog = () => {
+    setConsultaForm(emptyConsulta());
+    setConsultaOpen(true);
+  };
+
+  const handleConsultaSave = async () => {
+    if (!id || !consultaForm.data || !consultaForm.horario || !consultaForm.dentista_id) {
+      toast({ title: "Preencha data, horário e dentista", variant: "destructive" });
+      return;
+    }
+    try {
+      const created = await agendamentoService.criar({ ...consultaForm, paciente_id: id });
+      setAgendamentos((prev) => [created, ...prev]);
+      setConsultaOpen(false);
+      toast({ title: "Consulta agendada com sucesso" });
+    } catch {
+      toast({ title: "Erro ao salvar consulta", variant: "destructive" });
+    }
+  };
+
   const totalRecebido = debitos.filter((d) => d.status === "pago").reduce((s, d) => s + d.valor, 0);
   const totalAtrasado = debitos.filter((d) => isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
   const totalAReceber = debitos.filter((d) => d.status === "pendente" && !isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
