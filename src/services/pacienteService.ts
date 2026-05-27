@@ -65,4 +65,30 @@ export const pacienteService = {
     if (error) throw error;
     return true;
   },
+
+  uploadAvatar: async (id: string, file: File): Promise<string> => {
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `avatars/${id}-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from("paciente-fotos")
+      .upload(path, file, { contentType: file.type, upsert: true });
+    if (upErr) throw upErr;
+    const { error } = await supabase
+      .from("paciente")
+      .update({ avatar_url: path, updated_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) throw error;
+    const { data } = await supabase.storage
+      .from("paciente-fotos")
+      .createSignedUrl(path, 60 * 60);
+    return data?.signedUrl || "";
+  },
+
+  getAvatarSignedUrl: async (path: string): Promise<string> => {
+    if (!path) return "";
+    const { data } = await supabase.storage
+      .from("paciente-fotos")
+      .createSignedUrl(path, 60 * 60);
+    return data?.signedUrl || "";
+  },
 };
