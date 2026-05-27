@@ -46,9 +46,12 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-        <Command>
+        <Command shouldFilter>
           <CommandInput placeholder={searchPlaceholder} />
-          <CommandList className="scrollbar-hidden max-h-60">
+          <CommandList
+            className="scrollbar-hidden max-h-60 overflow-y-auto overscroll-contain"
+            onWheel={(e) => e.stopPropagation()}
+          >
             <CommandEmpty>{emptyText}</CommandEmpty>
             <CommandGroup>
               {options.map((o) => (
