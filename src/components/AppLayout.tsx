@@ -49,6 +49,39 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [clinicName, setClinicName] = useState<string>(
+    () => localStorage.getItem("clinic_name") || "SaaS Odonto"
+  );
+  const [clinicLogo, setClinicLogo] = useState<string | null>(
+    () => localStorage.getItem("clinic_logo")
+  );
+  const [editingName, setEditingName] = useState(false);
+  const [draftName, setDraftName] = useState(clinicName);
+
+  useEffect(() => {
+    localStorage.setItem("clinic_name", clinicName);
+  }, [clinicName]);
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      setClinicLogo(dataUrl);
+      localStorage.setItem("clinic_logo", dataUrl);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const saveName = () => {
+    const trimmed = draftName.trim();
+    if (trimmed) setClinicName(trimmed);
+    else setDraftName(clinicName);
+    setEditingName(false);
+  };
 
   const handleLogout = async () => {
     setSidebarOpen(false);
