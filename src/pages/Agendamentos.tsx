@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Search, Plus, Edit, Trash2, Calendar, Clock } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Calendar, Clock, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
