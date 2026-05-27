@@ -25,7 +25,11 @@ import { despesaService } from "@/services/despesaService";
 import { procedimentoConsultaLabels, formaPagamentoLabels } from "@/types";
 
 const pagamentoColors = ["hsl(160 84% 39%)", "hsl(239 84% 67%)", "hsl(38 92% 50%)", "hsl(0 72% 51%)", "hsl(280 60% 55%)"];
-const procStatusColors = ["hsl(38 92% 50%)", "hsl(160 84% 39%)"];
+const procedimentoColors = [
+  "hsl(239 84% 67%)", "hsl(160 84% 39%)", "hsl(38 92% 50%)", "hsl(0 72% 51%)",
+  "hsl(280 60% 55%)", "hsl(199 89% 48%)", "hsl(340 82% 60%)", "hsl(48 96% 53%)",
+  "hsl(173 80% 40%)", "hsl(262 83% 58%)", "hsl(15 86% 55%)", "hsl(120 50% 45%)",
+];
 
 const faturamentoConfig: ChartConfig = {
   receita: { label: "Receita", color: "hsl(var(--primary))" },
