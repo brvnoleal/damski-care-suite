@@ -10,6 +10,7 @@ import {
   Package,
   DollarSign,
   Settings,
+  LogOut,
   Menu,
   X,
   Bell,
@@ -41,7 +42,6 @@ const navigation = [
   { name: "Consultas", href: "/agendamentos", icon: CalendarDays },
   { name: "Insumos", href: "/insumos", icon: Package },
   { name: "Financeiro", href: "/financeiro", icon: DollarSign },
-  { name: "Configurações", href: "/configuracoes", icon: Settings },
 ];
 
 const AppLayout = ({ children }: AppLayoutProps) => {
