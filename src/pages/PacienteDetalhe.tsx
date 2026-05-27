@@ -56,11 +56,14 @@ const PacienteDetalhe = () => {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
-  const [editForm, setEditForm] = useState({
+  const emptyEditForm = (): Omit<Paciente, "id" | "created_at"> => ({
     nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", situacao_profissional: "",
     plano: "", numero_plano: "", numero_prontuario: "",
-    telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo" as "ativo" | "inativo",
+    telefone: "", email: "", instagram: "", data_nascimento: "",
+    cep: "", estado: "", cidade: "", bairro: "", rua: "", numero: "", complemento: "", ponto_referencia: "",
+    status: "ativo",
   });
+  const [editForm, setEditForm] = useState<Omit<Paciente, "id" | "created_at">>(emptyEditForm());
 
   const [sessions, setSessions] = useState<Sessao[]>([]);
   const [sessionOpen, setSessionOpen] = useState(false);
