@@ -72,18 +72,40 @@ const PacienteDetalhe = () => {
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [fotoMeta, setFotoMeta] = useState<{ categoria: FotoCategoria; descricao: string }>({ categoria: "antes", descricao: "" });
 
+  const [dentistas, setDentistas] = useState<Dentista[]>([]);
+
+  const [debitos, setDebitos] = useState<PacienteDebito[]>([]);
+  const [debitoOpen, setDebitoOpen] = useState(false);
+  const [debitoForm, setDebitoForm] = useState({
+    descricao: "", valor: "", forma_pagamento: "", data_vencimento: "",
+    modalidade: "avista" as "avista" | "parcelado", parcelas: "1",
+  });
+
+  const [evolucoes, setEvolucoes] = useState<Evolucao[]>([]);
+  const [evolucaoOpen, setEvolucaoOpen] = useState(false);
+  const today = new Date().toISOString().slice(0, 10);
+  const [evolucaoForm, setEvolucaoForm] = useState({
+    data: today, dentista_id: "", conteudo: "",
+  });
+
   useEffect(() => {
     const load = async () => {
       if (!id) return;
       try {
-        const [paciente, sessoes, fotosList] = await Promise.all([
+        const [paciente, sessoes, fotosList, dentistasList, debitosList, evolucoesList] = await Promise.all([
           pacienteService.buscarPorId(id),
           sessaoService.listarPorPaciente(id),
           pacienteFotoService.listarPorPaciente(id),
+          dentistaService.listar(),
+          pacienteDebitoService.listarPorPaciente(id),
+          evolucaoService.listarPorPaciente(id),
         ]);
         setPatientData(paciente);
         setSessions(sessoes);
         setFotos(fotosList);
+        setDentistas(dentistasList);
+        setDebitos(debitosList);
+        setEvolucoes(evolucoesList);
         if (paciente?.avatar_url) {
           const url = await pacienteService.getAvatarSignedUrl(paciente.avatar_url);
           setAvatarUrl(url);
@@ -96,6 +118,7 @@ const PacienteDetalhe = () => {
     };
     load();
   }, [id]);
+
 
   const initials = patientData?.nome
     ? patientData.nome.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
