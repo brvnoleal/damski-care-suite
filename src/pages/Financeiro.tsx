@@ -343,22 +343,29 @@ const Relatorios = () => {
 
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
             <div className="p-5 pb-2">
-              <h3 className="text-base font-semibold text-foreground">Procedimentos — Pendentes vs Concluídos</h3>
-              <p className="text-sm text-muted-foreground">Distribuição do status dos procedimentos</p>
+              <h3 className="text-base font-semibold text-foreground">Procedimentos por Tipo</h3>
+              <p className="text-sm text-muted-foreground">Distribuição dos procedimentos da clínica (pendentes + concluídos)</p>
             </div>
             <div className="px-5 pb-5">
-              <ChartContainer config={procedimentoConfig} className="h-[280px] w-full">
-                <PieChart>
-                  <Pie data={procStatus} dataKey="valor" nameKey="status" cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={3} label={(e: any) => `${e.status}: ${e.valor}`}>
-                    {procStatus.map((_, index) => <Cell key={index} fill={procStatusColors[index % procStatusColors.length]} />)}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <ChartLegend content={<ChartLegendContent nameKey="status" />} />
-                </PieChart>
-              </ChartContainer>
+              {procPorTipo.length === 0 ? (
+                <div className="h-[280px] flex items-center justify-center text-sm text-muted-foreground">
+                  Nenhum procedimento registrado.
+                </div>
+              ) : (
+                <ChartContainer config={procedimentoConfig} className="h-[320px] w-full">
+                  <PieChart>
+                    <Pie data={procPorTipo} dataKey="valor" nameKey="procedimento" cx="50%" cy="50%" innerRadius={60} outerRadius={110} paddingAngle={2} label={(e: any) => `${e.procedimento}: ${e.valor}`}>
+                      {procPorTipo.map((_, index) => <Cell key={index} fill={procedimentoColors[index % procedimentoColors.length]} />)}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent nameKey="procedimento" />} />
+                  </PieChart>
+                </ChartContainer>
+              )}
             </div>
           </LiquidGlassCard>
         </TabsContent>
+
 
         {/* ========== FINANCEIRO ========== */}
         <TabsContent value="financeiro" className="space-y-4">
