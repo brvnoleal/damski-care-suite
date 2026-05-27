@@ -142,14 +142,24 @@ const Agenda = () => {
             Visualize os agendamentos da clínica por dia
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex rounded-md border border-white/10 overflow-hidden">
+            <button
+              onClick={() => setView("mes")}
+              className={`px-3 h-8 text-xs font-medium transition-colors ${view === "mes" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-white/5"}`}
+            >Mês</button>
+            <button
+              onClick={() => setView("dia")}
+              className={`px-3 h-8 text-xs font-medium transition-colors ${view === "dia" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-white/5"}`}
+            >Dia</button>
+          </div>
           <Button variant="outline" size="sm" onClick={goToday}>Hoje</Button>
           <div className="flex items-center gap-1">
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <div className="min-w-[160px] text-center text-sm font-semibold capitalize">
-              {monthNames[month]} {year}
+            <div className="min-w-[200px] text-center text-sm font-semibold capitalize">
+              {headerLabel}
             </div>
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={goNext}>
               <ChevronRight className="w-4 h-4" />
@@ -157,6 +167,7 @@ const Agenda = () => {
           </div>
         </div>
       </motion.div>
+
 
       <motion.div {...fadeUp(0.05)}>
         <LiquidGlassCard className="p-3 sm:p-4" draggable={false}>
