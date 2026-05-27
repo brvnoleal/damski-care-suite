@@ -244,8 +244,12 @@ const Agendamentos = () => {
             <Input type="date" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} />
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário *</Label>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Início *</Label>
             <Input type="time" value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Término</Label>
+            <Input type="time" value={form.horario_fim || ""} onChange={(e) => setForm({ ...form, horario_fim: e.target.value })} />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Paciente *</Label>
