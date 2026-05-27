@@ -30,6 +30,13 @@ const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
   data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
 });
 
+const formatDataBR = (data: string) => {
+  if (!data) return "—";
+  const [y, m, d] = data.split("-");
+  if (!y || !m || !d) return data;
+  return `${d}/${m}/${y}`;
+};
+
 type RepetirTipo = "nao" | "diario" | "semanal" | "mensal" | "anual" | "personalizado";
 
 const repetirLabels: Record<RepetirTipo, string> = {
