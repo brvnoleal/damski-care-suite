@@ -1061,7 +1061,116 @@ const PacienteDetalhe = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Nova Consulta Dialog */}
+      <ResponsiveDialog
+        open={consultaOpen}
+        onOpenChange={setConsultaOpen}
+        title="Nova Consulta"
+        description={`Agende uma nova consulta para ${patientData.nome}.`}
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setConsultaOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button onClick={handleConsultaSave} className="flex-1 sm:flex-none">Agendar</Button>
+          </>
+        }
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Paciente</Label>
+            <Input value={patientData.nome} disabled />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Dentista *</Label>
+            <Select value={consultaForm.dentista_id} onValueChange={(v) => setConsultaForm({ ...consultaForm, dentista_id: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+              <SelectContent>
+                {dentistas.map((d) => (
+                  <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Data *</Label>
+            <Input type="date" value={consultaForm.data} onChange={(e) => setConsultaForm({ ...consultaForm, data: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Início *</Label>
+            <Input type="time" value={consultaForm.horario} onChange={(e) => setConsultaForm({ ...consultaForm, horario: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Término</Label>
+            <Input type="time" value={consultaForm.horario_fim || ""} onChange={(e) => setConsultaForm({ ...consultaForm, horario_fim: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Status</Label>
+            <Select value={consultaForm.status} onValueChange={(v: Agendamento["status"]) => setConsultaForm({ ...consultaForm, status: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="agendado">Agendado</SelectItem>
+                <SelectItem value="confirmado">Confirmado</SelectItem>
+                <SelectItem value="realizado">Realizado</SelectItem>
+                <SelectItem value="cancelado">Cancelado</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
+            <Select value={consultaForm.procedimento} onValueChange={(v: ProcedimentoConsulta) => setConsultaForm({ ...consultaForm, procedimento: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {Object.entries(procedimentoConsultaLabels).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="sm:col-span-2 pt-1">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pagamento</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Valor (R$) *</Label>
+            <Input type="number" min="0" step="0.01" value={consultaForm.valor || ""} onChange={(e) => setConsultaForm({ ...consultaForm, valor: parseFloat(e.target.value) || 0 })} placeholder="0,00" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Forma de Pagamento *</Label>
+            <Select value={consultaForm.forma_pagamento} onValueChange={(v: FormaPagamento) => setConsultaForm({ ...consultaForm, forma_pagamento: v, parcelas: v === "credito" || v === "boleto" ? consultaForm.parcelas : 1 })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {Object.entries(formaPagamentoLabels).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {(consultaForm.forma_pagamento === "credito" || consultaForm.forma_pagamento === "boleto") && (
+            <div>
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Parcelas</Label>
+              <Select value={String(consultaForm.parcelas)} onValueChange={(v) => setConsultaForm({ ...consultaForm, parcelas: parseInt(v) })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
+                    <SelectItem key={n} value={String(n)}>{n}x</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          <div className={consultaForm.forma_pagamento === "credito" || consultaForm.forma_pagamento === "boleto" ? "" : "sm:col-span-2"}>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Observações</Label>
+            <Input value={consultaForm.observacoes} onChange={(e) => setConsultaForm({ ...consultaForm, observacoes: e.target.value })} placeholder="Observações opcionais" />
+          </div>
+        </div>
+      </ResponsiveDialog>
     </div>
+
 
   );
 };
