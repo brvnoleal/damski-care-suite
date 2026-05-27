@@ -35,13 +35,22 @@ export const agendamentoService = {
   },
 
   criar: async (dados: Omit<Agendamento, "id" | "created_at">): Promise<Agendamento> => {
-    const { data, error } = await supabase.from("agendamento").insert(dados).select().single();
+    const payload: any = { ...dados, horario_fim: dados.horario_fim ? dados.horario_fim : null };
+    const { data, error } = await supabase.from("agendamento").insert(payload).select().single();
     if (error) throw error;
     return mapRow(data);
   },
 
+  criarVarios: async (lista: Omit<Agendamento, "id" | "created_at">[]): Promise<Agendamento[]> => {
+    const payload = lista.map((d) => ({ ...d, horario_fim: d.horario_fim ? d.horario_fim : null }));
+    const { data, error } = await supabase.from("agendamento").insert(payload).select();
+    if (error) throw error;
+    return (data || []).map(mapRow);
+  },
+
   atualizar: async (id: string, dados: Partial<Agendamento>): Promise<Agendamento | null> => {
     const { created_at, id: _, ...updateData } = dados as any;
+    if ("horario_fim" in updateData) updateData.horario_fim = updateData.horario_fim ? updateData.horario_fim : null;
     const { data, error } = await supabase.from("agendamento").update({ ...updateData, updated_at: new Date().toISOString() }).eq("id", id).select().single();
     if (error) throw error;
     return data ? mapRow(data) : null;
