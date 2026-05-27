@@ -220,6 +220,7 @@ export type Database = {
       }
       paciente: {
         Row: {
+          avatar_url: string | null
           bairro: string | null
           cep: string | null
           cidade: string | null
@@ -228,18 +229,27 @@ export type Database = {
           created_at: string
           data_nascimento: string
           email: string | null
+          emissor: string | null
           estado: string | null
+          estado_civil: string | null
           id: string
           instagram: string | null
           nome: string
           numero: string | null
+          numero_plano: string | null
+          numero_prontuario: string | null
+          plano: string | null
           ponto_referencia: string | null
+          rg: string | null
           rua: string | null
+          sexo: string | null
+          situacao_profissional: string | null
           status: string
           telefone: string | null
           updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
           bairro?: string | null
           cep?: string | null
           cidade?: string | null
@@ -248,18 +258,27 @@ export type Database = {
           created_at?: string
           data_nascimento: string
           email?: string | null
+          emissor?: string | null
           estado?: string | null
+          estado_civil?: string | null
           id?: string
           instagram?: string | null
           nome: string
           numero?: string | null
+          numero_plano?: string | null
+          numero_prontuario?: string | null
+          plano?: string | null
           ponto_referencia?: string | null
+          rg?: string | null
           rua?: string | null
+          sexo?: string | null
+          situacao_profissional?: string | null
           status?: string
           telefone?: string | null
           updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
           bairro?: string | null
           cep?: string | null
           cidade?: string | null
@@ -268,13 +287,21 @@ export type Database = {
           created_at?: string
           data_nascimento?: string
           email?: string | null
+          emissor?: string | null
           estado?: string | null
+          estado_civil?: string | null
           id?: string
           instagram?: string | null
           nome?: string
           numero?: string | null
+          numero_plano?: string | null
+          numero_prontuario?: string | null
+          plano?: string | null
           ponto_referencia?: string | null
+          rg?: string | null
           rua?: string | null
+          sexo?: string | null
+          situacao_profissional?: string | null
           status?: string
           telefone?: string | null
           updated_at?: string
