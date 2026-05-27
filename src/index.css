@@ -173,3 +173,14 @@
   scrollbar-width: thin;
   scrollbar-color: hsl(190 8% 75%) transparent;
 }
+
+/* Invisible scrollbar (still scrollable) */
+.scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hidden::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
