@@ -268,7 +268,7 @@ const Agendamentos = () => {
                         <div className="flex flex-col leading-tight">
                           <span>{a.horario}</span>
                           {a.horario_fim && (
-                            <span className="text-xs text-muted-foreground">{a.horario_fim}</span>
+                            <span>{a.horario_fim}</span>
                           )}
                         </div>
                       </div>
