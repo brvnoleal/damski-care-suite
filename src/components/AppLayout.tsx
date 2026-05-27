@@ -41,7 +41,6 @@ const navigation = [
   { name: "Consultas", href: "/agendamentos", icon: CalendarDays },
   { name: "Insumos", href: "/insumos", icon: Package },
   { name: "Financeiro", href: "/financeiro", icon: DollarSign },
-  { name: "Configurações", href: "/configuracoes", icon: Settings },
 ];
 
 const AppLayout = ({ children }: AppLayoutProps) => {
@@ -209,6 +208,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
               </ScrollArea>
             </PopoverContent>
           </Popover>
+
+          <button
+            onClick={() => navigate("/configuracoes")}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            title="Configurações"
+          >
+            <Settings className="w-[18px] h-[18px]" />
+          </button>
 
           <Badge variant="outline" className="text-[11px] font-medium hidden sm:flex border-border text-muted-foreground">
             RDC 1.002/2025
