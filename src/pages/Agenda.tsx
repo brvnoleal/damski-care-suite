@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, ChevronLeft, ChevronRight, Clock, User, Stethoscope, CreditCard, FileText } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Clock, User, Stethoscope, CreditCard, FileText, Filter, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { agendamentoService } from "@/services/agendamentoService";
