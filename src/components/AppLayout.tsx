@@ -6,6 +6,7 @@ import {
   Users,
   UserCog,
   CalendarDays,
+  Calendar,
   Package,
   DollarSign,
   Settings,
@@ -35,6 +36,7 @@ interface AppLayoutProps {
 const navigation = [
   { name: "Início", href: "/", icon: LayoutDashboard },
   { name: "Pacientes", href: "/pacientes", icon: Users },
+  { name: "Agenda", href: "/agenda", icon: Calendar },
   { name: "Dentistas", href: "/dentistas", icon: UserCog },
   { name: "Consultas", href: "/agendamentos", icon: CalendarDays },
   { name: "Insumos", href: "/insumos", icon: Package },

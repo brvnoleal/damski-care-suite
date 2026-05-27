@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Pacientes from "./pages/Pacientes";
 import PacienteDetalhe from "./pages/PacienteDetalhe";
+import Agenda from "./pages/Agenda";
 import Dentistas from "./pages/Dentistas";
 import Agendamentos from "./pages/Agendamentos";
 import Insumos from "./pages/Insumos";
@@ -43,6 +44,7 @@ const App = () => {
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/pacientes" element={<Pacientes />} />
                       <Route path="/pacientes/:id" element={<PacienteDetalhe />} />
+                      <Route path="/agenda" element={<Agenda />} />
                       <Route path="/dentistas" element={<Dentistas />} />
                       <Route path="/agendamentos" element={<Agendamentos />} />
                       <Route path="/insumos" element={<Insumos />} />

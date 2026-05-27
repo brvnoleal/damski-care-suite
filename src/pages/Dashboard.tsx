@@ -82,8 +82,6 @@ const Dashboard = () => {
   const [nextAppointments, setNextAppointments] = useState<{time: string; patient: string; proc: string; status: string}[]>([]);
   const [criticalSupplies, setCriticalSupplies] = useState<{name: string; lot: string; expiry: string; daysLeft: number}[]>([]);
   const [receitaSemana, setReceitaSemana] = useState({ total: 0, realizadas: 0, previstas: 0, items: [] as { proc: string; valor: number }[] });
-  const [monthAgendamentos, setMonthAgendamentos] = useState<Record<string, { count: number; items: { horario: string; paciente: string; proc: string; status: string }[] }>>({});
-  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -185,27 +183,6 @@ const Dashboard = () => {
         .filter((i) => i.daysLeft <= 15)
         .sort((a, b) => a.daysLeft - b.daysLeft);
       setCriticalSupplies(critical);
-
-      // Month calendar
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
-      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split("T")[0];
-      const { data: monthAg } = await supabase
-        .from("agendamento")
-        .select("data, horario, status, procedimento, paciente:paciente_id(nome)")
-        .gte("data", monthStart).lte("data", monthEnd)
-        .order("horario", { ascending: true });
-      const byDay: Record<string, { count: number; items: any[] }> = {};
-      (monthAg || []).forEach((a: any) => {
-        if (!byDay[a.data]) byDay[a.data] = { count: 0, items: [] };
-        byDay[a.data].count++;
-        byDay[a.data].items.push({
-          horario: (a.horario || "").slice(0, 5),
-          paciente: a.paciente?.nome || "—",
-          proc: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
-          status: a.status,
-        });
-      });
-      setMonthAgendamentos(byDay);
     };
 
     loadDashboard();
@@ -251,114 +228,35 @@ const Dashboard = () => {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 sm:gap-4">
-        <motion.div {...scaleIn(0.35)} className="lg:col-span-2">
-          <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <FileCheck className="w-4 h-4 text-primary" />
-                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Consultas da Semana</h2>
-              </div>
-              <Badge variant="outline" className="text-[10px]">{consultasPorStatus.reduce((s, c) => s + c.value, 0)} total</Badge>
+      <motion.div {...scaleIn(0.35)}>
+        <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
+          <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <FileCheck className="w-4 h-4 text-primary" />
+              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Consultas da Semana</h2>
             </div>
-            <div className="p-3 sm:p-4 flex-1 flex flex-col items-center justify-center">
-              <ResponsiveContainer width="100%" height={160}>
-                <PieChart>
-                  <Pie data={consultasPorStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={55} innerRadius={28} strokeWidth={2} stroke="rgba(255,255,255,0.1)">
-                    {consultasPorStatus.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                  </Pie>
-                  <Tooltip formatter={(v: number, name: string) => [`${v}`, name]} contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-1">
-                {consultasPorStatus.map((s, i) => (
-                  <div key={i} className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
-                    <span className="text-[10px] sm:text-[11px] text-muted-foreground">{s.name}: <span className="font-semibold text-foreground">{s.value}</span></span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </LiquidGlassCard>
-        </motion.div>
-
-        <motion.div {...scaleIn(0.45)} className="lg:col-span-3">
-          <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-primary" />
-                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Agenda</h2>
-              </div>
-              <Link to="/agendamentos" className="text-xs text-primary hover:underline flex items-center gap-0.5">
-                Ver completa <ChevronRight className="w-3 h-3" />
-              </Link>
-            </div>
-            {(() => {
-              const year = now.getFullYear();
-              const month = now.getMonth();
-              const firstDow = new Date(year, month, 1).getDay();
-              const daysInMonth = new Date(year, month + 1, 0).getDate();
-              const todayStr = now.toISOString().split("T")[0];
-              const cells: (string | null)[] = [];
-              for (let i = 0; i < firstDow; i++) cells.push(null);
-              for (let d = 1; d <= daysInMonth; d++) {
-                cells.push(`${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`);
-              }
-              const monthLabel = now.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
-              const selected = selectedDay ? monthAgendamentos[selectedDay] : null;
-              return (
-                <div className="p-2 sm:p-3">
-                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5 capitalize">{monthLabel}</p>
-                  <div className="grid grid-cols-7 gap-0.5 text-center text-[9px] text-muted-foreground mb-0.5">
-                    {["D", "S", "T", "Q", "Q", "S", "S"].map((w, i) => <div key={i}>{w}</div>)}
-                  </div>
-                  <div className="grid grid-cols-7 gap-0.5">
-                    {cells.map((iso, i) => {
-                      if (!iso) return <div key={i} />;
-                      const day = Number(iso.slice(-2));
-                      const info = monthAgendamentos[iso];
-                      const isToday = iso === todayStr;
-                      const isSelected = iso === selectedDay;
-                      return (
-                        <button
-                          key={i}
-                          onClick={() => setSelectedDay(isSelected ? null : iso)}
-                          className={cn(
-                            "h-6 sm:h-7 rounded flex items-center justify-center text-[10px] transition-colors relative",
-                            isSelected ? "bg-primary text-primary-foreground" :
-                            isToday ? "bg-primary/15 text-primary font-semibold" :
-                            info ? "bg-info/10 text-foreground hover:bg-info/20" :
-                            "text-muted-foreground hover:bg-muted/40"
-                          )}
-                        >
-                          <span>{day}</span>
-                          {info && !isSelected && (
-                            <span className="absolute bottom-0 w-0.5 h-0.5 rounded-full bg-info" />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {selected && (
-                    <div className="mt-2 pt-2 border-t border-white/10 space-y-1.5 max-h-32 overflow-y-auto">
-                      <p className="text-xs font-medium text-foreground">
-                        {new Date(selectedDay + "T00:00:00").toLocaleDateString("pt-BR", { weekday: "short", day: "numeric", month: "short" })} — {selected.count} consulta{selected.count > 1 ? "s" : ""}
-                      </p>
-                      {selected.items.map((it, idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-xs sm:text-[13px]">
-                          <span className="font-mono font-semibold text-primary">{it.horario}</span>
-                          <span className="text-foreground truncate flex-1">{it.paciente}</span>
-                          <span className="text-muted-foreground truncate">{it.proc}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+            <Badge variant="outline" className="text-[10px]">{consultasPorStatus.reduce((s, c) => s + c.value, 0)} total</Badge>
+          </div>
+          <div className="p-3 sm:p-4 flex-1 flex flex-col items-center justify-center">
+            <ResponsiveContainer width="100%" height={160}>
+              <PieChart>
+                <Pie data={consultasPorStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={55} innerRadius={28} strokeWidth={2} stroke="rgba(255,255,255,0.1)">
+                  {consultasPorStatus.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                </Pie>
+                <Tooltip formatter={(v: number, name: string) => [`${v}`, name]} contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-1">
+              {consultasPorStatus.map((s, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+                  <span className="text-[10px] sm:text-[11px] text-muted-foreground">{s.name}: <span className="font-semibold text-foreground">{s.value}</span></span>
                 </div>
-              );
-            })()}
-          </LiquidGlassCard>
-        </motion.div>
-      </div>
+              ))}
+            </div>
+          </div>
+        </LiquidGlassCard>
+      </motion.div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <motion.div {...fadeUp(0.5)}>
