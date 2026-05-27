@@ -93,6 +93,15 @@ const PacienteDetalhe = () => {
     data: today, dentista_id: "", conteudo: "",
   });
 
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [consultaOpen, setConsultaOpen] = useState(false);
+  const emptyConsulta = (): Omit<Agendamento, "id" | "created_at" | "paciente_id"> => ({
+    data: "", horario: "", horario_fim: "", dentista_id: "",
+    procedimento: "avaliacao", status: "agendado",
+    valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
+  });
+  const [consultaForm, setConsultaForm] = useState(emptyConsulta());
+
   useEffect(() => {
     const load = async () => {
       if (!id) return;
