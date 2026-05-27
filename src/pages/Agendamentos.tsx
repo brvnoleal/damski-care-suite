@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Search, Plus, Edit, Trash2, Calendar, Clock } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Calendar, Clock, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,48 @@ const formatDataBR = (data: string) => {
   return `${d}/${m}/${y}`;
 };
 
+type RepetirTipo = "nao" | "diario" | "semanal" | "mensal" | "anual" | "personalizado";
+
+const repetirLabels: Record<RepetirTipo, string> = {
+  nao: "Não repetir",
+  diario: "Todos os dias",
+  semanal: "Semanal",
+  mensal: "Mensal",
+  anual: "Anual",
+  personalizado: "Personalizado",
+};
+
+const toISO = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+const gerarDatasSugeridas = (tipo: RepetirTipo, base: string): string[] => {
+  if (!base) return [];
+  const [y, m, d] = base.split("-").map(Number);
+  const start = new Date(y, m - 1, d);
+  const result: string[] = [];
+  if (tipo === "diario") {
+    // próxima semana — 7 dias após a data base
+    for (let i = 1; i <= 7; i++) {
+      const dt = new Date(start); dt.setDate(start.getDate() + i); result.push(toISO(dt));
+    }
+  } else if (tipo === "semanal") {
+    // mesmo dia da semana — próximas 4 semanas
+    for (let i = 1; i <= 4; i++) {
+      const dt = new Date(start); dt.setDate(start.getDate() + i * 7); result.push(toISO(dt));
+    }
+  } else if (tipo === "mensal") {
+    // mesmo dia do mês — próximos 6 meses
+    for (let i = 1; i <= 6; i++) {
+      const dt = new Date(start); dt.setMonth(start.getMonth() + i); result.push(toISO(dt));
+    }
+  } else if (tipo === "anual") {
+    // mesma data — próximos 3 anos
+    for (let i = 1; i <= 3; i++) {
+      const dt = new Date(start); dt.setFullYear(start.getFullYear() + i); result.push(toISO(dt));
+    }
+  }
+  return result;
+};
+
 const statusConfig: Record<string, { label: string; className: string }> = {
   agendado: { label: "Agendado", className: "bg-info/10 text-info border-info/20" },
   confirmado: { label: "Confirmado", className: "bg-primary/10 text-primary border-primary/20" },
@@ -55,6 +98,11 @@ const Agendamentos = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyAgendamento());
+  const [repetir, setRepetir] = useState<RepetirTipo>("nao");
+  const [datasSelecionadas, setDatasSelecionadas] = useState<string[]>([]);
+  const [datasPersonalizadas, setDatasPersonalizadas] = useState<string[]>([]);
+
+  const datasSugeridas = repetir !== "nao" && repetir !== "personalizado" ? gerarDatasSugeridas(repetir, form.data) : [];
 
   const loadData = async () => {
     try {
@@ -85,17 +133,40 @@ const Agendamentos = () => {
       a.data.includes(search)
   );
 
+  const resetRepetir = () => {
+    setRepetir("nao");
+    setDatasSelecionadas([]);
+    setDatasPersonalizadas([]);
+  };
+
   const openCreate = () => {
     setEditingId(null);
     setForm(emptyAgendamento());
+    resetRepetir();
     setDialogOpen(true);
   };
 
   const openEdit = (a: Agendamento) => {
     setEditingId(a.id);
-    setForm({ data: a.data, horario: a.horario, paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, observacoes: a.observacoes || "" });
+    setForm({ data: a.data, horario: a.horario, horario_fim: a.horario_fim || "", paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, observacoes: a.observacoes || "" });
+    resetRepetir();
     setDialogOpen(true);
   };
+
+  // sincroniza seleção quando muda tipo de repetição ou data base
+  useEffect(() => {
+    if (repetir !== "nao" && repetir !== "personalizado") {
+      setDatasSelecionadas(gerarDatasSugeridas(repetir, form.data));
+    }
+  }, [repetir, form.data]);
+
+  const toggleData = (d: string) => {
+    setDatasSelecionadas((prev) => prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]);
+  };
+
+  const addDataPersonalizada = () => setDatasPersonalizadas((prev) => [...prev, ""]);
+  const setDataPersonalizada = (i: number, v: string) => setDatasPersonalizadas((prev) => prev.map((x, idx) => idx === i ? v : x));
+  const removeDataPersonalizada = (i: number) => setDatasPersonalizadas((prev) => prev.filter((_, idx) => idx !== i));
 
   const handleSave = async () => {
     if (!form.data || !form.horario || !form.paciente_id || !form.dentista_id) {
@@ -107,8 +178,16 @@ const Agendamentos = () => {
         await agendamentoService.atualizar(editingId, form);
         toast({ title: "Agendamento atualizado com sucesso" });
       } else {
-        await agendamentoService.criar(form);
-        toast({ title: "Agendamento criado com sucesso" });
+        const datasExtras = repetir === "personalizado"
+          ? datasPersonalizadas.filter((d) => d && d !== form.data)
+          : repetir !== "nao" ? datasSelecionadas.filter((d) => d !== form.data) : [];
+        const lista = [form, ...datasExtras.map((d) => ({ ...form, data: d }))];
+        if (lista.length === 1) {
+          await agendamentoService.criar(form);
+        } else {
+          await agendamentoService.criarVarios(lista);
+        }
+        toast({ title: lista.length > 1 ? `${lista.length} agendamentos criados` : "Agendamento criado com sucesso" });
       }
       await loadData();
       setDialogOpen(false);
@@ -116,6 +195,7 @@ const Agendamentos = () => {
       toast({ title: "Erro ao salvar agendamento", variant: "destructive" });
     }
   };
+
 
   const handleDelete = async () => {
     if (deletingId) {
@@ -273,6 +353,58 @@ const Agendamentos = () => {
               </SelectContent>
             </Select>
           </div>
+          {!editingId && (
+            <div className="sm:col-span-2">
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Repetir agendamento</Label>
+              <Select value={repetir} onValueChange={(v: RepetirTipo) => setRepetir(v)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {Object.entries(repetirLabels).map(([v, l]) => (
+                    <SelectItem key={v} value={v}>{l}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {repetir !== "nao" && repetir !== "personalizado" && (
+                <div className="mt-3 rounded-xl border border-border/50 bg-white/5 p-3">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Selecione as datas (mesmo horário: {form.horario || "—"}{form.horario_fim ? ` – ${form.horario_fim}` : ""})
+                  </p>
+                  {datasSugeridas.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">Defina a data base para ver as opções.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {datasSugeridas.map((d) => (
+                        <label key={d} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-white/5 rounded-md px-2 py-1.5 transition-colors">
+                          <Checkbox checked={datasSelecionadas.includes(d)} onCheckedChange={() => toggleData(d)} />
+                          <span>{formatDataBR(d)}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {repetir === "personalizado" && (
+                <div className="mt-3 rounded-xl border border-border/50 bg-white/5 p-3 space-y-2">
+                  <p className="text-xs text-muted-foreground">
+                    Adicione datas personalizadas (mesmo horário: {form.horario || "—"}{form.horario_fim ? ` – ${form.horario_fim}` : ""})
+                  </p>
+                  {datasPersonalizadas.map((d, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <Input type="date" value={d} onChange={(e) => setDataPersonalizada(i, e.target.value)} />
+                      <button type="button" onClick={() => removeDataPersonalizada(i)} className="p-1.5 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <Button type="button" variant="outline" size="sm" onClick={addDataPersonalizada} className="gap-1.5">
+                    <Plus className="w-3.5 h-3.5" /> Adicionar data
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
           <div className="sm:col-span-2">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
             <Select value={form.procedimento} onValueChange={(v: ProcedimentoConsulta) => setForm({ ...form, procedimento: v })}>
