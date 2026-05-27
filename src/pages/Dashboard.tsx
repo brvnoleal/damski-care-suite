@@ -183,27 +183,6 @@ const Dashboard = () => {
         .filter((i) => i.daysLeft <= 15)
         .sort((a, b) => a.daysLeft - b.daysLeft);
       setCriticalSupplies(critical);
-
-      // Month calendar
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
-      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split("T")[0];
-      const { data: monthAg } = await supabase
-        .from("agendamento")
-        .select("data, horario, status, procedimento, paciente:paciente_id(nome)")
-        .gte("data", monthStart).lte("data", monthEnd)
-        .order("horario", { ascending: true });
-      const byDay: Record<string, { count: number; items: any[] }> = {};
-      (monthAg || []).forEach((a: any) => {
-        if (!byDay[a.data]) byDay[a.data] = { count: 0, items: [] };
-        byDay[a.data].count++;
-        byDay[a.data].items.push({
-          horario: (a.horario || "").slice(0, 5),
-          paciente: a.paciente?.nome || "—",
-          proc: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
-          status: a.status,
-        });
-      });
-      setMonthAgendamentos(byDay);
     };
 
     loadDashboard();
