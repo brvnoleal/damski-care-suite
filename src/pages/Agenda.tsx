@@ -76,16 +76,32 @@ const Agenda = () => {
   const getPaciente = (id: string) => pacientes.find((p) => p.id === id);
   const getDentista = (id: string) => dentistas.find((d) => d.id === id);
 
+  const agendamentosFiltrados = useMemo(() => {
+    return agendamentos.filter((a) => {
+      if (filtroDentista !== "todos" && a.dentista_id !== filtroDentista) return false;
+      if (filtroStatus !== "todos" && a.status !== filtroStatus) return false;
+      if (filtroData && a.data !== filtroData) return false;
+      return true;
+    });
+  }, [agendamentos, filtroDentista, filtroStatus, filtroData]);
+
   const agendamentosPorDia = useMemo(() => {
     const map = new Map<string, Agendamento[]>();
-    for (const a of agendamentos) {
+    for (const a of agendamentosFiltrados) {
       const arr = map.get(a.data) || [];
       arr.push(a);
       map.set(a.data, arr);
     }
     for (const arr of map.values()) arr.sort((a, b) => a.horario.localeCompare(b.horario));
     return map;
-  }, [agendamentos]);
+  }, [agendamentosFiltrados]);
+
+  const filtrosAtivos = filtroDentista !== "todos" || filtroStatus !== "todos" || !!filtroData;
+  const limparFiltros = () => {
+    setFiltroDentista("todos");
+    setFiltroStatus("todos");
+    setFiltroData("");
+  };
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
