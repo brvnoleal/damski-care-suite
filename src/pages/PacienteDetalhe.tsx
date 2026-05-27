@@ -92,13 +92,15 @@ const PacienteDetalhe = () => {
     const load = async () => {
       if (!id) return;
       try {
+        const safe = <T,>(p: Promise<T>, fallback: T): Promise<T> =>
+          p.catch((err) => { console.error("PacienteDetalhe load error:", err); return fallback; });
         const [paciente, sessoes, fotosList, dentistasList, debitosList, evolucoesList] = await Promise.all([
           pacienteService.buscarPorId(id),
-          sessaoService.listarPorPaciente(id),
-          pacienteFotoService.listarPorPaciente(id),
-          dentistaService.listar(),
-          pacienteDebitoService.listarPorPaciente(id),
-          evolucaoService.listarPorPaciente(id),
+          safe(sessaoService.listarPorPaciente(id), []),
+          safe(pacienteFotoService.listarPorPaciente(id), []),
+          safe(dentistaService.listar(), []),
+          safe(pacienteDebitoService.listarPorPaciente(id), []),
+          safe(evolucaoService.listarPorPaciente(id), []),
         ]);
         setPatientData(paciente);
         setSessions(sessoes);
@@ -107,14 +109,18 @@ const PacienteDetalhe = () => {
         setDebitos(debitosList);
         setEvolucoes(evolucoesList);
         if (paciente?.avatar_url) {
-          const url = await pacienteService.getAvatarSignedUrl(paciente.avatar_url);
-          setAvatarUrl(url);
+          try {
+            const url = await pacienteService.getAvatarSignedUrl(paciente.avatar_url);
+            setAvatarUrl(url);
+          } catch (err) { console.error("avatar error:", err); }
         }
-      } catch {
+      } catch (err) {
+        console.error("Erro ao carregar paciente:", err);
         toast({ title: "Erro ao carregar paciente", variant: "destructive" });
       } finally {
         setLoading(false);
       }
+
     };
     load();
   }, [id]);
