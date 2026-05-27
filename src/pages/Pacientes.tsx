@@ -245,6 +245,78 @@ const Pacientes = () => {
             <Input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@usuario" />
           </div>
 
+          {/* Documentos & Dados Pessoais */}
+          <div className="sm:col-span-2 pt-3">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Documentos & Dados Pessoais</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">RG</Label>
+            <Input value={form.rg} onChange={(e) => setForm({ ...form, rg: e.target.value })} placeholder="00.000.000-0" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Órgão Emissor</Label>
+            <Input value={form.emissor} onChange={(e) => setForm({ ...form, emissor: e.target.value })} placeholder="SSP/SP" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Sexo</Label>
+            <Select value={form.sexo || ""} onValueChange={(v) => setForm({ ...form, sexo: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="feminino">Feminino</SelectItem>
+                <SelectItem value="masculino">Masculino</SelectItem>
+                <SelectItem value="outro">Outro</SelectItem>
+                <SelectItem value="nao_informar">Prefiro não informar</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Estado Civil</Label>
+            <Select value={form.estado_civil || ""} onValueChange={(v) => setForm({ ...form, estado_civil: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="solteiro">Solteiro(a)</SelectItem>
+                <SelectItem value="casado">Casado(a)</SelectItem>
+                <SelectItem value="divorciado">Divorciado(a)</SelectItem>
+                <SelectItem value="viuvo">Viúvo(a)</SelectItem>
+                <SelectItem value="uniao_estavel">União Estável</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Situação Profissional</Label>
+            <Select value={form.situacao_profissional || ""} onValueChange={(v) => setForm({ ...form, situacao_profissional: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="clt">CLT</SelectItem>
+                <SelectItem value="autonomo">Autônomo</SelectItem>
+                <SelectItem value="empresario">Empresário</SelectItem>
+                <SelectItem value="servidor_publico">Servidor Público</SelectItem>
+                <SelectItem value="aposentado">Aposentado</SelectItem>
+                <SelectItem value="estudante">Estudante</SelectItem>
+                <SelectItem value="desempregado">Desempregado</SelectItem>
+                <SelectItem value="outro">Outro</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Plano</Label>
+            <Input value={form.plano} onChange={(e) => setForm({ ...form, plano: e.target.value })} placeholder="Nome do plano" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Número do Plano</Label>
+            <Input value={form.numero_plano} onChange={(e) => setForm({ ...form, numero_plano: e.target.value })} placeholder="000000" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Número do Prontuário</Label>
+            <Input value={form.numero_prontuario} onChange={(e) => setForm({ ...form, numero_prontuario: e.target.value })} placeholder="000000" />
+          </div>
+
+
+
           {/* Endereço */}
           <div className="sm:col-span-2 pt-3">
             <div className="flex items-center gap-2 mb-3">
