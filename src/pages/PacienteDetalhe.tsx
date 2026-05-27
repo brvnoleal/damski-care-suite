@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X } from "lucide-react";
+import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X, User, DollarSign, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,10 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { pacienteService } from "@/services/pacienteService";
-import { Paciente } from "@/types";
+import { dentistaService } from "@/services/dentistaService";
+import { pacienteDebitoService, type PacienteDebito } from "@/services/pacienteDebitoService";
+import { evolucaoService, type Evolucao } from "@/services/evolucaoService";
+import { Paciente, Dentista } from "@/types";
 
 import { sessaoService, type Sessao } from "@/services/sessaoService";
 import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/services/pacienteFotoService";
@@ -27,6 +30,21 @@ const formatDateBR = (iso: string) => {
   const [y, m, d] = iso.split("-");
   return `${d}/${m}/${y}`;
 };
+
+const formatRG = (raw: string) => {
+  if (!raw) return "";
+  const digits = raw.replace(/\D/g, "").slice(0, 9);
+  return digits
+    .replace(/(\d{2})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+};
+
+const formatBRL = (n: number) =>
+  n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+const isAtrasado = (d: PacienteDebito) =>
+  d.status !== "pago" && new Date(d.data_vencimento) < new Date(new Date().toDateString());
 
 const PacienteDetalhe = () => {
   const { id } = useParams();
