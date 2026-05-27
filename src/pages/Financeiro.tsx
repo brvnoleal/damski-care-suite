@@ -25,7 +25,11 @@ import { despesaService } from "@/services/despesaService";
 import { procedimentoConsultaLabels, formaPagamentoLabels } from "@/types";
 
 const pagamentoColors = ["hsl(160 84% 39%)", "hsl(239 84% 67%)", "hsl(38 92% 50%)", "hsl(0 72% 51%)", "hsl(280 60% 55%)"];
-const procStatusColors = ["hsl(38 92% 50%)", "hsl(160 84% 39%)"];
+const procedimentoColors = [
+  "hsl(239 84% 67%)", "hsl(160 84% 39%)", "hsl(38 92% 50%)", "hsl(0 72% 51%)",
+  "hsl(280 60% 55%)", "hsl(199 89% 48%)", "hsl(340 82% 60%)", "hsl(48 96% 53%)",
+  "hsl(173 80% 40%)", "hsl(262 83% 58%)", "hsl(15 86% 55%)", "hsl(120 50% 45%)",
+];
 
 const faturamentoConfig: ChartConfig = {
   receita: { label: "Receita", color: "hsl(var(--primary))" },
@@ -44,6 +48,7 @@ const Relatorios = () => {
   const [taxaConfirmacao, setTaxaConfirmacao] = useState(0);
   const [taxaComparecimento, setTaxaComparecimento] = useState(0);
   const [procStatus, setProcStatus] = useState<{ status: string; valor: number }[]>([]);
+  const [procPorTipo, setProcPorTipo] = useState<{ procedimento: string; valor: number }[]>([]);
 
   // Financeiro
   const [receitaTotal, setReceitaTotal] = useState(0);
@@ -79,12 +84,25 @@ const Relatorios = () => {
         setTaxaConfirmacao(total > 0 ? Math.round((confirmadosOuRealizados / total) * 100) : 0);
         setTaxaComparecimento(baseComparecimento > 0 ? Math.round((realizados.length / baseComparecimento) * 100) : 0);
 
+        // Procedimentos por tipo (pendentes + concluídos, excluindo cancelados)
+        const ativosParaProc = agendamentos.filter((a: any) => a.status !== "cancelado");
         const pendentes = agendamentos.filter((a: any) => a.status === "agendado" || a.status === "confirmado").length;
         const concluidos = realizados.length;
         setProcStatus([
           { status: "Pendentes", valor: pendentes },
           { status: "Concluídos", valor: concluidos },
         ]);
+
+        const tipoTotals: Record<string, number> = {};
+        ativosParaProc.forEach((a: any) => {
+          const label = (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento;
+          tipoTotals[label] = (tipoTotals[label] || 0) + 1;
+        });
+        setProcPorTipo(
+          Object.entries(tipoTotals)
+            .sort((a, b) => b[1] - a[1])
+            .map(([procedimento, valor]) => ({ procedimento, valor })),
+        );
 
         // ============ Financeiro ============
         const totalReceita = realizados.reduce((s: number, a: any) => s + Number(a.valor), 0);
@@ -325,22 +343,29 @@ const Relatorios = () => {
 
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
             <div className="p-5 pb-2">
-              <h3 className="text-base font-semibold text-foreground">Procedimentos — Pendentes vs Concluídos</h3>
-              <p className="text-sm text-muted-foreground">Distribuição do status dos procedimentos</p>
+              <h3 className="text-base font-semibold text-foreground">Procedimentos por Tipo</h3>
+              <p className="text-sm text-muted-foreground">Distribuição dos procedimentos da clínica (pendentes + concluídos)</p>
             </div>
             <div className="px-5 pb-5">
-              <ChartContainer config={procedimentoConfig} className="h-[280px] w-full">
-                <PieChart>
-                  <Pie data={procStatus} dataKey="valor" nameKey="status" cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={3} label={(e: any) => `${e.status}: ${e.valor}`}>
-                    {procStatus.map((_, index) => <Cell key={index} fill={procStatusColors[index % procStatusColors.length]} />)}
-                  </Pie>
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <ChartLegend content={<ChartLegendContent nameKey="status" />} />
-                </PieChart>
-              </ChartContainer>
+              {procPorTipo.length === 0 ? (
+                <div className="h-[280px] flex items-center justify-center text-sm text-muted-foreground">
+                  Nenhum procedimento registrado.
+                </div>
+              ) : (
+                <ChartContainer config={procedimentoConfig} className="h-[320px] w-full">
+                  <PieChart>
+                    <Pie data={procPorTipo} dataKey="valor" nameKey="procedimento" cx="50%" cy="50%" innerRadius={60} outerRadius={110} paddingAngle={2} label={(e: any) => `${e.procedimento}: ${e.valor}`}>
+                      {procPorTipo.map((_, index) => <Cell key={index} fill={procedimentoColors[index % procedimentoColors.length]} />)}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <ChartLegend content={<ChartLegendContent nameKey="procedimento" />} />
+                  </PieChart>
+                </ChartContainer>
+              )}
             </div>
           </LiquidGlassCard>
         </TabsContent>
+
 
         {/* ========== FINANCEIRO ========== */}
         <TabsContent value="financeiro" className="space-y-4">
