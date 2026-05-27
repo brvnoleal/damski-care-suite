@@ -71,7 +71,7 @@ export default function ResetPassword() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={12}
                 autoComplete="new-password"
                 disabled={!sessionReady}
               />
@@ -84,7 +84,7 @@ export default function ResetPassword() {
                 value={confirmacao}
                 onChange={(e) => setConfirmacao(e.target.value)}
                 required
-                minLength={6}
+                minLength={12}
                 autoComplete="new-password"
                 disabled={!sessionReady}
               />
