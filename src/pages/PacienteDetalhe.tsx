@@ -33,10 +33,14 @@ const PacienteDetalhe = () => {
   const { toast } = useToast();
 
   const [patientData, setPatientData] = useState<Paciente | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
   const [editForm, setEditForm] = useState({
-    nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo" as "ativo" | "inativo",
+    nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", situacao_profissional: "",
+    plano: "", numero_plano: "", numero_prontuario: "",
+    telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo" as "ativo" | "inativo",
   });
 
   const [sessions, setSessions] = useState<Sessao[]>([]);
@@ -62,6 +66,10 @@ const PacienteDetalhe = () => {
         setPatientData(paciente);
         setSessions(sessoes);
         setFotos(fotosList);
+        if (paciente?.avatar_url) {
+          const url = await pacienteService.getAvatarSignedUrl(paciente.avatar_url);
+          setAvatarUrl(url);
+        }
       } catch {
         toast({ title: "Erro ao carregar paciente", variant: "destructive" });
       } finally {
@@ -78,11 +86,30 @@ const PacienteDetalhe = () => {
   const openEditDialog = () => {
     if (!patientData) return;
     setEditForm({
-      nome: patientData.nome, cpf: patientData.cpf, telefone: patientData.telefone,
+      nome: patientData.nome, cpf: patientData.cpf,
+      rg: patientData.rg || "", emissor: patientData.emissor || "", sexo: patientData.sexo || "",
+      estado_civil: patientData.estado_civil || "", situacao_profissional: patientData.situacao_profissional || "",
+      plano: patientData.plano || "", numero_plano: patientData.numero_plano || "", numero_prontuario: patientData.numero_prontuario || "",
+      telefone: patientData.telefone,
       email: patientData.email, instagram: patientData.instagram || "",
       data_nascimento: patientData.data_nascimento, status: patientData.status,
     });
     setEditOpen(true);
+  };
+
+  const handleAvatarChange = async (file: File) => {
+    if (!id) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Selecione um arquivo de imagem", variant: "destructive" });
+      return;
+    }
+    try {
+      const url = await pacienteService.uploadAvatar(id, file);
+      setAvatarUrl(url);
+      toast({ title: "Foto de perfil atualizada" });
+    } catch {
+      toast({ title: "Erro ao enviar foto de perfil", variant: "destructive" });
+    }
   };
 
   const handleEditSave = async () => {
