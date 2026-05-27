@@ -115,13 +115,71 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 h-16 border-b border-sidebar-border">
-          <div className="w-9 h-9 rounded-md bg-white flex items-center justify-center">
-            <span className="font-display font-bold text-sm text-sidebar-background">S</span>
-          </div>
-          <div className="flex-1">
-            <h1 className="font-display text-[15px] font-semibold text-sidebar-foreground">
-              SaaS Odonto
-            </h1>
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-9 h-9 rounded-md bg-white flex items-center justify-center overflow-hidden hover:opacity-80 transition-opacity shrink-0"
+            title="Alterar logo da clínica"
+          >
+            {clinicLogo ? (
+              <img src={clinicLogo} alt="Logo da clínica" className="w-full h-full object-cover" />
+            ) : (
+              <span className="font-display font-bold text-sm text-sidebar-background">
+                {clinicName.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleLogoUpload}
+          />
+          <div className="flex-1 min-w-0 flex items-center gap-1.5">
+            {editingName ? (
+              <>
+                <input
+                  autoFocus
+                  value={draftName}
+                  onChange={(e) => setDraftName(e.target.value)}
+                  onBlur={saveName}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") saveName();
+                    if (e.key === "Escape") {
+                      setDraftName(clinicName);
+                      setEditingName(false);
+                    }
+                  }}
+                  maxLength={40}
+                  className="flex-1 min-w-0 bg-transparent border-b border-sidebar-foreground/40 text-[15px] font-display font-semibold text-sidebar-foreground outline-none"
+                />
+                <button
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={saveName}
+                  className="text-sidebar-foreground/70 hover:text-sidebar-foreground shrink-0"
+                  title="Salvar"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                </button>
+              </>
+            ) : (
+              <>
+                <h1 className="font-display text-[15px] font-semibold text-sidebar-foreground truncate">
+                  {clinicName}
+                </h1>
+                <button
+                  onClick={() => {
+                    setDraftName(clinicName);
+                    setEditingName(true);
+                  }}
+                  className="text-sidebar-foreground/60 hover:text-sidebar-foreground shrink-0"
+                  title="Editar nome da clínica"
+                >
+                  <Pencil className="w-3 h-3" />
+                </button>
+              </>
+            )}
           </div>
           <button
             className="lg:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground"
