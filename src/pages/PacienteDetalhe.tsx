@@ -108,13 +108,14 @@ const PacienteDetalhe = () => {
       try {
         const safe = <T,>(p: Promise<T>, fallback: T): Promise<T> =>
           p.catch((err) => { console.error("PacienteDetalhe load error:", err); return fallback; });
-        const [paciente, sessoes, fotosList, dentistasList, debitosList, evolucoesList] = await Promise.all([
+        const [paciente, sessoes, fotosList, dentistasList, debitosList, evolucoesList, agendamentosList] = await Promise.all([
           pacienteService.buscarPorId(id),
           safe(sessaoService.listarPorPaciente(id), []),
           safe(pacienteFotoService.listarPorPaciente(id), []),
           safe(dentistaService.listar(), []),
           safe(pacienteDebitoService.listarPorPaciente(id), []),
           safe(evolucaoService.listarPorPaciente(id), []),
+          safe(agendamentoService.listar(), [] as Agendamento[]),
         ]);
         setPatientData(paciente);
         setSessions(sessoes);
@@ -122,6 +123,7 @@ const PacienteDetalhe = () => {
         setDentistas(dentistasList);
         setDebitos(debitosList);
         setEvolucoes(evolucoesList);
+        setAgendamentos(agendamentosList.filter((a) => a.paciente_id === id));
         if (paciente?.avatar_url) {
           try {
             const url = await pacienteService.getAvatarSignedUrl(paciente.avatar_url);
