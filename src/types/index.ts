@@ -7,6 +7,14 @@ export interface Paciente {
   id: string;
   nome: string;
   cpf: string;
+  rg?: string;
+  emissor?: string;
+  sexo?: string;
+  estado_civil?: string;
+  situacao_profissional?: string;
+  plano?: string;
+  numero_plano?: string;
+  numero_prontuario?: string;
   telefone: string;
   email: string;
   instagram?: string;
@@ -19,6 +27,7 @@ export interface Paciente {
   numero?: string;
   complemento?: string;
   ponto_referencia?: string;
+  avatar_url?: string;
   status: "ativo" | "inativo";
   created_at?: string;
 }

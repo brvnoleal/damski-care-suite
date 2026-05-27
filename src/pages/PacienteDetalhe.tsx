@@ -33,10 +33,14 @@ const PacienteDetalhe = () => {
   const { toast } = useToast();
 
   const [patientData, setPatientData] = useState<Paciente | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
   const [editForm, setEditForm] = useState({
-    nome: "", cpf: "", telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo" as "ativo" | "inativo",
+    nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", situacao_profissional: "",
+    plano: "", numero_plano: "", numero_prontuario: "",
+    telefone: "", email: "", instagram: "", data_nascimento: "", status: "ativo" as "ativo" | "inativo",
   });
 
   const [sessions, setSessions] = useState<Sessao[]>([]);
@@ -62,6 +66,10 @@ const PacienteDetalhe = () => {
         setPatientData(paciente);
         setSessions(sessoes);
         setFotos(fotosList);
+        if (paciente?.avatar_url) {
+          const url = await pacienteService.getAvatarSignedUrl(paciente.avatar_url);
+          setAvatarUrl(url);
+        }
       } catch {
         toast({ title: "Erro ao carregar paciente", variant: "destructive" });
       } finally {
@@ -78,11 +86,30 @@ const PacienteDetalhe = () => {
   const openEditDialog = () => {
     if (!patientData) return;
     setEditForm({
-      nome: patientData.nome, cpf: patientData.cpf, telefone: patientData.telefone,
+      nome: patientData.nome, cpf: patientData.cpf,
+      rg: patientData.rg || "", emissor: patientData.emissor || "", sexo: patientData.sexo || "",
+      estado_civil: patientData.estado_civil || "", situacao_profissional: patientData.situacao_profissional || "",
+      plano: patientData.plano || "", numero_plano: patientData.numero_plano || "", numero_prontuario: patientData.numero_prontuario || "",
+      telefone: patientData.telefone,
       email: patientData.email, instagram: patientData.instagram || "",
       data_nascimento: patientData.data_nascimento, status: patientData.status,
     });
     setEditOpen(true);
+  };
+
+  const handleAvatarChange = async (file: File) => {
+    if (!id) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Selecione um arquivo de imagem", variant: "destructive" });
+      return;
+    }
+    try {
+      const url = await pacienteService.uploadAvatar(id, file);
+      setAvatarUrl(url);
+      toast({ title: "Foto de perfil atualizada" });
+    } catch {
+      toast({ title: "Erro ao enviar foto de perfil", variant: "destructive" });
+    }
   };
 
   const handleEditSave = async () => {
@@ -200,9 +227,28 @@ const PacienteDetalhe = () => {
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-xl bg-primary flex items-center justify-center">
-            <span className="text-xl font-display font-bold text-primary-foreground">{initials}</span>
-          </div>
+          <button
+            type="button"
+            onClick={() => avatarInputRef.current?.click()}
+            className="group relative w-16 h-16 rounded-xl bg-primary overflow-hidden flex items-center justify-center hover:opacity-90 transition"
+            title="Alterar foto de perfil"
+          >
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={patientData.nome} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-xl font-display font-bold text-primary-foreground">{initials}</span>
+            )}
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+              <Camera className="w-5 h-5 text-white" />
+            </div>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleAvatarChange(f); e.target.value = ""; }}
+            />
+          </button>
           <div>
             <h1 className="text-2xl font-bold text-foreground">{patientData.nome}</h1>
             <div className="flex items-center gap-2 mt-1">
@@ -223,20 +269,28 @@ const PacienteDetalhe = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {[
+          { label: "Nº Prontuário", value: patientData.numero_prontuario || "—" },
           { label: "Data de Nascimento", value: nascFormatted },
           { label: "CPF", value: patientData.cpf ? patientData.cpf.slice(0, 3) + ".•••.•••-••" : "—" },
-          { label: "Telefone", value: patientData.telefone },
-          { label: "Email", value: patientData.email },
+          { label: "RG", value: patientData.rg ? `${patientData.rg}${patientData.emissor ? " — " + patientData.emissor : ""}` : "—" },
+          { label: "Sexo", value: patientData.sexo ? patientData.sexo.charAt(0).toUpperCase() + patientData.sexo.slice(1).replace("_", " ") : "—" },
+          { label: "Estado Civil", value: patientData.estado_civil ? patientData.estado_civil.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+          { label: "Situação Profissional", value: patientData.situacao_profissional ? patientData.situacao_profissional.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+          { label: "Telefone", value: patientData.telefone || "—" },
+          { label: "Email", value: patientData.email || "—" },
           { label: "Instagram", value: patientData.instagram || "—" },
+          { label: "Plano", value: patientData.plano || "—" },
+          { label: "Nº do Plano", value: patientData.numero_plano || "—" },
         ].map((item, i) => (
           <LiquidGlassCard key={i} draggable={false} className="p-4">
             <p className="text-xs text-muted-foreground">{item.label}</p>
-            <p className="text-sm font-medium text-foreground mt-1">{item.value}</p>
+            <p className="text-sm font-medium text-foreground mt-1 break-words">{item.value}</p>
           </LiquidGlassCard>
         ))}
       </div>
+
 
       <Tabs defaultValue="evolucoes" className="space-y-4">
         <TabsList className="bg-muted/50 p-1 flex flex-wrap gap-1 h-auto">
@@ -398,17 +452,61 @@ const PacienteDetalhe = () => {
 
       {/* Edit Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Paciente</DialogTitle>
             <DialogDescription>Atualize os dados do paciente.</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2"><Label>Nome *</Label><Input value={editForm.nome} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} /></div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>CPF *</Label><Input value={editForm.cpf} onChange={(e) => setEditForm({ ...editForm, cpf: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Data Nasc.</Label><Input type="date" value={editForm.data_nascimento} onChange={(e) => setEditForm({ ...editForm, data_nascimento: e.target.value })} /></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
+            <div className="space-y-2 sm:col-span-2"><Label>Nome *</Label><Input value={editForm.nome} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} /></div>
+            <div className="space-y-2"><Label>CPF *</Label><Input value={editForm.cpf} onChange={(e) => setEditForm({ ...editForm, cpf: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Data Nasc.</Label><Input type="date" value={editForm.data_nascimento} onChange={(e) => setEditForm({ ...editForm, data_nascimento: e.target.value })} /></div>
+            <div className="space-y-2"><Label>RG</Label><Input value={editForm.rg} onChange={(e) => setEditForm({ ...editForm, rg: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Órgão Emissor</Label><Input value={editForm.emissor} onChange={(e) => setEditForm({ ...editForm, emissor: e.target.value })} placeholder="SSP/SP" /></div>
+            <div className="space-y-2">
+              <Label>Sexo</Label>
+              <Select value={editForm.sexo} onValueChange={(v) => setEditForm({ ...editForm, sexo: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="feminino">Feminino</SelectItem>
+                  <SelectItem value="masculino">Masculino</SelectItem>
+                  <SelectItem value="outro">Outro</SelectItem>
+                  <SelectItem value="nao_informar">Prefiro não informar</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+            <div className="space-y-2">
+              <Label>Estado Civil</Label>
+              <Select value={editForm.estado_civil} onValueChange={(v) => setEditForm({ ...editForm, estado_civil: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="solteiro">Solteiro(a)</SelectItem>
+                  <SelectItem value="casado">Casado(a)</SelectItem>
+                  <SelectItem value="divorciado">Divorciado(a)</SelectItem>
+                  <SelectItem value="viuvo">Viúvo(a)</SelectItem>
+                  <SelectItem value="uniao_estavel">União Estável</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Situação Profissional</Label>
+              <Select value={editForm.situacao_profissional} onValueChange={(v) => setEditForm({ ...editForm, situacao_profissional: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="clt">CLT</SelectItem>
+                  <SelectItem value="autonomo">Autônomo</SelectItem>
+                  <SelectItem value="empresario">Empresário</SelectItem>
+                  <SelectItem value="servidor_publico">Servidor Público</SelectItem>
+                  <SelectItem value="aposentado">Aposentado</SelectItem>
+                  <SelectItem value="estudante">Estudante</SelectItem>
+                  <SelectItem value="desempregado">Desempregado</SelectItem>
+                  <SelectItem value="outro">Outro</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2"><Label>Plano</Label><Input value={editForm.plano} onChange={(e) => setEditForm({ ...editForm, plano: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Nº do Plano</Label><Input value={editForm.numero_plano} onChange={(e) => setEditForm({ ...editForm, numero_plano: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Nº do Prontuário</Label><Input value={editForm.numero_prontuario} onChange={(e) => setEditForm({ ...editForm, numero_prontuario: e.target.value })} /></div>
             <div className="space-y-2"><Label>Telefone</Label><Input value={editForm.telefone} onChange={(e) => setEditForm({ ...editForm, telefone: e.target.value })} /></div>
             <div className="space-y-2"><Label>Email</Label><Input value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} /></div>
             <div className="space-y-2"><Label>Instagram</Label><Input value={editForm.instagram} onChange={(e) => setEditForm({ ...editForm, instagram: e.target.value })} /></div>

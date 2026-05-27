@@ -9,6 +9,14 @@ const mapRow = (row: any): Paciente => ({
   id: row.id,
   nome: row.nome,
   cpf: row.cpf,
+  rg: row.rg || undefined,
+  emissor: row.emissor || undefined,
+  sexo: row.sexo || undefined,
+  estado_civil: row.estado_civil || undefined,
+  situacao_profissional: row.situacao_profissional || undefined,
+  plano: row.plano || undefined,
+  numero_plano: row.numero_plano || undefined,
+  numero_prontuario: row.numero_prontuario || undefined,
   telefone: row.telefone || "",
   email: row.email || "",
   instagram: row.instagram || undefined,
@@ -21,6 +29,7 @@ const mapRow = (row: any): Paciente => ({
   numero: row.numero || undefined,
   complemento: row.complemento || undefined,
   ponto_referencia: row.ponto_referencia || undefined,
+  avatar_url: row.avatar_url || undefined,
   status: row.status,
   created_at: row.created_at,
 });
@@ -55,5 +64,31 @@ export const pacienteService = {
     const { error } = await supabase.from("paciente").delete().eq("id", id);
     if (error) throw error;
     return true;
+  },
+
+  uploadAvatar: async (id: string, file: File): Promise<string> => {
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `avatars/${id}-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from("paciente-fotos")
+      .upload(path, file, { contentType: file.type, upsert: true });
+    if (upErr) throw upErr;
+    const { error } = await supabase
+      .from("paciente")
+      .update({ avatar_url: path, updated_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) throw error;
+    const { data } = await supabase.storage
+      .from("paciente-fotos")
+      .createSignedUrl(path, 60 * 60);
+    return data?.signedUrl || "";
+  },
+
+  getAvatarSignedUrl: async (path: string): Promise<string> => {
+    if (!path) return "";
+    const { data } = await supabase.storage
+      .from("paciente-fotos")
+      .createSignedUrl(path, 60 * 60);
+    return data?.signedUrl || "";
   },
 };
