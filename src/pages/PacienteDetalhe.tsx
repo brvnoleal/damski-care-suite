@@ -540,39 +540,63 @@ const PacienteDetalhe = () => {
         </TabsContent>
 
         <TabsContent value="consultas" className="space-y-4">
-
-          {sessions.length === 0 && (
+          <div className="flex justify-end">
+            <Button size="sm" className="gap-1.5" onClick={openConsultaDialog}>
+              <Plus className="w-3.5 h-3.5" /> Nova Consulta
+            </Button>
+          </div>
+          {agendamentos.length === 0 ? (
             <div className="rounded-xl glass p-8 text-center">
               <ClipboardList className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">Nenhuma sessão registrada ainda.</p>
+              <p className="text-sm text-muted-foreground">Nenhuma consulta agendada ainda.</p>
             </div>
+          ) : (
+            agendamentos.map((a) => {
+              const dentista = dentistas.find((d) => d.id === a.dentista_id);
+              const statusMap: Record<string, string> = {
+                agendado: "bg-info/10 text-info border-info/20",
+                confirmado: "bg-primary/10 text-primary border-primary/20",
+                realizado: "bg-success/10 text-success border-success/20",
+                cancelado: "bg-destructive/10 text-destructive border-destructive/20",
+              };
+              return (
+                <LiquidGlassCard key={a.id} draggable={false} className="p-5 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{procedimentoConsultaLabels[a.procedimento]}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {formatDateBR(a.data)} · {a.horario}{a.horario_fim ? ` – ${a.horario_fim}` : ""}
+                      </p>
+                    </div>
+                    <Badge className={statusMap[a.status] || statusMap.agendado}>
+                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Dentista</p>
+                      <p className="text-foreground">{dentista?.nome || "—"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Valor</p>
+                      <p className="text-foreground">{formatBRL(a.valor)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Pagamento</p>
+                      <p className="text-foreground">
+                        {formaPagamentoLabels[a.forma_pagamento]}{a.parcelas > 1 ? ` · ${a.parcelas}x` : ""}
+                      </p>
+                    </div>
+                  </div>
+                  {a.observacoes && (
+                    <p className="text-xs text-muted-foreground border-t border-border/40 pt-2">{a.observacoes}</p>
+                  )}
+                </LiquidGlassCard>
+              );
+            })
           )}
-          {sessions.map((session) => (
-            <LiquidGlassCard key={session.id} draggable={false} className="p-5 space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{session.procedimento}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{formatDateBR(session.data)}</p>
-                </div>
-                <Badge className={session.assinado ? "bg-success/10 text-success border-success/20" : "bg-warning/10 text-warning border-warning/20"}>
-                  {session.assinado ? (
-                    <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> Assinado</span>
-                  ) : "Pendente"}
-                </Badge>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                <div>
-                  <p className="text-xs text-muted-foreground">Técnica</p>
-                  <p className="text-foreground">{session.tecnica || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Substância / Lote</p>
-                  <p className="text-foreground">{session.substancia_lote || "—"}</p>
-                </div>
-              </div>
-            </LiquidGlassCard>
-          ))}
         </TabsContent>
+
 
         <TabsContent value="documentos" className="space-y-4">
           {[
