@@ -48,6 +48,7 @@ const Relatorios = () => {
   const [taxaConfirmacao, setTaxaConfirmacao] = useState(0);
   const [taxaComparecimento, setTaxaComparecimento] = useState(0);
   const [procStatus, setProcStatus] = useState<{ status: string; valor: number }[]>([]);
+  const [procPorTipo, setProcPorTipo] = useState<{ procedimento: string; valor: number }[]>([]);
 
   // Financeiro
   const [receitaTotal, setReceitaTotal] = useState(0);
