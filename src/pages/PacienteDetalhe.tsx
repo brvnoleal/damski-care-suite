@@ -21,7 +21,8 @@ import { pacienteService } from "@/services/pacienteService";
 import { dentistaService } from "@/services/dentistaService";
 import { pacienteDebitoService, type PacienteDebito } from "@/services/pacienteDebitoService";
 import { evolucaoService, type Evolucao } from "@/services/evolucaoService";
-import { Paciente, Dentista } from "@/types";
+import { agendamentoService } from "@/services/agendamentoService";
+import { Paciente, Dentista, Agendamento, ProcedimentoConsulta, procedimentoConsultaLabels, FormaPagamento, formaPagamentoLabels } from "@/types";
 
 import { sessaoService, type Sessao } from "@/services/sessaoService";
 import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/services/pacienteFotoService";
@@ -92,19 +93,29 @@ const PacienteDetalhe = () => {
     data: today, dentista_id: "", conteudo: "",
   });
 
+  const [agendamentos, setAgendamentos] = useState<Agendamento[]>([]);
+  const [consultaOpen, setConsultaOpen] = useState(false);
+  const emptyConsulta = (): Omit<Agendamento, "id" | "created_at" | "paciente_id"> => ({
+    data: "", horario: "", horario_fim: "", dentista_id: "",
+    procedimento: "avaliacao", status: "agendado",
+    valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
+  });
+  const [consultaForm, setConsultaForm] = useState(emptyConsulta());
+
   useEffect(() => {
     const load = async () => {
       if (!id) return;
       try {
         const safe = <T,>(p: Promise<T>, fallback: T): Promise<T> =>
           p.catch((err) => { console.error("PacienteDetalhe load error:", err); return fallback; });
-        const [paciente, sessoes, fotosList, dentistasList, debitosList, evolucoesList] = await Promise.all([
+        const [paciente, sessoes, fotosList, dentistasList, debitosList, evolucoesList, agendamentosList] = await Promise.all([
           pacienteService.buscarPorId(id),
           safe(sessaoService.listarPorPaciente(id), []),
           safe(pacienteFotoService.listarPorPaciente(id), []),
           safe(dentistaService.listar(), []),
           safe(pacienteDebitoService.listarPorPaciente(id), []),
           safe(evolucaoService.listarPorPaciente(id), []),
+          safe(agendamentoService.listar(), [] as Agendamento[]),
         ]);
         setPatientData(paciente);
         setSessions(sessoes);
@@ -112,6 +123,7 @@ const PacienteDetalhe = () => {
         setDentistas(dentistasList);
         setDebitos(debitosList);
         setEvolucoes(evolucoesList);
+        setAgendamentos(agendamentosList.filter((a) => a.paciente_id === id));
         if (paciente?.avatar_url) {
           try {
             const url = await pacienteService.getAvatarSignedUrl(paciente.avatar_url);
@@ -300,6 +312,26 @@ const PacienteDetalhe = () => {
     }
   };
 
+  const openConsultaDialog = () => {
+    setConsultaForm(emptyConsulta());
+    setConsultaOpen(true);
+  };
+
+  const handleConsultaSave = async () => {
+    if (!id || !consultaForm.data || !consultaForm.horario || !consultaForm.dentista_id) {
+      toast({ title: "Preencha data, horário e dentista", variant: "destructive" });
+      return;
+    }
+    try {
+      const created = await agendamentoService.criar({ ...consultaForm, paciente_id: id });
+      setAgendamentos((prev) => [created, ...prev]);
+      setConsultaOpen(false);
+      toast({ title: "Consulta agendada com sucesso" });
+    } catch {
+      toast({ title: "Erro ao salvar consulta", variant: "destructive" });
+    }
+  };
+
   const totalRecebido = debitos.filter((d) => d.status === "pago").reduce((s, d) => s + d.valor, 0);
   const totalAtrasado = debitos.filter((d) => isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
   const totalAReceber = debitos.filter((d) => d.status === "pendente" && !isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
@@ -374,9 +406,6 @@ const PacienteDetalhe = () => {
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="gap-1.5" onClick={openEditDialog}>
             <Edit className="w-3.5 h-3.5" /> Editar
-          </Button>
-          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5" onClick={openSessionDialog}>
-            <Syringe className="w-3.5 h-3.5" /> Nova Sessão
           </Button>
         </div>
       </div>
@@ -511,39 +540,63 @@ const PacienteDetalhe = () => {
         </TabsContent>
 
         <TabsContent value="consultas" className="space-y-4">
-
-          {sessions.length === 0 && (
+          <div className="flex justify-end">
+            <Button size="sm" className="gap-1.5" onClick={openConsultaDialog}>
+              <Plus className="w-3.5 h-3.5" /> Nova Consulta
+            </Button>
+          </div>
+          {agendamentos.length === 0 ? (
             <div className="rounded-xl glass p-8 text-center">
               <ClipboardList className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">Nenhuma sessão registrada ainda.</p>
+              <p className="text-sm text-muted-foreground">Nenhuma consulta agendada ainda.</p>
             </div>
+          ) : (
+            agendamentos.map((a) => {
+              const dentista = dentistas.find((d) => d.id === a.dentista_id);
+              const statusMap: Record<string, string> = {
+                agendado: "bg-info/10 text-info border-info/20",
+                confirmado: "bg-primary/10 text-primary border-primary/20",
+                realizado: "bg-success/10 text-success border-success/20",
+                cancelado: "bg-destructive/10 text-destructive border-destructive/20",
+              };
+              return (
+                <LiquidGlassCard key={a.id} draggable={false} className="p-5 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{procedimentoConsultaLabels[a.procedimento]}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {formatDateBR(a.data)} · {a.horario}{a.horario_fim ? ` – ${a.horario_fim}` : ""}
+                      </p>
+                    </div>
+                    <Badge className={statusMap[a.status] || statusMap.agendado}>
+                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Dentista</p>
+                      <p className="text-foreground">{dentista?.nome || "—"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Valor</p>
+                      <p className="text-foreground">{formatBRL(a.valor)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Pagamento</p>
+                      <p className="text-foreground">
+                        {formaPagamentoLabels[a.forma_pagamento]}{a.parcelas > 1 ? ` · ${a.parcelas}x` : ""}
+                      </p>
+                    </div>
+                  </div>
+                  {a.observacoes && (
+                    <p className="text-xs text-muted-foreground border-t border-border/40 pt-2">{a.observacoes}</p>
+                  )}
+                </LiquidGlassCard>
+              );
+            })
           )}
-          {sessions.map((session) => (
-            <LiquidGlassCard key={session.id} draggable={false} className="p-5 space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{session.procedimento}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{formatDateBR(session.data)}</p>
-                </div>
-                <Badge className={session.assinado ? "bg-success/10 text-success border-success/20" : "bg-warning/10 text-warning border-warning/20"}>
-                  {session.assinado ? (
-                    <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> Assinado</span>
-                  ) : "Pendente"}
-                </Badge>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                <div>
-                  <p className="text-xs text-muted-foreground">Técnica</p>
-                  <p className="text-foreground">{session.tecnica || "—"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Substância / Lote</p>
-                  <p className="text-foreground">{session.substancia_lote || "—"}</p>
-                </div>
-              </div>
-            </LiquidGlassCard>
-          ))}
         </TabsContent>
+
 
         <TabsContent value="documentos" className="space-y-4">
           {[
@@ -1008,7 +1061,116 @@ const PacienteDetalhe = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Nova Consulta Dialog */}
+      <ResponsiveDialog
+        open={consultaOpen}
+        onOpenChange={setConsultaOpen}
+        title="Nova Consulta"
+        description={`Agende uma nova consulta para ${patientData.nome}.`}
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setConsultaOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button onClick={handleConsultaSave} className="flex-1 sm:flex-none">Agendar</Button>
+          </>
+        }
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Paciente</Label>
+            <Input value={patientData.nome} disabled />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Dentista *</Label>
+            <Select value={consultaForm.dentista_id} onValueChange={(v) => setConsultaForm({ ...consultaForm, dentista_id: v })}>
+              <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+              <SelectContent>
+                {dentistas.map((d) => (
+                  <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Data *</Label>
+            <Input type="date" value={consultaForm.data} onChange={(e) => setConsultaForm({ ...consultaForm, data: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Início *</Label>
+            <Input type="time" value={consultaForm.horario} onChange={(e) => setConsultaForm({ ...consultaForm, horario: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Término</Label>
+            <Input type="time" value={consultaForm.horario_fim || ""} onChange={(e) => setConsultaForm({ ...consultaForm, horario_fim: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Status</Label>
+            <Select value={consultaForm.status} onValueChange={(v: Agendamento["status"]) => setConsultaForm({ ...consultaForm, status: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="agendado">Agendado</SelectItem>
+                <SelectItem value="confirmado">Confirmado</SelectItem>
+                <SelectItem value="realizado">Realizado</SelectItem>
+                <SelectItem value="cancelado">Cancelado</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
+            <Select value={consultaForm.procedimento} onValueChange={(v: ProcedimentoConsulta) => setConsultaForm({ ...consultaForm, procedimento: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {Object.entries(procedimentoConsultaLabels).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="sm:col-span-2 pt-1">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pagamento</span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Valor (R$) *</Label>
+            <Input type="number" min="0" step="0.01" value={consultaForm.valor || ""} onChange={(e) => setConsultaForm({ ...consultaForm, valor: parseFloat(e.target.value) || 0 })} placeholder="0,00" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Forma de Pagamento *</Label>
+            <Select value={consultaForm.forma_pagamento} onValueChange={(v: FormaPagamento) => setConsultaForm({ ...consultaForm, forma_pagamento: v, parcelas: v === "credito" || v === "boleto" ? consultaForm.parcelas : 1 })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {Object.entries(formaPagamentoLabels).map(([value, label]) => (
+                  <SelectItem key={value} value={value}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {(consultaForm.forma_pagamento === "credito" || consultaForm.forma_pagamento === "boleto") && (
+            <div>
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Parcelas</Label>
+              <Select value={String(consultaForm.parcelas)} onValueChange={(v) => setConsultaForm({ ...consultaForm, parcelas: parseInt(v) })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
+                    <SelectItem key={n} value={String(n)}>{n}x</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          <div className={consultaForm.forma_pagamento === "credito" || consultaForm.forma_pagamento === "boleto" ? "" : "sm:col-span-2"}>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Observações</Label>
+            <Input value={consultaForm.observacoes} onChange={(e) => setConsultaForm({ ...consultaForm, observacoes: e.target.value })} placeholder="Observações opcionais" />
+          </div>
+        </div>
+      </ResponsiveDialog>
     </div>
+
 
   );
 };
