@@ -137,16 +137,6 @@ const Agenda = () => {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex rounded-md border border-white/10 overflow-hidden">
-            <button
-              onClick={() => setView("mes")}
-              className={`px-3 h-8 text-xs font-medium transition-colors ${view === "mes" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-white/5"}`}
-            >Mês</button>
-            <button
-              onClick={() => setView("dia")}
-              className={`px-3 h-8 text-xs font-medium transition-colors ${view === "dia" ? "bg-primary/15 text-primary" : "text-muted-foreground hover:bg-white/5"}`}
-            >Dia</button>
-          </div>
           <Button variant="outline" size="sm" onClick={goToday}>Hoje</Button>
           <div className="flex items-center gap-1">
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev}>
@@ -213,71 +203,58 @@ const Agenda = () => {
           </div>
 
           <div className="p-2 sm:p-3">
-            {view === "mes" ? (
-              <>
-                <div className="grid grid-cols-7">
-                  {weekDays.map((w) => (
-                    <div key={w} className="text-[10px] sm:text-xs font-semibold text-muted-foreground text-center py-2 uppercase tracking-wider border border-white/[0.04]">
-                      {w}
-                    </div>
-                  ))}
+            <div className="grid grid-cols-7">
+              {weekDays.map((w) => (
+                <div key={w} className="text-[10px] sm:text-xs font-semibold text-muted-foreground text-center py-2 uppercase tracking-wider border border-white/[0.04]">
+                  {w}
                 </div>
+              ))}
+            </div>
 
-                <div className="grid grid-cols-7">
-                  {cells.map((cell, i) => {
-                    if (!cell) return <div key={`e-${i}`} className="min-h-[80px] sm:min-h-[110px] bg-white/[0.015] border border-white/[0.04]" />;
-                    const items = agendamentosPorDia.get(cell.key) || [];
-                    const isToday = cell.key === today;
-                    return (
-                      <div
-                        key={cell.key}
-                        onClick={() => { setCurrentDate(cell.date); setView("dia"); }}
-                        className={`min-h-[80px] sm:min-h-[110px] border p-1 sm:p-1.5 flex flex-col gap-0.5 transition-colors cursor-pointer ${
-                          isToday ? "border-primary/40 bg-primary/[0.04]" : "border-white/[0.04] bg-white/[0.02]"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className={`text-[11px] sm:text-xs font-semibold ${isToday ? "text-primary" : "text-foreground"}`}>
-                            {cell.date.getDate()}
-                          </span>
-                          {items.length > 0 && (
-                            <span className="text-[9px] sm:text-[10px] text-muted-foreground">{items.length}</span>
-                          )}
-                        </div>
-                        <div className="flex-1 flex flex-col gap-0.5 overflow-hidden">
-                          {items.slice(0, 3).map((a) => {
-                            const nome = getPaciente(a.paciente_id)?.nome || "—";
-                            const st = statusConfig[a.status];
-                            return (
-                              <button
-                                key={a.id}
-                                onClick={(e) => { e.stopPropagation(); setSelected(a); }}
-                                className="group flex items-center gap-1 px-1 py-0.5 text-left hover:bg-white/10 transition-colors"
-                              >
-                                <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st?.dot}`} />
-                                <span className="text-[11px] sm:text-sm font-mono text-muted-foreground shrink-0 hidden sm:inline">{a.horario}</span>
-                                <span className="text-[11px] sm:text-sm truncate text-foreground group-hover:text-primary">{nome}</span>
-                              </button>
-                            );
-                          })}
-                          {items.length > 3 && (
-                            <span className="text-[9px] sm:text-[10px] text-muted-foreground pl-1">+{items.length - 3} mais</span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            ) : (
-              <DayView
-                date={currentDate}
-                items={itensDoDia}
-                getPaciente={getPaciente}
-                getDentista={getDentista}
-                onSelect={setSelected}
-              />
-            )}
+            <div className="grid grid-cols-7">
+              {cells.map((cell, i) => {
+                if (!cell) return <div key={`e-${i}`} className="min-h-[80px] sm:min-h-[110px] bg-white/[0.015] border border-white/[0.04]" />;
+                const items = agendamentosPorDia.get(cell.key) || [];
+                const isToday = cell.key === today;
+                return (
+                  <div
+                    key={cell.key}
+                    className={`min-h-[80px] sm:min-h-[110px] border p-1 sm:p-1.5 flex flex-col gap-0.5 transition-colors ${
+                      isToday ? "border-primary/40 bg-primary/[0.04]" : "border-white/[0.04] bg-white/[0.02]"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[11px] sm:text-xs font-semibold ${isToday ? "text-primary" : "text-foreground"}`}>
+                        {cell.date.getDate()}
+                      </span>
+                      {items.length > 0 && (
+                        <span className="text-[9px] sm:text-[10px] text-muted-foreground">{items.length}</span>
+                      )}
+                    </div>
+                    <div className="flex-1 flex flex-col gap-0.5 overflow-hidden">
+                      {items.slice(0, 3).map((a) => {
+                        const nome = getPaciente(a.paciente_id)?.nome || "—";
+                        const st = statusConfig[a.status];
+                        return (
+                          <button
+                            key={a.id}
+                            onClick={() => setSelected(a)}
+                            className="group flex items-center gap-1 px-1 py-0.5 text-left hover:bg-white/10 transition-colors"
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st?.dot}`} />
+                            <span className="text-[11px] sm:text-sm font-mono text-muted-foreground shrink-0 hidden sm:inline">{a.horario}</span>
+                            <span className="text-[11px] sm:text-sm truncate text-foreground group-hover:text-primary">{nome}</span>
+                          </button>
+                        );
+                      })}
+                      {items.length > 3 && (
+                        <span className="text-[9px] sm:text-[10px] text-muted-foreground pl-1">+{items.length - 3} mais</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
 
             {loading && (
               <div className="text-center text-xs text-muted-foreground py-4">Carregando agenda...</div>
