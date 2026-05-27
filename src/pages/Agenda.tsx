@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
@@ -52,7 +52,7 @@ const Agenda = () => {
   const [selected, setSelected] = useState<Agendamento | null>(null);
   const [filtroDentista, setFiltroDentista] = useState<string>("todos");
   const [filtroStatus, setFiltroStatus] = useState<string>("todos");
-  const [filtroData, setFiltroData] = useState<string>("");
+  
   const [view, setView] = useState<"mes" | "dia">("mes");
 
   useEffect(() => {
@@ -81,10 +81,9 @@ const Agenda = () => {
     return agendamentos.filter((a) => {
       if (filtroDentista !== "todos" && a.dentista_id !== filtroDentista) return false;
       if (filtroStatus !== "todos" && a.status !== filtroStatus) return false;
-      if (filtroData && a.data !== filtroData) return false;
       return true;
     });
-  }, [agendamentos, filtroDentista, filtroStatus, filtroData]);
+  }, [agendamentos, filtroDentista, filtroStatus]);
 
   const agendamentosPorDia = useMemo(() => {
     const map = new Map<string, Agendamento[]>();
@@ -97,11 +96,10 @@ const Agenda = () => {
     return map;
   }, [agendamentosFiltrados]);
 
-  const filtrosAtivos = filtroDentista !== "todos" || filtroStatus !== "todos" || !!filtroData;
+  const filtrosAtivos = filtroDentista !== "todos" || filtroStatus !== "todos";
   const limparFiltros = () => {
     setFiltroDentista("todos");
     setFiltroStatus("todos");
-    setFiltroData("");
   };
 
   const year = currentDate.getFullYear();
@@ -180,7 +178,7 @@ const Agenda = () => {
               </Button>
             )}
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">Dentista</Label>
               <Select value={filtroDentista} onValueChange={setFiltroDentista}>
@@ -205,10 +203,6 @@ const Agenda = () => {
                   <SelectItem value="cancelado">Cancelado</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Data</Label>
-              <Input type="date" value={filtroData} onChange={(e) => setFiltroData(e.target.value)} className="h-9 text-sm" />
             </div>
           </div>
         </LiquidGlassCard>
