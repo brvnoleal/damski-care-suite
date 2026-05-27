@@ -84,12 +84,25 @@ const Relatorios = () => {
         setTaxaConfirmacao(total > 0 ? Math.round((confirmadosOuRealizados / total) * 100) : 0);
         setTaxaComparecimento(baseComparecimento > 0 ? Math.round((realizados.length / baseComparecimento) * 100) : 0);
 
+        // Procedimentos por tipo (pendentes + concluídos, excluindo cancelados)
+        const ativosParaProc = agendamentos.filter((a: any) => a.status !== "cancelado");
         const pendentes = agendamentos.filter((a: any) => a.status === "agendado" || a.status === "confirmado").length;
         const concluidos = realizados.length;
         setProcStatus([
           { status: "Pendentes", valor: pendentes },
           { status: "Concluídos", valor: concluidos },
         ]);
+
+        const tipoTotals: Record<string, number> = {};
+        ativosParaProc.forEach((a: any) => {
+          const label = (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento;
+          tipoTotals[label] = (tipoTotals[label] || 0) + 1;
+        });
+        setProcPorTipo(
+          Object.entries(tipoTotals)
+            .sort((a, b) => b[1] - a[1])
+            .map(([procedimento, valor]) => ({ procedimento, valor })),
+        );
 
         // ============ Financeiro ============
         const totalReceita = realizados.reduce((s: number, a: any) => s + Number(a.valor), 0);
