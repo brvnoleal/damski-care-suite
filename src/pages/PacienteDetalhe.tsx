@@ -21,7 +21,8 @@ import { pacienteService } from "@/services/pacienteService";
 import { dentistaService } from "@/services/dentistaService";
 import { pacienteDebitoService, type PacienteDebito } from "@/services/pacienteDebitoService";
 import { evolucaoService, type Evolucao } from "@/services/evolucaoService";
-import { Paciente, Dentista } from "@/types";
+import { agendamentoService } from "@/services/agendamentoService";
+import { Paciente, Dentista, Agendamento, ProcedimentoConsulta, procedimentoConsultaLabels, FormaPagamento, formaPagamentoLabels } from "@/types";
 
 import { sessaoService, type Sessao } from "@/services/sessaoService";
 import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/services/pacienteFotoService";
