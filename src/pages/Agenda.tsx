@@ -53,6 +53,7 @@ const Agenda = () => {
   const [filtroDentista, setFiltroDentista] = useState<string>("todos");
   const [filtroStatus, setFiltroStatus] = useState<string>("todos");
   const [filtroData, setFiltroData] = useState<string>("");
+  const [view, setView] = useState<"mes" | "dia">("mes");
 
   useEffect(() => {
     (async () => {
