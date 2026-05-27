@@ -333,25 +333,25 @@ const Agendamentos = () => {
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Paciente *</Label>
-            <Select value={form.paciente_id} onValueChange={(v) => setForm({ ...form, paciente_id: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-              <SelectContent>
-                {pacientes.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>{p.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={pacientes.map((p) => ({ value: p.id, label: p.nome }))}
+              value={form.paciente_id}
+              onChange={(v) => setForm({ ...form, paciente_id: v })}
+              placeholder="Selecione..."
+              searchPlaceholder="Buscar paciente..."
+              emptyText="Nenhum paciente encontrado."
+            />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Dentista *</Label>
-            <Select value={form.dentista_id} onValueChange={(v) => setForm({ ...form, dentista_id: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-              <SelectContent>
-                {dentistas.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={dentistas.map((d) => ({ value: d.id, label: d.nome }))}
+              value={form.dentista_id}
+              onChange={(v) => setForm({ ...form, dentista_id: v })}
+              placeholder="Selecione..."
+              searchPlaceholder="Buscar dentista..."
+              emptyText="Nenhum dentista encontrado."
+            />
           </div>
           {!editingId && (
             <div className="sm:col-span-2">
