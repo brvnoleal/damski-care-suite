@@ -30,8 +30,8 @@ export default function ResetPassword() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      toast.error("A senha deve ter no mínimo 6 caracteres");
+    if (password.length < 12) {
+      toast.error("A senha deve ter no mínimo 12 caracteres");
       return;
     }
     if (password !== confirmacao) {
@@ -71,7 +71,7 @@ export default function ResetPassword() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={12}
                 autoComplete="new-password"
                 disabled={!sessionReady}
               />
@@ -84,7 +84,7 @@ export default function ResetPassword() {
                 value={confirmacao}
                 onChange={(e) => setConfirmacao(e.target.value)}
                 required
-                minLength={6}
+                minLength={12}
                 autoComplete="new-password"
                 disabled={!sessionReady}
               />
