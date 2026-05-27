@@ -368,33 +368,19 @@ const PacienteDetalhe = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        {[
-          { label: "Nº Prontuário", value: patientData.numero_prontuario || "—" },
-          { label: "Data de Nascimento", value: nascFormatted },
-          { label: "CPF", value: patientData.cpf ? patientData.cpf.slice(0, 3) + ".•••.•••-••" : "—" },
-          { label: "RG", value: patientData.rg ? `${patientData.rg}${patientData.emissor ? " — " + patientData.emissor : ""}` : "—" },
-          { label: "Sexo", value: patientData.sexo ? patientData.sexo.charAt(0).toUpperCase() + patientData.sexo.slice(1).replace("_", " ") : "—" },
-          { label: "Estado Civil", value: patientData.estado_civil ? patientData.estado_civil.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
-          { label: "Situação Profissional", value: patientData.situacao_profissional ? patientData.situacao_profissional.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
-          { label: "Telefone", value: patientData.telefone || "—" },
-          { label: "Email", value: patientData.email || "—" },
-          { label: "Instagram", value: patientData.instagram || "—" },
-          { label: "Plano", value: patientData.plano || "—" },
-          { label: "Nº do Plano", value: patientData.numero_plano || "—" },
-        ].map((item, i) => (
-          <LiquidGlassCard key={i} draggable={false} className="p-4">
-            <p className="text-xs text-muted-foreground">{item.label}</p>
-            <p className="text-sm font-medium text-foreground mt-1 break-words">{item.value}</p>
-          </LiquidGlassCard>
-        ))}
-      </div>
-
-
-      <Tabs defaultValue="evolucoes" className="space-y-4">
+      <Tabs defaultValue="detalhes" className="space-y-4">
         <TabsList className="bg-muted/50 p-1 flex flex-wrap gap-1 h-auto">
-          <TabsTrigger value="evolucoes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+          <TabsTrigger value="detalhes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <User className="w-3.5 h-3.5" /> Detalhes
+          </TabsTrigger>
+          <TabsTrigger value="consultas" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <ClipboardList className="w-3.5 h-3.5" /> Consultas
+          </TabsTrigger>
+          <TabsTrigger value="evolucoes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <Activity className="w-3.5 h-3.5" /> Evoluções
+          </TabsTrigger>
+          <TabsTrigger value="financeiro" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <DollarSign className="w-3.5 h-3.5" /> Financeiro
           </TabsTrigger>
           <TabsTrigger value="documentos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <FileText className="w-3.5 h-3.5" /> Documentos
@@ -407,7 +393,112 @@ const PacienteDetalhe = () => {
           </TabsTrigger>
         </TabsList>
 
+        <TabsContent value="detalhes" className="space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {[
+              { label: "Nº Prontuário", value: patientData.numero_prontuario || "—" },
+              { label: "Data de Nascimento", value: nascFormatted },
+              { label: "CPF", value: patientData.cpf ? patientData.cpf.slice(0, 3) + ".•••.•••-••" : "—" },
+              { label: "RG", value: patientData.rg ? `${formatRG(patientData.rg)}${patientData.emissor ? " — " + patientData.emissor : ""}` : "—" },
+              { label: "Sexo", value: patientData.sexo ? patientData.sexo.charAt(0).toUpperCase() + patientData.sexo.slice(1).replace("_", " ") : "—" },
+              { label: "Estado Civil", value: patientData.estado_civil ? patientData.estado_civil.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+              { label: "Situação Profissional", value: patientData.situacao_profissional ? patientData.situacao_profissional.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+              { label: "Telefone", value: patientData.telefone || "—" },
+              { label: "Email", value: patientData.email || "—" },
+              { label: "Instagram", value: patientData.instagram || "—" },
+              { label: "Plano", value: patientData.plano || "—" },
+              { label: "Nº do Plano", value: patientData.numero_plano || "—" },
+            ].map((item, i) => (
+              <LiquidGlassCard key={i} draggable={false} className="p-4">
+                <p className="text-xs text-muted-foreground">{item.label}</p>
+                <p className="text-sm font-medium text-foreground mt-1 break-words">{item.value}</p>
+              </LiquidGlassCard>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="financeiro" className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <LiquidGlassCard draggable={false} className="p-4">
+              <p className="text-xs text-muted-foreground">Total atrasado</p>
+              <p className="text-xl font-bold text-destructive mt-1">{formatBRL(totalAtrasado)}</p>
+            </LiquidGlassCard>
+            <LiquidGlassCard draggable={false} className="p-4">
+              <p className="text-xs text-muted-foreground">Total a receber</p>
+              <p className="text-xl font-bold text-warning mt-1">{formatBRL(totalAReceber)}</p>
+            </LiquidGlassCard>
+            <LiquidGlassCard draggable={false} className="p-4">
+              <p className="text-xs text-muted-foreground">Total recebido</p>
+              <p className="text-xl font-bold text-success mt-1">{formatBRL(totalRecebido)}</p>
+            </LiquidGlassCard>
+          </div>
+          <div className="flex justify-end">
+            <Button size="sm" className="gap-1.5" onClick={openDebitoDialog}>
+              <Plus className="w-3.5 h-3.5" /> Novo Débito
+            </Button>
+          </div>
+          {debitos.length === 0 ? (
+            <div className="rounded-xl glass p-8 text-center">
+              <DollarSign className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">Nenhum débito registrado.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {debitos.map((d) => {
+                const atrasado = isAtrasado(d);
+                return (
+                  <LiquidGlassCard key={d.id} draggable={false} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground">{d.descricao}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Vencimento: {formatDateBR(d.data_vencimento)}
+                        {d.forma_pagamento ? ` · ${d.forma_pagamento}` : ""}
+                        {d.modalidade === "parcelado" ? ` · ${d.parcelas}x` : " · À vista"}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge className={
+                        d.status === "pago" ? "bg-success/10 text-success border-success/20" :
+                        atrasado ? "bg-destructive/10 text-destructive border-destructive/20" :
+                        "bg-warning/10 text-warning border-warning/20"
+                      }>
+                        {d.status === "pago" ? "Pago" : atrasado ? "Atrasado" : "Pendente"}
+                      </Badge>
+                      <p className="text-sm font-bold text-foreground">{formatBRL(d.valor)}</p>
+                    </div>
+                  </LiquidGlassCard>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
+
         <TabsContent value="evolucoes" className="space-y-4">
+          <div className="flex justify-end">
+            <Button size="sm" className="gap-1.5" onClick={openEvolucaoDialog}>
+              <Plus className="w-3.5 h-3.5" /> Nova Evolução
+            </Button>
+          </div>
+          {evolucoes.length === 0 ? (
+            <div className="rounded-xl glass p-8 text-center">
+              <Activity className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">Nenhuma evolução registrada.</p>
+            </div>
+          ) : (
+            evolucoes.map((ev) => (
+              <LiquidGlassCard key={ev.id} draggable={false} className="p-5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground">{formatDateBR(ev.data)}</p>
+                  <p className="text-xs text-muted-foreground">{ev.dentista_nome || "—"}</p>
+                </div>
+                <p className="text-sm text-foreground whitespace-pre-wrap">{ev.conteudo}</p>
+              </LiquidGlassCard>
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="consultas" className="space-y-4">
+
           {sessions.length === 0 && (
             <div className="rounded-xl glass p-8 text-center">
               <ClipboardList className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
