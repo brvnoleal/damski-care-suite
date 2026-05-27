@@ -182,6 +182,36 @@ export type Database = {
         }
         Relationships: []
       }
+      evolucao: {
+        Row: {
+          conteudo: string
+          created_at: string
+          data: string
+          dentista_id: string | null
+          id: string
+          paciente_id: string
+          updated_at: string
+        }
+        Insert: {
+          conteudo: string
+          created_at?: string
+          data?: string
+          dentista_id?: string | null
+          id?: string
+          paciente_id: string
+          updated_at?: string
+        }
+        Update: {
+          conteudo?: string
+          created_at?: string
+          data?: string
+          dentista_id?: string | null
+          id?: string
+          paciente_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       insumo: {
         Row: {
           created_at: string
@@ -305,6 +335,48 @@ export type Database = {
           status?: string
           telefone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      paciente_debito: {
+        Row: {
+          created_at: string
+          data_vencimento: string
+          descricao: string
+          forma_pagamento: string | null
+          id: string
+          modalidade: string
+          paciente_id: string
+          parcelas: number
+          status: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          created_at?: string
+          data_vencimento: string
+          descricao: string
+          forma_pagamento?: string | null
+          id?: string
+          modalidade?: string
+          paciente_id: string
+          parcelas?: number
+          status?: string
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          created_at?: string
+          data_vencimento?: string
+          descricao?: string
+          forma_pagamento?: string | null
+          id?: string
+          modalidade?: string
+          paciente_id?: string
+          parcelas?: number
+          status?: string
+          updated_at?: string
+          valor?: number
         }
         Relationships: []
       }

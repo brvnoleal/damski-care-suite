@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X } from "lucide-react";
+import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X, User, DollarSign, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,10 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { pacienteService } from "@/services/pacienteService";
-import { Paciente } from "@/types";
+import { dentistaService } from "@/services/dentistaService";
+import { pacienteDebitoService, type PacienteDebito } from "@/services/pacienteDebitoService";
+import { evolucaoService, type Evolucao } from "@/services/evolucaoService";
+import { Paciente, Dentista } from "@/types";
 
 import { sessaoService, type Sessao } from "@/services/sessaoService";
 import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/services/pacienteFotoService";
@@ -27,6 +30,21 @@ const formatDateBR = (iso: string) => {
   const [y, m, d] = iso.split("-");
   return `${d}/${m}/${y}`;
 };
+
+const formatRG = (raw: string) => {
+  if (!raw) return "";
+  const digits = raw.replace(/\D/g, "").slice(0, 9);
+  return digits
+    .replace(/(\d{2})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+};
+
+const formatBRL = (n: number) =>
+  n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+const isAtrasado = (d: PacienteDebito) =>
+  d.status !== "pago" && new Date(d.data_vencimento) < new Date(new Date().toDateString());
 
 const PacienteDetalhe = () => {
   const { id } = useParams();
@@ -54,18 +72,40 @@ const PacienteDetalhe = () => {
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [fotoMeta, setFotoMeta] = useState<{ categoria: FotoCategoria; descricao: string }>({ categoria: "antes", descricao: "" });
 
+  const [dentistas, setDentistas] = useState<Dentista[]>([]);
+
+  const [debitos, setDebitos] = useState<PacienteDebito[]>([]);
+  const [debitoOpen, setDebitoOpen] = useState(false);
+  const [debitoForm, setDebitoForm] = useState({
+    descricao: "", valor: "", forma_pagamento: "", data_vencimento: "",
+    modalidade: "avista" as "avista" | "parcelado", parcelas: "1",
+  });
+
+  const [evolucoes, setEvolucoes] = useState<Evolucao[]>([]);
+  const [evolucaoOpen, setEvolucaoOpen] = useState(false);
+  const today = new Date().toISOString().slice(0, 10);
+  const [evolucaoForm, setEvolucaoForm] = useState({
+    data: today, dentista_id: "", conteudo: "",
+  });
+
   useEffect(() => {
     const load = async () => {
       if (!id) return;
       try {
-        const [paciente, sessoes, fotosList] = await Promise.all([
+        const [paciente, sessoes, fotosList, dentistasList, debitosList, evolucoesList] = await Promise.all([
           pacienteService.buscarPorId(id),
           sessaoService.listarPorPaciente(id),
           pacienteFotoService.listarPorPaciente(id),
+          dentistaService.listar(),
+          pacienteDebitoService.listarPorPaciente(id),
+          evolucaoService.listarPorPaciente(id),
         ]);
         setPatientData(paciente);
         setSessions(sessoes);
         setFotos(fotosList);
+        setDentistas(dentistasList);
+        setDebitos(debitosList);
+        setEvolucoes(evolucoesList);
         if (paciente?.avatar_url) {
           const url = await pacienteService.getAvatarSignedUrl(paciente.avatar_url);
           setAvatarUrl(url);
@@ -78,6 +118,7 @@ const PacienteDetalhe = () => {
     };
     load();
   }, [id]);
+
 
   const initials = patientData?.nome
     ? patientData.nome.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()
@@ -193,6 +234,64 @@ const PacienteDetalhe = () => {
     }
   };
 
+  const openDebitoDialog = () => {
+    setDebitoForm({ descricao: "", valor: "", forma_pagamento: "", data_vencimento: "", modalidade: "avista", parcelas: "1" });
+    setDebitoOpen(true);
+  };
+
+  const handleDebitoSave = async () => {
+    if (!id || !debitoForm.descricao || !debitoForm.valor || !debitoForm.data_vencimento) {
+      toast({ title: "Preencha descrição, valor e vencimento", variant: "destructive" });
+      return;
+    }
+    try {
+      const created = await pacienteDebitoService.criar({
+        paciente_id: id,
+        descricao: debitoForm.descricao,
+        valor: Number(debitoForm.valor.replace(",", ".")),
+        forma_pagamento: debitoForm.forma_pagamento || null,
+        data_vencimento: debitoForm.data_vencimento,
+        modalidade: debitoForm.modalidade,
+        parcelas: debitoForm.modalidade === "parcelado" ? Math.max(1, Number(debitoForm.parcelas) || 1) : 1,
+      });
+      setDebitos((prev) => [created, ...prev]);
+      setDebitoOpen(false);
+      toast({ title: "Débito registrado" });
+    } catch {
+      toast({ title: "Erro ao salvar débito", variant: "destructive" });
+    }
+  };
+
+  const openEvolucaoDialog = () => {
+    setEvolucaoForm({ data: today, dentista_id: "", conteudo: "" });
+    setEvolucaoOpen(true);
+  };
+
+  const handleEvolucaoSave = async () => {
+    if (!id || !evolucaoForm.conteudo.trim()) {
+      toast({ title: "Escreva a evolução clínica", variant: "destructive" });
+      return;
+    }
+    try {
+      const created = await evolucaoService.criar({
+        paciente_id: id,
+        dentista_id: evolucaoForm.dentista_id || null,
+        data: evolucaoForm.data,
+        conteudo: evolucaoForm.conteudo.trim(),
+      });
+      setEvolucoes((prev) => [created, ...prev]);
+      setEvolucaoOpen(false);
+      toast({ title: "Evolução registrada" });
+    } catch {
+      toast({ title: "Erro ao salvar evolução", variant: "destructive" });
+    }
+  };
+
+  const totalRecebido = debitos.filter((d) => d.status === "pago").reduce((s, d) => s + d.valor, 0);
+  const totalAtrasado = debitos.filter((d) => isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
+  const totalAReceber = debitos.filter((d) => d.status === "pendente" && !isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
+
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -269,33 +368,19 @@ const PacienteDetalhe = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        {[
-          { label: "Nº Prontuário", value: patientData.numero_prontuario || "—" },
-          { label: "Data de Nascimento", value: nascFormatted },
-          { label: "CPF", value: patientData.cpf ? patientData.cpf.slice(0, 3) + ".•••.•••-••" : "—" },
-          { label: "RG", value: patientData.rg ? `${patientData.rg}${patientData.emissor ? " — " + patientData.emissor : ""}` : "—" },
-          { label: "Sexo", value: patientData.sexo ? patientData.sexo.charAt(0).toUpperCase() + patientData.sexo.slice(1).replace("_", " ") : "—" },
-          { label: "Estado Civil", value: patientData.estado_civil ? patientData.estado_civil.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
-          { label: "Situação Profissional", value: patientData.situacao_profissional ? patientData.situacao_profissional.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
-          { label: "Telefone", value: patientData.telefone || "—" },
-          { label: "Email", value: patientData.email || "—" },
-          { label: "Instagram", value: patientData.instagram || "—" },
-          { label: "Plano", value: patientData.plano || "—" },
-          { label: "Nº do Plano", value: patientData.numero_plano || "—" },
-        ].map((item, i) => (
-          <LiquidGlassCard key={i} draggable={false} className="p-4">
-            <p className="text-xs text-muted-foreground">{item.label}</p>
-            <p className="text-sm font-medium text-foreground mt-1 break-words">{item.value}</p>
-          </LiquidGlassCard>
-        ))}
-      </div>
-
-
-      <Tabs defaultValue="evolucoes" className="space-y-4">
+      <Tabs defaultValue="detalhes" className="space-y-4">
         <TabsList className="bg-muted/50 p-1 flex flex-wrap gap-1 h-auto">
-          <TabsTrigger value="evolucoes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+          <TabsTrigger value="detalhes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <User className="w-3.5 h-3.5" /> Detalhes
+          </TabsTrigger>
+          <TabsTrigger value="consultas" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <ClipboardList className="w-3.5 h-3.5" /> Consultas
+          </TabsTrigger>
+          <TabsTrigger value="evolucoes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <Activity className="w-3.5 h-3.5" /> Evoluções
+          </TabsTrigger>
+          <TabsTrigger value="financeiro" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <DollarSign className="w-3.5 h-3.5" /> Financeiro
           </TabsTrigger>
           <TabsTrigger value="documentos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <FileText className="w-3.5 h-3.5" /> Documentos
@@ -308,7 +393,112 @@ const PacienteDetalhe = () => {
           </TabsTrigger>
         </TabsList>
 
+        <TabsContent value="detalhes" className="space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {[
+              { label: "Nº Prontuário", value: patientData.numero_prontuario || "—" },
+              { label: "Data de Nascimento", value: nascFormatted },
+              { label: "CPF", value: patientData.cpf ? patientData.cpf.slice(0, 3) + ".•••.•••-••" : "—" },
+              { label: "RG", value: patientData.rg ? `${formatRG(patientData.rg)}${patientData.emissor ? " — " + patientData.emissor : ""}` : "—" },
+              { label: "Sexo", value: patientData.sexo ? patientData.sexo.charAt(0).toUpperCase() + patientData.sexo.slice(1).replace("_", " ") : "—" },
+              { label: "Estado Civil", value: patientData.estado_civil ? patientData.estado_civil.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+              { label: "Situação Profissional", value: patientData.situacao_profissional ? patientData.situacao_profissional.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+              { label: "Telefone", value: patientData.telefone || "—" },
+              { label: "Email", value: patientData.email || "—" },
+              { label: "Instagram", value: patientData.instagram || "—" },
+              { label: "Plano", value: patientData.plano || "—" },
+              { label: "Nº do Plano", value: patientData.numero_plano || "—" },
+            ].map((item, i) => (
+              <LiquidGlassCard key={i} draggable={false} className="p-4">
+                <p className="text-xs text-muted-foreground">{item.label}</p>
+                <p className="text-sm font-medium text-foreground mt-1 break-words">{item.value}</p>
+              </LiquidGlassCard>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="financeiro" className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <LiquidGlassCard draggable={false} className="p-4">
+              <p className="text-xs text-muted-foreground">Total atrasado</p>
+              <p className="text-xl font-bold text-destructive mt-1">{formatBRL(totalAtrasado)}</p>
+            </LiquidGlassCard>
+            <LiquidGlassCard draggable={false} className="p-4">
+              <p className="text-xs text-muted-foreground">Total a receber</p>
+              <p className="text-xl font-bold text-warning mt-1">{formatBRL(totalAReceber)}</p>
+            </LiquidGlassCard>
+            <LiquidGlassCard draggable={false} className="p-4">
+              <p className="text-xs text-muted-foreground">Total recebido</p>
+              <p className="text-xl font-bold text-success mt-1">{formatBRL(totalRecebido)}</p>
+            </LiquidGlassCard>
+          </div>
+          <div className="flex justify-end">
+            <Button size="sm" className="gap-1.5" onClick={openDebitoDialog}>
+              <Plus className="w-3.5 h-3.5" /> Novo Débito
+            </Button>
+          </div>
+          {debitos.length === 0 ? (
+            <div className="rounded-xl glass p-8 text-center">
+              <DollarSign className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">Nenhum débito registrado.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {debitos.map((d) => {
+                const atrasado = isAtrasado(d);
+                return (
+                  <LiquidGlassCard key={d.id} draggable={false} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground">{d.descricao}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Vencimento: {formatDateBR(d.data_vencimento)}
+                        {d.forma_pagamento ? ` · ${d.forma_pagamento}` : ""}
+                        {d.modalidade === "parcelado" ? ` · ${d.parcelas}x` : " · À vista"}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge className={
+                        d.status === "pago" ? "bg-success/10 text-success border-success/20" :
+                        atrasado ? "bg-destructive/10 text-destructive border-destructive/20" :
+                        "bg-warning/10 text-warning border-warning/20"
+                      }>
+                        {d.status === "pago" ? "Pago" : atrasado ? "Atrasado" : "Pendente"}
+                      </Badge>
+                      <p className="text-sm font-bold text-foreground">{formatBRL(d.valor)}</p>
+                    </div>
+                  </LiquidGlassCard>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
+
         <TabsContent value="evolucoes" className="space-y-4">
+          <div className="flex justify-end">
+            <Button size="sm" className="gap-1.5" onClick={openEvolucaoDialog}>
+              <Plus className="w-3.5 h-3.5" /> Nova Evolução
+            </Button>
+          </div>
+          {evolucoes.length === 0 ? (
+            <div className="rounded-xl glass p-8 text-center">
+              <Activity className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">Nenhuma evolução registrada.</p>
+            </div>
+          ) : (
+            evolucoes.map((ev) => (
+              <LiquidGlassCard key={ev.id} draggable={false} className="p-5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground">{formatDateBR(ev.data)}</p>
+                  <p className="text-xs text-muted-foreground">{ev.dentista_nome || "—"}</p>
+                </div>
+                <p className="text-sm text-foreground whitespace-pre-wrap">{ev.conteudo}</p>
+              </LiquidGlassCard>
+            ))
+          )}
+        </TabsContent>
+
+        <TabsContent value="consultas" className="space-y-4">
+
           {sessions.length === 0 && (
             <div className="rounded-xl glass p-8 text-center">
               <ClipboardList className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
@@ -583,7 +773,102 @@ const PacienteDetalhe = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Débito Dialog */}
+      <Dialog open={debitoOpen} onOpenChange={setDebitoOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Novo Débito</DialogTitle>
+            <DialogDescription>Registre um novo débito do paciente.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2"><Label>Descrição *</Label>
+              <Input value={debitoForm.descricao} onChange={(e) => setDebitoForm({ ...debitoForm, descricao: e.target.value })} placeholder="Ex: Harmonização facial" />
+            </div>
+            <div className="space-y-2"><Label>Valor (R$) *</Label>
+              <Input type="number" step="0.01" min="0" value={debitoForm.valor} onChange={(e) => setDebitoForm({ ...debitoForm, valor: e.target.value })} placeholder="0,00" />
+            </div>
+            <div className="space-y-2">
+              <Label>Forma de pagamento</Label>
+              <Select value={debitoForm.forma_pagamento} onValueChange={(v) => setDebitoForm({ ...debitoForm, forma_pagamento: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pix">PIX</SelectItem>
+                  <SelectItem value="credito">Cartão de Crédito</SelectItem>
+                  <SelectItem value="debito">Cartão de Débito</SelectItem>
+                  <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                  <SelectItem value="boleto">Boleto</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2"><Label>Data de Vencimento *</Label>
+              <Input type="date" value={debitoForm.data_vencimento} onChange={(e) => setDebitoForm({ ...debitoForm, data_vencimento: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>Modalidade</Label>
+                <Select value={debitoForm.modalidade} onValueChange={(v: "avista" | "parcelado") => setDebitoForm({ ...debitoForm, modalidade: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="avista">À vista</SelectItem>
+                    <SelectItem value="parcelado">Parcelado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {debitoForm.modalidade === "parcelado" && (
+                <div className="space-y-2">
+                  <Label>Nº de parcelas</Label>
+                  <Input type="number" min="2" max="24" value={debitoForm.parcelas} onChange={(e) => setDebitoForm({ ...debitoForm, parcelas: e.target.value })} />
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDebitoOpen(false)}>Cancelar</Button>
+            <Button onClick={handleDebitoSave}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Evolução Dialog */}
+      <Dialog open={evolucaoOpen} onOpenChange={setEvolucaoOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Nova Evolução</DialogTitle>
+            <DialogDescription>Registre a evolução clínica do paciente.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2"><Label>Data de criação</Label>
+                <Input type="date" value={evolucaoForm.data} onChange={(e) => setEvolucaoForm({ ...evolucaoForm, data: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Dentista responsável</Label>
+                <Select value={evolucaoForm.dentista_id} onValueChange={(v) => setEvolucaoForm({ ...evolucaoForm, dentista_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectContent>
+                    {dentistas.map((d) => (
+                      <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2"><Label>Paciente</Label>
+              <Input value={patientData.nome} disabled />
+            </div>
+            <div className="space-y-2"><Label>Evolução Clínica *</Label>
+              <Textarea rows={6} value={evolucaoForm.conteudo} onChange={(e) => setEvolucaoForm({ ...evolucaoForm, conteudo: e.target.value })} placeholder="Descreva a evolução clínica do paciente..." />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEvolucaoOpen(false)}>Cancelar</Button>
+            <Button onClick={handleEvolucaoSave}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+
   );
 };
 
