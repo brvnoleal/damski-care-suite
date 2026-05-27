@@ -345,4 +345,69 @@ const DetalheItem = ({ icon, label, value, sub }: { icon: React.ReactNode; label
   </div>
 );
 
+const DayView = ({
+  date,
+  items,
+  getPaciente,
+  getDentista,
+  onSelect,
+}: {
+  date: Date;
+  items: Agendamento[];
+  getPaciente: (id: string) => Paciente | undefined;
+  getDentista: (id: string) => Dentista | undefined;
+  onSelect: (a: Agendamento) => void;
+}) => {
+  const hours = Array.from({ length: 13 }, (_, i) => i + 7); // 07h - 19h
+  const itemsPorHora = new Map<number, Agendamento[]>();
+  for (const a of items) {
+    const h = parseInt(a.horario.slice(0, 2), 10);
+    const arr = itemsPorHora.get(h) || [];
+    arr.push(a);
+    itemsPorHora.set(h, arr);
+  }
+
+  return (
+    <div className="flex flex-col">
+      {items.length === 0 && (
+        <div className="text-center text-xs text-muted-foreground py-8 border border-dashed border-white/10 rounded-md mb-2">
+          Nenhum agendamento para este dia
+        </div>
+      )}
+      {hours.map((h) => {
+        const slot = (itemsPorHora.get(h) || []).sort((a, b) => a.horario.localeCompare(b.horario));
+        return (
+          <div key={h} className="grid grid-cols-[64px_1fr] border border-white/[0.04] min-h-[56px]">
+            <div className="px-2 py-2 text-xs font-mono text-muted-foreground border-r border-white/[0.04] bg-white/[0.015] flex items-start justify-end">
+              {String(h).padStart(2, "0")}:00
+            </div>
+            <div className="p-1.5 flex flex-col gap-1">
+              {slot.map((a) => {
+                const st = statusConfig[a.status];
+                const pac = getPaciente(a.paciente_id);
+                const den = getDentista(a.dentista_id);
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => onSelect(a)}
+                    className={`group text-left px-2 py-1.5 rounded-md border transition-colors hover:bg-white/10 ${st?.className}`}
+                  >
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`w-1.5 h-1.5 rounded-full ${st?.dot}`} />
+                      <span className="text-xs font-mono">{a.horario}</span>
+                      <span className="text-sm font-semibold text-foreground truncate">{pac?.nome || "—"}</span>
+                      <Badge variant="outline" className="text-[10px] h-5">{st?.label}</Badge>
+                      {den && <span className="text-[11px] text-muted-foreground truncate">• {den.nome}</span>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export default Agenda;
