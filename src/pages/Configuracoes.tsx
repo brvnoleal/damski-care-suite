@@ -183,6 +183,9 @@ const Configuracoes = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PerfilConsultorio />
+
+
         {/* Users */}
         <LiquidGlassCard draggable={false} className="p-5">
           <div className="space-y-4">
