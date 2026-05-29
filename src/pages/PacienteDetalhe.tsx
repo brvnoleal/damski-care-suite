@@ -27,6 +27,7 @@ import { Paciente, Dentista, Agendamento, ProcedimentoConsulta, procedimentoCons
 
 import { sessaoService, type Sessao } from "@/services/sessaoService";
 import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/services/pacienteFotoService";
+import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 
 const formatDateBR = (iso: string) => {
   if (!iso) return "";
@@ -932,7 +933,7 @@ const PacienteDetalhe = () => {
             <SheetDescription>Registre um novo procedimento.</SheetDescription>
           </SheetHeader>
           <div className="space-y-4 py-2">
-            <div className="space-y-2"><Label>Procedimento *</Label><Input value={sessionForm.proc} onChange={(e) => setSessionForm({ ...sessionForm, proc: e.target.value })} placeholder="Ex: Harmonização Facial" /></div>
+            <div className="space-y-2"><Label>Procedimento *</Label><ProcedimentoCombobox value={sessionForm.proc} onChange={(v) => setSessionForm({ ...sessionForm, proc: v })} allowCustom /></div>
             <div className="space-y-2"><Label>Data *</Label><Input type="date" value={sessionForm.date} onChange={(e) => setSessionForm({ ...sessionForm, date: e.target.value })} /></div>
             <div className="space-y-2"><Label>Técnica</Label><Input value={sessionForm.tech} onChange={(e) => setSessionForm({ ...sessionForm, tech: e.target.value })} placeholder="Técnica utilizada" /></div>
             <div className="space-y-2"><Label>Substância / Lote</Label><Input value={sessionForm.substance} onChange={(e) => setSessionForm({ ...sessionForm, substance: e.target.value })} placeholder="Substância e lote" /></div>
@@ -1125,14 +1126,11 @@ const PacienteDetalhe = () => {
           </div>
           <div className="sm:col-span-2">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
-            <Select value={consultaForm.procedimento} onValueChange={(v: ProcedimentoConsulta) => setConsultaForm({ ...consultaForm, procedimento: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {Object.entries(procedimentoConsultaLabels).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ProcedimentoCombobox
+              value={consultaForm.procedimento}
+              onChange={(v) => setConsultaForm({ ...consultaForm, procedimento: v as ProcedimentoConsulta })}
+            />
+
           </div>
 
           <div className="sm:col-span-2 pt-1">

@@ -26,6 +26,7 @@ import { pacienteService } from "@/services/pacienteService";
 import { dentistaService } from "@/services/dentistaService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
   data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
@@ -406,14 +407,11 @@ const Agendamentos = () => {
           )}
           <div className="sm:col-span-2">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
-            <Select value={form.procedimento} onValueChange={(v: ProcedimentoConsulta) => setForm({ ...form, procedimento: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione o procedimento..." /></SelectTrigger>
-              <SelectContent>
-                {Object.entries(procedimentoConsultaLabels).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ProcedimentoCombobox
+              value={form.procedimento}
+              onChange={(v) => setForm({ ...form, procedimento: v })}
+            />
+
           </div>
 
           <div className="sm:col-span-2 pt-1">
