@@ -13,8 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
-} from "@/components/ui/dialog";
+  Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig,
 } from "@/components/ui/chart";
@@ -231,12 +231,12 @@ const Relatorios = () => {
             </SelectContent>
           </Select>
           <Button variant="outline" size="sm" className="gap-2"><Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span></Button>
-          <Dialog open={despesaOpen} onOpenChange={setDespesaOpen}>
-            <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Nova Despesa</DialogTitle>
-                <DialogDescription>Cadastre uma nova despesa do consultório.</DialogDescription>
-              </DialogHeader>
+          <Sheet open={despesaOpen} onOpenChange={setDespesaOpen}>
+            <SheetContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Nova Despesa</SheetTitle>
+                <SheetDescription>Cadastre uma nova despesa do consultório.</SheetDescription>
+              </SheetHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2"><Label>Descrição *</Label><Input placeholder="Ex: Aluguel, Material..." value={novaDespesa.descricao} onChange={(e) => handleDespesaChange("descricao", e.target.value)} /></div>
@@ -278,12 +278,12 @@ const Relatorios = () => {
                 </div>
                 <div className="space-y-2"><Label>Observações</Label><Textarea rows={3} value={novaDespesa.observacoes} onChange={(e) => handleDespesaChange("observacoes", e.target.value)} /></div>
               </div>
-              <DialogFooter>
+              <SheetFooter>
                 <Button variant="outline" onClick={() => setDespesaOpen(false)}>Cancelar</Button>
                 <Button onClick={handleSalvarDespesa}>Salvar Despesa</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
 

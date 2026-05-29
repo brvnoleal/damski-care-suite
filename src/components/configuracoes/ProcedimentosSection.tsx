@@ -15,12 +15,12 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -232,13 +232,13 @@ export default function ProcedimentosSection() {
         )}
       </div>
 
-      <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : handleClose())}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
+      <Sheet open={open} onOpenChange={(o) => (o ? setOpen(true) : handleClose())}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>
               {editing ? "Editar Procedimento" : "Novo Procedimento"}
-            </DialogTitle>
-          </DialogHeader>
+            </SheetTitle>
+          </SheetHeader>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Procedimento</Label>
@@ -276,16 +276,16 @@ export default function ProcedimentosSection() {
               />
             </div>
           </div>
-          <DialogFooter>
+          <SheetFooter>
             <Button variant="outline" onClick={handleClose}>
               Cancelar
             </Button>
             <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
               {saveMutation.isPending ? "Salvando..." : "Salvar"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>

@@ -10,8 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
-} from "@/components/ui/dialog";
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetDescription,
+} from "@/components/ui/sheet";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { Odontograma } from "@/components/odontograma/Odontograma";
 import {
@@ -688,8 +688,8 @@ const PacienteDetalhe = () => {
           {fotos.length === 0 && <p className="text-center text-xs text-muted-foreground">Nenhuma foto adicionada ainda.</p>}
 
           {previewFoto && (
-            <Dialog open={!!previewFoto} onOpenChange={() => setPreviewFoto(null)}>
-              <DialogContent className="sm:max-w-3xl p-0 overflow-hidden">
+            <Sheet open={!!previewFoto} onOpenChange={() => setPreviewFoto(null)}>
+              <SheetContent className="sm:max-w-3xl p-0 overflow-hidden">
                 <div className="relative">
                   <img src={previewFoto.url} alt={previewFoto.nome_arquivo} className="w-full max-h-[80vh] object-contain bg-black" />
                   <button onClick={() => setPreviewFoto(null)} className="absolute top-3 right-3 p-2 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors">
@@ -701,8 +701,8 @@ const PacienteDetalhe = () => {
                     <p className="text-white/50 text-xs mt-0.5">{formatDateBR(previewFoto.data)} · {previewFoto.categoria}</p>
                   </div>
                 </div>
-              </DialogContent>
-            </Dialog>
+              </SheetContent>
+            </Sheet>
           )}
         </TabsContent>
 
@@ -714,7 +714,7 @@ const PacienteDetalhe = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Edit Dialog — mesmos campos do cadastro em Pacientes */}
+      {/* Edit Sheet — mesmos campos do cadastro em Pacientes */}
       <ResponsiveDialog
         open={editOpen}
         onOpenChange={setEditOpen}
@@ -924,33 +924,33 @@ const PacienteDetalhe = () => {
       </ResponsiveDialog>
 
 
-      {/* Session Dialog */}
-      <Dialog open={sessionOpen} onOpenChange={setSessionOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Registrar Sessão</DialogTitle>
-            <DialogDescription>Registre um novo procedimento.</DialogDescription>
-          </DialogHeader>
+      {/* Session Sheet */}
+      <Sheet open={sessionOpen} onOpenChange={setSessionOpen}>
+        <SheetContent className="sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Registrar Sessão</SheetTitle>
+            <SheetDescription>Registre um novo procedimento.</SheetDescription>
+          </SheetHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2"><Label>Procedimento *</Label><Input value={sessionForm.proc} onChange={(e) => setSessionForm({ ...sessionForm, proc: e.target.value })} placeholder="Ex: Harmonização Facial" /></div>
             <div className="space-y-2"><Label>Data *</Label><Input type="date" value={sessionForm.date} onChange={(e) => setSessionForm({ ...sessionForm, date: e.target.value })} /></div>
             <div className="space-y-2"><Label>Técnica</Label><Input value={sessionForm.tech} onChange={(e) => setSessionForm({ ...sessionForm, tech: e.target.value })} placeholder="Técnica utilizada" /></div>
             <div className="space-y-2"><Label>Substância / Lote</Label><Input value={sessionForm.substance} onChange={(e) => setSessionForm({ ...sessionForm, substance: e.target.value })} placeholder="Substância e lote" /></div>
           </div>
-          <DialogFooter>
+          <SheetFooter>
             <Button variant="outline" onClick={() => setSessionOpen(false)}>Cancelar</Button>
             <Button onClick={handleSessionSave}>Registrar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
-      {/* Foto Metadata Dialog */}
-      <Dialog open={fotoDialogOpen} onOpenChange={setFotoDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Detalhes da Foto</DialogTitle>
-            <DialogDescription>{pendingFiles.length} foto(s) selecionada(s)</DialogDescription>
-          </DialogHeader>
+      {/* Foto Metadata Sheet */}
+      <Sheet open={fotoDialogOpen} onOpenChange={setFotoDialogOpen}>
+        <SheetContent className="sm:max-w-sm">
+          <SheetHeader>
+            <SheetTitle>Detalhes da Foto</SheetTitle>
+            <SheetDescription>{pendingFiles.length} foto(s) selecionada(s)</SheetDescription>
+          </SheetHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label>Categoria</Label>
@@ -969,20 +969,20 @@ const PacienteDetalhe = () => {
               <Textarea rows={2} value={fotoMeta.descricao} onChange={(e) => setFotoMeta({ ...fotoMeta, descricao: e.target.value })} placeholder="Ex: Vista frontal, sorriso..." />
             </div>
           </div>
-          <DialogFooter>
+          <SheetFooter>
             <Button variant="outline" onClick={() => setFotoDialogOpen(false)}>Cancelar</Button>
             <Button onClick={handleFotoSave}>Salvar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
-      {/* Débito Dialog */}
-      <Dialog open={debitoOpen} onOpenChange={setDebitoOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Novo Débito</DialogTitle>
-            <DialogDescription>Registre um novo débito do paciente.</DialogDescription>
-          </DialogHeader>
+      {/* Débito Sheet */}
+      <Sheet open={debitoOpen} onOpenChange={setDebitoOpen}>
+        <SheetContent className="sm:max-w-md">
+          <SheetHeader>
+            <SheetTitle>Novo Débito</SheetTitle>
+            <SheetDescription>Registre um novo débito do paciente.</SheetDescription>
+          </SheetHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2"><Label>Descrição *</Label>
               <Input value={debitoForm.descricao} onChange={(e) => setDebitoForm({ ...debitoForm, descricao: e.target.value })} placeholder="Ex: Harmonização facial" />
@@ -1025,20 +1025,20 @@ const PacienteDetalhe = () => {
               )}
             </div>
           </div>
-          <DialogFooter>
+          <SheetFooter>
             <Button variant="outline" onClick={() => setDebitoOpen(false)}>Cancelar</Button>
             <Button onClick={handleDebitoSave}>Salvar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
-      {/* Evolução Dialog */}
-      <Dialog open={evolucaoOpen} onOpenChange={setEvolucaoOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Nova Evolução</DialogTitle>
-            <DialogDescription>Registre a evolução clínica do paciente.</DialogDescription>
-          </DialogHeader>
+      {/* Evolução Sheet */}
+      <Sheet open={evolucaoOpen} onOpenChange={setEvolucaoOpen}>
+        <SheetContent className="sm:max-w-lg">
+          <SheetHeader>
+            <SheetTitle>Nova Evolução</SheetTitle>
+            <SheetDescription>Registre a evolução clínica do paciente.</SheetDescription>
+          </SheetHeader>
           <div className="space-y-4 py-2">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2"><Label>Data de criação</Label>
@@ -1063,14 +1063,14 @@ const PacienteDetalhe = () => {
               <Textarea rows={6} value={evolucaoForm.conteudo} onChange={(e) => setEvolucaoForm({ ...evolucaoForm, conteudo: e.target.value })} placeholder="Descreva a evolução clínica do paciente..." />
             </div>
           </div>
-          <DialogFooter>
+          <SheetFooter>
             <Button variant="outline" onClick={() => setEvolucaoOpen(false)}>Cancelar</Button>
             <Button onClick={handleEvolucaoSave}>Salvar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
-      {/* Nova Consulta Dialog */}
+      {/* Nova Consulta Sheet */}
       <ResponsiveDialog
         open={consultaOpen}
         onOpenChange={setConsultaOpen}

@@ -12,8 +12,8 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
-} from "@/components/ui/dialog";
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetDescription,
+} from "@/components/ui/sheet";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -301,11 +301,11 @@ const Insumos = () => {
         </div>
       </LiquidGlassCard>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingSupply ? "Editar Insumo" : "Cadastrar Insumo"}</DialogTitle>
-          </DialogHeader>
+      <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
+        <SheetContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>{editingSupply ? "Editar Insumo" : "Cadastrar Insumo"}</SheetTitle>
+          </SheetHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label htmlFor="supply-name">Nome do Insumo</Label>
@@ -370,27 +370,27 @@ const Insumos = () => {
               </div>
             </div>
           </div>
-          <DialogFooter>
+          <SheetFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
             <Button onClick={handleSubmit}>{editingSupply ? "Salvar" : "Cadastrar"}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Excluir Insumo</DialogTitle>
-            <DialogDescription>
+      <Sheet open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <SheetContent className="sm:max-w-sm">
+          <SheetHeader>
+            <SheetTitle>Excluir Insumo</SheetTitle>
+            <SheetDescription>
               Tem certeza que deseja excluir <strong>{deletingSupply?.nome}</strong> (Lote: {deletingSupply?.lote})?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
+            </SheetDescription>
+          </SheetHeader>
+          <SheetFooter>
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancelar</Button>
             <Button variant="destructive" onClick={handleDelete}>Excluir</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

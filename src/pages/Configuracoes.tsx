@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
@@ -308,12 +308,12 @@ const Configuracoes = () => {
       </div>
 
 
-      {/* Edit Role Dialog */}
-      <Dialog open={editItem !== null} onOpenChange={(open) => { if (!open) setEditItem(null); }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Editar Perfil de Acesso</DialogTitle>
-          </DialogHeader>
+      {/* Edit Role Sheet */}
+      <Sheet open={editItem !== null} onOpenChange={(open) => { if (!open) setEditItem(null); }}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Editar Perfil de Acesso</SheetTitle>
+          </SheetHeader>
           {editItem && (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
@@ -332,19 +332,19 @@ const Configuracoes = () => {
               </div>
             </div>
           )}
-          <DialogFooter>
+          <SheetFooter>
             <Button variant="outline" onClick={() => setEditItem(null)}>Cancelar</Button>
             <Button onClick={handleEditSave} disabled={updateRoleMutation.isPending}>Salvar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
-      {/* Add User Dialog */}
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Novo Usuário</DialogTitle>
-          </DialogHeader>
+      {/* Add User Sheet */}
+      <Sheet open={addOpen} onOpenChange={setAddOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Novo Usuário</SheetTitle>
+          </SheetHeader>
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Nome completo</Label>
@@ -376,21 +376,21 @@ const Configuracoes = () => {
               </Select>
             </div>
           </div>
-          <DialogFooter>
+          <SheetFooter>
             <Button variant="outline" onClick={() => setAddOpen(false)}>Cancelar</Button>
             <Button onClick={handleCreateUser} disabled={creating}>
               {creating ? "Criando..." : "Criar Usuário"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       {/* Generated password dialog */}
-      <Dialog open={!!generatedPassword} onOpenChange={(o) => !o && setGeneratedPassword(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Senha temporária gerada</DialogTitle>
-          </DialogHeader>
+      <Sheet open={!!generatedPassword} onOpenChange={(o) => !o && setGeneratedPassword(null)}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Senha temporária gerada</SheetTitle>
+          </SheetHeader>
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
               Copie e compartilhe com o usuário de forma segura. Esta senha não será exibida novamente.
@@ -411,11 +411,11 @@ const Configuracoes = () => {
               </Button>
             </div>
           </div>
-          <DialogFooter>
+          <SheetFooter>
             <Button onClick={() => setGeneratedPassword(null)}>Fechar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
