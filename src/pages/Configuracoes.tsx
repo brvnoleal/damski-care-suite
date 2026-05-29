@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
+import PerfilConsultorio from "@/components/configuracoes/PerfilConsultorio";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 
@@ -182,6 +183,9 @@ const Configuracoes = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PerfilConsultorio />
+
+
         {/* Users */}
         <LiquidGlassCard draggable={false} className="p-5">
           <div className="space-y-4">
