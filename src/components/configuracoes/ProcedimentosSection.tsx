@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ClipboardList, Plus, Pencil, Trash2 } from "lucide-react";
+import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
@@ -41,17 +41,24 @@ const formatBRL = (v: number) =>
 
 const emptyForm = { nome: "", plano: "", especialidade: "", preco: "" };
 
+const ITEMS_PER_PAGE = 10;
+
 export default function ProcedimentosSection() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ProcedimentoRecord | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<ProcedimentoRecord | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: procedimentos = [], isLoading } = useQuery({
     queryKey: ["procedimentos"],
     queryFn: procedimentoService.list,
   });
+
+  const totalPages = Math.ceil(procedimentos.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginated = procedimentos.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -79,6 +86,9 @@ export default function ProcedimentosSection() {
       queryClient.invalidateQueries({ queryKey: ["procedimentos"] });
       toast.success("Procedimento excluído.");
       setDeleteTarget(null);
+      if (paginated.length === 1 && currentPage > 1) {
+        setCurrentPage((prev) => prev - 1);
+      }
     },
     onError: () => toast.error("Erro ao excluir."),
   });
@@ -152,7 +162,7 @@ export default function ProcedimentosSection() {
                   </TableCell>
                 </TableRow>
               ) : (
-                procedimentos.map((p) => (
+                paginated.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell className="font-medium text-foreground">{p.nome}</TableCell>
                     <TableCell className="text-muted-foreground">{p.plano || "—"}</TableCell>
@@ -187,6 +197,39 @@ export default function ProcedimentosSection() {
             </TableBody>
           </Table>
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-xs text-muted-foreground">
+              Mostrando {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, procedimentos.length)} de {procedimentos.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="gap-1"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Anterior
+              </Button>
+              <span className="text-xs text-muted-foreground px-2">
+                Página {currentPage} de {totalPages}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="gap-1"
+              >
+                Próxima
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : handleClose())}>
