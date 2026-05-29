@@ -57,9 +57,13 @@ export default function ProcedimentosSection() {
     queryFn: procedimentoService.list,
   });
 
-  const totalPages = Math.ceil(procedimentos.length / ITEMS_PER_PAGE);
+  const filtered = procedimentos.filter((p) =>
+    p.nome.toLowerCase().includes(search.trim().toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginated = procedimentos.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginated = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
