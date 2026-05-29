@@ -464,6 +464,36 @@ export type Database = {
         }
         Relationships: []
       }
+      procedimento: {
+        Row: {
+          created_at: string
+          especialidade: string | null
+          id: string
+          nome: string
+          plano: string | null
+          preco: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          especialidade?: string | null
+          id?: string
+          nome: string
+          plano?: string | null
+          preco?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          especialidade?: string | null
+          id?: string
+          nome?: string
+          plano?: string | null
+          preco?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
