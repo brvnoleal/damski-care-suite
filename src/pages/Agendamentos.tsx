@@ -406,14 +406,11 @@ const Agendamentos = () => {
           )}
           <div className="sm:col-span-2">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
-            <Select value={form.procedimento} onValueChange={(v: ProcedimentoConsulta) => setForm({ ...form, procedimento: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione o procedimento..." /></SelectTrigger>
-              <SelectContent>
-                {Object.entries(procedimentoConsultaLabels).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ProcedimentoCombobox
+              value={form.procedimento}
+              onChange={(v) => setForm({ ...form, procedimento: v })}
+            />
+
           </div>
 
           <div className="sm:col-span-2 pt-1">
