@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ClipboardList, Plus, Pencil, Trash2 } from "lucide-react";
+import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
