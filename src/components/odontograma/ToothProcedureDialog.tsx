@@ -26,6 +26,7 @@ import {
   odontogramaStatusLabels,
   procedimentoOdontoLabels,
 } from "@/types";
+import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 
 interface ToothProcedureDialogProps {
   open: boolean;
