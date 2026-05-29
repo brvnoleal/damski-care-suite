@@ -98,7 +98,7 @@ export interface Agendamento {
   horario_fim?: string;
   paciente_id: string;
   dentista_id: string;
-  procedimento: ProcedimentoConsulta;
+  procedimento: ProcedimentoConsulta | string;
   status: "agendado" | "confirmado" | "realizado" | "cancelado";
   valor: number;
   forma_pagamento: FormaPagamento;
