@@ -416,6 +416,9 @@ const PacienteDetalhe = () => {
           <TabsTrigger value="detalhes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <User className="w-3.5 h-3.5" /> Detalhes
           </TabsTrigger>
+          <TabsTrigger value="odontograma" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <Smile className="w-3.5 h-3.5" /> Odontograma
+          </TabsTrigger>
           <TabsTrigger value="consultas" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <ClipboardList className="w-3.5 h-3.5" /> Consultas
           </TabsTrigger>
