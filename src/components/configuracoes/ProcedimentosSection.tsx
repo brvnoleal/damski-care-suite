@@ -86,6 +86,9 @@ export default function ProcedimentosSection() {
       queryClient.invalidateQueries({ queryKey: ["procedimentos"] });
       toast.success("Procedimento excluído.");
       setDeleteTarget(null);
+      if (paginated.length === 1 && currentPage > 1) {
+        setCurrentPage((prev) => prev - 1);
+      }
     },
     onError: () => toast.error("Erro ao excluir."),
   });
@@ -227,9 +230,6 @@ export default function ProcedimentosSection() {
             </div>
           </div>
         )}
-            </TableBody>
-          </Table>
-        </div>
       </div>
 
       <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : handleClose())}>
