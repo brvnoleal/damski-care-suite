@@ -114,6 +114,70 @@ export interface Procedimento {
   valor: number;
 }
 
+// ============================================
+// Odontograma
+// ============================================
+
+export type OdontogramaStatus = "pendente" | "em_andamento" | "concluido" | "removido";
+
+export const odontogramaStatusLabels: Record<OdontogramaStatus, string> = {
+  pendente: "Pendente",
+  em_andamento: "Em andamento",
+  concluido: "Concluído",
+  removido: "Removido",
+};
+
+export type ProcedimentoOdonto =
+  | "restauracao"
+  | "canal"
+  | "extracao"
+  | "coroa"
+  | "implante"
+  | "limpeza"
+  | "selante"
+  | "clareamento"
+  | "aparelho"
+  | "protese"
+  | "faceta"
+  | "nucleo"
+  | "onlay_inlay"
+  | "avaliacao"
+  | "outro";
+
+export const procedimentoOdontoLabels: Record<ProcedimentoOdonto, string> = {
+  restauracao: "Restauração",
+  canal: "Tratamento de Canal",
+  extracao: "Extração",
+  coroa: "Coroa",
+  implante: "Implante",
+  limpeza: "Limpeza / Profilaxia",
+  selante: "Selante",
+  clareamento: "Clareamento",
+  aparelho: "Aparelho Ortodôntico",
+  protese: "Prótese",
+  faceta: "Faceta",
+  nucleo: "Núcleo",
+  onlay_inlay: "Onlay / Inlay",
+  avaliacao: "Avaliação",
+  outro: "Outro",
+};
+
+export type ToothState = "neutro" | "em_andamento" | "concluido" | "removido";
+
+export interface OdontogramaProcedimento {
+  id: string;
+  paciente_id: string;
+  dente: number;
+  status: OdontogramaStatus;
+  procedimento: string; // ProcedimentoOdonto, mas armazenado como string para flexibilidade
+  valor: number;
+  dentista_id?: string;
+  observacoes?: string;
+  data: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface Pagamento {
   id: string;
   agendamento_id: string;
