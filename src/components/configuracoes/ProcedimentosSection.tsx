@@ -159,7 +159,7 @@ export default function ProcedimentosSection() {
                   </TableCell>
                 </TableRow>
               ) : (
-                procedimentos.map((p) => (
+                paginated.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell className="font-medium text-foreground">{p.nome}</TableCell>
                     <TableCell className="text-muted-foreground">{p.plano || "—"}</TableCell>
@@ -191,6 +191,42 @@ export default function ProcedimentosSection() {
                   </TableRow>
                 ))
               )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-xs text-muted-foreground">
+              Mostrando {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, procedimentos.length)} de {procedimentos.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="gap-1"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Anterior
+              </Button>
+              <span className="text-xs text-muted-foreground px-2">
+                Página {currentPage} de {totalPages}
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="gap-1"
+              >
+                Próxima
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        )}
             </TableBody>
           </Table>
         </div>
