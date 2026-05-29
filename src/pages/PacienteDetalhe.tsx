@@ -1126,14 +1126,11 @@ const PacienteDetalhe = () => {
           </div>
           <div className="sm:col-span-2">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
-            <Select value={consultaForm.procedimento} onValueChange={(v: ProcedimentoConsulta) => setConsultaForm({ ...consultaForm, procedimento: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {Object.entries(procedimentoConsultaLabels).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ProcedimentoCombobox
+              value={consultaForm.procedimento}
+              onChange={(v) => setConsultaForm({ ...consultaForm, procedimento: v as ProcedimentoConsulta })}
+            />
+
           </div>
 
           <div className="sm:col-span-2 pt-1">
