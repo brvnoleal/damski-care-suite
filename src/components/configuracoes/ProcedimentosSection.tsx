@@ -221,7 +221,7 @@ export default function ProcedimentosSection() {
         {totalPages > 1 && (
           <div className="flex items-center justify-between pt-2">
             <span className="text-xs text-muted-foreground">
-              Mostrando {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, procedimentos.length)} de {procedimentos.length}
+              Mostrando {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, filtered.length)} de {filtered.length}
             </span>
             <div className="flex items-center gap-1">
               <Button
