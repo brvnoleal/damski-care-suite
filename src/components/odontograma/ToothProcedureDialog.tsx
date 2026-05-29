@@ -143,14 +143,11 @@ export const ToothProcedureDialog = ({
           </div>
           <div className="space-y-1.5">
             <Label>Procedimento</Label>
-            <Select value={form.procedimento} onValueChange={(v) => setForm({ ...form, procedimento: v as ProcedimentoOdonto })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {(Object.entries(procedimentoOdontoLabels) as [ProcedimentoOdonto, string][]).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ProcedimentoCombobox
+              value={form.procedimento}
+              onChange={(v) => setForm({ ...form, procedimento: v as ProcedimentoOdonto })}
+              allowCustom
+            />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
