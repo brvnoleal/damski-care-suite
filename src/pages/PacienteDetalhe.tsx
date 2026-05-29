@@ -933,7 +933,7 @@ const PacienteDetalhe = () => {
             <SheetDescription>Registre um novo procedimento.</SheetDescription>
           </SheetHeader>
           <div className="space-y-4 py-2">
-            <div className="space-y-2"><Label>Procedimento *</Label><Input value={sessionForm.proc} onChange={(e) => setSessionForm({ ...sessionForm, proc: e.target.value })} placeholder="Ex: Harmonização Facial" /></div>
+            <div className="space-y-2"><Label>Procedimento *</Label><ProcedimentoCombobox value={sessionForm.proc} onChange={(v) => setSessionForm({ ...sessionForm, proc: v })} allowCustom /></div>
             <div className="space-y-2"><Label>Data *</Label><Input type="date" value={sessionForm.date} onChange={(e) => setSessionForm({ ...sessionForm, date: e.target.value })} /></div>
             <div className="space-y-2"><Label>Técnica</Label><Input value={sessionForm.tech} onChange={(e) => setSessionForm({ ...sessionForm, tech: e.target.value })} placeholder="Técnica utilizada" /></div>
             <div className="space-y-2"><Label>Substância / Lote</Label><Input value={sessionForm.substance} onChange={(e) => setSessionForm({ ...sessionForm, substance: e.target.value })} placeholder="Substância e lote" /></div>
