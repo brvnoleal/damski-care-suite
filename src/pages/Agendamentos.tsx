@@ -26,6 +26,7 @@ import { pacienteService } from "@/services/pacienteService";
 import { dentistaService } from "@/services/dentistaService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
   data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
