@@ -160,10 +160,12 @@ export default function ProcedimentosSection() {
                     Carregando...
                   </TableCell>
                 </TableRow>
-              ) : procedimentos.length === 0 ? (
+              ) : filtered.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-sm text-muted-foreground">
-                    Nenhum procedimento cadastrado.
+                    {search.trim()
+                      ? "Nenhum procedimento encontrado."
+                      : "Nenhum procedimento cadastrado."}
                   </TableCell>
                 </TableRow>
               ) : (
