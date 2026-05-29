@@ -135,7 +135,7 @@ export const ToothProcedureDialog = ({
             <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as OdontogramaStatus })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                {Object.entries(odontogramaStatusLabels).map(([k, v]) => (
+                {(Object.entries(odontogramaStatusLabels) as [OdontogramaStatus, string][]).map(([k, v]) => (
                   <SelectItem key={k} value={k}>{v}</SelectItem>
                 ))}
               </SelectContent>
@@ -146,7 +146,7 @@ export const ToothProcedureDialog = ({
             <Select value={form.procedimento} onValueChange={(v) => setForm({ ...form, procedimento: v as ProcedimentoOdonto })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                {Object.entries(procedimentoOdontoLabels).map(([k, v]) => (
+                {(Object.entries(procedimentoOdontoLabels) as [ProcedimentoOdonto, string][]).map(([k, v]) => (
                   <SelectItem key={k} value={k}>{v}</SelectItem>
                 ))}
               </SelectContent>
