@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
@@ -50,15 +50,20 @@ export default function ProcedimentosSection() {
   const [form, setForm] = useState(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<ProcedimentoRecord | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
 
   const { data: procedimentos = [], isLoading } = useQuery({
     queryKey: ["procedimentos"],
     queryFn: procedimentoService.list,
   });
 
-  const totalPages = Math.ceil(procedimentos.length / ITEMS_PER_PAGE);
+  const filtered = procedimentos.filter((p) =>
+    p.nome.toLowerCase().includes(search.trim().toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginated = procedimentos.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginated = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -137,6 +142,19 @@ export default function ProcedimentosSection() {
           </Button>
         </div>
 
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Input
+            placeholder="Pesquisar procedimento..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="pl-9"
+          />
+        </div>
+
         <div className="rounded-lg border border-border/40 overflow-hidden">
           <Table>
             <TableHeader>
@@ -155,10 +173,12 @@ export default function ProcedimentosSection() {
                     Carregando...
                   </TableCell>
                 </TableRow>
-              ) : procedimentos.length === 0 ? (
+              ) : filtered.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-sm text-muted-foreground">
-                    Nenhum procedimento cadastrado.
+                    {search.trim()
+                      ? "Nenhum procedimento encontrado."
+                      : "Nenhum procedimento cadastrado."}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -201,7 +221,7 @@ export default function ProcedimentosSection() {
         {totalPages > 1 && (
           <div className="flex items-center justify-between pt-2">
             <span className="text-xs text-muted-foreground">
-              Mostrando {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, procedimentos.length)} de {procedimentos.length}
+              Mostrando {startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, filtered.length)} de {filtered.length}
             </span>
             <div className="flex items-center gap-1">
               <Button
