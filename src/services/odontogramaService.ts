@@ -88,7 +88,12 @@ export const computeToothStates = (
   const map: Record<number, ToothState> = {};
   for (const p of procedimentos) {
     const current = map[p.dente] || "neutro";
-    const next = statusToState(p.status);
+    // Extração concluída marca o dente como removido (X vermelho)
+    const isExtracaoConcluida =
+      p.procedimento === "extracao" && p.status === "concluido";
+    const next: ToothState = isExtracaoConcluida
+      ? "removido"
+      : statusToState(p.status);
     map[p.dente] = mergeState(current, next);
   }
   return map;
