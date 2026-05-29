@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
 import PerfilConsultorio from "@/components/configuracoes/PerfilConsultorio";
+import ProcedimentosSection from "@/components/configuracoes/ProcedimentosSection";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 
@@ -302,7 +303,10 @@ const Configuracoes = () => {
             </div>
           </div>
         </LiquidGlassCard>
+
+        <ProcedimentosSection />
       </div>
+
 
       {/* Edit Role Dialog */}
       <Dialog open={editItem !== null} onOpenChange={(open) => { if (!open) setEditItem(null); }}>
