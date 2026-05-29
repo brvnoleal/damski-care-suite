@@ -41,17 +41,24 @@ const formatBRL = (v: number) =>
 
 const emptyForm = { nome: "", plano: "", especialidade: "", preco: "" };
 
+const ITEMS_PER_PAGE = 10;
+
 export default function ProcedimentosSection() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ProcedimentoRecord | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<ProcedimentoRecord | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: procedimentos = [], isLoading } = useQuery({
     queryKey: ["procedimentos"],
     queryFn: procedimentoService.list,
   });
+
+  const totalPages = Math.ceil(procedimentos.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginated = procedimentos.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
