@@ -142,6 +142,19 @@ export default function ProcedimentosSection() {
           </Button>
         </div>
 
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <Input
+            placeholder="Pesquisar procedimento..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="pl-9"
+          />
+        </div>
+
         <div className="rounded-lg border border-border/40 overflow-hidden">
           <Table>
             <TableHeader>
