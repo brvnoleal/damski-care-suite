@@ -463,6 +463,10 @@ const PacienteDetalhe = () => {
           </div>
         </TabsContent>
 
+        <TabsContent value="odontograma" className="space-y-4">
+          <Odontograma pacienteId={patientData.id} />
+        </TabsContent>
+
         <TabsContent value="financeiro" className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <LiquidGlassCard draggable={false} className="p-4">
