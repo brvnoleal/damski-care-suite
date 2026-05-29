@@ -257,6 +257,48 @@ export type Database = {
         }
         Relationships: []
       }
+      odontograma_procedimento: {
+        Row: {
+          created_at: string
+          data: string
+          dente: number
+          dentista_id: string | null
+          id: string
+          observacoes: string | null
+          paciente_id: string
+          procedimento: string
+          status: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          dente: number
+          dentista_id?: string | null
+          id?: string
+          observacoes?: string | null
+          paciente_id: string
+          procedimento: string
+          status?: string
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          dente?: number
+          dentista_id?: string | null
+          id?: string
+          observacoes?: string | null
+          paciente_id?: string
+          procedimento?: string
+          status?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: []
+      }
       paciente: {
         Row: {
           avatar_url: string | null
