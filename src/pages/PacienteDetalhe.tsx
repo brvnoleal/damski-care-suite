@@ -1047,7 +1047,7 @@ const PacienteDetalhe = () => {
               <Input value={debitoForm.descricao} onChange={(e) => setDebitoForm({ ...debitoForm, descricao: e.target.value })} placeholder="Ex: Harmonização facial" />
             </div>
             <div className="space-y-2"><Label>Valor (R$) *</Label>
-              <Input type="number" step="0.01" min="0" value={debitoForm.valor} onChange={(e) => setDebitoForm({ ...debitoForm, valor: e.target.value })} placeholder="0,00" />
+              <CurrencyInput value={debitoForm.valor} onChange={(n) => setDebitoForm({ ...debitoForm, valor: n ? String(n) : "" })} />
             </div>
             <div className="space-y-2">
               <Label>Forma de pagamento</Label>
