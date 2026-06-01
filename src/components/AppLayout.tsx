@@ -176,15 +176,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <Menu className="w-5 h-5" />
           </button>
 
-          <button
-            className="hidden lg:inline-flex text-muted-foreground hover:text-foreground transition-colors"
-            onClick={() => setCollapsed((c) => !c)}
-            title={collapsed ? "Expandir menu" : "Recolher menu"}
-          >
-            {collapsed ? <ChevronsRight className="w-5 h-5" /> : <ChevronsLeft className="w-5 h-5" />}
-          </button>
-
-
           <div className="flex-1" />
 
           <Popover>
