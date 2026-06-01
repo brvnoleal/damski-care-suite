@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore, useRef, useEffect } from "react";
+import { useState, useSyncExternalStore, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -15,11 +15,10 @@ import {
   Bell,
   CheckCheck,
   LogOut,
-  Pencil,
-  Check,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
