@@ -307,6 +307,7 @@ const Insumos = () => {
           </Table>
         </div>
       </LiquidGlassCard>
+      </FadeIn>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
         <SheetContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
