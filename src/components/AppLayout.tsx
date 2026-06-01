@@ -17,6 +17,8 @@ import {
   LogOut,
   Pencil,
   Check,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +49,11 @@ const navigation = [
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState<boolean>(() => localStorage.getItem("sidebar_collapsed") === "1");
+
+  useEffect(() => {
+    localStorage.setItem("sidebar_collapsed", collapsed ? "1" : "0");
+  }, [collapsed]);
   const location = useLocation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
