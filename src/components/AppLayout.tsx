@@ -27,6 +27,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { notificationStore } from "@/stores/notificationStore";
@@ -198,41 +204,54 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
 
         {/* Nav */}
-        <nav className={cn("flex-1 py-4 space-y-1 overflow-y-auto", collapsed ? "lg:px-2 px-3" : "px-3")}>
-          {navigation.map((item) => {
-            const isActive = location.pathname === item.href;
-            return (
-              <Link
-                key={item.name}
-                to={item.href}
-                onClick={() => setSidebarOpen(false)}
-                title={collapsed ? item.name : undefined}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                  collapsed && "lg:justify-center lg:px-2",
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60"
-                )}
-              >
-                <item.icon className="w-[18px] h-[18px] shrink-0" />
-                <span className={cn(collapsed && "lg:hidden")}>{item.name}</span>
-              </Link>
-            );
-          })}
+        <TooltipProvider delayDuration={200}>
+          <nav className={cn("flex-1 py-4 space-y-1 overflow-y-auto", collapsed ? "lg:px-2 px-3" : "px-3")}>
+            {navigation.map((item) => {
+              const isActive = location.pathname === item.href;
+              const link = (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                    collapsed && "lg:justify-center lg:px-2",
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60"
+                  )}
+                >
+                  <item.icon className="w-[18px] h-[18px] shrink-0" />
+                  <span className={cn(collapsed && "lg:hidden")}>{item.name}</span>
+                </Link>
+              );
+              return collapsed ? (
+                <Tooltip key={item.name}>
+                  <TooltipTrigger asChild>{link}</TooltipTrigger>
+                  <TooltipContent side="right">{item.name}</TooltipContent>
+                </Tooltip>
+              ) : (
+                link
+              );
+            })}
 
-          <button
-            onClick={handleLogout}
-            title={collapsed ? "Sair" : undefined}
-            className={cn(
-              "w-full mt-2 pt-3 border-t border-sidebar-border flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors",
-              collapsed && "lg:justify-center lg:px-2"
-            )}
-          >
-            <LogOut className="w-[18px] h-[18px] shrink-0" />
-            <span className={cn(collapsed && "lg:hidden")}>Sair</span>
-          </button>
-        </nav>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={handleLogout}
+                  className={cn(
+                    "w-full mt-2 pt-3 border-t border-sidebar-border flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors",
+                    collapsed && "lg:justify-center lg:px-2"
+                  )}
+                >
+                  <LogOut className="w-[18px] h-[18px] shrink-0" />
+                  <span className={cn(collapsed && "lg:hidden")}>Sair</span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Sair</TooltipContent>
+            </Tooltip>
+          </nav>
+        </TooltipProvider>
       </aside>
 
       {/* Main */}
