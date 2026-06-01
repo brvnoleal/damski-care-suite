@@ -27,6 +27,7 @@ import {
   procedimentoOdontoLabels,
 } from "@/types";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
 interface ToothProcedureDialogProps {
   open: boolean;
