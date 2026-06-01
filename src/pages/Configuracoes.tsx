@@ -13,6 +13,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
 import PerfilConsultorio from "@/components/configuracoes/PerfilConsultorio";
 import ProcedimentosSection from "@/components/configuracoes/ProcedimentosSection";
+import { FadeIn } from "@/components/FadeIn";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 
@@ -178,12 +179,15 @@ const Configuracoes = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Configurações</h1>
-        <p className="text-sm text-muted-foreground mt-1">Gerenciamento do sistema e usuários</p>
-      </div>
+      <FadeIn>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Configurações</h1>
+          <p className="text-sm text-muted-foreground mt-1">Gerenciamento do sistema e usuários</p>
+        </div>
+      </FadeIn>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <FadeIn delay={0.1}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PerfilConsultorio />
 
 
@@ -306,6 +310,7 @@ const Configuracoes = () => {
 
         <ProcedimentosSection />
       </div>
+      </FadeIn>
 
 
       {/* Edit Role Sheet */}

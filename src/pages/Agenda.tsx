@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, Clock, User, Stethoscope, CreditCard, FileText, Filter, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/FadeIn";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,11 +20,6 @@ import {
   formaPagamentoLabels,
 } from "@/types";
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
-});
 
 const statusConfig: Record<string, { label: string; className: string; dot: string }> = {
   agendado: { label: "Agendado", className: "bg-info/10 text-info border-info/20", dot: "bg-info" },
@@ -129,7 +124,7 @@ const Agenda = () => {
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <FadeIn className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-foreground">Agenda da Clínica</h1>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
@@ -150,10 +145,10 @@ const Agenda = () => {
             </Button>
           </div>
         </div>
-      </motion.div>
+      </FadeIn>
 
 
-      <motion.div {...fadeUp(0.05)}>
+      <FadeIn delay={0.05}>
         <LiquidGlassCard className="p-3 sm:p-4" draggable={false}>
           <div className="flex items-center gap-2 mb-3">
             <Filter className="w-4 h-4 text-primary" />
@@ -192,9 +187,9 @@ const Agenda = () => {
             </div>
           </div>
         </LiquidGlassCard>
-      </motion.div>
+      </FadeIn>
 
-      <motion.div {...fadeUp(0.1)}>
+      <FadeIn delay={0.1}>
 
         <LiquidGlassCard className="overflow-hidden" draggable={false}>
           <div className="flex items-center gap-2 px-4 sm:px-5 py-3 border-b border-white/10">
@@ -261,7 +256,7 @@ const Agenda = () => {
             )}
           </div>
         </LiquidGlassCard>
-      </motion.div>
+      </FadeIn>
 
       <ResponsiveDialog
         open={!!selected}
