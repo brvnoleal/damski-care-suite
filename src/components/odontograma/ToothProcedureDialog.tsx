@@ -27,6 +27,7 @@ import {
   procedimentoOdontoLabels,
 } from "@/types";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
 interface ToothProcedureDialogProps {
   open: boolean;
@@ -154,13 +155,9 @@ export const ToothProcedureDialog = ({
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label>Valor (R$)</Label>
-            <Input
-              type="number"
-              min={0}
-              step="0.01"
+            <CurrencyInput
               value={form.valor}
-              onChange={(e) => setForm({ ...form, valor: e.target.value })}
-              placeholder="0,00"
+              onChange={(n) => setForm({ ...form, valor: n ? String(n) : "" })}
             />
           </div>
           <div className="space-y-1.5">

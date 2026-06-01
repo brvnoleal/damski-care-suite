@@ -28,6 +28,7 @@ import { Paciente, Dentista, Agendamento, ProcedimentoConsulta, procedimentoCons
 import { sessaoService, type Sessao } from "@/services/sessaoService";
 import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/services/pacienteFotoService";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
 const formatDateBR = (iso: string) => {
   if (!iso) return "";
@@ -1046,7 +1047,7 @@ const PacienteDetalhe = () => {
               <Input value={debitoForm.descricao} onChange={(e) => setDebitoForm({ ...debitoForm, descricao: e.target.value })} placeholder="Ex: Harmonização facial" />
             </div>
             <div className="space-y-2"><Label>Valor (R$) *</Label>
-              <Input type="number" step="0.01" min="0" value={debitoForm.valor} onChange={(e) => setDebitoForm({ ...debitoForm, valor: e.target.value })} placeholder="0,00" />
+              <CurrencyInput value={debitoForm.valor} onChange={(n) => setDebitoForm({ ...debitoForm, valor: n ? String(n) : "" })} />
             </div>
             <div className="space-y-2">
               <Label>Forma de pagamento</Label>
@@ -1200,7 +1201,7 @@ const PacienteDetalhe = () => {
 
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Valor (R$) *</Label>
-            <Input type="number" min="0" step="0.01" value={consultaForm.valor || ""} onChange={(e) => setConsultaForm({ ...consultaForm, valor: parseFloat(e.target.value) || 0 })} placeholder="0,00" />
+            <CurrencyInput value={consultaForm.valor || 0} onChange={(n) => setConsultaForm({ ...consultaForm, valor: n })} />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Forma de Pagamento *</Label>
