@@ -80,24 +80,43 @@ export const odontogramaService = {
 
 /**
  * Calcula o estado visual de cada dente a partir da lista de procedimentos.
- * Prioridade: removido > em_andamento > concluido > neutro.
+ * A cor do dente reflete o STATUS DO ÚLTIMO registro lançado naquele dente
+ * (ordenado por data e, em caso de empate, por updated_at/created_at).
+ * Regra especial: extração concluída marca o dente como "removido".
  */
 export const computeToothStates = (
   procedimentos: OdontogramaProcedimento[]
 ): Record<number, ToothState> => {
-  const map: Record<number, ToothState> = {};
+  // Agrupa por dente e mantém apenas o registro mais recente
+  const latestByTooth: Record<number, OdontogramaProcedimento> = {};
   for (const p of procedimentos) {
-    const current = map[p.dente] || "neutro";
-    // Extração concluída marca o dente como removido (X vermelho)
+    const current = latestByTooth[p.dente];
+    if (!current || compareRecency(p, current) > 0) {
+      latestByTooth[p.dente] = p;
+    }
+  }
+
+  const map: Record<number, ToothState> = {};
+  for (const [dente, p] of Object.entries(latestByTooth)) {
     const isExtracaoConcluida =
       p.procedimento === "extracao" && p.status === "concluido";
-    const next: ToothState = isExtracaoConcluida
-      ? "removido"
-      : statusToState(p.status);
-    map[p.dente] = mergeState(current, next);
+    map[Number(dente)] = isExtracaoConcluida ? "removido" : statusToState(p.status);
   }
   return map;
 };
+
+const recencyKey = (p: OdontogramaProcedimento): number => {
+  const ts = p.updated_at || p.created_at;
+  const tsMs = ts ? new Date(ts).getTime() : 0;
+  const dataMs = p.data ? new Date(p.data).getTime() : 0;
+  // Prioriza a data clínica; usa timestamp como desempate
+  return dataMs * 1e6 + (isNaN(tsMs) ? 0 : tsMs / 1000);
+};
+
+const compareRecency = (
+  a: OdontogramaProcedimento,
+  b: OdontogramaProcedimento
+): number => recencyKey(a) - recencyKey(b);
 
 const statusToState = (s: OdontogramaStatus): ToothState => {
   switch (s) {
@@ -112,12 +131,3 @@ const statusToState = (s: OdontogramaStatus): ToothState => {
   }
 };
 
-const priority: Record<ToothState, number> = {
-  neutro: 0,
-  concluido: 1,
-  em_andamento: 2,
-  removido: 3,
-};
-
-const mergeState = (a: ToothState, b: ToothState): ToothState =>
-  priority[b] >= priority[a] ? b : a;
