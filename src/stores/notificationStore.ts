@@ -1,6 +1,7 @@
 /**
  * Store global de notificações do sistema.
- * Registra toda criação, edição e exclusão de registros, além de alertas de insumos.
+ * Persiste em localStorage e registra criações, atualizações, exclusões
+ * e alertas de vencimento de insumos (15 e 5 dias).
  */
 
 export type NotificationType = "create" | "update" | "delete" | "alert";
@@ -14,44 +15,40 @@ export interface AppNotification {
   description: string;
   timestamp: string;
   read: boolean;
+  /** chave de deduplicação para alertas recorrentes */
+  dedupeKey?: string;
 }
 
 type Listener = () => void;
 
-let notifications: AppNotification[] = [
-  // Notificações iniciais (mock)
-  {
-    id: "n1",
-    type: "alert",
-    module: "insumo",
-    title: "Ácido Hialurônico próximo ao vencimento",
-    description: "Lote AH2024-089 vence em 15 dias. 3 unidades em estoque.",
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    read: false,
-  },
-  {
-    id: "n2",
-    type: "create",
-    module: "agendamento",
-    title: "Novo agendamento criado",
-    description: "Ana Costa — Toxina Botulínica em 10/03 às 09:00.",
-    timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
-    read: false,
-  },
-  {
-    id: "n3",
-    type: "update",
-    module: "paciente",
-    title: "Cadastro de paciente atualizado",
-    description: "Maria Silva — dados atualizados.",
-    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-    read: false,
-  },
-];
+const STORAGE_KEY = "app_notifications_v2";
+const MAX_ITEMS = 200;
+
+function load(): AppNotification[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function persist() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications.slice(0, MAX_ITEMS)));
+  } catch {
+    /* ignore */
+  }
+}
+
+let notifications: AppNotification[] = load();
 
 const listeners: Set<Listener> = new Set();
 
 function emit() {
+  persist();
   listeners.forEach((fn) => fn());
 }
 
@@ -71,6 +68,36 @@ const moduleLabel: Record<NotificationModule, string> = {
   financeiro: "Financeiro",
 };
 
+function pushNotification(n: Omit<AppNotification, "id" | "timestamp" | "read"> & { read?: boolean }) {
+  if (n.dedupeKey && notifications.some((x) => x.dedupeKey === n.dedupeKey)) {
+    return;
+  }
+  const item: AppNotification = {
+    id: String(Date.now()) + Math.random().toString(36).slice(2, 6),
+    timestamp: new Date().toISOString(),
+    read: n.read ?? false,
+    ...n,
+  };
+  notifications = [item, ...notifications].slice(0, MAX_ITEMS);
+  emit();
+}
+
+interface InsumoLike {
+  id: string;
+  nome: string;
+  lote: string;
+  validade: string | null;
+  sem_validade: boolean;
+  quantidade: number;
+}
+
+function daysUntil(dateIso: string): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(dateIso + "T00:00:00");
+  return Math.floor((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 export const notificationStore = {
   subscribe(listener: Listener) {
     listeners.add(listener);
@@ -86,17 +113,40 @@ export const notificationStore = {
   },
 
   add(type: NotificationType, module: NotificationModule, title: string, description: string) {
-    const n: AppNotification = {
-      id: String(Date.now()) + Math.random().toString(36).slice(2, 6),
-      type,
-      module,
-      title,
-      description,
-      timestamp: new Date().toISOString(),
-      read: false,
-    };
-    notifications = [n, ...notifications];
-    emit();
+    pushNotification({ type, module, title, description });
+  },
+
+  /**
+   * Gera alertas para insumos a vencer em 15 e 5 dias.
+   * Deduplica via chave por insumo + threshold.
+   */
+  syncInsumoAlerts(insumos: InsumoLike[]) {
+    const thresholds = [15, 5];
+    let changed = false;
+    insumos.forEach((insumo) => {
+      if (insumo.sem_validade || !insumo.validade) return;
+      const diff = daysUntil(insumo.validade);
+      thresholds.forEach((t) => {
+        if (diff <= t && diff >= 0) {
+          const key = `insumo:${insumo.id}:exp${t}`;
+          if (!notifications.some((n) => n.dedupeKey === key)) {
+            const item: AppNotification = {
+              id: String(Date.now()) + Math.random().toString(36).slice(2, 6),
+              type: "alert",
+              module: "insumo",
+              title: `${insumo.nome} vence em ${diff} dia${diff === 1 ? "" : "s"}`,
+              description: `Lote ${insumo.lote} — ${insumo.quantidade} em estoque. Vencimento em ${new Date(insumo.validade + "T00:00:00").toLocaleDateString("pt-BR")}.`,
+              timestamp: new Date().toISOString(),
+              read: false,
+              dedupeKey: key,
+            };
+            notifications = [item, ...notifications].slice(0, MAX_ITEMS);
+            changed = true;
+          }
+        }
+      });
+    });
+    if (changed) emit();
   },
 
   markAllRead() {

@@ -4,6 +4,7 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 import { Paciente } from "@/types";
+import { notificationStore } from "@/stores/notificationStore";
 
 const mapRow = (row: any): Paciente => ({
   id: row.id,
@@ -50,19 +51,27 @@ export const pacienteService = {
   criar: async (dados: Omit<Paciente, "id" | "created_at">): Promise<Paciente> => {
     const { data, error } = await supabase.from("paciente").insert(dados).select().single();
     if (error) throw error;
-    return mapRow(data);
+    const item = mapRow(data);
+    notificationStore.add("create", "paciente", "Paciente cadastrado", `${item.nome} foi adicionado.`);
+    return item;
   },
 
   atualizar: async (id: string, dados: Partial<Paciente>): Promise<Paciente | null> => {
     const { created_at, id: _, ...updateData } = dados as any;
     const { data, error } = await supabase.from("paciente").update({ ...updateData, updated_at: new Date().toISOString() }).eq("id", id).select().single();
     if (error) throw error;
-    return data ? mapRow(data) : null;
+    if (data) {
+      const item = mapRow(data);
+      notificationStore.add("update", "paciente", "Paciente atualizado", `Dados de ${item.nome} foram alterados.`);
+      return item;
+    }
+    return null;
   },
 
   excluir: async (id: string): Promise<boolean> => {
     const { error } = await supabase.from("paciente").delete().eq("id", id);
     if (error) throw error;
+    notificationStore.add("delete", "paciente", "Paciente removido", "Um paciente foi excluído.");
     return true;
   },
 
