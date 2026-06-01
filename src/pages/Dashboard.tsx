@@ -197,7 +197,7 @@ const Dashboard = () => {
         {kpis.map((kpi, i) => {
           const colors = colorMap[kpi.color];
           return (
-            <motion.div key={kpi.label} {...fadeUp(i * 0.08)} className="h-full">
+            <FadeIn key={kpi.label} delay={i * 0.08} className="h-full">
               <LiquidGlassCard className="p-3 sm:p-5 h-full" draggable={false}>
                 <div className="flex items-start justify-between gap-1 h-full">
                   <div className="space-y-0.5 sm:space-y-1 min-w-0">
@@ -212,12 +212,12 @@ const Dashboard = () => {
                   </div>
                 </div>
               </LiquidGlassCard>
-            </motion.div>
+            </FadeIn>
           );
         })}
       </div>
 
-      <motion.div {...scaleIn(0.35)}>
+      <FadeIn delay={0.35}>
         <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
           <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
             <div className="flex items-center gap-2">
@@ -245,10 +245,10 @@ const Dashboard = () => {
             </div>
           </div>
         </LiquidGlassCard>
-      </motion.div>
+      </FadeIn>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-        <motion.div {...fadeUp(0.5)}>
+        <FadeIn delay={0.5}>
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center gap-2 px-4 sm:px-5 py-3 border-b border-white/10">
               <Clock className="w-4 h-4 text-info" />
@@ -270,9 +270,9 @@ const Dashboard = () => {
               </ResponsiveContainer>
             </div>
           </LiquidGlassCard>
-        </motion.div>
+        </FadeIn>
 
-        <motion.div {...fadeUp(0.6)}>
+        <FadeIn delay={0.6}>
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center gap-2 px-4 sm:px-5 py-3 border-b border-white/10">
               <Star className="w-4 h-4 text-primary" />
@@ -303,9 +303,9 @@ const Dashboard = () => {
               )}
             </div>
           </LiquidGlassCard>
-        </motion.div>
+        </FadeIn>
 
-        <motion.div {...fadeUp(0.7)} className="sm:col-span-2 lg:col-span-1">
+        <FadeIn delay={0.7} className="sm:col-span-2 lg:col-span-1">
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
@@ -332,11 +332,11 @@ const Dashboard = () => {
               ))}
             </div>
           </LiquidGlassCard>
-        </motion.div>
+        </FadeIn>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 items-stretch">
-        <motion.div {...fadeUp(0.8)} className="h-full">
+        <FadeIn delay={0.8} className="h-full">
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
@@ -365,9 +365,9 @@ const Dashboard = () => {
               ))}
             </div>
           </LiquidGlassCard>
-        </motion.div>
+        </FadeIn>
 
-        <motion.div {...fadeUp(0.9)} className="h-full">
+        <FadeIn delay={0.9} className="h-full">
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
@@ -400,7 +400,7 @@ const Dashboard = () => {
               ))}
             </div>
           </LiquidGlassCard>
-        </motion.div>
+        </FadeIn>
       </div>
     </div>
   );
