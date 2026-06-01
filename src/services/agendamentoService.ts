@@ -39,14 +39,20 @@ export const agendamentoService = {
     const payload: any = { ...dados, horario_fim: dados.horario_fim ? dados.horario_fim : null };
     const { data, error } = await supabase.from("agendamento").insert(payload).select().single();
     if (error) throw error;
-    return mapRow(data);
+    const item = mapRow(data);
+    notificationStore.add("create", "agendamento", "Consulta agendada", `${new Date(item.data + "T00:00:00").toLocaleDateString("pt-BR")} às ${item.horario}.`);
+    return item;
   },
 
   criarVarios: async (lista: Omit<Agendamento, "id" | "created_at">[]): Promise<Agendamento[]> => {
     const payload = lista.map((d) => ({ ...d, horario_fim: d.horario_fim ? d.horario_fim : null }));
     const { data, error } = await supabase.from("agendamento").insert(payload).select();
     if (error) throw error;
-    return (data || []).map(mapRow);
+    const itens = (data || []).map(mapRow);
+    if (itens.length > 0) {
+      notificationStore.add("create", "agendamento", "Consultas agendadas", `${itens.length} consulta(s) cadastrada(s).`);
+    }
+    return itens;
   },
 
   atualizar: async (id: string, dados: Partial<Agendamento>): Promise<Agendamento | null> => {
@@ -54,12 +60,18 @@ export const agendamentoService = {
     if ("horario_fim" in updateData) updateData.horario_fim = updateData.horario_fim ? updateData.horario_fim : null;
     const { data, error } = await supabase.from("agendamento").update({ ...updateData, updated_at: new Date().toISOString() }).eq("id", id).select().single();
     if (error) throw error;
-    return data ? mapRow(data) : null;
+    if (data) {
+      const item = mapRow(data);
+      notificationStore.add("update", "agendamento", "Consulta atualizada", `${new Date(item.data + "T00:00:00").toLocaleDateString("pt-BR")} às ${item.horario}.`);
+      return item;
+    }
+    return null;
   },
 
   excluir: async (id: string): Promise<boolean> => {
     const { error } = await supabase.from("agendamento").delete().eq("id", id);
     if (error) throw error;
+    notificationStore.add("delete", "agendamento", "Consulta removida", "Um agendamento foi excluído.");
     return true;
   },
 };
