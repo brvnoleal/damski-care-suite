@@ -34,7 +34,7 @@ const colorMap = {
   primary: { bg: "bg-primary/10", text: "text-primary" },
   info: { bg: "bg-info/10", text: "text-info" },
   success: { bg: "bg-success/10", text: "text-success" },
-  gold: { bg: "bg-accent", text: "text-primary" },
+  warning: { bg: "bg-warning/10", text: "text-warning" },
 };
 
 const CHART_COLORS = [
