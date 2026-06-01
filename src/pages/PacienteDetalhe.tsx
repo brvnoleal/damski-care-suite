@@ -30,6 +30,7 @@ import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/se
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { processClinicalPhoto } from "@/lib/imageProcessing";
+import { CameraCapture } from "@/components/CameraCapture";
 
 const formatDateBR = (iso: string) => {
   if (!iso) return "";
