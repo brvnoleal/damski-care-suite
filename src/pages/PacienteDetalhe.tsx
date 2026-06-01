@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X, User, DollarSign, Activity, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn, isValidCpf } from "@/lib/utils";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -228,6 +228,10 @@ const PacienteDetalhe = () => {
   const handleEditSave = async () => {
     if (!id || !editForm.nome || !editForm.cpf) {
       toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
+      return;
+    }
+    if (!isValidCpf(editForm.cpf)) {
+      toast({ title: "CPF inválido", description: "Verifique os dígitos e tente novamente.", variant: "destructive" });
       return;
     }
     try {

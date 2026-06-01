@@ -21,7 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Paciente } from "@/types";
 import { pacienteService } from "@/services/pacienteService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
-import { maskCpf } from "@/lib/utils";
+import { maskCpf, isValidCpf } from "@/lib/utils";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
   nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", situacao_profissional: "",
@@ -85,6 +85,10 @@ const Pacientes = () => {
   const handleSave = async () => {
     if (!form.nome || !form.cpf || !form.data_nascimento) {
       toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
+      return;
+    }
+    if (!isValidCpf(form.cpf)) {
+      toast({ title: "CPF inválido", description: "Verifique os dígitos e tente novamente.", variant: "destructive" });
       return;
     }
     try {
