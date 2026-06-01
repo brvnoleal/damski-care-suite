@@ -735,19 +735,11 @@ const PacienteDetalhe = () => {
             </div>
             <div
               className="rounded-xl border-2 border-dashed border-border bg-card p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors"
-              onClick={() => cameraInputRef.current?.click()}
+              onClick={() => setCameraOpen(true)}
             >
               <Camera className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
               <p className="text-sm font-medium text-foreground">Tirar foto agora</p>
               <p className="text-xs text-muted-foreground mt-1">Abre a câmera do dispositivo</p>
-              <input
-                ref={cameraInputRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={(e) => { if (e.target.files && e.target.files.length > 0) { openFotoDialog(Array.from(e.target.files)); e.target.value = ""; } }}
-              />
             </div>
           </div>
 
