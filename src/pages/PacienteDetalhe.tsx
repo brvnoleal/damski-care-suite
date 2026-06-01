@@ -408,7 +408,20 @@ const PacienteDetalhe = () => {
             />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">{patientData.nome}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-foreground">{patientData.nome}</h1>
+              {patientData.telefone && (
+                <a
+                  href={getWhatsAppLink(patientData.telefone)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-emerald-500 hover:text-emerald-400 transition-colors"
+                  title="Conversar no WhatsApp"
+                >
+                  <WhatsAppIcon className="w-5 h-5" />
+                </a>
+              )}
+            </div>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs font-mono text-primary font-semibold">{id}</span>
               <Badge className={patientData.status === "ativo" ? "bg-success/10 text-success border-success/20 text-xs" : "bg-muted text-muted-foreground text-xs"}>
