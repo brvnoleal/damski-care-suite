@@ -288,6 +288,7 @@ const Relatorios = () => {
             </SheetContent>
           </Sheet>
         </div>
+      </FadeIn>
       </div>
 
       <Tabs defaultValue="visao" className="space-y-4">
