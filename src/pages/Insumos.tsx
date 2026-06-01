@@ -173,20 +173,23 @@ const Insumos = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Controle de Insumos</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Rastreabilidade por lote conforme RDC 1.002/2025
-          </p>
+      <FadeIn>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Controle de Insumos</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Rastreabilidade por lote conforme RDC 1.002/2025
+            </p>
+          </div>
+          <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
+            <Plus className="w-4 h-4" />
+            Cadastrar Insumo
+          </Button>
         </div>
-        <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
-          <Plus className="w-4 h-4" />
-          Cadastrar Insumo
-        </Button>
-      </div>
+      </FadeIn>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <FadeIn delay={0.1}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <LiquidGlassCard draggable={false} className="p-4">
           <div className="flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 text-destructive" />
