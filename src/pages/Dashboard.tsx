@@ -113,7 +113,7 @@ const Dashboard = () => {
       setKpis([
         { label: "Pacientes Ativos", value: String(pacCount), change: "", icon: Users, color: "primary", trend: "up" },
         { label: "Sessões Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "info", trend: "neutral" },
-        { label: "Insumos Críticos", value: String(criticalCount), change: "", icon: Package, color: "gold", trend: "neutral" },
+        { label: "Insumos Críticos", value: String(criticalCount), change: "", icon: Package, color: "warning", trend: "neutral" },
         { label: "Consultas Semana", value: String(weekAg.length), change: `${weekConfirmed} confirmadas`, icon: FileCheck, color: "success", trend: "up" },
       ]);
 
