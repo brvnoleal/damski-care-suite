@@ -66,6 +66,7 @@ const Pacientes = () => {
   const openCreate = () => {
     setEditingId(null);
     setForm(emptyPaciente());
+    setErrors({});
     setDialogOpen(true);
   };
 
