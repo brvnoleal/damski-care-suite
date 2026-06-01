@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/hooks/use-toast";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
+import { FadeIn } from "@/components/FadeIn";
 import {
   insumoService, Insumo,
   InsumoCategoria, insumoCategoriaLabels,
