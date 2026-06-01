@@ -1201,7 +1201,7 @@ const PacienteDetalhe = () => {
 
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Valor (R$) *</Label>
-            <Input type="number" min="0" step="0.01" value={consultaForm.valor || ""} onChange={(e) => setConsultaForm({ ...consultaForm, valor: parseFloat(e.target.value) || 0 })} placeholder="0,00" />
+            <CurrencyInput value={consultaForm.valor || 0} onChange={(n) => setConsultaForm({ ...consultaForm, valor: n })} />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Forma de Pagamento *</Label>
