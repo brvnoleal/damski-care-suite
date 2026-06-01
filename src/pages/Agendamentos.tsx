@@ -242,6 +242,7 @@ const Agendamentos = () => {
       </FadeIn>
 
       <FadeIn delay={0.15}>
+        <LiquidGlassCard className="overflow-hidden" draggable={false}>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
