@@ -17,6 +17,8 @@ import {
   LogOut,
   Pencil,
   Check,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +49,11 @@ const navigation = [
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState<boolean>(() => localStorage.getItem("sidebar_collapsed") === "1");
+
+  useEffect(() => {
+    localStorage.setItem("sidebar_collapsed", collapsed ? "1" : "0");
+  }, [collapsed]);
   const location = useLocation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -108,13 +115,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Sidebar — liquid glass dark surface */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[260px] flex flex-col transition-transform duration-300 lg:relative lg:translate-x-0 lg:z-auto shrink-0",
+          "fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:relative lg:translate-x-0 lg:z-auto shrink-0",
           "glass-sidebar text-sidebar-foreground",
+          collapsed ? "lg:w-[72px] w-[260px]" : "w-[260px]",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 h-16 border-b border-sidebar-border">
+        <div className={cn("flex items-center gap-3 h-16 border-b border-sidebar-border", collapsed ? "lg:px-3 px-5" : "px-5")}>
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -136,7 +144,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             className="hidden"
             onChange={handleLogoUpload}
           />
-          <div className="flex-1 min-w-0 flex items-center gap-1.5">
+          <div className={cn("flex-1 min-w-0 flex items-center gap-1.5", collapsed && "lg:hidden")}>
             {editingName ? (
               <>
                 <input
@@ -190,7 +198,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className={cn("flex-1 py-4 space-y-1 overflow-y-auto", collapsed ? "lg:px-2 px-3" : "px-3")}>
           {navigation.map((item) => {
             const isActive = location.pathname === item.href;
             return (
@@ -198,25 +206,31 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                 key={item.name}
                 to={item.href}
                 onClick={() => setSidebarOpen(false)}
+                title={collapsed ? item.name : undefined}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                  collapsed && "lg:justify-center lg:px-2",
                   isActive
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60"
                 )}
               >
-                <item.icon className="w-[18px] h-[18px]" />
-                {item.name}
+                <item.icon className="w-[18px] h-[18px] shrink-0" />
+                <span className={cn(collapsed && "lg:hidden")}>{item.name}</span>
               </Link>
             );
           })}
 
           <button
             onClick={handleLogout}
-            className="w-full mt-2 pt-3 border-t border-sidebar-border flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
+            title={collapsed ? "Sair" : undefined}
+            className={cn(
+              "w-full mt-2 pt-3 border-t border-sidebar-border flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors",
+              collapsed && "lg:justify-center lg:px-2"
+            )}
           >
-            <LogOut className="w-[18px] h-[18px]" />
-            Sair
+            <LogOut className="w-[18px] h-[18px] shrink-0" />
+            <span className={cn(collapsed && "lg:hidden")}>Sair</span>
           </button>
         </nav>
       </aside>
@@ -231,6 +245,15 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           >
             <Menu className="w-5 h-5" />
           </button>
+
+          <button
+            className="hidden lg:inline-flex text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => setCollapsed((c) => !c)}
+            title={collapsed ? "Expandir menu" : "Recolher menu"}
+          >
+            {collapsed ? <ChevronsRight className="w-5 h-5" /> : <ChevronsLeft className="w-5 h-5" />}
+          </button>
+
 
           <div className="flex-1" />
 
