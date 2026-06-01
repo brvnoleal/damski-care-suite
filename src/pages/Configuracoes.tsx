@@ -310,6 +310,7 @@ const Configuracoes = () => {
 
         <ProcedimentosSection />
       </div>
+      </FadeIn>
 
 
       {/* Edit Role Sheet */}
