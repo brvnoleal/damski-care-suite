@@ -217,22 +217,23 @@ const Relatorios = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4">
-        <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">Relatórios</h1>
-          <p className="text-sm text-muted-foreground mt-1">Insights operacionais e financeiros da clínica</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Select value={periodo} onValueChange={setPeriodo}>
-            <SelectTrigger className="w-[140px] h-9 text-sm"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="semanal">Semanal</SelectItem>
-              <SelectItem value="mensal">Mensal</SelectItem>
-              <SelectItem value="trimestral">Trimestral</SelectItem>
-              <SelectItem value="anual">Anual</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="sm" className="gap-2"><Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span></Button>
+      <FadeIn>
+        <div className="flex flex-col gap-4">
+          <div>
+            <h1 className="text-2xl font-display font-bold text-foreground">Relatórios</h1>
+            <p className="text-sm text-muted-foreground mt-1">Insights operacionais e financeiros da clínica</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Select value={periodo} onValueChange={setPeriodo}>
+              <SelectTrigger className="w-[140px] h-9 text-sm"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="semanal">Semanal</SelectItem>
+                <SelectItem value="mensal">Mensal</SelectItem>
+                <SelectItem value="trimestral">Trimestral</SelectItem>
+                <SelectItem value="anual">Anual</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm" className="gap-2"><Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span></Button>
           <Sheet open={despesaOpen} onOpenChange={setDespesaOpen}>
             <SheetContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
               <SheetHeader>
