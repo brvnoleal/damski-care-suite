@@ -28,6 +28,7 @@ import { Paciente, Dentista, Agendamento, ProcedimentoConsulta, procedimentoCons
 import { sessaoService, type Sessao } from "@/services/sessaoService";
 import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/services/pacienteFotoService";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
+import { CurrencyInput } from "@/components/ui/currency-input";
 
 const formatDateBR = (iso: string) => {
   if (!iso) return "";
