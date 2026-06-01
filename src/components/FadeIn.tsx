@@ -11,14 +11,6 @@ interface FadeInProps extends Omit<HTMLMotionProps<"div">, "children"> {
   className?: string;
 }
 
-const directionMap = {
-  up: { y: 20 },
-  down: { y: -20 },
-  left: { x: 20 },
-  right: { x: -20 },
-  none: {},
-};
-
 export const FadeIn = ({
   children,
   delay = 0,
@@ -29,18 +21,21 @@ export const FadeIn = ({
   className,
   ...props
 }: FadeInProps) => {
-  const dir = directionMap[direction];
-  const initial = {
-    opacity: 0,
-    ...(direction !== "none" && {
-      y: dir.y !== undefined ? dir.y * (distance / 20) : 0,
-      x: dir.x !== undefined ? dir.x * (distance / 20) : 0,
-    }),
+  const getInitial = () => {
+    const d = distance;
+    switch (direction) {
+      case "up": return { opacity: 0, y: d };
+      case "down": return { opacity: 0, y: -d };
+      case "left": return { opacity: 0, x: d };
+      case "right": return { opacity: 0, x: -d };
+      case "none": return { opacity: 0 };
+      default: return { opacity: 0, y: d };
+    }
   };
 
   return (
     <motion.div
-      initial={initial}
+      initial={getInitial()}
       whileInView={{ opacity: 1, y: 0, x: 0 }}
       viewport={{ once, margin: "-40px" }}
       transition={{
