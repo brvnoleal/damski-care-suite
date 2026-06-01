@@ -104,25 +104,31 @@ const Dentistas = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Dentistas</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Cadastro e gerenciamento do corpo clínico
-          </p>
+      <FadeIn>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Dentistas</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Cadastro e gerenciamento do corpo clínico
+            </p>
+          </div>
+          <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
+            <Plus className="w-4 h-4" />
+            Novo Dentista
+          </Button>
         </div>
-        <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
-          <Plus className="w-4 h-4" />
-          Novo Dentista
-        </Button>
-      </div>
+      </FadeIn>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Buscar por nome ou CRO..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+      <FadeIn delay={0.1}>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Buscar por nome ou CRO..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          </div>
         </div>
-      </div>
+      </FadeIn>
+
+      <FadeIn delay={0.15}>
 
       <LiquidGlassCard className="overflow-hidden" draggable={false}>
         <div className="overflow-x-auto">
