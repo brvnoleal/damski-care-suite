@@ -439,17 +439,20 @@ const PacienteDetalhe = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-foreground">{patientData.nome}</h1>
-              {patientData.telefone && (
-                <a
-                  href={getWhatsAppLink(patientData.telefone)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-emerald-500 hover:text-emerald-400 transition-colors"
-                  title="Conversar no WhatsApp"
-                >
-                  <WhatsAppIcon className="w-5 h-5" />
-                </a>
-              )}
+              {(() => {
+                const waLink = getWhatsAppLink(patientData.telefone);
+                return waLink ? (
+                  <a
+                    href={waLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-emerald-500 hover:text-emerald-400 transition-colors"
+                    title="Conversar no WhatsApp"
+                  >
+                    <WhatsAppIcon className="w-5 h-5" />
+                  </a>
+                ) : null;
+              })()}
             </div>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs font-mono text-primary font-semibold">{id}</span>
