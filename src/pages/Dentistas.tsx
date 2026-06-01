@@ -182,6 +182,7 @@ const Dentistas = () => {
           </Table>
         </div>
       </LiquidGlassCard>
+      </FadeIn>
 
       <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
         <SheetContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
