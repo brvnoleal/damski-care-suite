@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dentista } from "@/types";
 import { dentistaService } from "@/services/dentistaService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
+import { FadeIn } from "@/components/FadeIn";
 
 const emptyDentista = (): Omit<Dentista, "id" | "created_at"> => ({
   nome: "", especialidade: "", cro: "", telefone: "", email: "", instagram: "",
