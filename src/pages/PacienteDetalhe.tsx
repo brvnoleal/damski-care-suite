@@ -117,6 +117,7 @@ const PacienteDetalhe = () => {
   const [fotos, setFotos] = useState<PacienteFoto[]>([]);
   const [previewFoto, setPreviewFoto] = useState<PacienteFoto | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [fotoDialogOpen, setFotoDialogOpen] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [fotoMeta, setFotoMeta] = useState<{ categoria: FotoCategoria; descricao: string }>({ categoria: "antes", descricao: "" });
