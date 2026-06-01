@@ -259,7 +259,7 @@ const Relatorios = () => {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2"><Label>Fornecedor</Label><Input placeholder="Nome do fornecedor" value={novaDespesa.fornecedor} onChange={(e) => handleDespesaChange("fornecedor", e.target.value)} /></div>
-                  <div className="space-y-2"><Label>Valor (R$) *</Label><Input type="number" placeholder="0,00" value={novaDespesa.valor} onChange={(e) => handleDespesaChange("valor", e.target.value)} /></div>
+                  <div className="space-y-2"><Label>Valor (R$) *</Label><CurrencyInput value={novaDespesa.valor} onChange={(n) => handleDespesaChange("valor", n ? String(n) : "")} /></div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
