@@ -29,6 +29,7 @@ import { sessaoService, type Sessao } from "@/services/sessaoService";
 import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/services/pacienteFotoService";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 import { CurrencyInput } from "@/components/ui/currency-input";
+import { processClinicalPhoto } from "@/lib/imageProcessing";
 
 const formatDateBR = (iso: string) => {
   if (!iso) return "";
