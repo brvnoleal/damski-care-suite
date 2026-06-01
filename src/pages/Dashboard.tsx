@@ -25,12 +25,6 @@ const colorMap = {
   warning: { bg: "bg-warning/10", text: "text-warning" },
 };
 
-const colorMap = {
-  primary: { bg: "bg-primary/10", text: "text-primary" },
-  info: { bg: "bg-info/10", text: "text-info" },
-  success: { bg: "bg-success/10", text: "text-success" },
-  warning: { bg: "bg-warning/10", text: "text-warning" },
-};
 
 const CHART_COLORS = [
   "hsl(239, 84%, 67%)", "hsl(217, 91%, 60%)", "hsl(160, 84%, 39%)",
