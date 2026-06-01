@@ -9,60 +9,64 @@ interface CurrencyInputProps
 }
 
 /**
- * Input monetário pt-BR.
- * - Aceita apenas dígitos, vírgula e ponto.
- * - Ao perder o foco, formata como "N,NN" (ex.: 500 -> 500,00).
- * - Emite valor numérico para o componente pai.
+ * Input monetário pt-BR com máscara de centavos em tempo real.
+ * Cada dígito digitado é interpretado como centavo:
+ * - "5"      -> "0,05"
+ * - "50"     -> "0,50"
+ * - "500"    -> "5,00"
+ * - "50000"  -> "500,00"
+ * Emite o valor numérico (reais) para o componente pai.
  */
-const parseNumeric = (raw: string): number => {
-  if (!raw) return 0;
-  const cleaned = raw.replace(/\./g, "").replace(",", ".").replace(/[^\d.]/g, "");
-  const n = parseFloat(cleaned);
-  return Number.isFinite(n) ? n : 0;
+const onlyDigits = (s: string) => s.replace(/\D/g, "");
+
+const centsToBRL = (cents: number): string => {
+  const n = cents / 100;
+  return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
-const formatBRL = (n: number): string =>
-  n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-const toDisplay = (v: number | string): string => {
-  if (v === "" || v === null || v === undefined) return "";
-  const n = typeof v === "number" ? v : parseNumeric(v);
-  if (!n) return typeof v === "string" ? v : "";
-  return formatBRL(n);
+const valueToCents = (v: number | string): number => {
+  if (v === "" || v === null || v === undefined) return 0;
+  const n = typeof v === "number" ? v : parseFloat(String(v).replace(/\./g, "").replace(",", "."));
+  if (!Number.isFinite(n)) return 0;
+  return Math.round(n * 100);
 };
 
 export const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
-  ({ value, onChange, className, onBlur, onFocus, placeholder = "0,00", ...props }, ref) => {
-    const [display, setDisplay] = React.useState<string>(() => toDisplay(value));
-    const [focused, setFocused] = React.useState(false);
+  ({ value, onChange, className, placeholder = "0,00", ...props }, ref) => {
+    const [display, setDisplay] = React.useState<string>(() => {
+      const c = valueToCents(value);
+      return c ? centsToBRL(c) : "";
+    });
 
     React.useEffect(() => {
-      if (!focused) setDisplay(toDisplay(value));
-    }, [value, focused]);
+      const c = valueToCents(value);
+      const formatted = c ? centsToBRL(c) : "";
+      setDisplay((prev) => {
+        // Evita sobrescrever enquanto o usuário digita o mesmo valor
+        if (valueToCents(prev.replace(/\./g, "").replace(",", ".")) === c) return prev;
+        return formatted;
+      });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [value]);
 
     return (
       <Input
         {...props}
         ref={ref}
-        inputMode="decimal"
+        inputMode="numeric"
         placeholder={placeholder}
         className={cn(className)}
         value={display}
-        onFocus={(e) => {
-          setFocused(true);
-          onFocus?.(e);
-        }}
         onChange={(e) => {
-          const raw = e.target.value.replace(/[^\d.,]/g, "");
-          setDisplay(raw);
-          onChange(parseNumeric(raw));
-        }}
-        onBlur={(e) => {
-          setFocused(false);
-          const n = parseNumeric(display);
-          setDisplay(n ? formatBRL(n) : "");
-          onChange(n);
-          onBlur?.(e);
+          const digits = onlyDigits(e.target.value);
+          if (!digits) {
+            setDisplay("");
+            onChange(0);
+            return;
+          }
+          const cents = parseInt(digits, 10);
+          setDisplay(centsToBRL(cents));
+          onChange(cents / 100);
         }}
       />
     );
