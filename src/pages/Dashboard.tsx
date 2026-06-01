@@ -34,7 +34,7 @@ const colorMap = {
   primary: { bg: "bg-primary/10", text: "text-primary" },
   info: { bg: "bg-info/10", text: "text-info" },
   success: { bg: "bg-success/10", text: "text-success" },
-  gold: { bg: "bg-accent", text: "text-primary" },
+  warning: { bg: "bg-warning/10", text: "text-warning" },
 };
 
 const CHART_COLORS = [
@@ -72,7 +72,7 @@ const Dashboard = () => {
   const [kpis, setKpis] = useState([
     { label: "Pacientes Ativos", value: "—", change: "carregando...", icon: Users, color: "primary" as const, trend: "neutral" },
     { label: "Sessões Hoje", value: "—", change: "", icon: Calendar, color: "info" as const, trend: "neutral" },
-    { label: "Insumos Críticos", value: "—", change: "", icon: Package, color: "gold" as const, trend: "neutral" },
+    { label: "Insumos Críticos", value: "—", change: "", icon: Package, color: "warning" as const, trend: "neutral" },
     { label: "Consultas Semana", value: "—", change: "", icon: FileCheck, color: "success" as const, trend: "up" },
   ]);
 
@@ -113,7 +113,7 @@ const Dashboard = () => {
       setKpis([
         { label: "Pacientes Ativos", value: String(pacCount), change: "", icon: Users, color: "primary", trend: "up" },
         { label: "Sessões Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "info", trend: "neutral" },
-        { label: "Insumos Críticos", value: String(criticalCount), change: "", icon: Package, color: "gold", trend: "neutral" },
+        { label: "Insumos Críticos", value: String(criticalCount), change: "", icon: Package, color: "warning", trend: "neutral" },
         { label: "Consultas Semana", value: String(weekAg.length), change: `${weekConfirmed} confirmadas`, icon: FileCheck, color: "success", trend: "up" },
       ]);
 
