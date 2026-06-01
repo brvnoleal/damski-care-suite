@@ -22,6 +22,7 @@ import { Paciente } from "@/types";
 import { pacienteService } from "@/services/pacienteService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { maskCpf, isValidCpf } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
   nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", situacao_profissional: "",
@@ -41,6 +42,7 @@ const Pacientes = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyPaciente());
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
 
   const loadData = async () => {
     try {
@@ -64,11 +66,13 @@ const Pacientes = () => {
   const openCreate = () => {
     setEditingId(null);
     setForm(emptyPaciente());
+    setErrors({});
     setDialogOpen(true);
   };
 
   const openEdit = (p: Paciente) => {
     setEditingId(p.id);
+    setErrors({});
     setForm({
       nome: p.nome, cpf: p.cpf,
       rg: p.rg || "", emissor: p.emissor || "", sexo: p.sexo || "",
@@ -83,15 +87,31 @@ const Pacientes = () => {
   };
 
   const handleSave = async () => {
-    if (!form.nome || !form.cpf || !form.data_nascimento) {
-      toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
+    const newErrors: Record<string, boolean> = {};
+    if (!form.nome) newErrors.nome = true;
+    if (!form.cpf) newErrors.cpf = true;
+    if (!form.data_nascimento) newErrors.data_nascimento = true;
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast({ title: "Preencha os campos obrigatórios", description: "Os campos destacados em vermelho são obrigatórios.", variant: "destructive" });
       return;
     }
     if (!isValidCpf(form.cpf)) {
+      setErrors({ cpf: true });
       toast({ title: "CPF inválido", description: "Verifique os dígitos e tente novamente.", variant: "destructive" });
       return;
     }
     try {
+      let query = supabase.from("paciente").select("id").eq("cpf", form.cpf);
+      if (editingId) query = query.neq("id", editingId);
+      const { data: dup, error: dupErr } = await query.maybeSingle();
+      if (dupErr) throw dupErr;
+      if (dup) {
+        setErrors({ cpf: true });
+        toast({ title: "CPF já cadastrado", description: "Já existe um paciente com este CPF no sistema.", variant: "destructive" });
+        return;
+      }
+
       if (editingId) {
         await pacienteService.atualizar(editingId, form);
         toast({ title: "Paciente atualizado com sucesso" });
@@ -99,6 +119,7 @@ const Pacientes = () => {
         await pacienteService.criar(form);
         toast({ title: "Paciente cadastrado com sucesso" });
       }
+      setErrors({});
       await loadData();
       setDialogOpen(false);
     } catch (err) {
@@ -213,23 +234,39 @@ const Pacientes = () => {
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
           <div className="sm:col-span-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nome *</Label>
-            <Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Nome completo" />
+            <Label className={`text-xs font-semibold uppercase tracking-wider mb-1.5 block ${errors.nome ? "text-destructive" : "text-muted-foreground"}`}>Nome *</Label>
+            <Input
+              value={form.nome}
+              onChange={(e) => { setForm({ ...form, nome: e.target.value }); if (errors.nome) setErrors({ ...errors, nome: false }); }}
+              placeholder="Nome completo"
+              className={errors.nome ? "border-destructive focus-visible:ring-destructive" : ""}
+            />
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">CPF *</Label>
-            <Input value={form.cpf} onChange={(e) => {
-              const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
-              const formatted = raw
-                .replace(/(\d{3})(\d)/, "$1.$2")
-                .replace(/(\d{3})(\d)/, "$1.$2")
-                .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-              setForm({ ...form, cpf: formatted });
-            }} placeholder="000.000.000-00" />
+            <Label className={`text-xs font-semibold uppercase tracking-wider mb-1.5 block ${errors.cpf ? "text-destructive" : "text-muted-foreground"}`}>CPF *</Label>
+            <Input
+              value={form.cpf}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
+                const formatted = raw
+                  .replace(/(\d{3})(\d)/, "$1.$2")
+                  .replace(/(\d{3})(\d)/, "$1.$2")
+                  .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+                setForm({ ...form, cpf: formatted });
+                if (errors.cpf) setErrors({ ...errors, cpf: false });
+              }}
+              placeholder="000.000.000-00"
+              className={errors.cpf ? "border-destructive focus-visible:ring-destructive" : ""}
+            />
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Data de Nascimento *</Label>
-            <Input type="date" value={form.data_nascimento} onChange={(e) => setForm({ ...form, data_nascimento: e.target.value })} />
+            <Label className={`text-xs font-semibold uppercase tracking-wider mb-1.5 block ${errors.data_nascimento ? "text-destructive" : "text-muted-foreground"}`}>Data de Nascimento *</Label>
+            <Input
+              type="date"
+              value={form.data_nascimento}
+              onChange={(e) => { setForm({ ...form, data_nascimento: e.target.value }); if (errors.data_nascimento) setErrors({ ...errors, data_nascimento: false }); }}
+              className={errors.data_nascimento ? "border-destructive focus-visible:ring-destructive" : ""}
+            />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Telefone</Label>
