@@ -230,6 +230,10 @@ const PacienteDetalhe = () => {
       toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
       return;
     }
+    if (!isValidCpf(editForm.cpf)) {
+      toast({ title: "CPF inválido", description: "Verifique os dígitos e tente novamente.", variant: "destructive" });
+      return;
+    }
     try {
       const updated = await pacienteService.atualizar(id, editForm);
       setPatientData(updated);
