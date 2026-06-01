@@ -22,6 +22,7 @@ import { Paciente } from "@/types";
 import { pacienteService } from "@/services/pacienteService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { maskCpf, isValidCpf } from "@/lib/utils";
+import { FadeIn } from "@/components/FadeIn";
 import { supabase } from "@/integrations/supabase/client";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
@@ -143,29 +144,35 @@ const Pacientes = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Pacientes</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Cadastro e gerenciamento de pacientes — CRUD completo
-          </p>
+      <FadeIn>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Pacientes</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Cadastro e gerenciamento de pacientes — CRUD completo
+            </p>
+          </div>
+          <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
+            <Plus className="w-4 h-4" />
+            Novo Paciente
+          </Button>
         </div>
-        <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
-          <Plus className="w-4 h-4" />
-          Novo Paciente
-        </Button>
-      </div>
+      </FadeIn>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Buscar por nome ou CPF..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+      <FadeIn delay={0.1}>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Buscar por nome ou CPF..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          </div>
+          <Button variant="outline" className="gap-2">
+            <Filter className="w-4 h-4" />
+            Filtros
+          </Button>
         </div>
-        <Button variant="outline" className="gap-2">
-          <Filter className="w-4 h-4" />
-          Filtros
-        </Button>
-      </div>
+      </FadeIn>
+
+      <FadeIn delay={0.15}>
 
       <LiquidGlassCard className="overflow-hidden" draggable={false}>
         <div className="overflow-x-auto">
@@ -218,6 +225,8 @@ const Pacientes = () => {
           </Table>
         </div>
       </LiquidGlassCard>
+
+      </FadeIn>
 
       <ResponsiveDialog
         open={dialogOpen}
