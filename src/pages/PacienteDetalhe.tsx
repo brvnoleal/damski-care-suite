@@ -275,9 +275,31 @@ const PacienteDetalhe = () => {
 
   const handleFotoSave = async () => {
     if (!id) return;
+    const processedFiles: File[] = [];
+    const rejected: string[] = [];
+    for (const file of pendingFiles) {
+      try {
+        const { file: processed } = await processClinicalPhoto(file);
+        processedFiles.push(processed);
+      } catch (err: any) {
+        rejected.push(`${file.name}: ${err?.message || "erro ao processar"}`);
+      }
+    }
+    if (rejected.length > 0) {
+      toast({
+        title: `${rejected.length} foto(s) ignorada(s)`,
+        description: rejected.slice(0, 3).join(" • "),
+        variant: "destructive",
+      });
+    }
+    if (processedFiles.length === 0) {
+      setFotoDialogOpen(false);
+      setPendingFiles([]);
+      return;
+    }
     try {
       const uploaded = await Promise.all(
-        pendingFiles.map((file) =>
+        processedFiles.map((file) =>
           pacienteFotoService.upload(id, file, {
             categoria: fotoMeta.categoria,
             descricao: fotoMeta.descricao,
