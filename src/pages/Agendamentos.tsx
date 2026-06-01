@@ -23,6 +23,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Agendamento, Paciente, Dentista, ProcedimentoConsulta, procedimentoConsultaLabels, FormaPagamento, formaPagamentoLabels } from "@/types";
 import { agendamentoService } from "@/services/agendamentoService";
+import { FadeIn } from "@/components/FadeIn";
 import { pacienteService } from "@/services/pacienteService";
 import { dentistaService } from "@/services/dentistaService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";

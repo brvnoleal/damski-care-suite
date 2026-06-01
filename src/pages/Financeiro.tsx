@@ -22,6 +22,7 @@ import {
 import { PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Area, AreaChart } from "recharts";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { FadeIn } from "@/components/FadeIn";
 import { despesaService } from "@/services/despesaService";
 import { procedimentoConsultaLabels, formaPagamentoLabels } from "@/types";
 
