@@ -313,6 +313,7 @@ const Agendamentos = () => {
           </Table>
         </div>
       </LiquidGlassCard>
+      </FadeIn>
 
       <ResponsiveDialog
         open={dialogOpen}
