@@ -801,6 +801,12 @@ const PacienteDetalhe = () => {
               </SheetContent>
             </Sheet>
           )}
+
+          <CameraCapture
+            open={cameraOpen}
+            onOpenChange={setCameraOpen}
+            onCapture={(file) => openFotoDialog([file])}
+          />
         </TabsContent>
 
         <TabsContent value="insumos" className="space-y-4">
