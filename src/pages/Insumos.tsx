@@ -217,6 +217,7 @@ const Insumos = () => {
             </div>
           </div>
         </LiquidGlassCard>
+      </div>
       </FadeIn>
 
       <FadeIn delay={0.15}>
@@ -230,7 +231,9 @@ const Insumos = () => {
           Filtros
         </Button>
       </div>
+      </FadeIn>
 
+      <FadeIn delay={0.2}>
       <LiquidGlassCard className="overflow-hidden" draggable={false}>
         <div className="overflow-x-auto">
           <Table>
