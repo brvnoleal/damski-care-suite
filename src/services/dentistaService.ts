@@ -42,19 +42,27 @@ export const dentistaService = {
   criar: async (dados: Omit<Dentista, "id" | "created_at">): Promise<Dentista> => {
     const { data, error } = await supabase.from("dentista").insert(dados).select().single();
     if (error) throw error;
-    return mapRow(data);
+    const item = mapRow(data);
+    notificationStore.add("create", "dentista", "Dentista cadastrado", `${item.nome} (CRO ${item.cro}).`);
+    return item;
   },
 
   atualizar: async (id: string, dados: Partial<Dentista>): Promise<Dentista | null> => {
     const { created_at, id: _, ...updateData } = dados as any;
     const { data, error } = await supabase.from("dentista").update({ ...updateData, updated_at: new Date().toISOString() }).eq("id", id).select().single();
     if (error) throw error;
-    return data ? mapRow(data) : null;
+    if (data) {
+      const item = mapRow(data);
+      notificationStore.add("update", "dentista", "Dentista atualizado", `Dados de ${item.nome} foram alterados.`);
+      return item;
+    }
+    return null;
   },
 
   excluir: async (id: string): Promise<boolean> => {
     const { error } = await supabase.from("dentista").delete().eq("id", id);
     if (error) throw error;
+    notificationStore.add("delete", "dentista", "Dentista removido", "Um dentista foi excluído.");
     return true;
   },
 };
