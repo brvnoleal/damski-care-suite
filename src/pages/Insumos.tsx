@@ -217,9 +217,10 @@ const Insumos = () => {
             </div>
           </div>
         </LiquidGlassCard>
-      </div>
+      </FadeIn>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <FadeIn delay={0.15}>
+        <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input placeholder="Buscar por insumo ou lote..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
