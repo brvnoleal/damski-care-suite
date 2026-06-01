@@ -72,6 +72,7 @@ const Pacientes = () => {
 
   const openEdit = (p: Paciente) => {
     setEditingId(p.id);
+    setErrors({});
     setForm({
       nome: p.nome, cpf: p.cpf,
       rg: p.rg || "", emissor: p.emissor || "", sexo: p.sexo || "",
@@ -86,15 +87,31 @@ const Pacientes = () => {
   };
 
   const handleSave = async () => {
-    if (!form.nome || !form.cpf || !form.data_nascimento) {
-      toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
+    const newErrors: Record<string, boolean> = {};
+    if (!form.nome) newErrors.nome = true;
+    if (!form.cpf) newErrors.cpf = true;
+    if (!form.data_nascimento) newErrors.data_nascimento = true;
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast({ title: "Preencha os campos obrigatórios", description: "Os campos destacados em vermelho são obrigatórios.", variant: "destructive" });
       return;
     }
     if (!isValidCpf(form.cpf)) {
+      setErrors({ cpf: true });
       toast({ title: "CPF inválido", description: "Verifique os dígitos e tente novamente.", variant: "destructive" });
       return;
     }
     try {
+      let query = supabase.from("paciente").select("id").eq("cpf", form.cpf);
+      if (editingId) query = query.neq("id", editingId);
+      const { data: dup, error: dupErr } = await query.maybeSingle();
+      if (dupErr) throw dupErr;
+      if (dup) {
+        setErrors({ cpf: true });
+        toast({ title: "CPF já cadastrado", description: "Já existe um paciente com este CPF no sistema.", variant: "destructive" });
+        return;
+      }
+
       if (editingId) {
         await pacienteService.atualizar(editingId, form);
         toast({ title: "Paciente atualizado com sucesso" });
@@ -102,6 +119,7 @@ const Pacientes = () => {
         await pacienteService.criar(form);
         toast({ title: "Paciente cadastrado com sucesso" });
       }
+      setErrors({});
       await loadData();
       setDialogOpen(false);
     } catch (err) {
