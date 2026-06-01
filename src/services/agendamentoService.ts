@@ -4,6 +4,7 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 import { Agendamento } from "@/types";
+import { notificationStore } from "@/stores/notificationStore";
 
 const mapRow = (row: any): Agendamento => ({
   id: row.id,
