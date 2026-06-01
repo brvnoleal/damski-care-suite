@@ -13,22 +13,17 @@ import {
   XAxis, YAxis, CartesianGrid,
   BarChart, Bar,
 } from "recharts";
-import { motion } from "framer-motion";
+import { FadeIn, StaggerContainer, StaggerItem } from "@/components/FadeIn";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { supabase } from "@/integrations/supabase/client";
 import { procedimentoConsultaLabels } from "@/types";
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
-});
-
-const scaleIn = (delay = 0) => ({
-  initial: { opacity: 0, scale: 0.95 },
-  animate: { opacity: 1, scale: 1 },
-  transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
-});
+const colorMap = {
+  primary: { bg: "bg-primary/10", text: "text-primary" },
+  info: { bg: "bg-info/10", text: "text-info" },
+  success: { bg: "bg-success/10", text: "text-success" },
+  warning: { bg: "bg-warning/10", text: "text-warning" },
+};
 
 const colorMap = {
   primary: { bg: "bg-primary/10", text: "text-primary" },
