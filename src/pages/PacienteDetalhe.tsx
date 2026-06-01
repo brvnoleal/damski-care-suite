@@ -744,35 +744,38 @@ const PacienteDetalhe = () => {
           </div>
 
           {fotos.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
               {fotos.map((foto) => (
-                <div key={foto.id} className="group relative rounded-xl glass overflow-hidden shadow-elegant">
-                  <div className="aspect-square overflow-hidden">
-                    <img src={foto.url} alt={foto.nome_arquivo} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="p-2">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <Badge variant="outline" className={cn(
-                        "text-[10px] px-1.5 py-0",
-                        foto.categoria === "antes" && "border-blue-500/30 text-blue-600",
-                        foto.categoria === "depois" && "border-green-500/30 text-green-600",
-                        foto.categoria === "durante" && "border-amber-500/30 text-amber-600",
-                        foto.categoria === "outro" && "border-muted-foreground/30 text-muted-foreground",
-                      )}>
-                        {foto.categoria.charAt(0).toUpperCase() + foto.categoria.slice(1)}
-                      </Badge>
-                    </div>
-                    <p className="text-xs font-medium text-foreground truncate">{foto.nome_arquivo}</p>
-                    {foto.descricao && <p className="text-[11px] text-muted-foreground truncate">{foto.descricao}</p>}
-                    <p className="text-xs text-muted-foreground">{formatDateBR(foto.data)}</p>
-                  </div>
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button onClick={() => setPreviewFoto(foto)} className="p-2 rounded-full bg-card/90 text-foreground hover:bg-card transition-colors">
-                      <ZoomIn className="w-4 h-4" />
+                <div
+                  key={foto.id}
+                  className="group relative rounded-md overflow-hidden border border-border bg-card aspect-square"
+                  title={`${foto.nome_arquivo}${foto.descricao ? ` — ${foto.descricao}` : ""}`}
+                >
+                  <img src={foto.url} alt={foto.nome_arquivo} className="w-full h-full object-cover" />
+                  <span
+                    className={cn(
+                      "absolute top-1 left-1 inline-block w-2 h-2 rounded-full ring-1 ring-white/70",
+                      foto.categoria === "antes" && "bg-blue-500",
+                      foto.categoria === "depois" && "bg-green-500",
+                      foto.categoria === "durante" && "bg-amber-500",
+                      foto.categoria === "outro" && "bg-muted-foreground",
+                    )}
+                    aria-label={foto.categoria}
+                  />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                    <button
+                      onClick={() => setPreviewFoto(foto)}
+                      className="p-1 rounded-full bg-card/90 text-foreground hover:bg-card transition-colors"
+                      aria-label="Ampliar"
+                    >
+                      <ZoomIn className="w-3 h-3" />
                     </button>
-                    <button onClick={() => handleFotoDelete(foto)}
-                      className="p-2 rounded-full bg-destructive/90 text-destructive-foreground hover:bg-destructive transition-colors">
-                      <Trash2 className="w-4 h-4" />
+                    <button
+                      onClick={() => handleFotoDelete(foto)}
+                      className="p-1 rounded-full bg-destructive/90 text-destructive-foreground hover:bg-destructive transition-colors"
+                      aria-label="Remover"
+                    >
+                      <Trash2 className="w-3 h-3" />
                     </button>
                   </div>
                 </div>
