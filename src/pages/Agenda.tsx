@@ -124,7 +124,7 @@ const Agenda = () => {
 
   return (
     <div className="space-y-4 sm:space-y-5">
-      <motion.div {...fadeUp(0)} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <FadeIn className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-foreground">Agenda da Clínica</h1>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
@@ -145,10 +145,10 @@ const Agenda = () => {
             </Button>
           </div>
         </div>
-      </motion.div>
+      </FadeIn>
 
 
-      <motion.div {...fadeUp(0.05)}>
+      <FadeIn delay={0.05}>
         <LiquidGlassCard className="p-3 sm:p-4" draggable={false}>
           <div className="flex items-center gap-2 mb-3">
             <Filter className="w-4 h-4 text-primary" />
@@ -187,9 +187,9 @@ const Agenda = () => {
             </div>
           </div>
         </LiquidGlassCard>
-      </motion.div>
+      </FadeIn>
 
-      <motion.div {...fadeUp(0.1)}>
+      <FadeIn delay={0.1}>
 
         <LiquidGlassCard className="overflow-hidden" draggable={false}>
           <div className="flex items-center gap-2 px-4 sm:px-5 py-3 border-b border-white/10">
@@ -256,7 +256,7 @@ const Agenda = () => {
             )}
           </div>
         </LiquidGlassCard>
-      </motion.div>
+      </FadeIn>
 
       <ResponsiveDialog
         open={!!selected}
