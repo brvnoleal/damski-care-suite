@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore, useRef, useEffect } from "react";
+import { useState, useSyncExternalStore, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -15,11 +15,10 @@ import {
   Bell,
   CheckCheck,
   LogOut,
-  Pencil,
-  Check,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -62,39 +61,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   }, [collapsed]);
   const location = useLocation();
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [clinicName, setClinicName] = useState<string>(
-    () => localStorage.getItem("clinic_name") || "SaaS Odonto"
-  );
-  const [clinicLogo, setClinicLogo] = useState<string | null>(
-    () => localStorage.getItem("clinic_logo")
-  );
-  const [editingName, setEditingName] = useState(false);
-  const [draftName, setDraftName] = useState(clinicName);
-
-  useEffect(() => {
-    localStorage.setItem("clinic_name", clinicName);
-  }, [clinicName]);
-
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      setClinicLogo(dataUrl);
-      localStorage.setItem("clinic_logo", dataUrl);
-    };
-    reader.readAsDataURL(file);
-    e.target.value = "";
-  };
-
-  const saveName = () => {
-    const trimmed = draftName.trim();
-    if (trimmed) setClinicName(trimmed);
-    else setDraftName(clinicName);
-    setEditingName(false);
-  };
 
   const handleLogout = async () => {
     setSidebarOpen(false);
@@ -127,74 +93,19 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        {/* Logo */}
-        <div className={cn("flex items-center gap-3 h-16 border-b border-sidebar-border", collapsed ? "lg:px-3 px-5" : "px-5")}>
+        {/* Top row: collapse toggle + mobile close */}
+        <div className={cn(
+          "flex items-center h-12 border-b border-sidebar-border",
+          collapsed ? "lg:px-2 px-5 justify-between" : "px-5 justify-between"
+        )}>
           <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="w-9 h-9 rounded-md bg-white flex items-center justify-center overflow-hidden hover:opacity-80 transition-opacity shrink-0"
-            title="Alterar logo da clínica"
+            className="hidden lg:inline-flex items-center justify-center w-7 h-7 rounded-md text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
+            onClick={() => setCollapsed((c) => !c)}
+            title={collapsed ? "Expandir menu" : "Recolher menu"}
           >
-            {clinicLogo ? (
-              <img src={clinicLogo} alt="Logo da clínica" className="w-full h-full object-cover" />
-            ) : (
-              <span className="font-display font-bold text-sm text-sidebar-background">
-                {clinicName.charAt(0).toUpperCase()}
-              </span>
-            )}
+            {collapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
           </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleLogoUpload}
-          />
-          <div className={cn("flex-1 min-w-0 flex items-center gap-1.5", collapsed && "lg:hidden")}>
-            {editingName ? (
-              <>
-                <input
-                  autoFocus
-                  value={draftName}
-                  onChange={(e) => setDraftName(e.target.value)}
-                  onBlur={saveName}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") saveName();
-                    if (e.key === "Escape") {
-                      setDraftName(clinicName);
-                      setEditingName(false);
-                    }
-                  }}
-                  maxLength={40}
-                  className="flex-1 min-w-0 bg-transparent border-b border-sidebar-foreground/40 text-[15px] font-display font-semibold text-sidebar-foreground outline-none"
-                />
-                <button
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={saveName}
-                  className="text-sidebar-foreground/70 hover:text-sidebar-foreground shrink-0"
-                  title="Salvar"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                </button>
-              </>
-            ) : (
-              <>
-                <h1 className="font-display text-[15px] font-semibold text-sidebar-foreground truncate">
-                  {clinicName}
-                </h1>
-                <button
-                  onClick={() => {
-                    setDraftName(clinicName);
-                    setEditingName(true);
-                  }}
-                  className="text-sidebar-foreground/60 hover:text-sidebar-foreground shrink-0"
-                  title="Editar nome da clínica"
-                >
-                  <Pencil className="w-3 h-3" />
-                </button>
-              </>
-            )}
-          </div>
+
           <button
             className="lg:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground"
             onClick={() => setSidebarOpen(false)}
@@ -264,15 +175,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           >
             <Menu className="w-5 h-5" />
           </button>
-
-          <button
-            className="hidden lg:inline-flex text-muted-foreground hover:text-foreground transition-colors"
-            onClick={() => setCollapsed((c) => !c)}
-            title={collapsed ? "Expandir menu" : "Recolher menu"}
-          >
-            {collapsed ? <ChevronsRight className="w-5 h-5" /> : <ChevronsLeft className="w-5 h-5" />}
-          </button>
-
 
           <div className="flex-1" />
 
