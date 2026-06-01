@@ -42,6 +42,7 @@ const Pacientes = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyPaciente());
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
 
   const loadData = async () => {
     try {
