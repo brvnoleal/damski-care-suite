@@ -234,23 +234,39 @@ const Pacientes = () => {
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
           <div className="sm:col-span-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nome *</Label>
-            <Input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Nome completo" />
+            <Label className={`text-xs font-semibold uppercase tracking-wider mb-1.5 block ${errors.nome ? "text-destructive" : "text-muted-foreground"}`}>Nome *</Label>
+            <Input
+              value={form.nome}
+              onChange={(e) => { setForm({ ...form, nome: e.target.value }); if (errors.nome) setErrors({ ...errors, nome: false }); }}
+              placeholder="Nome completo"
+              className={errors.nome ? "border-destructive focus-visible:ring-destructive" : ""}
+            />
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">CPF *</Label>
-            <Input value={form.cpf} onChange={(e) => {
-              const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
-              const formatted = raw
-                .replace(/(\d{3})(\d)/, "$1.$2")
-                .replace(/(\d{3})(\d)/, "$1.$2")
-                .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-              setForm({ ...form, cpf: formatted });
-            }} placeholder="000.000.000-00" />
+            <Label className={`text-xs font-semibold uppercase tracking-wider mb-1.5 block ${errors.cpf ? "text-destructive" : "text-muted-foreground"}`}>CPF *</Label>
+            <Input
+              value={form.cpf}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/\D/g, "").slice(0, 11);
+                const formatted = raw
+                  .replace(/(\d{3})(\d)/, "$1.$2")
+                  .replace(/(\d{3})(\d)/, "$1.$2")
+                  .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+                setForm({ ...form, cpf: formatted });
+                if (errors.cpf) setErrors({ ...errors, cpf: false });
+              }}
+              placeholder="000.000.000-00"
+              className={errors.cpf ? "border-destructive focus-visible:ring-destructive" : ""}
+            />
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Data de Nascimento *</Label>
-            <Input type="date" value={form.data_nascimento} onChange={(e) => setForm({ ...form, data_nascimento: e.target.value })} />
+            <Label className={`text-xs font-semibold uppercase tracking-wider mb-1.5 block ${errors.data_nascimento ? "text-destructive" : "text-muted-foreground"}`}>Data de Nascimento *</Label>
+            <Input
+              type="date"
+              value={form.data_nascimento}
+              onChange={(e) => { setForm({ ...form, data_nascimento: e.target.value }); if (errors.data_nascimento) setErrors({ ...errors, data_nascimento: false }); }}
+              className={errors.data_nascimento ? "border-destructive focus-visible:ring-destructive" : ""}
+            />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Telefone</Label>
