@@ -217,27 +217,31 @@ const Agendamentos = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Agendamentos</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Gerenciamento de consultas e horários
-          </p>
+      <FadeIn>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Agendamentos</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Gerenciamento de consultas e horários
+            </p>
+          </div>
+          <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
+            <Plus className="w-4 h-4" />
+            Nova Consulta
+          </Button>
         </div>
-        <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
-          <Plus className="w-4 h-4" />
-          Nova Consulta
-        </Button>
-      </div>
+      </FadeIn>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Buscar por paciente, dentista ou data..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+      <FadeIn delay={0.1}>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Buscar por paciente, dentista ou data..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          </div>
         </div>
-      </div>
+      </FadeIn>
 
-      <LiquidGlassCard className="overflow-hidden" draggable={false}>
+      <FadeIn delay={0.15}>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
