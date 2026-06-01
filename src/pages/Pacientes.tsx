@@ -87,6 +87,10 @@ const Pacientes = () => {
       toast({ title: "Preencha os campos obrigatórios", variant: "destructive" });
       return;
     }
+    if (!isValidCpf(form.cpf)) {
+      toast({ title: "CPF inválido", description: "Verifique os dígitos e tente novamente.", variant: "destructive" });
+      return;
+    }
     try {
       if (editingId) {
         await pacienteService.atualizar(editingId, form);
