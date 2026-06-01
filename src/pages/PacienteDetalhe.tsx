@@ -47,10 +47,39 @@ const formatRG = (raw: string) => {
 const formatBRL = (n: number) =>
   n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const getWhatsAppLink = (telefone: string) => {
-  const digits = telefone.replace(/\D/g, "");
-  const withCountry = digits.startsWith("55") ? digits : `55${digits}`;
-  return `https://wa.me/${withCountry}`;
+// Normaliza um telefone BR para o formato aceito pelo wa.me (E.164 sem '+').
+// Retorna null se o número não tiver um formato válido (10 ou 11 dígitos locais,
+// opcionalmente prefixado por 55). DDD deve estar entre 11 e 99 e, para celulares
+// (11 dígitos locais), o primeiro dígito após o DDD deve ser 9.
+const normalizeWhatsAppNumber = (telefone: string | null | undefined): string | null => {
+  if (!telefone) return null;
+  let digits = telefone.replace(/\D/g, "");
+  if (!digits) return null;
+
+  // Remove prefixo internacional 00 e '+' já foi descartado pelo replace
+  if (digits.startsWith("00")) digits = digits.slice(2);
+
+  // Remove DDI 55 para validar a parte local
+  let local = digits;
+  if (local.length > 11 && local.startsWith("55")) {
+    local = local.slice(2);
+  }
+
+  // Aceita 10 (fixo) ou 11 (celular) dígitos locais
+  if (local.length !== 10 && local.length !== 11) return null;
+
+  const ddd = parseInt(local.slice(0, 2), 10);
+  if (isNaN(ddd) || ddd < 11 || ddd > 99) return null;
+
+  // Celular precisa começar com 9
+  if (local.length === 11 && local[2] !== "9") return null;
+
+  return `55${local}`;
+};
+
+const getWhatsAppLink = (telefone: string | null | undefined): string | null => {
+  const normalized = normalizeWhatsAppNumber(telefone);
+  return normalized ? `https://wa.me/${normalized}` : null;
 };
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -410,17 +439,20 @@ const PacienteDetalhe = () => {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold text-foreground">{patientData.nome}</h1>
-              {patientData.telefone && (
-                <a
-                  href={getWhatsAppLink(patientData.telefone)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-emerald-500 hover:text-emerald-400 transition-colors"
-                  title="Conversar no WhatsApp"
-                >
-                  <WhatsAppIcon className="w-5 h-5" />
-                </a>
-              )}
+              {(() => {
+                const waLink = getWhatsAppLink(patientData.telefone);
+                return waLink ? (
+                  <a
+                    href={waLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-emerald-500 hover:text-emerald-400 transition-colors"
+                    title="Conversar no WhatsApp"
+                  >
+                    <WhatsAppIcon className="w-5 h-5" />
+                  </a>
+                ) : null;
+              })()}
             </div>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs font-mono text-primary font-semibold">{id}</span>
