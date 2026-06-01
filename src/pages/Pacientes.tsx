@@ -21,7 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Paciente } from "@/types";
 import { pacienteService } from "@/services/pacienteService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
-import { maskCpf } from "@/lib/utils";
+import { maskCpf, isValidCpf } from "@/lib/utils";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
   nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", situacao_profissional: "",
