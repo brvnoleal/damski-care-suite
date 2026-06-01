@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, Clock, User, Stethoscope, CreditCard, FileText, Filter, X } from "lucide-react";
-import { motion } from "framer-motion";
+import { FadeIn } from "@/components/FadeIn";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,11 +20,6 @@ import {
   formaPagamentoLabels,
 } from "@/types";
 
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, delay, ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number] },
-});
 
 const statusConfig: Record<string, { label: string; className: string; dot: string }> = {
   agendado: { label: "Agendado", className: "bg-info/10 text-info border-info/20", dot: "bg-info" },
