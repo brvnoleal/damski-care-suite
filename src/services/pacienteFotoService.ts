@@ -76,7 +76,7 @@ export const pacienteFotoService = {
         categoria: meta.categoria,
         descricao: meta.descricao || null,
         data: new Date().toISOString().slice(0, 10),
-      })
+      } as any)
       .select()
       .single();
     if (error) throw error;

@@ -37,6 +37,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { notificationStore } from "@/stores/notificationStore";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useClinicaContext } from "@/hooks/useClinicaContext";
+import { Building2 } from "lucide-react";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -61,6 +63,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   }, [collapsed]);
   const location = useLocation();
   const navigate = useNavigate();
+  const { clinicaNome, isSuperAdmin } = useClinicaContext();
 
   const handleLogout = async () => {
     setSidebarOpen(false);
@@ -73,6 +76,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     notificationStore.getSnapshot
   );
   const unreadCount = notifications.filter((n: any) => !n.read).length;
+
+  const navItems = isSuperAdmin
+    ? [...navigation, { name: "Clínicas", href: "/super-admin", icon: Building2 }]
+    : navigation;
 
   return (
     <div className="h-screen flex overflow-hidden bg-background">
@@ -117,7 +124,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         {/* Nav */}
         <TooltipProvider delayDuration={200}>
           <nav className={cn("flex-1 py-4 space-y-1 overflow-y-auto", collapsed ? "lg:px-2 px-3" : "px-3")}>
-            {navigation.map((item) => {
+            {navItems.map((item) => {
               const isActive = location.pathname === item.href;
               const link = (
                 <Link
@@ -175,6 +182,13 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           >
             <Menu className="w-5 h-5" />
           </button>
+
+          {clinicaNome && (
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+              <Building2 className="w-4 h-4 text-primary" />
+              <span className="truncate max-w-[200px]">{clinicaNome}</span>
+            </div>
+          )}
 
           <div className="flex-1" />
 

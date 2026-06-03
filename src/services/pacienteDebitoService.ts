@@ -43,7 +43,7 @@ export const pacienteDebitoService = {
   criar: async (dados: Omit<PacienteDebito, "id" | "created_at" | "status"> & { status?: PacienteDebito["status"] }): Promise<PacienteDebito> => {
     const { data, error } = await (supabase as any)
       .from("paciente_debito")
-      .insert(dados)
+      .insert(dados as any)
       .select()
       .single();
     if (error) throw error;

@@ -21,12 +21,14 @@ const roleLabels: Record<AppRole, string> = {
   admin: "Administrador",
   responsavel_tecnico: "Responsável Técnico",
   recepcionista: "Recepcionista",
+  super_admin: "Super Admin",
 };
 
 const roleColors: Record<AppRole, string> = {
   admin: "bg-accent text-primary",
   responsavel_tecnico: "bg-primary/10 text-primary",
   recepcionista: "bg-info/10 text-info",
+  super_admin: "bg-destructive/10 text-destructive",
 };
 
 interface UserWithRole {

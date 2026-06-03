@@ -49,7 +49,7 @@ export const pacienteService = {
   },
 
   criar: async (dados: Omit<Paciente, "id" | "created_at">): Promise<Paciente> => {
-    const { data, error } = await supabase.from("paciente").insert(dados).select().single();
+    const { data, error } = await supabase.from("paciente").insert(dados as any).select().single();
     if (error) throw error;
     const item = mapRow(data);
     notificationStore.add("create", "paciente", "Paciente cadastrado", `${item.nome} foi adicionado.`);
