@@ -183,6 +183,13 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <Menu className="w-5 h-5" />
           </button>
 
+          {clinicaNome && (
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+              <Building2 className="w-4 h-4 text-primary" />
+              <span className="truncate max-w-[200px]">{clinicaNome}</span>
+            </div>
+          )}
+
           <div className="flex-1" />
 
           <Popover>
