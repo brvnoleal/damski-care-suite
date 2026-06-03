@@ -599,7 +599,11 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "responsavel_tecnico" | "recepcionista"
+      app_role:
+        | "admin"
+        | "responsavel_tecnico"
+        | "recepcionista"
+        | "super_admin"
       foto_categoria: "antes" | "depois" | "durante" | "outro"
     }
     CompositeTypes: {
@@ -728,7 +732,12 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "responsavel_tecnico", "recepcionista"],
+      app_role: [
+        "admin",
+        "responsavel_tecnico",
+        "recepcionista",
+        "super_admin",
+      ],
       foto_categoria: ["antes", "depois", "durante", "outro"],
     },
   },
