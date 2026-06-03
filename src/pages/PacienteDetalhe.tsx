@@ -525,6 +525,9 @@ const PacienteDetalhe = () => {
           <TabsTrigger value="insumos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <Syringe className="w-3.5 h-3.5" /> Insumos Utilizados
           </TabsTrigger>
+          <TabsTrigger value="lgpd" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <FileText className="w-3.5 h-3.5" /> LGPD
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="detalhes" className="space-y-4">
