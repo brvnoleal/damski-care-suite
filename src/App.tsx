@@ -14,6 +14,7 @@ import Agendamentos from "./pages/Agendamentos";
 import Insumos from "./pages/Insumos";
 import Financeiro from "./pages/Financeiro";
 import Configuracoes from "./pages/Configuracoes";
+import SuperAdmin from "./pages/SuperAdmin";
 import Login from "./pages/Login";
 import EsqueciSenha from "./pages/EsqueciSenha";
 import ResetPassword from "./pages/ResetPassword";
