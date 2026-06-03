@@ -37,6 +37,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { notificationStore } from "@/stores/notificationStore";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useClinicaContext } from "@/hooks/useClinicaContext";
+import { Building2 } from "lucide-react";
 
 interface AppLayoutProps {
   children: React.ReactNode;
