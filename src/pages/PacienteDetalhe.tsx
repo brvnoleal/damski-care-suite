@@ -822,6 +822,10 @@ const PacienteDetalhe = () => {
             <p className="text-sm text-muted-foreground">Rastreabilidade de insumos vinculados às sessões do paciente.</p>
           </div>
         </TabsContent>
+
+        <TabsContent value="lgpd" className="space-y-4">
+          {id && <PacienteLGPDPanel pacienteId={id} />}
+        </TabsContent>
       </Tabs>
 
       {/* Edit Sheet — mesmos campos do cadastro em Pacientes */}
