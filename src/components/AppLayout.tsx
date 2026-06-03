@@ -63,6 +63,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   }, [collapsed]);
   const location = useLocation();
   const navigate = useNavigate();
+  const { clinicaNome, isSuperAdmin } = useClinicaContext();
 
   const handleLogout = async () => {
     setSidebarOpen(false);
@@ -75,6 +76,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     notificationStore.getSnapshot
   );
   const unreadCount = notifications.filter((n: any) => !n.read).length;
+
+  const navItems = isSuperAdmin
+    ? [...navigation, { name: "Clínicas", href: "/super-admin", icon: Building2 }]
+    : navigation;
 
   return (
     <div className="h-screen flex overflow-hidden bg-background">
