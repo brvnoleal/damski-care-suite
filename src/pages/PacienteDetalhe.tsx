@@ -31,6 +31,7 @@ import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { processClinicalPhoto } from "@/lib/imageProcessing";
 import { CameraCapture } from "@/components/CameraCapture";
+import { PacienteLGPDPanel } from "@/components/PacienteLGPDPanel";
 
 const formatDateBR = (iso: string) => {
   if (!iso) return "";
