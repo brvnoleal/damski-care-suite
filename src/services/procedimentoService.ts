@@ -30,7 +30,7 @@ export const procedimentoService = {
   async create(input: ProcedimentoInput): Promise<ProcedimentoRecord> {
     const { data, error } = await supabase
       .from("procedimento")
-      .insert(input)
+      .insert(input as any)
       .select()
       .single();
     if (error) throw error;

@@ -37,7 +37,7 @@ export const evolucaoService = {
   criar: async (dados: Omit<Evolucao, "id" | "created_at" | "dentista_nome">): Promise<Evolucao> => {
     const { data, error } = await (supabase as any)
       .from("evolucao")
-      .insert(dados)
+      .insert(dados as any)
       .select("*, dentista:dentista_id(nome)")
       .single();
     if (error) throw error;

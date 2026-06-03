@@ -38,7 +38,7 @@ export const despesaService = {
   },
 
   criar: async (dados: Omit<Despesa, "id" | "created_at">): Promise<Despesa> => {
-    const { data, error } = await supabase.from("despesa").insert(dados).select().single();
+    const { data, error } = await supabase.from("despesa").insert(dados as any).select().single();
     if (error) throw error;
     return mapRow(data);
   },

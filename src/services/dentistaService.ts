@@ -40,7 +40,7 @@ export const dentistaService = {
   },
 
   criar: async (dados: Omit<Dentista, "id" | "created_at">): Promise<Dentista> => {
-    const { data, error } = await supabase.from("dentista").insert(dados).select().single();
+    const { data, error } = await supabase.from("dentista").insert(dados as any).select().single();
     if (error) throw error;
     const item = mapRow(data);
     notificationStore.add("create", "dentista", "Dentista cadastrado", `${item.nome} (CRO ${item.cro}).`);

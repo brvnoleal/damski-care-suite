@@ -66,7 +66,7 @@ export const sessaoService = {
   ): Promise<Sessao> => {
     const { data, error } = await supabase
       .from("sessao")
-      .insert(dados)
+      .insert(dados as any)
       .select()
       .single();
     if (error) throw error;

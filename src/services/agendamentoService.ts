@@ -37,7 +37,7 @@ export const agendamentoService = {
 
   criar: async (dados: Omit<Agendamento, "id" | "created_at">): Promise<Agendamento> => {
     const payload: any = { ...dados, horario_fim: dados.horario_fim ? dados.horario_fim : null };
-    const { data, error } = await supabase.from("agendamento").insert(payload).select().single();
+    const { data, error } = await supabase.from("agendamento").insert(payload as any).select().single();
     if (error) throw error;
     const item = mapRow(data);
     notificationStore.add("create", "agendamento", "Consulta agendada", `${new Date(item.data + "T00:00:00").toLocaleDateString("pt-BR")} às ${item.horario}.`);
@@ -46,7 +46,7 @@ export const agendamentoService = {
 
   criarVarios: async (lista: Omit<Agendamento, "id" | "created_at">[]): Promise<Agendamento[]> => {
     const payload = lista.map((d) => ({ ...d, horario_fim: d.horario_fim ? d.horario_fim : null }));
-    const { data, error } = await supabase.from("agendamento").insert(payload).select();
+    const { data, error } = await supabase.from("agendamento").insert(payload as any).select();
     if (error) throw error;
     const itens = (data || []).map(mapRow);
     if (itens.length > 0) {
