@@ -57,43 +57,34 @@ export const pacienteFotoService = {
     file: File,
     meta: { categoria: FotoCategoria; descricao?: string },
   ): Promise<PacienteFoto> => {
-    const ext = file.name.split(".").pop() || "jpg";
-    const path = `${pacienteId}/${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2, 8)}.${ext}`;
+    // Upload é validado server-side pela edge function (MIME real, tamanho, extensão).
+    const form = new FormData();
+    form.append("file", file);
+    form.append("paciente_id", pacienteId);
+    form.append("categoria", meta.categoria);
+    if (meta.descricao) form.append("descricao", meta.descricao);
 
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKET)
-      .upload(path, file, { contentType: file.type, upsert: false });
-    if (uploadError) throw uploadError;
-
-    const { data, error } = await supabase
-      .from("paciente_foto")
-      .insert({
-        paciente_id: pacienteId,
-        storage_path: path,
-        nome_arquivo: file.name,
-        categoria: meta.categoria,
-        descricao: meta.descricao || null,
-        data: new Date().toISOString().slice(0, 10),
-      } as any)
-      .select()
-      .single();
+    const { data, error } = await supabase.functions.invoke("upload-paciente-foto", {
+      body: form,
+    });
     if (error) throw error;
+    const row = (data as any)?.foto;
+    if (!row) throw new Error("Falha no upload");
 
-    const url = await signUrl(path);
+    const url = await signUrl(row.storage_path);
     return {
-      id: data.id,
-      paciente_id: data.paciente_id,
-      storage_path: data.storage_path,
-      nome_arquivo: data.nome_arquivo,
-      categoria: data.categoria,
-      descricao: data.descricao,
-      data: data.data,
-      created_at: data.created_at,
+      id: row.id,
+      paciente_id: row.paciente_id,
+      storage_path: row.storage_path,
+      nome_arquivo: row.nome_arquivo,
+      categoria: row.categoria,
+      descricao: row.descricao,
+      data: row.data,
+      created_at: row.created_at,
       url,
     };
   },
+
 
   excluir: async (foto: PacienteFoto): Promise<void> => {
     await supabase.storage.from(BUCKET).remove([foto.storage_path]);

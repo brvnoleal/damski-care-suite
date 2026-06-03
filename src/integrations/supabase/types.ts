@@ -90,6 +90,39 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          action: string
+          clinica_id: string | null
+          created_at: string
+          diff: Json | null
+          entity: string
+          entity_id: string | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          clinica_id?: string | null
+          created_at?: string
+          diff?: Json | null
+          entity: string
+          entity_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          clinica_id?: string | null
+          created_at?: string
+          diff?: Json | null
+          entity?: string
+          entity_id?: string | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       clinica: {
         Row: {
           cnpj: string | null
@@ -530,6 +563,54 @@ export type Database = {
           },
         ]
       }
+      paciente_consentimento: {
+        Row: {
+          aceito: boolean
+          aceito_em: string
+          clinica_id: string
+          conteudo: string
+          created_at: string
+          finalidade: string
+          id: string
+          ip: string | null
+          paciente_id: string
+          registrado_por: string | null
+          revogado_em: string | null
+          user_agent: string | null
+          versao: string
+        }
+        Insert: {
+          aceito?: boolean
+          aceito_em?: string
+          clinica_id: string
+          conteudo: string
+          created_at?: string
+          finalidade: string
+          id?: string
+          ip?: string | null
+          paciente_id: string
+          registrado_por?: string | null
+          revogado_em?: string | null
+          user_agent?: string | null
+          versao?: string
+        }
+        Update: {
+          aceito?: boolean
+          aceito_em?: string
+          clinica_id?: string
+          conteudo?: string
+          created_at?: string
+          finalidade?: string
+          id?: string
+          ip?: string | null
+          paciente_id?: string
+          registrado_por?: string | null
+          revogado_em?: string | null
+          user_agent?: string | null
+          versao?: string
+        }
+        Relationships: []
+      }
       paciente_debito: {
         Row: {
           clinica_id: string
@@ -771,6 +852,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      anonimizar_paciente: {
+        Args: { _paciente_id: string }
+        Returns: undefined
+      }
+      exportar_dados_paciente: { Args: { _paciente_id: string }; Returns: Json }
       get_user_clinica_id: { Args: { _user_id: string }; Returns: string }
       get_user_role: {
         Args: { _user_id: string }
