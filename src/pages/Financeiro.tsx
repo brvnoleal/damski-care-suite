@@ -266,59 +266,61 @@ const Relatorios = () => {
             >
               <Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span>
             </Button>
-          <Sheet open={despesaOpen} onOpenChange={setDespesaOpen}>
-            <SheetContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>Nova Despesa</SheetTitle>
-                <SheetDescription>Cadastre uma nova despesa do consultório.</SheetDescription>
-              </SheetHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label>Descrição *</Label><Input placeholder="Ex: Aluguel, Material..." value={novaDespesa.descricao} onChange={(e) => handleDespesaChange("descricao", e.target.value)} /></div>
-                  <div className="space-y-2">
-                    <Label>Categoria</Label>
-                    <Select value={novaDespesa.categoria} onValueChange={(v) => handleDespesaChange("categoria", v)}>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="aluguel">Aluguel</SelectItem>
-                        <SelectItem value="material">Material Odontológico</SelectItem>
-                        <SelectItem value="folha">Folha de Pagamento</SelectItem>
-                        <SelectItem value="utilidades">Utilidades</SelectItem>
-                        <SelectItem value="marketing">Marketing</SelectItem>
-                        <SelectItem value="software">Software</SelectItem>
-                        <SelectItem value="outros">Outros</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+          <ResponsiveDialog
+            open={despesaOpen}
+            onOpenChange={setDespesaOpen}
+            title="Nova Despesa"
+            description="Cadastre uma nova despesa do consultório."
+            className="sm:max-w-[520px]"
+            footer={
+              <>
+                <Button variant="outline" onClick={() => setDespesaOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+                <Button onClick={handleSalvarDespesa} className="flex-1 sm:flex-none">Salvar Despesa</Button>
+              </>
+            }
+          >
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2"><Label>Descrição *</Label><Input placeholder="Ex: Aluguel, Material..." value={novaDespesa.descricao} onChange={(e) => handleDespesaChange("descricao", e.target.value)} /></div>
+                <div className="space-y-2">
+                  <Label>Categoria</Label>
+                  <Select value={novaDespesa.categoria} onValueChange={(v) => handleDespesaChange("categoria", v)}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="aluguel">Aluguel</SelectItem>
+                      <SelectItem value="material">Material Odontológico</SelectItem>
+                      <SelectItem value="folha">Folha de Pagamento</SelectItem>
+                      <SelectItem value="utilidades">Utilidades</SelectItem>
+                      <SelectItem value="marketing">Marketing</SelectItem>
+                      <SelectItem value="software">Software</SelectItem>
+                      <SelectItem value="outros">Outros</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label>Fornecedor</Label><Input placeholder="Nome do fornecedor" value={novaDespesa.fornecedor} onChange={(e) => handleDespesaChange("fornecedor", e.target.value)} /></div>
-                  <div className="space-y-2"><Label>Valor (R$) *</Label><CurrencyInput value={novaDespesa.valor} onChange={(n) => handleDespesaChange("valor", n ? String(n) : "")} /></div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Forma de Pagamento</Label>
-                    <Select value={novaDespesa.formaPagamento} onValueChange={(v) => handleDespesaChange("formaPagamento", v)}>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pix">PIX</SelectItem>
-                        <SelectItem value="boleto">Boleto</SelectItem>
-                        <SelectItem value="credito">Cartão de Crédito</SelectItem>
-                        <SelectItem value="debito">Cartão de Débito</SelectItem>
-                        <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2"><Label>Vencimento *</Label><Input type="date" value={novaDespesa.vencimento} onChange={(e) => handleDespesaChange("vencimento", e.target.value)} /></div>
-                </div>
-                <div className="space-y-2"><Label>Observações</Label><Textarea rows={3} value={novaDespesa.observacoes} onChange={(e) => handleDespesaChange("observacoes", e.target.value)} /></div>
               </div>
-              <SheetFooter>
-                <Button variant="outline" onClick={() => setDespesaOpen(false)}>Cancelar</Button>
-                <Button onClick={handleSalvarDespesa}>Salvar Despesa</Button>
-              </SheetFooter>
-            </SheetContent>
-          </Sheet>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2"><Label>Fornecedor</Label><Input placeholder="Nome do fornecedor" value={novaDespesa.fornecedor} onChange={(e) => handleDespesaChange("fornecedor", e.target.value)} /></div>
+                <div className="space-y-2"><Label>Valor (R$) *</Label><CurrencyInput value={novaDespesa.valor} onChange={(n) => handleDespesaChange("valor", n ? String(n) : "")} /></div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Forma de Pagamento</Label>
+                  <Select value={novaDespesa.formaPagamento} onValueChange={(v) => handleDespesaChange("formaPagamento", v)}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pix">PIX</SelectItem>
+                      <SelectItem value="boleto">Boleto</SelectItem>
+                      <SelectItem value="credito">Cartão de Crédito</SelectItem>
+                      <SelectItem value="debito">Cartão de Débito</SelectItem>
+                      <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2"><Label>Vencimento *</Label><Input type="date" value={novaDespesa.vencimento} onChange={(e) => handleDespesaChange("vencimento", e.target.value)} /></div>
+              </div>
+              <div className="space-y-2"><Label>Observações</Label><Textarea rows={3} value={novaDespesa.observacoes} onChange={(e) => handleDespesaChange("observacoes", e.target.value)} /></div>
+            </div>
+          </ResponsiveDialog>
         </div>
       </div>
       </FadeIn>
