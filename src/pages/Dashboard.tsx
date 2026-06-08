@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   Users, Calendar, Package, FileCheck,
   AlertTriangle, ArrowUpRight, ChevronRight, Star, Activity,
-  Smile, Clock,
+  Smile, Clock, DollarSign, UserPlus, CalendarDays, CreditCard,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ const colorMap = {
   info: { bg: "bg-info/10", text: "text-info" },
   success: { bg: "bg-success/10", text: "text-success" },
   warning: { bg: "bg-warning/10", text: "text-warning" },
+  destructive: { bg: "bg-destructive/10", text: "text-destructive" },
 };
 
 
