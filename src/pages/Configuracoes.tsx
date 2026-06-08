@@ -13,6 +13,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Database } from "@/integrations/supabase/types";
 import PerfilConsultorio from "@/components/configuracoes/PerfilConsultorio";
 import ProcedimentosSection from "@/components/configuracoes/ProcedimentosSection";
+import { AnamneseLinkSection } from "@/components/configuracoes/AnamneseLinkSection";
 import { FadeIn } from "@/components/FadeIn";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
@@ -194,6 +195,10 @@ const Configuracoes = () => {
       <FadeIn delay={0.1}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PerfilConsultorio />
+
+        <AnamneseLinkSection />
+
+
 
 
         {/* Users */}

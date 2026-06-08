@@ -240,3 +240,35 @@ O sistema está preparado para evolução futura, incluindo integração com bac
 ---
 
 *Documento gerado como parte do Projeto Integrador — Desenvolvimento Web com Banco de Dados e Controle de Versão*
+
+---
+
+## 12. Módulo de Anamnese Digital
+
+Permite que o paciente preencha a Ficha de Anamnese antes da consulta, com vínculo automático ao cadastro pela validação de CPF + nome + data de nascimento, ou criação de novo cadastro caso o CPF ainda não exista na base da clínica.
+
+### 12.1 Formas de acesso
+- **Link público da clínica**: `/anamnese/:clinicaId` — pode ser exibido na recepção (tablet) ou compartilhado livremente.
+- **Link individual de uso único**: `/anamnese/t/:token` — gerado em Configurações ou na aba Anamnese do prontuário; expira em 7 dias.
+
+### 12.2 Fluxo
+1. Paciente informa o CPF.
+2. Sistema consulta a base da clínica:
+   - **Existe** → solicita nome completo + data de nascimento para confirmação (3 tentativas em 15 min).
+   - **Não existe** → exibe formulário de cadastro básico (nome, nascimento, contato, endereço via ViaCEP).
+3. Paciente preenche a ficha (blocos: Odontológico/Médico, Estético/Injetáveis, Hábitos).
+4. Aceita o termo LGPD e assina digitalmente (canvas).
+5. Sistema cria/atualiza o paciente e grava a nova versão da anamnese com IP, user-agent e origem.
+
+### 12.3 Modelo de dados
+- `paciente_anamnese` — versões da ficha, respostas em JSONB, assinatura digital, metadados.
+- `anamnese_token` — tokens individuais com expiração (7 dias) e uso único.
+- `anamnese_tentativa` — controle interno de rate limit por CPF + clínica.
+
+Todas as tabelas seguem o padrão multi-tenant do projeto (`clinica_id` preenchido pelo trigger `set_clinica_id_from_user`) e estão protegidas por RLS via `get_user_clinica_id(auth.uid())`.
+
+### 12.4 Edge Functions
+- `anamnese-lookup-cpf` — verifica existência do paciente sem expor dados sensíveis (retorna nome mascarado).
+- `anamnese-validar-identidade` — confirma identidade (normaliza acentuação) e controla tentativas.
+- `anamnese-submit` — cria paciente (se necessário) e a anamnese em transação lógica, registrando auditoria.
+

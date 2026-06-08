@@ -32,6 +32,7 @@ import { CurrencyInput } from "@/components/ui/currency-input";
 import { processClinicalPhoto } from "@/lib/imageProcessing";
 import { CameraCapture } from "@/components/CameraCapture";
 import { PacienteLGPDPanel } from "@/components/PacienteLGPDPanel";
+import { AnamneseTab } from "@/components/anamnese/AnamneseTab";
 
 const formatDateBR = (iso: string) => {
   if (!iso) return "";
@@ -526,6 +527,9 @@ const PacienteDetalhe = () => {
           <TabsTrigger value="insumos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <Syringe className="w-3.5 h-3.5" /> Insumos Utilizados
           </TabsTrigger>
+          <TabsTrigger value="anamnese" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <ClipboardList className="w-3.5 h-3.5" /> Anamnese
+          </TabsTrigger>
           <TabsTrigger value="lgpd" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <FileText className="w-3.5 h-3.5" /> LGPD
           </TabsTrigger>
@@ -822,6 +826,10 @@ const PacienteDetalhe = () => {
             <Syringe className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">Rastreabilidade de insumos vinculados às sessões do paciente.</p>
           </div>
+        </TabsContent>
+
+        <TabsContent value="anamnese" className="space-y-4">
+          {id && <AnamneseTab pacienteId={id} />}
         </TabsContent>
 
         <TabsContent value="lgpd" className="space-y-4">
