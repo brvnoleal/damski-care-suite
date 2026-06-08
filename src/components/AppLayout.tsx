@@ -184,13 +184,15 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           </button>
 
           {clinicaNome && (
-            <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+            <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-foreground/80 shrink-0">
               <Building2 className="w-4 h-4 text-primary" />
-              <span className="truncate max-w-[200px]">{clinicaNome}</span>
+              <span>{clinicaNome}</span>
             </div>
           )}
 
-          <div className="flex-1" />
+          <div className="flex-1 flex justify-center px-2">
+            <GlobalSearch />
+          </div>
 
           <Popover>
             <PopoverTrigger asChild>
