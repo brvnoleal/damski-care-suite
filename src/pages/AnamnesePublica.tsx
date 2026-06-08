@@ -70,33 +70,37 @@ const AnamnesePublica = () => {
 
   const origem: "link_publico" | "link_individual" = token ? "link_individual" : "link_publico";
 
-  // Resolve clínica (via id direto ou via token)
+  // Resolve clínica (via id direto ou via token) usando edge function pública
   useEffect(() => {
     (async () => {
       try {
-        if (token) {
-          const { data: t } = await supabase.from("anamnese_token").select("clinica_id, paciente_id, expires_at, used_at").eq("token", token).maybeSingle();
-          if (!t) { setBootError("Link inválido."); return; }
-          if (t.used_at) { setBootError("Este link já foi utilizado."); return; }
-          if (new Date(t.expires_at) < new Date()) { setBootError("Link expirado."); return; }
-          const { data: c } = await supabase.from("clinica").select("id, nome, status").eq("id", t.clinica_id).maybeSingle();
-          if (!c || c.status !== "ativo") { setBootError("Clínica indisponível."); return; }
-          setResolvedClinicaId(c.id);
-          setClinicaNome(c.nome);
-          setTokenPacienteId(t.paciente_id);
-        } else if (clinicaParam) {
-          const { data: c } = await supabase.from("clinica").select("id, nome, status").eq("id", clinicaParam).maybeSingle();
-          if (!c || c.status !== "ativo") { setBootError("Clínica não encontrada."); return; }
-          setResolvedClinicaId(c.id);
-          setClinicaNome(c.nome);
-        } else {
-          setBootError("Endereço inválido.");
+        const body = token ? { token } : clinicaParam ? { clinica_id: clinicaParam } : null;
+        if (!body) { setBootError("Endereço inválido."); return; }
+        const { data, error } = await supabase.functions.invoke<{
+          clinica_id: string; clinica_nome: string; paciente_id: string | null; error?: string;
+        }>("anamnese-resolve", { body });
+        const errCode = (data as any)?.error || (error as any)?.context?.error;
+        if (errCode) {
+          const map: Record<string, string> = {
+            link_invalido: "Link inválido.",
+            link_usado: "Este link já foi utilizado.",
+            link_expirado: "Link expirado.",
+            clinica_indisponivel: "Clínica indisponível.",
+            parametros_invalidos: "Endereço inválido.",
+          };
+          setBootError(map[errCode] || "Não foi possível abrir a ficha.");
+          return;
         }
+        if (error || !data?.clinica_id) { setBootError("Não foi possível abrir a ficha."); return; }
+        setResolvedClinicaId(data.clinica_id);
+        setClinicaNome(data.clinica_nome);
+        setTokenPacienteId(data.paciente_id);
       } finally {
         setBootLoading(false);
       }
     })();
   }, [clinicaParam, token]);
+
 
   const proxLookup = async () => {
     if (!resolvedClinicaId) return;
