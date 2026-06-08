@@ -145,6 +145,38 @@ const Agenda = () => {
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => {
+              const mesAtual = agendamentosFiltrados
+                .filter((a) => {
+                  const [y, m] = a.data.split("-").map(Number);
+                  return y === year && m === month + 1;
+                })
+                .sort((a, b) => (a.data + a.horario).localeCompare(b.data + b.horario));
+              exportToXlsx(
+                mesAtual.map((a) => ({
+                  Data: a.data,
+                  Horário: a.horario,
+                  "Horário Fim": a.horario_fim ?? "",
+                  Paciente: getPaciente(a.paciente_id)?.nome ?? "—",
+                  Dentista: getDentista(a.dentista_id)?.nome ?? "—",
+                  Procedimento: procedimentoConsultaLabels[a.procedimento as keyof typeof procedimentoConsultaLabels] ?? a.procedimento,
+                  Status: a.status,
+                  Valor: a.valor,
+                  "Forma Pagamento": formaPagamentoLabels[a.forma_pagamento as keyof typeof formaPagamentoLabels] ?? a.forma_pagamento,
+                  Observações: a.observacoes ?? "",
+                })),
+                `agenda-${year}-${String(month + 1).padStart(2, "0")}`,
+                "Agenda",
+              );
+            }}
+            disabled={!agendamentosFiltrados.length}
+          >
+            <Download className="w-4 h-4" /> Exportar XLSX
+          </Button>
         </div>
       </FadeIn>
 
