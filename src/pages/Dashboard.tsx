@@ -238,7 +238,7 @@ const Dashboard = () => {
                 <div className="flex items-start justify-between gap-1 h-full">
                   <div className="space-y-0.5 sm:space-y-1 min-w-0">
                     <p className="text-[10px] sm:text-[13px] text-muted-foreground font-medium truncate">{kpi.label}</p>
-                    <p className="text-lg sm:text-2xl font-display font-bold text-foreground">{kpi.value}</p>
+                    <p className="text-base sm:text-xl font-display font-bold text-foreground truncate">{kpi.value}</p>
                     <p className={cn("text-[9px] sm:text-xs font-medium truncate min-h-[1rem] sm:min-h-[1.25rem]", kpi.trend === "up" ? "text-success" : "text-muted-foreground")}>
                       {kpi.change || "\u00A0"}
                     </p>
