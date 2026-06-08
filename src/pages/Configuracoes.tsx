@@ -319,64 +319,25 @@ const Configuracoes = () => {
 
 
       {/* Edit Role Sheet */}
-      <Sheet open={editItem !== null} onOpenChange={(open) => { if (!open) setEditItem(null); }}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Editar Perfil de Acesso</SheetTitle>
-          </SheetHeader>
-          {editItem && (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Usuário: <span className="font-medium text-foreground">{editItem.nome}</span>
-              </p>
-              <div className="space-y-2">
-                <Label>Perfil</Label>
-                <Select value={editRole} onValueChange={(v) => setEditRole(v as AppRole)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {assignableRoles.map(r => (
-                      <SelectItem key={r} value={r}>{roleLabels[r]}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
-          <SheetFooter>
-            <Button variant="outline" onClick={() => setEditItem(null)}>Cancelar</Button>
-            <Button onClick={handleEditSave} disabled={updateRoleMutation.isPending}>Salvar</Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-
-      {/* Add User Sheet */}
-      <Sheet open={addOpen} onOpenChange={setAddOpen}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Novo Usuário</SheetTitle>
-          </SheetHeader>
+      <ResponsiveDialog
+        open={editItem !== null}
+        onOpenChange={(open) => { if (!open) setEditItem(null); }}
+        title="Editar Perfil de Acesso"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setEditItem(null)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button onClick={handleEditSave} disabled={updateRoleMutation.isPending} className="flex-1 sm:flex-none">Salvar</Button>
+          </>
+        }
+      >
+        {editItem && (
           <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Usuário: <span className="font-medium text-foreground">{editItem.nome}</span>
+            </p>
             <div className="space-y-2">
-              <Label>Nome completo</Label>
-              <Input value={newNome} onChange={(e) => setNewNome(e.target.value)} placeholder="Dr(a). Nome" />
-            </div>
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="email@exemplo.com" />
-            </div>
-            <div className="space-y-2">
-              <Label>CPF</Label>
-              <Input
-                value={newCpf}
-                onChange={(e) => setNewCpf(formatCpf(e.target.value))}
-                placeholder="000.000.000-00"
-                maxLength={14}
-              />
-              <p className="text-xs text-muted-foreground">Uma senha temporária aleatória será gerada e exibida uma única vez após a criação.</p>
-            </div>
-            <div className="space-y-2">
-              <Label>Perfil de acesso</Label>
-              <Select value={newRole} onValueChange={(v) => setNewRole(v as AppRole)}>
+              <Label>Perfil</Label>
+              <Select value={editRole} onValueChange={(v) => setEditRole(v as AppRole)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {assignableRoles.map(r => (
@@ -386,46 +347,87 @@ const Configuracoes = () => {
               </Select>
             </div>
           </div>
-          <SheetFooter>
-            <Button variant="outline" onClick={() => setAddOpen(false)}>Cancelar</Button>
-            <Button onClick={handleCreateUser} disabled={creating}>
+        )}
+      </ResponsiveDialog>
+
+      {/* Add User Sheet */}
+      <ResponsiveDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        title="Novo Usuário"
+        description="Preencha os dados para criar um novo usuário."
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setAddOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button onClick={handleCreateUser} disabled={creating} className="flex-1 sm:flex-none">
               {creating ? "Criando..." : "Criar Usuário"}
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Nome completo</Label>
+            <Input value={newNome} onChange={(e) => setNewNome(e.target.value)} placeholder="Dr(a). Nome" />
+          </div>
+          <div className="space-y-2">
+            <Label>Email</Label>
+            <Input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="email@exemplo.com" />
+          </div>
+          <div className="space-y-2">
+            <Label>CPF</Label>
+            <Input
+              value={newCpf}
+              onChange={(e) => setNewCpf(formatCpf(e.target.value))}
+              placeholder="000.000.000-00"
+              maxLength={14}
+            />
+            <p className="text-xs text-muted-foreground">Uma senha temporária aleatória será gerada e exibida uma única vez após a criação.</p>
+          </div>
+          <div className="space-y-2">
+            <Label>Perfil de acesso</Label>
+            <Select value={newRole} onValueChange={(v) => setNewRole(v as AppRole)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {assignableRoles.map(r => (
+                  <SelectItem key={r} value={r}>{roleLabels[r]}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </ResponsiveDialog>
 
       {/* Generated password dialog */}
-      <Sheet open={!!generatedPassword} onOpenChange={(o) => !o && setGeneratedPassword(null)}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Senha temporária gerada</SheetTitle>
-          </SheetHeader>
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Copie e compartilhe com o usuário de forma segura. Esta senha não será exibida novamente.
-              O usuário deve alterá-la no primeiro acesso.
-            </p>
-            <div className="flex items-center gap-2">
-              <Input readOnly value={generatedPassword ?? ""} className="font-mono" />
-              <Button
-                variant="outline"
-                onClick={() => {
-                  if (generatedPassword) {
-                    navigator.clipboard.writeText(generatedPassword);
-                    toast.success("Senha copiada.");
-                  }
-                }}
-              >
-                Copiar
-              </Button>
-            </div>
+      <ResponsiveDialog
+        open={!!generatedPassword}
+        onOpenChange={(o) => !o && setGeneratedPassword(null)}
+        title="Senha temporária gerada"
+        footer={
+          <Button onClick={() => setGeneratedPassword(null)} className="flex-1 sm:flex-none">Fechar</Button>
+        }
+      >
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Copie e compartilhe com o usuário de forma segura. Esta senha não será exibida novamente.
+            O usuário deve alterá-la no primeiro acesso.
+          </p>
+          <div className="flex items-center gap-2">
+            <Input readOnly value={generatedPassword ?? ""} className="font-mono" />
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (generatedPassword) {
+                  navigator.clipboard.writeText(generatedPassword);
+                  toast.success("Senha copiada.");
+                }
+              }}
+            >
+              Copiar
+            </Button>
           </div>
-          <SheetFooter>
-            <Button onClick={() => setGeneratedPassword(null)}>Fechar</Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+        </div>
+      </ResponsiveDialog>
     </div>
   );
 };
