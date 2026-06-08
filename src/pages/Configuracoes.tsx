@@ -31,6 +31,9 @@ const roleColors: Record<AppRole, string> = {
   super_admin: "bg-destructive/10 text-destructive",
 };
 
+// Roles selectable by clinic admins (super_admin is reserved and granted only via DB)
+const assignableRoles: AppRole[] = ["admin", "responsavel_tecnico", "recepcionista"];
+
 interface UserWithRole {
   id: string;
   user_id: string;
