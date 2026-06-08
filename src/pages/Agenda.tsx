@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { agendamentoService } from "@/services/agendamentoService";
@@ -30,6 +31,7 @@ const statusConfig: Record<string, { label: string; className: string; dot: stri
 };
 
 const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const weekDaysFull = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
 const monthNames = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
@@ -37,6 +39,11 @@ const monthNames = [
 
 const formatDateKey = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+// Hourly slots from 07:00 to 20:00
+const HOUR_SLOTS = Array.from({ length: 14 }, (_, i) => `${String(i + 7).padStart(2, "0")}:00`);
+
+type ViewMode = "dia" | "semana" | "mes";
 
 const Agenda = () => {
   const { toast } = useToast();
@@ -48,6 +55,7 @@ const Agenda = () => {
   const [selected, setSelected] = useState<Agendamento | null>(null);
   const [filtroDentista, setFiltroDentista] = useState<string>("todos");
   const [filtroStatus, setFiltroStatus] = useState<string>("todos");
+  const [viewMode, setViewMode] = useState<ViewMode>("mes");
 
 
 
@@ -114,14 +122,61 @@ const Agenda = () => {
 
   const today = formatDateKey(new Date());
 
-  const goPrev = () => setCurrentDate(new Date(year, month - 1, 1));
-  const goNext = () => setCurrentDate(new Date(year, month + 1, 1));
+  // Week days based on currentDate
+  const weekStart = useMemo(() => {
+    const d = new Date(currentDate);
+    d.setDate(d.getDate() - d.getDay());
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, [currentDate]);
+
+  const weekDates = useMemo(() => {
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(weekStart);
+      d.setDate(weekStart.getDate() + i);
+      return { date: d, key: formatDateKey(d) };
+    });
+  }, [weekStart]);
+
+  const goPrev = () => {
+    if (viewMode === "mes") setCurrentDate(new Date(year, month - 1, 1));
+    else if (viewMode === "semana") setCurrentDate(new Date(currentDate.getTime() - 7 * 86400000));
+    else setCurrentDate(new Date(currentDate.getTime() - 86400000));
+  };
+  const goNext = () => {
+    if (viewMode === "mes") setCurrentDate(new Date(year, month + 1, 1));
+    else if (viewMode === "semana") setCurrentDate(new Date(currentDate.getTime() + 7 * 86400000));
+    else setCurrentDate(new Date(currentDate.getTime() + 86400000));
+  };
   const goToday = () => setCurrentDate(new Date());
 
-  const headerLabel = `${monthNames[month]} ${year}`;
+  const headerLabel = useMemo(() => {
+    if (viewMode === "mes") return `${monthNames[month]} ${year}`;
+    if (viewMode === "semana") {
+      const end = weekDates[6].date;
+      return `${weekStart.getDate()} ${monthNames[weekStart.getMonth()].slice(0, 3)} – ${end.getDate()} ${monthNames[end.getMonth()].slice(0, 3)} ${end.getFullYear()}`;
+    }
+    return `${weekDaysFull[currentDate.getDay()]}, ${currentDate.getDate()} de ${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+  }, [viewMode, month, year, weekStart, weekDates, currentDate]);
 
   const selectedPaciente = selected ? getPaciente(selected.paciente_id) : null;
   const selectedDentista = selected ? getDentista(selected.dentista_id) : null;
+
+  // Group an array of agendamentos by hour slot ("HH:00")
+  const groupByHour = (items: Agendamento[]) => {
+    const map = new Map<string, Agendamento[]>();
+    for (const slot of HOUR_SLOTS) map.set(slot, []);
+    for (const a of items) {
+      const hour = a.horario.slice(0, 2);
+      const slot = `${hour}:00`;
+      if (!map.has(slot)) map.set(slot, []);
+      map.get(slot)!.push(a);
+    }
+    return map;
+  };
+
+  const dayItems = agendamentosPorDia.get(formatDateKey(currentDate)) || [];
+  const dayByHour = useMemo(() => groupByHour(dayItems), [dayItems]);
 
   return (
     <div className="space-y-4 sm:space-y-5">
@@ -129,16 +184,23 @@ const Agenda = () => {
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-foreground">Agenda da Clínica</h1>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-            Visualize os agendamentos da clínica por dia
+            Visualize os agendamentos por dia, semana ou mês
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
+            <TabsList className="h-8">
+              <TabsTrigger value="dia" className="text-xs px-3">Dia</TabsTrigger>
+              <TabsTrigger value="semana" className="text-xs px-3">Semana</TabsTrigger>
+              <TabsTrigger value="mes" className="text-xs px-3">Mês</TabsTrigger>
+            </TabsList>
+          </Tabs>
           <Button variant="outline" size="sm" onClick={goToday}>Hoje</Button>
           <div className="flex items-center gap-1">
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
-            <div className="min-w-[200px] text-center text-sm font-semibold capitalize">
+            <div className="min-w-[220px] text-center text-sm font-semibold capitalize">
               {headerLabel}
             </div>
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={goNext}>
@@ -227,67 +289,182 @@ const Agenda = () => {
         <LiquidGlassCard className="overflow-hidden" draggable={false}>
           <div className="flex items-center gap-2 px-4 sm:px-5 py-3 border-b border-white/10">
             <CalendarDays className="w-4 h-4 text-primary" />
-            <h2 className="text-xs sm:text-sm font-semibold text-foreground">Calendário de Consultas</h2>
+            <h2 className="text-xs sm:text-sm font-semibold text-foreground">
+              {viewMode === "mes" && "Calendário Mensal"}
+              {viewMode === "semana" && "Agenda Semanal"}
+              {viewMode === "dia" && "Agenda do Dia"}
+            </h2>
           </div>
 
-          <div className="p-2 sm:p-3">
-            <div className="grid grid-cols-7">
-              {weekDays.map((w) => (
-                <div key={w} className="text-[10px] sm:text-xs font-semibold text-muted-foreground text-center py-2 uppercase tracking-wider border border-white/[0.04]">
-                  {w}
-                </div>
-              ))}
-            </div>
+          {viewMode === "mes" && (
+            <div className="p-2 sm:p-3">
+              <div className="grid grid-cols-7">
+                {weekDays.map((w) => (
+                  <div key={w} className="text-[10px] sm:text-xs font-semibold text-muted-foreground text-center py-2 uppercase tracking-wider border border-white/[0.04]">
+                    {w}
+                  </div>
+                ))}
+              </div>
 
-            <div className="grid grid-cols-7">
-              {cells.map((cell, i) => {
-                if (!cell) return <div key={`e-${i}`} className="min-h-[80px] sm:min-h-[110px] bg-white/[0.015] border border-white/[0.04]" />;
-                const items = agendamentosPorDia.get(cell.key) || [];
-                const isToday = cell.key === today;
-                return (
-                  <div
-                    key={cell.key}
-                    className={`min-h-[80px] sm:min-h-[110px] border p-1 sm:p-1.5 flex flex-col gap-0.5 transition-colors ${
-                      isToday ? "border-primary/40 bg-primary/[0.04]" : "border-white/[0.04] bg-white/[0.02]"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className={`text-[11px] sm:text-xs font-semibold ${isToday ? "text-primary" : "text-foreground"}`}>
-                        {cell.date.getDate()}
-                      </span>
-                      {items.length > 0 && (
-                        <span className="text-[9px] sm:text-[10px] text-muted-foreground">{items.length}</span>
-                      )}
+              <div className="grid grid-cols-7">
+                {cells.map((cell, i) => {
+                  if (!cell) return <div key={`e-${i}`} className="min-h-[80px] sm:min-h-[110px] bg-white/[0.015] border border-white/[0.04]" />;
+                  const items = agendamentosPorDia.get(cell.key) || [];
+                  const isToday = cell.key === today;
+                  return (
+                    <div
+                      key={cell.key}
+                      className={`min-h-[80px] sm:min-h-[110px] border p-1 sm:p-1.5 flex flex-col gap-0.5 transition-colors ${
+                        isToday ? "border-primary/40 bg-primary/[0.04]" : "border-white/[0.04] bg-white/[0.02]"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <button
+                          onClick={() => { setCurrentDate(cell.date); setViewMode("dia"); }}
+                          className={`text-[11px] sm:text-xs font-semibold hover:text-primary ${isToday ? "text-primary" : "text-foreground"}`}
+                        >
+                          {cell.date.getDate()}
+                        </button>
+                        {items.length > 0 && (
+                          <span className="text-[9px] sm:text-[10px] text-muted-foreground">{items.length}</span>
+                        )}
+                      </div>
+                      <div className="flex-1 flex flex-col gap-0.5 overflow-hidden">
+                        {items.slice(0, 3).map((a) => {
+                          const nome = getPaciente(a.paciente_id)?.nome || "—";
+                          const st = statusConfig[a.status];
+                          return (
+                            <button
+                              key={a.id}
+                              onClick={() => setSelected(a)}
+                              className="group flex items-center gap-1 px-1 py-0.5 text-left hover:bg-white/10 transition-colors"
+                            >
+                              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st?.dot}`} />
+                              <span className="text-[11px] sm:text-sm font-mono text-muted-foreground shrink-0 hidden sm:inline">{a.horario}</span>
+                              <span className="text-[11px] sm:text-sm truncate text-foreground group-hover:text-primary">{nome}</span>
+                            </button>
+                          );
+                        })}
+                        {items.length > 3 && (
+                          <span className="text-[9px] sm:text-[10px] text-muted-foreground pl-1">+{items.length - 3} mais</span>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex-1 flex flex-col gap-0.5 overflow-hidden">
-                      {items.slice(0, 3).map((a) => {
-                        const nome = getPaciente(a.paciente_id)?.nome || "—";
-                        const st = statusConfig[a.status];
-                        return (
-                          <button
-                            key={a.id}
-                            onClick={() => setSelected(a)}
-                            className="group flex items-center gap-1 px-1 py-0.5 text-left hover:bg-white/10 transition-colors"
-                          >
-                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st?.dot}`} />
-                            <span className="text-[11px] sm:text-sm font-mono text-muted-foreground shrink-0 hidden sm:inline">{a.horario}</span>
-                            <span className="text-[11px] sm:text-sm truncate text-foreground group-hover:text-primary">{nome}</span>
-                          </button>
-                        );
-                      })}
-                      {items.length > 3 && (
-                        <span className="text-[9px] sm:text-[10px] text-muted-foreground pl-1">+{items.length - 3} mais</span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {viewMode === "semana" && (
+            <div className="p-2 sm:p-3 overflow-x-auto">
+              <div className="min-w-[720px]">
+                <div className="grid grid-cols-[60px_repeat(7,1fr)]">
+                  <div className="border border-white/[0.04] py-2" />
+                  {weekDates.map((wd) => {
+                    const isToday = wd.key === today;
+                    return (
+                      <button
+                        key={wd.key}
+                        onClick={() => { setCurrentDate(wd.date); setViewMode("dia"); }}
+                        className={`text-center py-2 border border-white/[0.04] hover:bg-white/5 transition-colors ${isToday ? "bg-primary/[0.06]" : ""}`}
+                      >
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{weekDays[wd.date.getDay()]}</div>
+                        <div className={`text-sm font-semibold ${isToday ? "text-primary" : "text-foreground"}`}>{wd.date.getDate()}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {HOUR_SLOTS.map((slot) => (
+                  <div key={slot} className="grid grid-cols-[60px_repeat(7,1fr)]">
+                    <div className="text-[10px] sm:text-xs text-muted-foreground font-mono text-right pr-2 py-2 border border-white/[0.04] bg-white/[0.015]">
+                      {slot}
+                    </div>
+                    {weekDates.map((wd) => {
+                      const items = (agendamentosPorDia.get(wd.key) || []).filter((a) => a.horario.startsWith(slot.slice(0, 2)));
+                      const isToday = wd.key === today;
+                      return (
+                        <div
+                          key={wd.key + slot}
+                          className={`min-h-[50px] border border-white/[0.04] p-1 flex flex-col gap-0.5 ${isToday ? "bg-primary/[0.02]" : "bg-white/[0.01]"}`}
+                        >
+                          {items.length === 0 ? (
+                            <span className="text-[9px] text-muted-foreground/40 italic">livre</span>
+                          ) : (
+                            items.map((a) => {
+                              const nome = getPaciente(a.paciente_id)?.nome || "—";
+                              const st = statusConfig[a.status];
+                              return (
+                                <button
+                                  key={a.id}
+                                  onClick={() => setSelected(a)}
+                                  className="group flex items-center gap-1 px-1 py-0.5 text-left rounded hover:bg-white/10 transition-colors"
+                                >
+                                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st?.dot}`} />
+                                  <span className="text-[10px] font-mono text-muted-foreground shrink-0">{a.horario}</span>
+                                  <span className="text-[10px] truncate text-foreground group-hover:text-primary">{nome}</span>
+                                </button>
+                              );
+                            })
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {viewMode === "dia" && (
+            <div className="p-2 sm:p-3">
+              {HOUR_SLOTS.map((slot) => {
+                const items = dayByHour.get(slot) || [];
+                return (
+                  <div key={slot} className="grid grid-cols-[70px_1fr] border-b border-white/[0.04] last:border-b-0">
+                    <div className="text-xs text-muted-foreground font-mono text-right pr-3 py-3 border-r border-white/[0.04] bg-white/[0.015]">
+                      {slot}
+                    </div>
+                    <div className="min-h-[60px] p-2 flex flex-col gap-1">
+                      {items.length === 0 ? (
+                        <span className="text-[11px] text-muted-foreground/50 italic">Sem agendamentos</span>
+                      ) : (
+                        items.map((a) => {
+                          const nome = getPaciente(a.paciente_id)?.nome || "—";
+                          const dent = getDentista(a.dentista_id)?.nome || "—";
+                          const st = statusConfig[a.status];
+                          return (
+                            <button
+                              key={a.id}
+                              onClick={() => setSelected(a)}
+                              className="group flex items-start gap-2 px-2 py-2 text-left rounded-lg hover:bg-white/10 transition-colors border border-white/5"
+                            >
+                              <span className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${st?.dot}`} />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-sm font-mono text-foreground">{a.horario}{a.horario_fim ? `–${a.horario_fim}` : ""}</span>
+                                  <span className="text-sm font-medium text-foreground group-hover:text-primary truncate">{nome}</span>
+                                  <Badge className={`${st?.className} text-[10px] py-0`}>{st?.label}</Badge>
+                                </div>
+                                <div className="text-xs text-muted-foreground mt-0.5 truncate">
+                                  {procedimentoConsultaLabels[a.procedimento] ?? a.procedimento} • {dent}
+                                </div>
+                              </div>
+                            </button>
+                          );
+                        })
                       )}
                     </div>
                   </div>
                 );
               })}
             </div>
+          )}
 
-            {loading && (
-              <div className="text-center text-xs text-muted-foreground py-4">Carregando agenda...</div>
-            )}
-          </div>
+          {loading && (
+            <div className="text-center text-xs text-muted-foreground py-4">Carregando agenda...</div>
+          )}
         </LiquidGlassCard>
       </FadeIn>
 
