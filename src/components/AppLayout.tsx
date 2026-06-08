@@ -270,7 +270,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           >
             <Settings className="w-[18px] h-[18px]" />
           </button>
-
+        </header>
 
         {/* Content */}
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
