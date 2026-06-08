@@ -271,10 +271,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             <Settings className="w-[18px] h-[18px]" />
           </button>
 
-          <Badge variant="outline" className="text-[11px] font-medium hidden sm:flex border-border text-muted-foreground">
-            RDC 1.002/2025
-          </Badge>
-        </header>
 
         {/* Content */}
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
