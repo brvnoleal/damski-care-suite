@@ -313,7 +313,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <Smile className="w-4 h-4 text-primary" />
-                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Próximos Atendimentos</h2>
+                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Tratamentos em andamento</h2>
               </div>
               <Badge variant="outline" className="text-[10px]">{nextAppointments.length}</Badge>
             </div>
