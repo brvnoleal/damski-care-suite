@@ -84,6 +84,17 @@ Deno.serve(async (req) => {
 
     let pacienteId = body.paciente_id ?? null;
 
+    // Garante vínculo do token ao paciente: se o token foi emitido para um paciente
+    // específico, não permitir submeter anamnese para um paciente diferente.
+    if (tokenRow?.paciente_id) {
+      if (pacienteId && pacienteId !== tokenRow.paciente_id) {
+        return new Response(JSON.stringify({ error: "Paciente não corresponde ao token" }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      pacienteId = tokenRow.paciente_id;
+    }
+
     // Cria paciente se necessário
     if (!pacienteId) {
       if (!body.paciente_novo) {
