@@ -39,6 +39,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useClinicaContext } from "@/hooks/useClinicaContext";
 import { Building2 } from "lucide-react";
+import GlobalSearch from "@/components/GlobalSearch";
 
 interface AppLayoutProps {
   children: React.ReactNode;
