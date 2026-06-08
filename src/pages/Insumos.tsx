@@ -183,10 +183,33 @@ const Insumos = () => {
               Rastreabilidade por lote conforme RDC 1.002/2025
             </p>
           </div>
-          <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
-            <Plus className="w-4 h-4" />
-            Cadastrar Insumo
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => exportToXlsx(
+                filtered.map((s) => ({
+                  Nome: s.nome,
+                  Categoria: s.categoria ? insumoCategoriaLabels[s.categoria as InsumoCategoria] : "",
+                  Fabricante: s.fabricante,
+                  Lote: s.lote,
+                  Validade: s.validade ?? "Sem validade",
+                  Quantidade: s.quantidade,
+                  Unidade: s.unidade_medida ? insumoUnidadeMedidaLabels[s.unidade_medida as InsumoUnidadeMedida] : "",
+                  "Pacientes Vinculados": s.pacientes_vinculados ?? 0,
+                })),
+                "insumos",
+                "Insumos",
+              )}
+              disabled={!filtered.length}
+            >
+              <Download className="w-4 h-4" /> Exportar XLSX
+            </Button>
+            <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
+              <Plus className="w-4 h-4" />
+              Cadastrar Insumo
+            </Button>
+          </div>
         </div>
       </FadeIn>
 
