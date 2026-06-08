@@ -60,11 +60,16 @@ const Dashboard = () => {
     loadName();
   }, []);
 
-  const [kpis, setKpis] = useState([
-    { label: "Pacientes Ativos", value: "—", change: "carregando...", icon: Users, color: "primary" as const, trend: "neutral" },
-    { label: "Sessões Hoje", value: "—", change: "", icon: Calendar, color: "info" as const, trend: "neutral" },
-    { label: "Insumos Críticos", value: "—", change: "", icon: Package, color: "warning" as const, trend: "neutral" },
-    { label: "Consultas Semana", value: "—", change: "", icon: FileCheck, color: "success" as const, trend: "up" },
+  type KpiColor = "primary" | "info" | "success" | "warning" | "destructive";
+  const [kpis, setKpis] = useState<{ label: string; value: string; change: string; icon: any; color: KpiColor; trend: string }[]>([
+    { label: "Consultas Hoje", value: "—", change: "carregando...", icon: Calendar, color: "primary", trend: "neutral" },
+    { label: "Faturamento do Mês", value: "—", change: "", icon: DollarSign, color: "success", trend: "neutral" },
+    { label: "Novos Pacientes do Mês", value: "—", change: "", icon: UserPlus, color: "info", trend: "neutral" },
+    { label: "Insumos Críticos", value: "—", change: "", icon: AlertTriangle, color: "warning", trend: "neutral" },
+    { label: "Agenda do Dia", value: "—", change: "", icon: CalendarDays, color: "primary", trend: "neutral" },
+    { label: "Pagamentos Atrasados", value: "—", change: "", icon: CreditCard, color: "destructive", trend: "neutral" },
+    { label: "Tratamentos em Andamento", value: "—", change: "", icon: Activity, color: "info", trend: "neutral" },
+    { label: "Top Procedimento", value: "—", change: "", icon: Star, color: "success", trend: "neutral" },
   ]);
 
   const [consultasPorStatus, setConsultasPorStatus] = useState<{name: string; value: number; color: string}[]>([]);
