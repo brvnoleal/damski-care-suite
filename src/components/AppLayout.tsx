@@ -103,7 +103,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         {/* Top row: collapse toggle + mobile close */}
         <div className={cn(
           "flex items-center h-14 border-b border-sidebar-border",
-          collapsed ? "lg:px-2 px-5 justify-between" : "px-5 justify-between"
+          collapsed ? "lg:px-2 px-5 lg:justify-center justify-between" : "px-5 justify-between"
         )}>
           <button
             className="hidden lg:inline-flex items-center justify-center w-7 h-7 rounded-md text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
