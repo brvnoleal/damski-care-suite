@@ -25,6 +25,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { FadeIn } from "@/components/FadeIn";
 import { despesaService } from "@/services/despesaService";
 import { procedimentoConsultaLabels, formaPagamentoLabels } from "@/types";
+import { exportMultiSheetXlsx } from "@/lib/exportXlsx";
 
 const pagamentoColors = ["hsl(160 84% 39%)", "hsl(239 84% 67%)", "hsl(38 92% 50%)", "hsl(0 72% 51%)", "hsl(280 60% 55%)"];
 const procedimentoColors = [
@@ -233,7 +234,40 @@ const Relatorios = () => {
                 <SelectItem value="anual">Anual</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" className="gap-2"><Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span></Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => {
+                exportMultiSheetXlsx(
+                  [
+                    {
+                      name: "Resumo",
+                      rows: [
+                        { Métrica: "Período", Valor: periodo },
+                        { Métrica: "Total de Consultas", Valor: totalConsultas },
+                        { Métrica: "Taxa de Confirmação (%)", Valor: taxaConfirmacao },
+                        { Métrica: "Taxa de Comparecimento (%)", Valor: taxaComparecimento },
+                        { Métrica: "Pacientes Atendidos", Valor: pacientesAtendidos },
+                        { Métrica: "Receita Total", Valor: receitaTotal },
+                        { Métrica: "Despesa Total", Valor: despesaTotal },
+                        { Métrica: "Lucro", Valor: receitaTotal - despesaTotal },
+                      ],
+                    },
+                    { name: "Faturamento Mensal", rows: faturamentoMensal },
+                    { name: "Procedimentos por Tipo", rows: procPorTipo },
+                    { name: "Status Procedimentos", rows: procStatus },
+                    { name: "Formas Pagamento", rows: formasPagamento },
+                    { name: "Entradas", rows: entradas },
+                    { name: "Saidas", rows: saidas },
+                  ],
+                  "relatorio-financeiro",
+                );
+                toast.success("Relatório exportado");
+              }}
+            >
+              <Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span>
+            </Button>
           <Sheet open={despesaOpen} onOpenChange={setDespesaOpen}>
             <SheetContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
               <SheetHeader>

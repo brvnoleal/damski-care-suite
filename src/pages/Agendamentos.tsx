@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Search, Plus, Edit, Trash2, Calendar, Clock, X } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Calendar, Clock, X, Download } from "lucide-react";
+import { exportToXlsx } from "@/lib/exportXlsx";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { CurrencyInput } from "@/components/ui/currency-input";
@@ -225,10 +226,36 @@ const Agendamentos = () => {
               Gerenciamento de consultas e horários
             </p>
           </div>
-          <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
-            <Plus className="w-4 h-4" />
-            Nova Consulta
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => exportToXlsx(
+                filtered.map((a) => ({
+                  Data: formatDataBR(a.data),
+                  Horário: a.horario,
+                  "Horário Fim": a.horario_fim ?? "",
+                  Paciente: getPacienteNome(a.paciente_id),
+                  Dentista: getDentistaNome(a.dentista_id),
+                  Procedimento: procedimentoConsultaLabels[a.procedimento as ProcedimentoConsulta] ?? a.procedimento,
+                  Status: a.status,
+                  Valor: a.valor,
+                  "Forma Pagamento": formaPagamentoLabels[a.forma_pagamento as FormaPagamento] ?? a.forma_pagamento,
+                  Parcelas: a.parcelas ?? 1,
+                  Observações: a.observacoes ?? "",
+                })),
+                "consultas",
+                "Consultas",
+              )}
+              disabled={!filtered.length}
+            >
+              <Download className="w-4 h-4" /> Exportar XLSX
+            </Button>
+            <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
+              <Plus className="w-4 h-4" />
+              Nova Consulta
+            </Button>
+          </div>
         </div>
       </FadeIn>
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, Plus, Filter, Eye, Edit, Trash2 } from "lucide-react";
+import { Search, Plus, Filter, Eye, Edit, Trash2, Download } from "lucide-react";
+import { exportToXlsx } from "@/lib/exportXlsx";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -152,10 +153,34 @@ const Pacientes = () => {
               Cadastro e gerenciamento de pacientes — CRUD completo
             </p>
           </div>
-          <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
-            <Plus className="w-4 h-4" />
-            Novo Paciente
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => exportToXlsx(
+                filtered.map((p) => ({
+                  Nome: p.nome, CPF: p.cpf, RG: p.rg ?? "", Sexo: p.sexo ?? "",
+                  "Estado Civil": p.estado_civil ?? "", Telefone: p.telefone ?? "",
+                  Email: p.email ?? "", Instagram: p.instagram ?? "",
+                  "Data Nascimento": p.data_nascimento ?? "",
+                  Plano: p.plano ?? "", "Nº Plano": p.numero_plano ?? "",
+                  "Nº Prontuário": p.numero_prontuario ?? "",
+                  CEP: p.cep ?? "", Estado: p.estado ?? "", Cidade: p.cidade ?? "",
+                  Bairro: p.bairro ?? "", Rua: p.rua ?? "", Número: p.numero ?? "",
+                  Complemento: p.complemento ?? "", Status: p.status,
+                })),
+                "pacientes",
+                "Pacientes",
+              )}
+              disabled={!filtered.length}
+            >
+              <Download className="w-4 h-4" /> Exportar XLSX
+            </Button>
+            <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
+              <Plus className="w-4 h-4" />
+              Novo Paciente
+            </Button>
+          </div>
         </div>
       </FadeIn>
 
