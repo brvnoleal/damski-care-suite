@@ -60,13 +60,13 @@ const Dashboard = () => {
   }, []);
 
   const [kpis, setKpis] = useState([
-    { label: "Pacientes Ativos", value: "—", change: "carregando...", icon: Users, color: "primary" as const, trend: "neutral" },
-    { label: "Sessões Hoje", value: "—", change: "", icon: Calendar, color: "info" as const, trend: "neutral" },
+    { label: "Novos Pacientes este mês", value: "—", change: "carregando...", icon: Users, color: "primary" as const, trend: "neutral" },
+    { label: "Consultas Hoje", value: "—", change: "", icon: Calendar, color: "info" as const, trend: "neutral" },
     { label: "Insumos Críticos", value: "—", change: "", icon: Package, color: "warning" as const, trend: "neutral" },
     { label: "Consultas Semana", value: "—", change: "", icon: FileCheck, color: "success" as const, trend: "up" },
   ]);
 
-  const [consultasPorStatus, setConsultasPorStatus] = useState<{name: string; value: number; color: string}[]>([]);
+  const [agendaDoDia, setAgendaDoDia] = useState<{time: string; patient: string; proc: string; status: string}[]>([]);
   const [sessionsWeekly, setSessionsWeekly] = useState<{day: string; sessoes: number}[]>([]);
   const [topProcedures, setTopProcedures] = useState<{name: string; count: number}[]>([]);
   const [nextAppointments, setNextAppointments] = useState<{time: string; patient: string; proc: string; status: string}[]>([]);
@@ -81,14 +81,16 @@ const Dashboard = () => {
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekStart.getDate() + 5);
 
-      const [pacRes, todayRes, weekRes, insumoRes] = await Promise.all([
-        supabase.from("paciente").select("id", { count: "exact" }).eq("status", "ativo"),
-        supabase.from("agendamento").select("*").eq("data", today),
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+
+      const [novosPacRes, todayRes, weekRes, insumoRes] = await Promise.all([
+        supabase.from("paciente").select("id", { count: "exact", head: true }).gte("created_at", monthStart),
+        supabase.from("agendamento").select("*, paciente:paciente_id(nome)").eq("data", today),
         supabase.from("agendamento").select("*, paciente:paciente_id(nome)").gte("data", weekStart.toISOString().split("T")[0]).lte("data", weekEnd.toISOString().split("T")[0]),
         supabase.from("insumo").select("*"),
       ]);
 
-      const pacCount = pacRes.count || 0;
+      const novosPacCount = novosPacRes.count || 0;
       const todayAg = todayRes.data || [];
       const weekAg = weekRes.data || [];
       const insumos = insumoRes.data || [];
@@ -101,8 +103,8 @@ const Dashboard = () => {
       const weekConfirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
 
       setKpis([
-        { label: "Pacientes Ativos", value: String(pacCount), change: "", icon: Users, color: "primary", trend: "up" },
-        { label: "Sessões Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "info", trend: "neutral" },
+        { label: "Novos Pacientes este mês", value: String(novosPacCount), change: "", icon: Users, color: "primary", trend: "up" },
+        { label: "Consultas Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "info", trend: "neutral" },
         { label: "Insumos Críticos", value: String(criticalCount), change: "", icon: Package, color: "warning", trend: "neutral" },
         { label: "Consultas Semana", value: String(weekAg.length), change: `${weekConfirmed} confirmadas`, icon: FileCheck, color: "success", trend: "up" },
       ]);
@@ -120,15 +122,17 @@ const Dashboard = () => {
       const procItems = Object.entries(procMap).sort((a, b) => b[1] - a[1]).map(([proc, valor]) => ({ proc, valor }));
       setReceitaSemana({ total: totalRealizado, realizadas: realizadasAg.length, previstas: totalPrevisto, items: procItems });
 
-      // Consultas por status
-      const confirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
-      const pending = weekAg.filter((a: any) => a.status === "agendado").length;
-      const cancelled = weekAg.filter((a: any) => a.status === "cancelado").length;
-      setConsultasPorStatus([
-        { name: "Confirmadas", value: confirmed, color: "hsl(160, 84%, 39%)" },
-        { name: "Aguardando", value: pending, color: "hsl(40, 60%, 55%)" },
-        { name: "Canceladas", value: cancelled, color: "hsl(345, 45%, 45%)" },
-      ]);
+      // Agenda do Dia
+      const dia = todayAg
+        .filter((a: any) => a.status !== "cancelado")
+        .sort((a: any, b: any) => a.horario.localeCompare(b.horario))
+        .map((a: any) => ({
+          time: a.horario.slice(0, 5),
+          patient: a.paciente?.nome || "—",
+          proc: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
+          status: a.status,
+        }));
+      setAgendaDoDia(dia);
 
       // Sessions weekly
       const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -222,28 +226,26 @@ const Dashboard = () => {
         <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
           <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
             <div className="flex items-center gap-2">
-              <FileCheck className="w-4 h-4 text-primary" />
-              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Consultas da Semana</h2>
+              <Calendar className="w-4 h-4 text-primary" />
+              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Agenda do Dia</h2>
             </div>
-            <Badge variant="outline" className="text-[10px]">{consultasPorStatus.reduce((s, c) => s + c.value, 0)} total</Badge>
+            <Badge variant="outline" className="text-[10px]">{agendaDoDia.length} consulta{agendaDoDia.length !== 1 ? "s" : ""}</Badge>
           </div>
-          <div className="p-3 sm:p-4 flex-1 flex flex-col items-center justify-center">
-            <ResponsiveContainer width="100%" height={160}>
-              <PieChart>
-                <Pie data={consultasPorStatus} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={55} innerRadius={28} strokeWidth={2} stroke="rgba(255,255,255,0.1)">
-                  {consultasPorStatus.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                </Pie>
-                <Tooltip formatter={(v: number, name: string) => [`${v}`, name]} contentStyle={glassTooltip} labelStyle={glassTooltipText} itemStyle={glassTooltipText} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-1">
-              {consultasPorStatus.map((s, i) => (
-                <div key={i} className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
-                  <span className="text-[10px] sm:text-[11px] text-muted-foreground">{s.name}: <span className="font-semibold text-foreground">{s.value}</span></span>
+          <div className="divide-y divide-white/5 max-h-[320px] overflow-y-auto">
+            {agendaDoDia.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">Nenhuma consulta agendada para hoje</p>
+            ) : agendaDoDia.map((a, i) => (
+              <div key={i} className="flex items-center gap-3 px-4 sm:px-5 py-3">
+                <span className="text-sm font-mono font-semibold text-primary w-12 shrink-0">{a.time}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{a.patient}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">{a.proc}</p>
                 </div>
-              ))}
-            </div>
+                <Badge variant="outline" className={cn("text-[10px] shrink-0 capitalize", a.status === "confirmado" ? "text-success border-success/30" : a.status === "realizado" ? "text-primary border-primary/30" : "text-warning border-warning/30")}>
+                  {a.status}
+                </Badge>
+              </div>
+            ))}
           </div>
         </LiquidGlassCard>
       </FadeIn>
