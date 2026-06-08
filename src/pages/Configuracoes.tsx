@@ -379,7 +379,7 @@ const Configuracoes = () => {
               <Select value={newRole} onValueChange={(v) => setNewRole(v as AppRole)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(roleLabels) as AppRole[]).map(r => (
+                  {assignableRoles.map(r => (
                     <SelectItem key={r} value={r}>{roleLabels[r]}</SelectItem>
                   ))}
                 </SelectContent>
