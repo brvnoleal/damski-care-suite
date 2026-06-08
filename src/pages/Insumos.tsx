@@ -332,96 +332,97 @@ const Insumos = () => {
       </LiquidGlassCard>
       </FadeIn>
 
-      <Sheet open={dialogOpen} onOpenChange={setDialogOpen}>
-        <SheetContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>{editingSupply ? "Editar Insumo" : "Cadastrar Insumo"}</SheetTitle>
-          </SheetHeader>
-          <div className="space-y-4 py-2">
+      <ResponsiveDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title={editingSupply ? "Editar Insumo" : "Cadastrar Insumo"}
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setDialogOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button onClick={handleSubmit} className="flex-1 sm:flex-none">{editingSupply ? "Salvar" : "Cadastrar"}</Button>
+          </>
+        }
+      >
+        <div className="space-y-4 py-2">
+          <div className="space-y-2">
+            <Label htmlFor="supply-name">Nome do Insumo</Label>
+            <Input id="supply-name" placeholder="Ex: Ácido Hialurônico 20mg/ml" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="supply-manufacturer">Fabricante</Label>
+            <Input id="supply-manufacturer" placeholder="Ex: Galderma" value={form.fabricante} onChange={(e) => setForm({ ...form, fabricante: e.target.value })} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="supply-name">Nome do Insumo</Label>
-              <Input id="supply-name" placeholder="Ex: Ácido Hialurônico 20mg/ml" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="supply-manufacturer">Fabricante</Label>
-              <Input id="supply-manufacturer" placeholder="Ex: Galderma" value={form.fabricante} onChange={(e) => setForm({ ...form, fabricante: e.target.value })} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Categoria</Label>
-                <Select value={form.categoria} onValueChange={(v) => setForm({ ...form, categoria: v as InsumoCategoria })}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(insumoCategoriaLabels).map(([v, l]) => (
-                      <SelectItem key={v} value={v}>{l}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Unidade de Medida</Label>
-                <Select value={form.unidade_medida} onValueChange={(v) => setForm({ ...form, unidade_medida: v as InsumoUnidadeMedida })}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(insumoUnidadeMedidaLabels).map(([v, l]) => (
-                      <SelectItem key={v} value={v}>{l}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="supply-lot">Lote</Label>
-                <Input id="supply-lot" placeholder="Ex: AH2024-089" value={form.lote} onChange={(e) => setForm({ ...form, lote: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="supply-qty">Quantidade</Label>
-                <Input id="supply-qty" type="number" min="1" placeholder="0" value={form.quantidade} onChange={(e) => setForm({ ...form, quantidade: e.target.value })} />
-              </div>
+              <Label>Categoria</Label>
+              <Select value={form.categoria} onValueChange={(v) => setForm({ ...form, categoria: v as InsumoCategoria })}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  {Object.entries(insumoCategoriaLabels).map(([v, l]) => (
+                    <SelectItem key={v} value={v}>{l}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="supply-expiry">Validade</Label>
-              <Input
-                id="supply-expiry"
-                type="date"
-                value={form.validade}
-                disabled={form.sem_validade}
-                onChange={(e) => setForm({ ...form, validade: e.target.value })}
-              />
-              <div className="flex items-center gap-2 pt-1">
-                <Checkbox
-                  id="sem-validade"
-                  checked={form.sem_validade}
-                  onCheckedChange={(c) => setForm({ ...form, sem_validade: !!c, validade: c ? "" : form.validade })}
-                />
-                <Label htmlFor="sem-validade" className="cursor-pointer text-sm font-normal">
-                  Sem validade
-                </Label>
-              </div>
+              <Label>Unidade de Medida</Label>
+              <Select value={form.unidade_medida} onValueChange={(v) => setForm({ ...form, unidade_medida: v as InsumoUnidadeMedida })}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  {Object.entries(insumoUnidadeMedidaLabels).map(([v, l]) => (
+                    <SelectItem key={v} value={v}>{l}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
-          <SheetFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSubmit}>{editingSupply ? "Salvar" : "Cadastrar"}</Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="supply-lot">Lote</Label>
+              <Input id="supply-lot" placeholder="Ex: AH2024-089" value={form.lote} onChange={(e) => setForm({ ...form, lote: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="supply-qty">Quantidade</Label>
+              <Input id="supply-qty" type="number" min="1" placeholder="0" value={form.quantidade} onChange={(e) => setForm({ ...form, quantidade: e.target.value })} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="supply-expiry">Validade</Label>
+            <Input
+              id="supply-expiry"
+              type="date"
+              value={form.validade}
+              disabled={form.sem_validade}
+              onChange={(e) => setForm({ ...form, validade: e.target.value })}
+            />
+            <div className="flex items-center gap-2 pt-1">
+              <Checkbox
+                id="sem-validade"
+                checked={form.sem_validade}
+                onCheckedChange={(c) => setForm({ ...form, sem_validade: !!c, validade: c ? "" : form.validade })}
+              />
+              <Label htmlFor="sem-validade" className="cursor-pointer text-sm font-normal">
+                Sem validade
+              </Label>
+            </div>
+          </div>
+        </div>
+      </ResponsiveDialog>
 
-      <Sheet open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <SheetContent className="sm:max-w-sm">
-          <SheetHeader>
-            <SheetTitle>Excluir Insumo</SheetTitle>
-            <SheetDescription>
-              Tem certeza que deseja excluir <strong>{deletingSupply?.nome}</strong> (Lote: {deletingSupply?.lote})?
-            </SheetDescription>
-          </SheetHeader>
-          <SheetFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Cancelar</Button>
-            <Button variant="destructive" onClick={handleDelete}>Excluir</Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+      <ResponsiveDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Excluir Insumo"
+        description={`Tem certeza que deseja excluir ${deletingSupply?.nome ?? ""} (Lote: ${deletingSupply?.lote ?? ""})?`}
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button variant="destructive" onClick={handleDelete} className="flex-1 sm:flex-none">Excluir</Button>
+          </>
+        }
+      >
+        <p className="text-sm text-muted-foreground">Esta ação não pode ser desfeita.</p>
+      </ResponsiveDialog>
     </div>
   );
 };
