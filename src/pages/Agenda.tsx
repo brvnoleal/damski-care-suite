@@ -304,16 +304,16 @@ const Agenda = () => {
                 ))}
               </div>
 
-              <div className="grid grid-cols-7">
+              <div className="grid grid-cols-7 gap-1">
                 {cells.map((cell, i) => {
-                  if (!cell) return <div key={`e-${i}`} className="min-h-[80px] sm:min-h-[110px] bg-white/[0.015] border border-white/[0.04]" />;
+                  if (!cell) return <div key={`e-${i}`} className="min-h-[80px] sm:min-h-[110px] rounded-md bg-white/[0.015] border border-white/[0.04]" />;
                   const items = agendamentosPorDia.get(cell.key) || [];
                   const isToday = cell.key === today;
                   return (
                     <div
                       key={cell.key}
-                      className={`min-h-[80px] sm:min-h-[110px] border p-1 sm:p-1.5 flex flex-col gap-0.5 transition-colors ${
-                        isToday ? "border-primary/40 bg-primary/[0.04]" : "border-white/[0.04] bg-white/[0.02]"
+                      className={`min-h-[80px] sm:min-h-[110px] rounded-md border p-1 sm:p-1.5 flex flex-col gap-0.5 transition-colors cursor-default ${
+                        isToday ? "border-primary/40 bg-primary/[0.04]" : "border-white/[0.08] bg-white/[0.02] hover:border-primary/30"
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -347,6 +347,9 @@ const Agenda = () => {
                           <span className="text-[9px] sm:text-[10px] text-muted-foreground pl-1">+{items.length - 3} mais</span>
                         )}
                       </div>
+                      {items.length === 0 && (
+                        <span className="mt-auto text-[9px] sm:text-[10px] text-muted-foreground/40 italic self-start">Livre</span>
+                      )}
                     </div>
                   );
                 })}
