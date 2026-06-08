@@ -81,14 +81,16 @@ const Dashboard = () => {
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekStart.getDate() + 5);
 
-      const [pacRes, todayRes, weekRes, insumoRes] = await Promise.all([
-        supabase.from("paciente").select("id", { count: "exact" }).eq("status", "ativo"),
-        supabase.from("agendamento").select("*").eq("data", today),
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+
+      const [novosPacRes, todayRes, weekRes, insumoRes] = await Promise.all([
+        supabase.from("paciente").select("id", { count: "exact", head: true }).gte("created_at", monthStart),
+        supabase.from("agendamento").select("*, paciente:paciente_id(nome)").eq("data", today),
         supabase.from("agendamento").select("*, paciente:paciente_id(nome)").gte("data", weekStart.toISOString().split("T")[0]).lte("data", weekEnd.toISOString().split("T")[0]),
         supabase.from("insumo").select("*"),
       ]);
 
-      const pacCount = pacRes.count || 0;
+      const novosPacCount = novosPacRes.count || 0;
       const todayAg = todayRes.data || [];
       const weekAg = weekRes.data || [];
       const insumos = insumoRes.data || [];
@@ -101,8 +103,8 @@ const Dashboard = () => {
       const weekConfirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
 
       setKpis([
-        { label: "Pacientes Ativos", value: String(pacCount), change: "", icon: Users, color: "primary", trend: "up" },
-        { label: "Sessões Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "info", trend: "neutral" },
+        { label: "Novos Pacientes este mês", value: String(novosPacCount), change: "", icon: Users, color: "primary", trend: "up" },
+        { label: "Consultas Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "info", trend: "neutral" },
         { label: "Insumos Críticos", value: String(criticalCount), change: "", icon: Package, color: "warning", trend: "neutral" },
         { label: "Consultas Semana", value: String(weekAg.length), change: `${weekConfirmed} confirmadas`, icon: FileCheck, color: "success", trend: "up" },
       ]);
