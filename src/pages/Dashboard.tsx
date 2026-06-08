@@ -122,15 +122,17 @@ const Dashboard = () => {
       const procItems = Object.entries(procMap).sort((a, b) => b[1] - a[1]).map(([proc, valor]) => ({ proc, valor }));
       setReceitaSemana({ total: totalRealizado, realizadas: realizadasAg.length, previstas: totalPrevisto, items: procItems });
 
-      // Consultas por status
-      const confirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
-      const pending = weekAg.filter((a: any) => a.status === "agendado").length;
-      const cancelled = weekAg.filter((a: any) => a.status === "cancelado").length;
-      setConsultasPorStatus([
-        { name: "Confirmadas", value: confirmed, color: "hsl(160, 84%, 39%)" },
-        { name: "Aguardando", value: pending, color: "hsl(40, 60%, 55%)" },
-        { name: "Canceladas", value: cancelled, color: "hsl(345, 45%, 45%)" },
-      ]);
+      // Agenda do Dia
+      const dia = todayAg
+        .filter((a: any) => a.status !== "cancelado")
+        .sort((a: any, b: any) => a.horario.localeCompare(b.horario))
+        .map((a: any) => ({
+          time: a.horario.slice(0, 5),
+          patient: a.paciente?.nome || "—",
+          proc: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
+          status: a.status,
+        }));
+      setAgendaDoDia(dia);
 
       // Sessions weekly
       const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
