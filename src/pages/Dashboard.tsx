@@ -53,7 +53,8 @@ const Dashboard = () => {
       if (!user) return;
       const { data: profile } = await supabase.from("profiles").select("nome").eq("id", user.id).maybeSingle();
       const nome = profile?.nome?.trim() || (user.user_metadata as any)?.nome || (user.user_metadata as any)?.full_name || user.email?.split("@")[0] || "";
-      setDisplayName(nome.split(" ")[0]);
+      const cleanNome = nome.replace(/^\s*(Dra\.?|Dr\.?|Sr\.?|Sra\.?|Prof\.?|Eng\.?)\s+/i, "");
+      setDisplayName(cleanNome.split(" ")[0]);
     };
     loadName();
   }, []);
