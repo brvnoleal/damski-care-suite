@@ -87,30 +87,59 @@ const Dashboard = () => {
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekStart.getDate() + 5);
 
-      const [pacRes, todayRes, weekRes, insumoRes] = await Promise.all([
-        supabase.from("paciente").select("id", { count: "exact" }).eq("status", "ativo"),
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split("T")[0];
+
+      const [todayRes, weekRes, insumoRes, monthAgRes, novosPacRes, debitoRes, futureAgRes] = await Promise.all([
         supabase.from("agendamento").select("*").eq("data", today),
         supabase.from("agendamento").select("*, paciente:paciente_id(nome)").gte("data", weekStart.toISOString().split("T")[0]).lte("data", weekEnd.toISOString().split("T")[0]),
         supabase.from("insumo").select("*"),
+        supabase.from("agendamento").select("valor,procedimento,status,data").gte("data", monthStart).lte("data", monthEnd),
+        supabase.from("paciente").select("id", { count: "exact", head: true }).gte("created_at", monthStart),
+        supabase.from("paciente_debito").select("valor,data_vencimento,status"),
+        supabase.from("agendamento").select("paciente_id,data,status").gte("data", today),
       ]);
 
-      const pacCount = pacRes.count || 0;
       const todayAg = todayRes.data || [];
       const weekAg = weekRes.data || [];
       const insumos = insumoRes.data || [];
+      const monthAg = monthAgRes.data || [];
+      const debitos = debitoRes.data || [];
+      const futureAg = futureAgRes.data || [];
 
       const todayDone = todayAg.filter((a: any) => a.status === "realizado").length;
+      const todayRemaining = todayAg.filter((a: any) => !["realizado", "cancelado"].includes(a.status)).length;
       const criticalCount = insumos.filter((i: any) => {
         const d = Math.ceil((new Date(i.validade).getTime() - now.getTime()) / 86400000);
         return d <= 15;
       }).length;
-      const weekConfirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
+      const faturamentoMes = monthAg
+        .filter((a: any) => a.status === "realizado")
+        .reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
+      const novosPacientes = novosPacRes.count || 0;
+      const atrasados = debitos.filter((d: any) => d.status !== "pago" && new Date(d.data_vencimento) < new Date(today));
+      const totalAtrasado = atrasados.reduce((s: number, d: any) => s + Number(d.valor || 0), 0);
+      const tratamentosAndamento = new Set(
+        futureAg.filter((a: any) => ["agendado", "confirmado"].includes(a.status)).map((a: any) => a.paciente_id)
+      ).size;
+
+      const procCount: Record<string, number> = {};
+      monthAg.forEach((a: any) => { procCount[a.procedimento] = (procCount[a.procedimento] || 0) + 1; });
+      const topProc = Object.entries(procCount).sort((a, b) => b[1] - a[1])[0];
+      const topProcLabel = topProc ? ((procedimentoConsultaLabels as any)[topProc[0]] || topProc[0]) : "—";
+      const topProcCount = topProc ? topProc[1] : 0;
+
+      const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 
       setKpis([
-        { label: "Pacientes Ativos", value: String(pacCount), change: "", icon: Users, color: "primary", trend: "up" },
-        { label: "Sessões Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "info", trend: "neutral" },
-        { label: "Insumos Críticos", value: String(criticalCount), change: "", icon: Package, color: "warning", trend: "neutral" },
-        { label: "Consultas Semana", value: String(weekAg.length), change: `${weekConfirmed} confirmadas`, icon: FileCheck, color: "success", trend: "up" },
+        { label: "Consultas Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "primary", trend: "neutral" },
+        { label: "Faturamento do Mês", value: brl(faturamentoMes), change: `${monthAg.filter((a: any) => a.status === "realizado").length} realizadas`, icon: DollarSign, color: "success", trend: "up" },
+        { label: "Novos Pacientes do Mês", value: String(novosPacientes), change: now.toLocaleDateString("pt-BR", { month: "long" }), icon: UserPlus, color: "info", trend: "up" },
+        { label: "Insumos Críticos", value: String(criticalCount), change: criticalCount ? "≤ 15 dias" : "tudo ok", icon: AlertTriangle, color: "warning", trend: "neutral" },
+        { label: "Agenda do Dia", value: String(todayRemaining), change: `${todayAg.length} no total`, icon: CalendarDays, color: "primary", trend: "neutral" },
+        { label: "Pagamentos Atrasados", value: String(atrasados.length), change: totalAtrasado ? brl(totalAtrasado) : "em dia", icon: CreditCard, color: "destructive", trend: "neutral" },
+        { label: "Tratamentos em Andamento", value: String(tratamentosAndamento), change: "pacientes ativos", icon: Activity, color: "info", trend: "neutral" },
+        { label: "Top Procedimento", value: topProcLabel, change: topProcCount ? `${topProcCount}x no mês` : "sem dados", icon: Star, color: "success", trend: "up" },
       ]);
 
       // Receita da Semana
