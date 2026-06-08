@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   Users, Calendar, Package, FileCheck,
   AlertTriangle, ArrowUpRight, ChevronRight, Star, Activity,
-  Smile, Clock,
+  Smile, Clock, DollarSign, UserPlus, CalendarDays, CreditCard,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ const colorMap = {
   info: { bg: "bg-info/10", text: "text-info" },
   success: { bg: "bg-success/10", text: "text-success" },
   warning: { bg: "bg-warning/10", text: "text-warning" },
+  destructive: { bg: "bg-destructive/10", text: "text-destructive" },
 };
 
 
@@ -59,11 +60,16 @@ const Dashboard = () => {
     loadName();
   }, []);
 
-  const [kpis, setKpis] = useState([
-    { label: "Pacientes Ativos", value: "—", change: "carregando...", icon: Users, color: "primary" as const, trend: "neutral" },
-    { label: "Sessões Hoje", value: "—", change: "", icon: Calendar, color: "info" as const, trend: "neutral" },
-    { label: "Insumos Críticos", value: "—", change: "", icon: Package, color: "warning" as const, trend: "neutral" },
-    { label: "Consultas Semana", value: "—", change: "", icon: FileCheck, color: "success" as const, trend: "up" },
+  type KpiColor = "primary" | "info" | "success" | "warning" | "destructive";
+  const [kpis, setKpis] = useState<{ label: string; value: string; change: string; icon: any; color: KpiColor; trend: string }[]>([
+    { label: "Consultas Hoje", value: "—", change: "carregando...", icon: Calendar, color: "primary", trend: "neutral" },
+    { label: "Faturamento do Mês", value: "—", change: "", icon: DollarSign, color: "success", trend: "neutral" },
+    { label: "Novos Pacientes do Mês", value: "—", change: "", icon: UserPlus, color: "info", trend: "neutral" },
+    { label: "Insumos Críticos", value: "—", change: "", icon: AlertTriangle, color: "warning", trend: "neutral" },
+    { label: "Agenda do Dia", value: "—", change: "", icon: CalendarDays, color: "primary", trend: "neutral" },
+    { label: "Pagamentos Atrasados", value: "—", change: "", icon: CreditCard, color: "destructive", trend: "neutral" },
+    { label: "Tratamentos em Andamento", value: "—", change: "", icon: Activity, color: "info", trend: "neutral" },
+    { label: "Top Procedimento", value: "—", change: "", icon: Star, color: "success", trend: "neutral" },
   ]);
 
   const [consultasPorStatus, setConsultasPorStatus] = useState<{name: string; value: number; color: string}[]>([]);
@@ -81,30 +87,59 @@ const Dashboard = () => {
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekStart.getDate() + 5);
 
-      const [pacRes, todayRes, weekRes, insumoRes] = await Promise.all([
-        supabase.from("paciente").select("id", { count: "exact" }).eq("status", "ativo"),
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split("T")[0];
+
+      const [todayRes, weekRes, insumoRes, monthAgRes, novosPacRes, debitoRes, futureAgRes] = await Promise.all([
         supabase.from("agendamento").select("*").eq("data", today),
         supabase.from("agendamento").select("*, paciente:paciente_id(nome)").gte("data", weekStart.toISOString().split("T")[0]).lte("data", weekEnd.toISOString().split("T")[0]),
         supabase.from("insumo").select("*"),
+        supabase.from("agendamento").select("valor,procedimento,status,data").gte("data", monthStart).lte("data", monthEnd),
+        supabase.from("paciente").select("id", { count: "exact", head: true }).gte("created_at", monthStart),
+        supabase.from("paciente_debito").select("valor,data_vencimento,status"),
+        supabase.from("agendamento").select("paciente_id,data,status").gte("data", today),
       ]);
 
-      const pacCount = pacRes.count || 0;
       const todayAg = todayRes.data || [];
       const weekAg = weekRes.data || [];
       const insumos = insumoRes.data || [];
+      const monthAg = monthAgRes.data || [];
+      const debitos = debitoRes.data || [];
+      const futureAg = futureAgRes.data || [];
 
       const todayDone = todayAg.filter((a: any) => a.status === "realizado").length;
+      const todayRemaining = todayAg.filter((a: any) => !["realizado", "cancelado"].includes(a.status)).length;
       const criticalCount = insumos.filter((i: any) => {
         const d = Math.ceil((new Date(i.validade).getTime() - now.getTime()) / 86400000);
         return d <= 15;
       }).length;
-      const weekConfirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
+      const faturamentoMes = monthAg
+        .filter((a: any) => a.status === "realizado")
+        .reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
+      const novosPacientes = novosPacRes.count || 0;
+      const atrasados = debitos.filter((d: any) => d.status !== "pago" && new Date(d.data_vencimento) < new Date(today));
+      const totalAtrasado = atrasados.reduce((s: number, d: any) => s + Number(d.valor || 0), 0);
+      const tratamentosAndamento = new Set(
+        futureAg.filter((a: any) => ["agendado", "confirmado"].includes(a.status)).map((a: any) => a.paciente_id)
+      ).size;
+
+      const procCount: Record<string, number> = {};
+      monthAg.forEach((a: any) => { procCount[a.procedimento] = (procCount[a.procedimento] || 0) + 1; });
+      const topProc = Object.entries(procCount).sort((a, b) => b[1] - a[1])[0];
+      const topProcLabel = topProc ? ((procedimentoConsultaLabels as any)[topProc[0]] || topProc[0]) : "—";
+      const topProcCount = topProc ? topProc[1] : 0;
+
+      const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 
       setKpis([
-        { label: "Pacientes Ativos", value: String(pacCount), change: "", icon: Users, color: "primary", trend: "up" },
-        { label: "Sessões Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "info", trend: "neutral" },
-        { label: "Insumos Críticos", value: String(criticalCount), change: "", icon: Package, color: "warning", trend: "neutral" },
-        { label: "Consultas Semana", value: String(weekAg.length), change: `${weekConfirmed} confirmadas`, icon: FileCheck, color: "success", trend: "up" },
+        { label: "Consultas Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "primary", trend: "neutral" },
+        { label: "Faturamento do Mês", value: brl(faturamentoMes), change: `${monthAg.filter((a: any) => a.status === "realizado").length} realizadas`, icon: DollarSign, color: "success", trend: "up" },
+        { label: "Novos Pacientes do Mês", value: String(novosPacientes), change: now.toLocaleDateString("pt-BR", { month: "long" }), icon: UserPlus, color: "info", trend: "up" },
+        { label: "Insumos Críticos", value: String(criticalCount), change: criticalCount ? "≤ 15 dias" : "tudo ok", icon: AlertTriangle, color: "warning", trend: "neutral" },
+        { label: "Agenda do Dia", value: String(todayRemaining), change: `${todayAg.length} no total`, icon: CalendarDays, color: "primary", trend: "neutral" },
+        { label: "Pagamentos Atrasados", value: String(atrasados.length), change: totalAtrasado ? brl(totalAtrasado) : "em dia", icon: CreditCard, color: "destructive", trend: "neutral" },
+        { label: "Tratamentos em Andamento", value: String(tratamentosAndamento), change: "pacientes ativos", icon: Activity, color: "info", trend: "neutral" },
+        { label: "Top Procedimento", value: topProcLabel, change: topProcCount ? `${topProcCount}x no mês` : "sem dados", icon: Star, color: "success", trend: "up" },
       ]);
 
       // Receita da Semana
@@ -203,7 +238,7 @@ const Dashboard = () => {
                 <div className="flex items-start justify-between gap-1 h-full">
                   <div className="space-y-0.5 sm:space-y-1 min-w-0">
                     <p className="text-[10px] sm:text-[13px] text-muted-foreground font-medium truncate">{kpi.label}</p>
-                    <p className="text-lg sm:text-2xl font-display font-bold text-foreground">{kpi.value}</p>
+                    <p className="text-base sm:text-xl font-display font-bold text-foreground truncate">{kpi.value}</p>
                     <p className={cn("text-[9px] sm:text-xs font-medium truncate min-h-[1rem] sm:min-h-[1.25rem]", kpi.trend === "up" ? "text-success" : "text-muted-foreground")}>
                       {kpi.change || "\u00A0"}
                     </p>
