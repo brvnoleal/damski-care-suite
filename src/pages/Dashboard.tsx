@@ -60,8 +60,8 @@ const Dashboard = () => {
   }, []);
 
   const [kpis, setKpis] = useState([
-    { label: "Pacientes Ativos", value: "—", change: "carregando...", icon: Users, color: "primary" as const, trend: "neutral" },
-    { label: "Sessões Hoje", value: "—", change: "", icon: Calendar, color: "info" as const, trend: "neutral" },
+    { label: "Novos Pacientes este mês", value: "—", change: "carregando...", icon: Users, color: "primary" as const, trend: "neutral" },
+    { label: "Consultas Hoje", value: "—", change: "", icon: Calendar, color: "info" as const, trend: "neutral" },
     { label: "Insumos Críticos", value: "—", change: "", icon: Package, color: "warning" as const, trend: "neutral" },
     { label: "Consultas Semana", value: "—", change: "", icon: FileCheck, color: "success" as const, trend: "up" },
   ]);
