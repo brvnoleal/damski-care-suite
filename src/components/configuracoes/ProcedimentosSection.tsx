@@ -14,13 +14,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -252,60 +246,59 @@ export default function ProcedimentosSection() {
         )}
       </div>
 
-      <Sheet open={open} onOpenChange={(o) => (o ? setOpen(true) : handleClose())}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>
-              {editing ? "Editar Procedimento" : "Novo Procedimento"}
-            </SheetTitle>
-          </SheetHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Procedimento</Label>
-              <Input
-                value={form.nome}
-                onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                placeholder="Ex: Limpeza"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Plano</Label>
-              <Input
-                value={form.plano}
-                onChange={(e) => setForm({ ...form, plano: e.target.value })}
-                placeholder="Ex: Particular, Unimed..."
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Especialidade</Label>
-              <Input
-                value={form.especialidade}
-                onChange={(e) => setForm({ ...form, especialidade: e.target.value })}
-                placeholder="Ex: Ortodontia"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Preço (R$)</Label>
-              <Input
-                type="number"
-                step="0.01"
-                min="0"
-                value={form.preco}
-                onChange={(e) => setForm({ ...form, preco: e.target.value })}
-                placeholder="0,00"
-              />
-            </div>
-          </div>
-          <SheetFooter>
-            <Button variant="outline" onClick={handleClose}>
+      <ResponsiveDialog
+        open={open}
+        onOpenChange={(o) => (o ? setOpen(true) : handleClose())}
+        title={editing ? "Editar Procedimento" : "Novo Procedimento"}
+        footer={
+          <>
+            <Button variant="outline" onClick={handleClose} className="flex-1 sm:flex-none">
               Cancelar
             </Button>
-            <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
+            <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="flex-1 sm:flex-none">
               {saveMutation.isPending ? "Salvando..." : "Salvar"}
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Procedimento</Label>
+            <Input
+              value={form.nome}
+              onChange={(e) => setForm({ ...form, nome: e.target.value })}
+              placeholder="Ex: Limpeza"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Plano</Label>
+            <Input
+              value={form.plano}
+              onChange={(e) => setForm({ ...form, plano: e.target.value })}
+              placeholder="Ex: Particular, Unimed..."
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Especialidade</Label>
+            <Input
+              value={form.especialidade}
+              onChange={(e) => setForm({ ...form, especialidade: e.target.value })}
+              placeholder="Ex: Ortodontia"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Preço (R$)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.preco}
+              onChange={(e) => setForm({ ...form, preco: e.target.value })}
+              placeholder="0,00"
+            />
+          </div>
+        </div>
+      </ResponsiveDialog>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>
