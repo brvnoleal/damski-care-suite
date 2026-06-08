@@ -39,6 +39,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useClinicaContext } from "@/hooks/useClinicaContext";
 import { Building2 } from "lucide-react";
+import GlobalSearch from "@/components/GlobalSearch";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -184,13 +185,15 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           </button>
 
           {clinicaNome && (
-            <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
+            <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-foreground/80 shrink-0">
               <Building2 className="w-4 h-4 text-primary" />
-              <span className="truncate max-w-[200px]">{clinicaNome}</span>
+              <span>{clinicaNome}</span>
             </div>
           )}
 
-          <div className="flex-1" />
+          <div className="flex-1 flex justify-center px-2">
+            <GlobalSearch />
+          </div>
 
           <Popover>
             <PopoverTrigger asChild>
@@ -267,10 +270,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           >
             <Settings className="w-[18px] h-[18px]" />
           </button>
-
-          <Badge variant="outline" className="text-[11px] font-medium hidden sm:flex border-border text-muted-foreground">
-            RDC 1.002/2025
-          </Badge>
         </header>
 
         {/* Content */}
