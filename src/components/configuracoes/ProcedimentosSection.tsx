@@ -14,13 +14,7 @@ import {
   TableBody,
   TableCell,
 } from "@/components/ui/table";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
