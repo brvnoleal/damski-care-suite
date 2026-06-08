@@ -31,6 +31,9 @@ const roleColors: Record<AppRole, string> = {
   super_admin: "bg-destructive/10 text-destructive",
 };
 
+// Roles selectable by clinic admins (super_admin is reserved and granted only via DB)
+const assignableRoles: AppRole[] = ["admin", "responsavel_tecnico", "recepcionista"];
+
 interface UserWithRole {
   id: string;
   user_id: string;
@@ -331,7 +334,7 @@ const Configuracoes = () => {
                 <Select value={editRole} onValueChange={(v) => setEditRole(v as AppRole)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {(Object.keys(roleLabels) as AppRole[]).map(r => (
+                    {assignableRoles.map(r => (
                       <SelectItem key={r} value={r}>{roleLabels[r]}</SelectItem>
                     ))}
                   </SelectContent>
@@ -376,7 +379,7 @@ const Configuracoes = () => {
               <Select value={newRole} onValueChange={(v) => setNewRole(v as AppRole)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(roleLabels) as AppRole[]).map(r => (
+                  {assignableRoles.map(r => (
                     <SelectItem key={r} value={r}>{roleLabels[r]}</SelectItem>
                   ))}
                 </SelectContent>
