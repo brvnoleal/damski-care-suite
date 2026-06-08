@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
 
     // Confirma clínica
     const { data: clinica } = await admin.from("clinica").select("id, status").eq("id", body.clinica_id).maybeSingle();
-    if (!clinica || clinica.status !== "ativo") {
+    if (!clinica || (clinica.status !== "ativa" && clinica.status !== "ativo")) {
       return new Response(JSON.stringify({ error: "Clínica inválida" }), {
         status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
