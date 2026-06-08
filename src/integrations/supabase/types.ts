@@ -90,6 +90,92 @@ export type Database = {
           },
         ]
       }
+      anamnese_tentativa: {
+        Row: {
+          bloqueado_ate: string | null
+          clinica_id: string
+          cpf_hash: string
+          created_at: string
+          id: string
+          tentativas: number
+          updated_at: string
+        }
+        Insert: {
+          bloqueado_ate?: string | null
+          clinica_id: string
+          cpf_hash: string
+          created_at?: string
+          id?: string
+          tentativas?: number
+          updated_at?: string
+        }
+        Update: {
+          bloqueado_ate?: string | null
+          clinica_id?: string
+          cpf_hash?: string
+          created_at?: string
+          id?: string
+          tentativas?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anamnese_tentativa_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      anamnese_token: {
+        Row: {
+          clinica_id: string
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          id: string
+          paciente_id: string | null
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          clinica_id: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          paciente_id?: string | null
+          token?: string
+          used_at?: string | null
+        }
+        Update: {
+          clinica_id?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          id?: string
+          paciente_id?: string | null
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anamnese_token_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "anamnese_token_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "paciente"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -559,6 +645,69 @@ export type Database = {
             columns: ["clinica_id"]
             isOneToOne: false
             referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paciente_anamnese: {
+        Row: {
+          assinatura_em: string
+          assinatura_ip: string | null
+          assinatura_paciente: string
+          assinatura_user_agent: string | null
+          clinica_id: string
+          created_at: string
+          id: string
+          origem: string
+          paciente_id: string
+          respostas: Json
+          token_id: string | null
+          updated_at: string
+          versao: number
+        }
+        Insert: {
+          assinatura_em?: string
+          assinatura_ip?: string | null
+          assinatura_paciente: string
+          assinatura_user_agent?: string | null
+          clinica_id: string
+          created_at?: string
+          id?: string
+          origem?: string
+          paciente_id: string
+          respostas?: Json
+          token_id?: string | null
+          updated_at?: string
+          versao?: number
+        }
+        Update: {
+          assinatura_em?: string
+          assinatura_ip?: string | null
+          assinatura_paciente?: string
+          assinatura_user_agent?: string | null
+          clinica_id?: string
+          created_at?: string
+          id?: string
+          origem?: string
+          paciente_id?: string
+          respostas?: Json
+          token_id?: string | null
+          updated_at?: string
+          versao?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paciente_anamnese_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paciente_anamnese_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "paciente"
             referencedColumns: ["id"]
           },
         ]
