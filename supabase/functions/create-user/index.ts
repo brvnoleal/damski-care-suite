@@ -41,9 +41,13 @@ Deno.serve(async (req) => {
       throw new Error("Campos obrigatórios: nome, email, cpf, role");
     }
 
-    const allowedRoles = ["admin", "responsavel_tecnico", "recepcionista"];
+    // Only super_admin can assign elevated roles (admin, responsavel_tecnico).
+    // Clinic admins may only create recepcionista accounts.
+    const allowedRoles = isSuper
+      ? ["admin", "responsavel_tecnico", "recepcionista"]
+      : ["recepcionista"];
     if (!allowedRoles.includes(role)) {
-      throw new Error("Papel inválido");
+      throw new Error("Papel inválido para o seu nível de acesso");
     }
 
     // Super admin can target any clínica; regular admin can only create in own clínica
