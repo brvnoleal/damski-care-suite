@@ -148,7 +148,6 @@ const Agenda = () => {
     else if (viewMode === "semana") setCurrentDate(new Date(currentDate.getTime() + 7 * 86400000));
     else setCurrentDate(new Date(currentDate.getTime() + 86400000));
   };
-  const goToday = () => setCurrentDate(new Date());
 
   const headerLabel = useMemo(() => {
     if (viewMode === "mes") return `${monthNames[month]} ${year}`;
@@ -195,7 +194,6 @@ const Agenda = () => {
               <TabsTrigger value="mes" className="text-xs px-3">Mês</TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button variant="outline" size="sm" onClick={goToday}>Hoje</Button>
           <div className="flex items-center gap-1">
             <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev}>
               <ChevronLeft className="w-4 h-4" />
