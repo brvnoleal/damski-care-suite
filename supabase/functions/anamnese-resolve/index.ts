@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
       .eq("id", clinicaId!)
       .maybeSingle();
     if (ce) return json({ error: "erro_interno" }, 500);
-    if (!c || c.status !== "ativo") return json({ error: "clinica_indisponivel" }, 404);
+    if (!c || (c.status !== "ativa" && c.status !== "ativo")) return json({ error: "clinica_indisponivel" }, 404);
 
     return json({
       clinica_id: c.id,
