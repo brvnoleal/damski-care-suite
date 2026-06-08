@@ -828,6 +828,10 @@ const PacienteDetalhe = () => {
           </div>
         </TabsContent>
 
+        <TabsContent value="anamnese" className="space-y-4">
+          {id && <AnamneseTab pacienteId={id} />}
+        </TabsContent>
+
         <TabsContent value="lgpd" className="space-y-4">
           {id && <PacienteLGPDPanel pacienteId={id} />}
         </TabsContent>
