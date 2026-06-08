@@ -32,6 +32,7 @@ import { CurrencyInput } from "@/components/ui/currency-input";
 import { processClinicalPhoto } from "@/lib/imageProcessing";
 import { CameraCapture } from "@/components/CameraCapture";
 import { PacienteLGPDPanel } from "@/components/PacienteLGPDPanel";
+import { AnamneseTab } from "@/components/anamnese/AnamneseTab";
 
 const formatDateBR = (iso: string) => {
   if (!iso) return "";
@@ -525,6 +526,9 @@ const PacienteDetalhe = () => {
           </TabsTrigger>
           <TabsTrigger value="insumos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <Syringe className="w-3.5 h-3.5" /> Insumos Utilizados
+          </TabsTrigger>
+          <TabsTrigger value="anamnese" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <ClipboardList className="w-3.5 h-3.5" /> Anamnese
           </TabsTrigger>
           <TabsTrigger value="lgpd" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <FileText className="w-3.5 h-3.5" /> LGPD
