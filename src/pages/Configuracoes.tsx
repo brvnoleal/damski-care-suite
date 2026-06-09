@@ -14,6 +14,7 @@ import type { Database } from "@/integrations/supabase/types";
 import PerfilConsultorio from "@/components/configuracoes/PerfilConsultorio";
 import ProcedimentosSection from "@/components/configuracoes/ProcedimentosSection";
 import { AnamneseLinkSection } from "@/components/configuracoes/AnamneseLinkSection";
+import { ModelosDocumentosSection } from "@/components/configuracoes/ModelosDocumentosSection";
 import { FadeIn } from "@/components/FadeIn";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
@@ -319,6 +320,8 @@ const Configuracoes = () => {
         </LiquidGlassCard>
 
         <ProcedimentosSection />
+
+        <ModelosDocumentosSection />
       </div>
       </FadeIn>
 

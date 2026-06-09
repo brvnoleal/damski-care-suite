@@ -33,6 +33,7 @@ import { processClinicalPhoto } from "@/lib/imageProcessing";
 import { CameraCapture } from "@/components/CameraCapture";
 
 import { AnamneseTab } from "@/components/anamnese/AnamneseTab";
+import { DocumentosPacienteTab } from "@/components/paciente/DocumentosPacienteTab";
 
 const formatDateBR = (iso: string) => {
   if (!iso) return "";
@@ -730,31 +731,7 @@ const PacienteDetalhe = () => {
 
 
         <TabsContent value="documentos" className="space-y-4">
-          {[
-            { name: "TCLE — Termo de Consentimento Livre e Esclarecido", status: "assinado" as const },
-            { name: "Contrato de Prestação de Serviços", status: "assinado" as const },
-            { name: "Orçamento", status: "pendente" as const },
-          ].map((doc, i) => (
-            <LiquidGlassCard key={i} draggable={false} className="p-4 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <FileText className="w-5 h-5 text-muted-foreground shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{doc.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {doc.status === "assinado" ? "Assinado pelo paciente" : "Aguardando assinatura"}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <Badge className={doc.status === "assinado" ? "bg-success/10 text-success border-success/20 text-xs" : "bg-warning/10 text-warning border-warning/20 text-xs"}>
-                  {doc.status === "assinado" ? "Assinado" : "Pendente"}
-                </Badge>
-                <Button variant="outline" size="sm" className="gap-1.5 text-xs" disabled={doc.status !== "assinado"}>
-                  <FileText className="w-3.5 h-3.5" /> Ver Termo
-                </Button>
-              </div>
-            </LiquidGlassCard>
-          ))}
+          {id && <DocumentosPacienteTab pacienteId={id} />}
         </TabsContent>
 
         <TabsContent value="fotos" className="space-y-4">
