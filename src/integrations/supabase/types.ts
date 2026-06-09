@@ -398,6 +398,53 @@ export type Database = {
           },
         ]
       }
+      documento_modelo: {
+        Row: {
+          ativo: boolean
+          clinica_id: string
+          conteudo: string
+          created_at: string
+          id: string
+          nome: string
+          requer_assinatura_paciente: boolean
+          requer_assinatura_responsavel: boolean
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          clinica_id: string
+          conteudo: string
+          created_at?: string
+          id?: string
+          nome: string
+          requer_assinatura_paciente?: boolean
+          requer_assinatura_responsavel?: boolean
+          tipo: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          clinica_id?: string
+          conteudo?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          requer_assinatura_paciente?: boolean
+          requer_assinatura_responsavel?: boolean
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documento_modelo_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evolucao: {
         Row: {
           clinica_id: string
@@ -809,6 +856,123 @@ export type Database = {
             columns: ["clinica_id"]
             isOneToOne: false
             referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paciente_documento: {
+        Row: {
+          assinado_em: string | null
+          assinado_ip: string | null
+          assinado_user_agent: string | null
+          assinatura_paciente_dataurl: string | null
+          assinatura_responsavel_dataurl: string | null
+          clinica_id: string
+          conteudo_renderizado: string
+          created_at: string
+          criado_por: string | null
+          expira_em: string
+          id: string
+          modelo_id: string | null
+          paciente_id: string
+          status: string
+          tipo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          assinado_em?: string | null
+          assinado_ip?: string | null
+          assinado_user_agent?: string | null
+          assinatura_paciente_dataurl?: string | null
+          assinatura_responsavel_dataurl?: string | null
+          clinica_id: string
+          conteudo_renderizado: string
+          created_at?: string
+          criado_por?: string | null
+          expira_em?: string
+          id?: string
+          modelo_id?: string | null
+          paciente_id: string
+          status?: string
+          tipo: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          assinado_em?: string | null
+          assinado_ip?: string | null
+          assinado_user_agent?: string | null
+          assinatura_paciente_dataurl?: string | null
+          assinatura_responsavel_dataurl?: string | null
+          clinica_id?: string
+          conteudo_renderizado?: string
+          created_at?: string
+          criado_por?: string | null
+          expira_em?: string
+          id?: string
+          modelo_id?: string | null
+          paciente_id?: string
+          status?: string
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paciente_documento_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paciente_documento_modelo_id_fkey"
+            columns: ["modelo_id"]
+            isOneToOne: false
+            referencedRelation: "documento_modelo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paciente_documento_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "paciente"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      paciente_documento_token: {
+        Row: {
+          created_at: string
+          documento_id: string
+          expires_at: string
+          id: string
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          documento_id: string
+          expires_at: string
+          id?: string
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          documento_id?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paciente_documento_token_documento_id_fkey"
+            columns: ["documento_id"]
+            isOneToOne: false
+            referencedRelation: "paciente_documento"
             referencedColumns: ["id"]
           },
         ]
