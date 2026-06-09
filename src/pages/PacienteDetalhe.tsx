@@ -31,7 +31,7 @@ import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { processClinicalPhoto } from "@/lib/imageProcessing";
 import { CameraCapture } from "@/components/CameraCapture";
-import { PacienteLGPDPanel } from "@/components/PacienteLGPDPanel";
+
 import { AnamneseTab } from "@/components/anamnese/AnamneseTab";
 
 const formatDateBR = (iso: string) => {
@@ -530,34 +530,61 @@ const PacienteDetalhe = () => {
           <TabsTrigger value="anamnese" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <ClipboardList className="w-3.5 h-3.5" /> Anamnese
           </TabsTrigger>
-          <TabsTrigger value="lgpd" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
-            <FileText className="w-3.5 h-3.5" /> LGPD
-          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="detalhes" className="space-y-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {[
-              { label: "Nº Prontuário", value: patientData.numero_prontuario || "—" },
-              { label: "Data de Nascimento", value: nascFormatted },
-              { label: "CPF", value: patientData.cpf ? patientData.cpf.slice(0, 3) + ".•••.•••-••" : "—" },
-              { label: "RG", value: patientData.rg ? `${formatRG(patientData.rg)}${patientData.emissor ? " — " + patientData.emissor : ""}` : "—" },
-              { label: "Sexo", value: patientData.sexo ? patientData.sexo.charAt(0).toUpperCase() + patientData.sexo.slice(1).replace("_", " ") : "—" },
-              { label: "Estado Civil", value: patientData.estado_civil ? patientData.estado_civil.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
-              { label: "Situação Profissional", value: patientData.situacao_profissional ? patientData.situacao_profissional.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
-              { label: "Telefone", value: patientData.telefone || "—" },
-              { label: "Email", value: patientData.email || "—" },
-              { label: "Instagram", value: patientData.instagram || "—" },
-              { label: "Plano", value: patientData.plano || "—" },
-              { label: "Nº do Plano", value: patientData.numero_plano || "—" },
-            ].map((item, i) => (
-              <LiquidGlassCard key={i} draggable={false} className="p-4">
-                <p className="text-xs text-muted-foreground">{item.label}</p>
-                <p className="text-sm font-medium text-foreground mt-1 break-words">{item.value}</p>
-              </LiquidGlassCard>
-            ))}
-          </div>
+        <TabsContent value="detalhes" className="space-y-6">
+          {(() => {
+            const sections: { title: string; items: { label: string; value: string }[] }[] = [
+              {
+                title: "Identificação",
+                items: [
+                  { label: "Nº Prontuário", value: patientData.numero_prontuario || "—" },
+                  { label: "Data de Nascimento", value: nascFormatted },
+                  { label: "CPF", value: patientData.cpf ? patientData.cpf.slice(0, 3) + ".•••.•••-••" : "—" },
+                  { label: "RG", value: patientData.rg ? `${formatRG(patientData.rg)}${patientData.emissor ? " — " + patientData.emissor : ""}` : "—" },
+                  { label: "Sexo", value: patientData.sexo ? patientData.sexo.charAt(0).toUpperCase() + patientData.sexo.slice(1).replace("_", " ") : "—" },
+                  { label: "Estado Civil", value: patientData.estado_civil ? patientData.estado_civil.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+                  { label: "Situação Profissional", value: patientData.situacao_profissional ? patientData.situacao_profissional.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+                ],
+              },
+              {
+                title: "Contato",
+                items: [
+                  { label: "Telefone", value: patientData.telefone || "—" },
+                  { label: "Email", value: patientData.email || "—" },
+                  { label: "Instagram", value: patientData.instagram || "—" },
+                ],
+              },
+              {
+                title: "Plano",
+                items: [
+                  { label: "Plano", value: patientData.plano || "—" },
+                  { label: "Nº do Plano", value: patientData.numero_plano || "—" },
+                ],
+              },
+            ];
+            return sections.map((section) => (
+              <section key={section.title} className="space-y-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  {section.title}
+                </h3>
+                <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-4 border-t border-border/50 pt-4">
+                  {section.items.map((item) => (
+                    <div key={item.label} className="min-w-0">
+                      <dt className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                        {item.label}
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium text-foreground break-words">
+                        {item.value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            ));
+          })()}
         </TabsContent>
+
 
         <TabsContent value="odontograma" className="space-y-4">
           <Odontograma pacienteId={patientData.id} />
@@ -832,9 +859,6 @@ const PacienteDetalhe = () => {
           {id && <AnamneseTab pacienteId={id} />}
         </TabsContent>
 
-        <TabsContent value="lgpd" className="space-y-4">
-          {id && <PacienteLGPDPanel pacienteId={id} />}
-        </TabsContent>
       </Tabs>
 
       {/* Edit Sheet — mesmos campos do cadastro em Pacientes */}

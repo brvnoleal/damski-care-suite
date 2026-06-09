@@ -76,8 +76,9 @@ export const pacienteService = {
   },
 
   uploadAvatar: async (id: string, file: File): Promise<string> => {
-    const ext = file.name.split(".").pop() || "jpg";
-    const path = `avatars/${id}-${Date.now()}.${ext}`;
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    // RLS exige que o primeiro segmento do path seja o paciente_id.
+    const path = `${id}/avatar-${Date.now()}.${ext}`;
     const { error: upErr } = await supabase.storage
       .from("paciente-fotos")
       .upload(path, file, { contentType: file.type, upsert: true });
