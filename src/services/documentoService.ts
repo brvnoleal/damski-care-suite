@@ -142,12 +142,15 @@ export const documentoService = {
     if (pe) throw pe;
     if (!paciente) throw new Error("Paciente não encontrado.");
 
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Sessão expirada. Faça login novamente.");
     const { data: membro } = await supabase
       .from("clinica_membro")
       .select("clinica_id")
+      .eq("user_id", user.id)
       .maybeSingle();
     const clinicaId = membro?.clinica_id;
-    if (!clinicaId) throw new Error("Clínica não identificada.");
+    if (!clinicaId) throw new Error("Usuário sem clínica vinculada.");
 
     const { data: clinica } = await supabase
       .from("clinica")
