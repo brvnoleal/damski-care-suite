@@ -39,7 +39,7 @@ export default function Login() {
           <img
             src={logo.url}
             alt="CloudSmile - Sistema de gestão para clínicas odontológicas"
-            className="w-full max-w-sm h-auto drop-shadow-xl"
+            className="w-full max-w-sm h-auto"
           />
           <p className="mt-6 text-muted-foreground">
             Gestão inteligente para a sua clínica odontológica.
