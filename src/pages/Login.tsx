@@ -34,7 +34,7 @@ export default function Login() {
 
   return (
     <main className="min-h-screen grid lg:grid-cols-2 bg-background">
-      <section className="hidden lg:flex items-center justify-center p-10 bg-white">
+      <section className="hidden lg:flex items-center justify-end p-6 bg-white">
         <div className="flex flex-col items-center text-center max-w-md">
           <img
             src={logo.url}
@@ -47,7 +47,7 @@ export default function Login() {
         </div>
       </section>
 
-      <section className="flex items-center justify-center p-4">
+      <section className="flex items-center justify-start p-6">
         <Card className="w-full max-w-md">
           <CardHeader>
             <div className="flex justify-center lg:hidden mb-4">
