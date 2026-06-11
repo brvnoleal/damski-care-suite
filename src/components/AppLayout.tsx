@@ -1,5 +1,6 @@
 import { useState, useSyncExternalStore, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion, LayoutGroup } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard,
@@ -124,52 +125,71 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
         {/* Nav */}
         <TooltipProvider delayDuration={200}>
-          <nav className={cn("flex-1 py-4 space-y-1 overflow-y-auto", collapsed ? "lg:px-2 px-3" : "px-3")}>
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.href;
-              const link = (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                    collapsed && "lg:justify-center lg:px-2",
-                    isActive
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60"
-                  )}
-                >
-                  <item.icon className="w-[18px] h-[18px] shrink-0" />
-                  <span className={cn(collapsed && "lg:hidden")}>{item.name}</span>
-                </Link>
-              );
-              return collapsed ? (
-                <Tooltip key={item.name}>
-                  <TooltipTrigger asChild>{link}</TooltipTrigger>
-                  <TooltipContent side="right">{item.name}</TooltipContent>
-                </Tooltip>
-              ) : (
-                link
-              );
-            })}
+          <LayoutGroup id="sidebar-nav">
+            <nav className={cn("flex-1 py-4 space-y-1 overflow-y-auto", collapsed ? "lg:px-2 px-3" : "px-3")}>
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.href;
+                const link = (
+                  <motion.div
+                    key={item.name}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    className="relative"
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="sidebar-active-pill"
+                        className="absolute inset-0 rounded-full bg-sidebar-accent shadow-[0_4px_14px_-2px_rgba(0,0,0,0.35)]"
+                        transition={{ type: "spring", stiffness: 380, damping: 32, mass: 0.8 }}
+                      />
+                    )}
+                    <Link
+                      to={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={cn(
+                        "relative flex items-center gap-3 px-3 py-2 rounded-full text-sm transition-colors duration-200",
+                        collapsed && "lg:justify-center lg:px-2",
+                        isActive
+                          ? "text-sidebar-accent-foreground font-semibold"
+                          : "text-sidebar-foreground/60 hover:text-sidebar-foreground font-medium"
+                      )}
+                    >
+                      <item.icon className={cn("w-[18px] h-[18px] shrink-0 transition-transform duration-200", isActive && "scale-110")} />
+                      <span className={cn(collapsed && "lg:hidden")}>{item.name}</span>
+                    </Link>
+                  </motion.div>
+                );
+                return collapsed ? (
+                  <Tooltip key={item.name}>
+                    <TooltipTrigger asChild>{link}</TooltipTrigger>
+                    <TooltipContent side="right">{item.name}</TooltipContent>
+                  </Tooltip>
+                ) : (
+                  link
+                );
+              })}
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={handleLogout}
-                  className={cn(
-                    "w-full mt-2 pt-3 border-t border-sidebar-border flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors",
-                    collapsed && "lg:justify-center lg:px-2"
-                  )}
-                >
-                  <LogOut className="w-[18px] h-[18px] shrink-0" />
-                  <span className={cn(collapsed && "lg:hidden")}>Sair</span>
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="right">Sair</TooltipContent>
-            </Tooltip>
-          </nav>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    onClick={handleLogout}
+                    className={cn(
+                      "w-full mt-2 pt-3 border-t border-sidebar-border flex items-center gap-3 px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors",
+                      collapsed && "lg:justify-center lg:px-2"
+                    )}
+                  >
+                    <LogOut className="w-[18px] h-[18px] shrink-0" />
+                    <span className={cn(collapsed && "lg:hidden")}>Sair</span>
+                  </motion.button>
+                </TooltipTrigger>
+                <TooltipContent side="right">Sair</TooltipContent>
+              </Tooltip>
+            </nav>
+          </LayoutGroup>
         </TooltipProvider>
       </aside>
 
