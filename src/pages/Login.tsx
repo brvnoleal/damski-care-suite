@@ -34,7 +34,7 @@ export default function Login() {
 
   return (
     <main className="min-h-screen grid lg:grid-cols-2 bg-background">
-      <section className="hidden lg:flex items-center justify-center p-10 bg-gradient-to-br from-primary/10 via-background to-primary/5">
+      <section className="hidden lg:flex items-center justify-center p-10 bg-white">
         <div className="flex flex-col items-center text-center max-w-md">
           <img
             src={logo.url}
