@@ -1,5 +1,6 @@
 import { useState, useSyncExternalStore, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion, LayoutGroup } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LayoutDashboard,
