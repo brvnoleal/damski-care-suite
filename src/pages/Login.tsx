@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
+import logo from "@/assets/cloudsmile-logo.png.asset.json";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -32,33 +33,51 @@ export default function Login() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Acessar o sistema</CardTitle>
-          <CardDescription>Entre com seu e-mail e senha</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">E-mail</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+    <main className="min-h-screen grid lg:grid-cols-2 bg-background">
+      <section className="hidden lg:flex items-center justify-center p-10 bg-gradient-to-br from-primary/10 via-background to-primary/5">
+        <div className="flex flex-col items-center text-center max-w-md">
+          <img
+            src={logo.url}
+            alt="CloudSmile - Sistema de gestão para clínicas odontológicas"
+            className="w-full max-w-sm h-auto drop-shadow-xl"
+          />
+          <p className="mt-6 text-muted-foreground">
+            Gestão inteligente para a sua clínica odontológica.
+          </p>
+        </div>
+      </section>
+
+      <section className="flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <div className="flex justify-center lg:hidden mb-4">
+              <img src={logo.url} alt="CloudSmile" className="h-16 w-auto" />
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Senha</Label>
-                <Link to="/esqueci-senha" className="text-xs text-primary hover:underline">
-                  Esqueci minha senha
-                </Link>
+            <CardTitle>Acessar o sistema</CardTitle>
+            <CardDescription>Entre com seu e-mail e senha</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">E-mail</Label>
+                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
               </div>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Entrando..." : "Entrar"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Senha</Label>
+                  <Link to="/esqueci-senha" className="text-xs text-primary hover:underline">
+                    Esqueci minha senha
+                  </Link>
+                </div>
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Entrando..." : "Entrar"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </section>
     </main>
   );
 }
