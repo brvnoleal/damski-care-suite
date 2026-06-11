@@ -191,24 +191,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
             </nav>
           </LayoutGroup>
         </TooltipProvider>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  onClick={handleLogout}
-                  className={cn(
-                    "w-full mt-2 pt-3 border-t border-sidebar-border flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors",
-                    collapsed && "lg:justify-center lg:px-2"
-                  )}
-                >
-                  <LogOut className="w-[18px] h-[18px] shrink-0" />
-                  <span className={cn(collapsed && "lg:hidden")}>Sair</span>
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="right">Sair</TooltipContent>
-            </Tooltip>
-          </nav>
-        </TooltipProvider>
       </aside>
 
       {/* Main */}
