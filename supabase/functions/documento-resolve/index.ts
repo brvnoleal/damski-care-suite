@@ -47,7 +47,8 @@ Deno.serve(async (req) => {
       clinica_nome: c?.nome ?? null,
     });
   } catch (e) {
-    return json({ error: "erro_interno", detail: String(e) }, 500);
+    console.error("documento-resolve error:", e);
+    return json({ error: "erro_interno" }, 500);
   }
 });
 
