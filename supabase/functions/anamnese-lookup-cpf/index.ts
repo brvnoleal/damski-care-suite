@@ -105,7 +105,8 @@ Deno.serve(async (req) => {
       ano_nascimento: paciente?.data_nascimento ? new Date(paciente.data_nascimento).getUTCFullYear() : null,
     }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e: any) {
-    return new Response(JSON.stringify({ error: e.message || "Erro inesperado" }), {
+    console.error(e);
+    return new Response(JSON.stringify({ error: "Erro inesperado" }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

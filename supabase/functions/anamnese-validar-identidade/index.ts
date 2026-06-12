@@ -80,7 +80,8 @@ Deno.serve(async (req) => {
       paciente_id: valido ? paciente!.id : null,
     }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e: any) {
-    return new Response(JSON.stringify({ error: e.message || "Erro inesperado" }), {
+    console.error(e);
+    return new Response(JSON.stringify({ error: "Erro inesperado" }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
