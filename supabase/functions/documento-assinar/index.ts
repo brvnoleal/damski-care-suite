@@ -8,11 +8,30 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const token = typeof body?.token === "string" ? body.token.trim() : "";
     const assinatura = typeof body?.assinatura === "string" ? body.assinatura : "";
-    if (!token || !assinatura.startsWith("data:image/")) {
+    if (!token) {
       return json({ error: "parametros_invalidos" }, 400);
+    }
+    const ALLOWED_PREFIXES = ["data:image/png;base64,", "data:image/jpeg;base64,", "data:image/webp;base64,"];
+    const prefix = ALLOWED_PREFIXES.find((p) => assinatura.startsWith(p));
+    if (!prefix) {
+      return json({ error: "tipo_invalido" }, 400);
     }
     if (assinatura.length > 600_000) {
       return json({ error: "assinatura_muito_grande" }, 400);
+    }
+    // Verify magic bytes match declared MIME
+    try {
+      const b64 = assinatura.slice(prefix.length);
+      const head = atob(b64.slice(0, 24));
+      const b = new Uint8Array([...head].map((c) => c.charCodeAt(0)));
+      const isPng = b.length >= 8 && b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47;
+      const isJpeg = b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff;
+      const isWebp = b.length >= 12 && b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 && b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50;
+      const declared = prefix.includes("png") ? "png" : prefix.includes("jpeg") ? "jpeg" : "webp";
+      const matches = (declared === "png" && isPng) || (declared === "jpeg" && isJpeg) || (declared === "webp" && isWebp);
+      if (!matches) return json({ error: "tipo_invalido" }, 400);
+    } catch {
+      return json({ error: "tipo_invalido" }, 400);
     }
 
     const admin = createClient(
