@@ -19,7 +19,7 @@ Deno.serve(async (req) => {
       .select("documento_id, used_at, expires_at")
       .eq("token", token)
       .maybeSingle();
-    if (error) return json({ error: "erro_interno", detail: error.message }, 500);
+    if (error) { console.error("documento-resolve token:", error); return json({ error: "erro_interno" }, 500); }
     if (!t) return json({ error: "link_invalido" }, 404);
     if (t.used_at) return json({ error: "link_usado" }, 410);
     if (new Date(t.expires_at) < new Date()) return json({ error: "link_expirado" }, 410);
@@ -47,7 +47,8 @@ Deno.serve(async (req) => {
       clinica_nome: c?.nome ?? null,
     });
   } catch (e) {
-    return json({ error: "erro_interno", detail: String(e) }, 500);
+    console.error("documento-resolve error:", e);
+    return json({ error: "erro_interno" }, 500);
   }
 });
 

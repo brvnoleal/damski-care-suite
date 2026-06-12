@@ -52,7 +52,8 @@ Deno.serve(async (req) => {
       origem,
     });
   } catch (e) {
-    return json({ error: "erro_interno", detail: String(e) }, 500);
+    console.error("anamnese-resolve error:", e);
+    return json({ error: "erro_interno" }, 500);
   }
 });
 
