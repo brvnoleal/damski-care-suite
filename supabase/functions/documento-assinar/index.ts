@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
         assinado_user_agent: ua,
       })
       .eq("id", t.documento_id);
-    if (ue) return json({ error: "erro_interno", detail: ue.message }, 500);
+    if (ue) { console.error("documento-assinar update:", ue); return json({ error: "erro_interno" }, 500); }
 
     await admin
       .from("paciente_documento_token")
@@ -56,7 +56,8 @@ Deno.serve(async (req) => {
 
     return json({ ok: true });
   } catch (e) {
-    return json({ error: "erro_interno", detail: String(e) }, 500);
+    console.error("documento-assinar error:", e);
+    return json({ error: "erro_interno" }, 500);
   }
 });
 
