@@ -34,7 +34,7 @@ export function ResponsiveDialog({
       <SheetContent
         side="right"
         className={cn(
-          "w-full sm:max-w-lg p-0 flex flex-col gap-0",
+          "!top-4 !bottom-4 !h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] sm:max-w-lg p-0 flex flex-col gap-0 rounded-2xl overflow-hidden border border-border shadow-2xl",
           className,
         )}
       >
