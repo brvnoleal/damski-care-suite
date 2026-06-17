@@ -315,7 +315,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 mt-14 h-[calc(100vh-56px)] overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 mt-14 h-[calc(100vh-56px)] overflow-hidden rounded-tr-2xl">
         {/* Content */}
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
           <div className="animate-fade-in">{children}</div>
