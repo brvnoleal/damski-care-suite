@@ -27,6 +27,7 @@ description: Sidebar has a fixed hamburger Menu toggle at the very top, separate
 - On desktop: the toggle switches the sidebar between `72px` (icon-only) and `260px` (icons + labels). The dashboard main area resizes to fill the remaining width.
 - On mobile: the toggle opens/closes the off-canvas sidebar drawer.
 - The toggle button stays in the same position at the top of the sidebar at all times.
+- Right-side form popups (e.g. Nova Consulta) float with visible top/bottom spacing, rounded corners, and internal scrolling instead of touching the viewport edges.
 
 ## Why
 Putting the menu control at the top of the sidebar, separated by a line, makes the relationship explicit: it controls the icons below it. Removing the menu toggle and clinic name from the header keeps the header clean and lets the search sit centered.
