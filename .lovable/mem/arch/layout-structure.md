@@ -20,7 +20,7 @@ description: Sidebar has a fixed hamburger Menu toggle at the very top, separate
 - Layout is a single grid row: `1fr auto 1fr`.
   - Left column: empty spacer.
   - Center column: patient search centered within the remaining space (up to `max-w-md`).
-  - Right column: notifications + settings icons aligned to the right.
+  - Right column: notifications icon aligned to the right.
 - Only the standard header bottom border separates it from the main content.
 
 ## Behavior
