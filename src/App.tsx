@@ -14,6 +14,8 @@ import Agendamentos from "./pages/Agendamentos";
 import Insumos from "./pages/Insumos";
 import Financeiro from "./pages/Financeiro";
 import Configuracoes from "./pages/Configuracoes";
+import Procedimentos from "./pages/Procedimentos";
+import Documentos from "./pages/Documentos";
 import SuperAdmin from "./pages/SuperAdmin";
 import Login from "./pages/Login";
 import EsqueciSenha from "./pages/EsqueciSenha";
@@ -55,6 +57,8 @@ const App = () => {
                       <Route path="/agendamentos" element={<Agendamentos />} />
                       <Route path="/insumos" element={<Insumos />} />
                       <Route path="/financeiro" element={<Financeiro />} />
+                      <Route path="/procedimentos" element={<Procedimentos />} />
+                      <Route path="/documentos" element={<Documentos />} />
                       <Route path="/configuracoes" element={<Configuracoes />} />
                       <Route path="/super-admin" element={<SuperAdmin />} />
                       <Route path="*" element={<NotFound />} />

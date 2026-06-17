@@ -16,6 +16,9 @@ import {
   Bell,
   CheckCheck,
   LogOut,
+  ClipboardList,
+  FileText,
+
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -49,7 +52,9 @@ const navigation = [
   { name: "Agenda", href: "/agenda", icon: Calendar },
   { name: "Consultas", href: "/agendamentos", icon: CalendarDays },
   { name: "Pacientes", href: "/pacientes", icon: Users },
-  { name: "Dentistas", href: "/dentistas", icon: UserCog },
+  { name: "Procedimentos", href: "/procedimentos", icon: ClipboardList },
+  { name: "Usuários", href: "/dentistas", icon: UserCog },
+  { name: "Documentos", href: "/documentos", icon: FileText },
   { name: "Insumos", href: "/insumos", icon: Package },
   { name: "Relatórios", href: "/financeiro", icon: DollarSign },
 ];
