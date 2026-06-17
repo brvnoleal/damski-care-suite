@@ -184,13 +184,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         {/* Top bar — clean white, centered search */}
         <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 glass-header grid grid-cols-3 items-center gap-4">
-          <button
-            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            onClick={handleMenuToggle}
-            title={isDesktop ? (collapsed ? "Expandir menu" : "Recolher menu") : "Menu"}
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+          <div />
 
           {clinicaNome && (
             <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-foreground/80 shrink-0">
