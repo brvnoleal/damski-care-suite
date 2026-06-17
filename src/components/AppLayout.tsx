@@ -199,11 +199,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Top bar — clean white */}
+        {/* Top bar — clean white, fixed menu toggle */}
         <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 flex items-center gap-4 glass-header">
           <button
-            className="lg:hidden text-muted-foreground hover:text-foreground"
-            onClick={() => setSidebarOpen(true)}
+            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            onClick={handleMenuToggle}
+            title={isDesktop ? (collapsed ? "Expandir menu" : "Recolher menu") : "Menu"}
           >
             <Menu className="w-5 h-5" />
           </button>
