@@ -232,8 +232,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                       to={item.href}
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
-                        "relative flex items-center gap-3 px-3 py-2 rounded-full text-sm transition-colors duration-200",
-                        collapsed && "lg:justify-center lg:px-2",
+                        "relative flex items-center px-3 py-2 rounded-full text-sm transition-colors duration-200",
                         isActive
                           ? "text-sidebar-accent-foreground font-semibold"
                           : "text-sidebar-foreground/60 hover:text-sidebar-foreground font-medium"
@@ -241,9 +240,11 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                     >
                       <item.icon className={cn("w-[18px] h-[18px] shrink-0 transition-transform duration-200", isActive && "scale-110")} />
                       <span className={cn(
-                        "whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden",
-                        collapsed ? "lg:w-0 lg:opacity-0" : "w-auto opacity-100"
-                      )}>{item.name}</span>
+                        "overflow-hidden transition-all duration-300 ease-in-out",
+                        collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[180px] opacity-100 ml-3"
+                      )}>
+                        <span className="whitespace-nowrap">{item.name}</span>
+                      </span>
                     </Link>
                   </motion.div>
                 );
