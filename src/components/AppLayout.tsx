@@ -140,7 +140,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                     {isActive && (
                       <motion.div
                         layoutId="sidebar-active-pill"
-                        className="absolute inset-0 rounded-full bg-sidebar-accent shadow-[0_4px_14px_-2px_rgba(0,0,0,0.35)]"
+                        className="absolute inset-0 rounded-2xl bg-sidebar-accent shadow-[0_1px_2px_0_rgba(17,17,17,0.04),0_4px_12px_-6px_rgba(17,17,17,0.08)]"
                         transition={{ type: "spring", stiffness: 380, damping: 32, mass: 0.8 }}
                       />
                     )}

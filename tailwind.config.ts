@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["'Plus Jakarta Sans'", "sans-serif"],
-        body: ["'IBM Plex Sans'", "sans-serif"],
+        display: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "SF Pro Display", "sans-serif"],
+        body: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "SF Pro Display", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
