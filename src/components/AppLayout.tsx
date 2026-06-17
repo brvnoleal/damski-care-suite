@@ -197,12 +197,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
       </header>
 
-      {/* Sidebar — clean white surface, animates independently */}
+      {/* Sidebar — clean white surface, fixed width, labels expand/collapse */}
       <aside
         className={cn(
           "fixed left-0 z-40 flex flex-col overflow-hidden transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 lg:z-auto shrink-0",
           "glass-sidebar text-sidebar-foreground",
-          collapsed ? "lg:w-[72px] w-[260px]" : "w-[260px]",
+          "w-[260px]",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           "mt-14 h-[calc(100vh-56px)]"
         )}
