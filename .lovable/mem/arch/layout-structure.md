@@ -9,6 +9,8 @@ description: Sidebar has a fixed hamburger Menu toggle at the very top, separate
 - **Top section**: fixed hamburger Menu icon (3 horizontal lines) that toggles the collapsed/expanded state of the navigation icons below.
 - **Separator**: a single hairline below the menu toggle separates it from the navigation icons (Início, Agenda, etc.).
 - **Navigation**: icons sit below the separator. When collapsed, only icons show; when expanded, icons + labels show.
+- **Footer actions**: a "Configurações" link sits just above the "Sair" button.
+- **Separator**: a hairline (`border-t`) separates the "Sair" button from the navigation and "Configurações" items above it.
 - On mobile, the sidebar is an off-canvas drawer; the menu row also contains a close (X) button on the right.
 - The menu toggle itself does not expand/retract — it only controls the icons below it.
 
