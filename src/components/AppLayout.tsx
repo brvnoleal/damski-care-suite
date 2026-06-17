@@ -112,117 +112,92 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         />
       )}
 
-      {/* Top bar — toggle + header side by side */}
-      <div className="fixed top-0 left-0 right-0 z-40 h-14 flex">
-        {/* Toggle area */}
-        <div
-          className={cn(
-            "h-full flex items-center border-b border-sidebar-border bg-sidebar shrink-0",
-            collapsed
-              ? "lg:w-[72px] lg:px-2 lg:justify-center"
-              : "lg:w-[260px] lg:px-3",
-            "w-auto px-2 gap-2"
-          )}
+      {/* Top bar — fixed full width, independent of sidebar width */}
+      <header className="fixed top-0 left-0 right-0 z-50 h-14 glass-header border-b border-border grid grid-cols-[auto_1fr_auto] items-center px-4 lg:px-6 gap-4">
+        <button
+          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-colors"
+          onClick={handleMenuToggle}
+          title={isDesktop ? (collapsed ? "Expandir menu" : "Recolher menu") : "Menu"}
         >
-          <button
-            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
-            onClick={handleMenuToggle}
-            title={isDesktop ? (collapsed ? "Expandir menu" : "Recolher menu") : "Menu"}
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
 
-          {sidebarOpen && (
-            <button
-              className="lg:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
+        <div className="flex justify-center px-2 w-full">
+          <GlobalSearch />
         </div>
 
-        {/* Header — search + notifications */}
-        <header className="flex-1 h-full px-4 lg:px-6 glass-header grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-          <div />
-
-          <div className="flex justify-center px-2 w-full">
-            <GlobalSearch />
-          </div>
-
-          <div className="flex items-center justify-end gap-4">
-            <Popover>
-              <PopoverTrigger asChild>
-                <button className="relative text-muted-foreground hover:text-foreground transition-colors">
-                  <Bell className="w-[18px] h-[18px]" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[10px] text-destructive-foreground flex items-center justify-center font-bold">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
-                </button>
-              </PopoverTrigger>
-              <PopoverContent align="end" className="w-[360px] p-0 my-4 rounded-2xl overflow-hidden border border-border shadow-2xl" sideOffset={8}>
-                <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-popover">
-                  <h3 className="text-sm font-semibold text-foreground">Notificações</h3>
-                  {unreadCount > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-xs h-7 gap-1 text-muted-foreground"
-                      onClick={() => notificationStore.markAllRead()}
-                    >
-                      <CheckCheck className="w-3.5 h-3.5" />
-                      Marcar lidas
-                    </Button>
-                  )}
-                </div>
-                <ScrollArea className="h-[400px]">
-                  <div className="divide-y divide-border">
-                    {notifications.length === 0 ? (
-                      <p className="text-sm text-muted-foreground text-center py-8">Nenhuma notificação.</p>
-                    ) : (
-                      notifications.slice(0, 20).map((n) => (
-                        <div
-                          key={n.id}
-                          className={cn(
-                            "px-4 py-3 cursor-pointer hover:bg-muted transition-colors",
-                            !n.read && "bg-accent/30"
-                          )}
-                          onClick={() => notificationStore.markRead(n.id)}
-                        >
-                          <div className="flex gap-3">
-                            <span className="text-base shrink-0 leading-none mt-0.5">{notificationStore.getIcon(n.type)}</span>
-                            <div className="flex-1 min-w-0 space-y-1">
-                              <div className="flex items-start justify-between gap-2">
-                                <p className={cn("text-sm leading-snug", !n.read ? "font-semibold text-foreground" : "text-foreground")}>
-                                  {n.title}
-                                </p>
-                                {!n.read && <span className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />}
-                              </div>
-                              <p className="text-xs text-muted-foreground leading-relaxed">{n.description}</p>
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0">
-                                  {notificationStore.getModuleLabel(n.module)}
-                                </Badge>
-                                <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                                  {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true, locale: ptBR })}
-                                </span>
-                              </div>
+        <div className="flex items-center justify-end gap-4">
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="relative text-muted-foreground hover:text-foreground transition-colors">
+                <Bell className="w-[18px] h-[18px]" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[10px] text-destructive-foreground flex items-center justify-center font-bold">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-[360px] p-0 my-4 rounded-2xl overflow-hidden border border-border shadow-2xl" sideOffset={8}>
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-popover">
+                <h3 className="text-sm font-semibold text-foreground">Notificações</h3>
+                {unreadCount > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-7 gap-1 text-muted-foreground"
+                    onClick={() => notificationStore.markAllRead()}
+                  >
+                    <CheckCheck className="w-3.5 h-3.5" />
+                    Marcar lidas
+                  </Button>
+                )}
+              </div>
+              <ScrollArea className="h-[400px]">
+                <div className="divide-y divide-border">
+                  {notifications.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-8">Nenhuma notificação.</p>
+                  ) : (
+                    notifications.slice(0, 20).map((n) => (
+                      <div
+                        key={n.id}
+                        className={cn(
+                          "px-4 py-3 cursor-pointer hover:bg-muted transition-colors",
+                          !n.read && "bg-accent/30"
+                        )}
+                        onClick={() => notificationStore.markRead(n.id)}
+                      >
+                        <div className="flex gap-3">
+                          <span className="text-base shrink-0 leading-none mt-0.5">{notificationStore.getIcon(n.type)}</span>
+                          <div className="flex-1 min-w-0 space-y-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className={cn("text-sm leading-snug", !n.read ? "font-semibold text-foreground" : "text-foreground")}>
+                                {n.title}
+                              </p>
+                              {!n.read && <span className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />}
+                            </div>
+                            <p className="text-xs text-muted-foreground leading-relaxed">{n.description}</p>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0">
+                                {notificationStore.getModuleLabel(n.module)}
+                              </Badge>
+                              <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true, locale: ptBR })}
+                              </span>
                             </div>
                           </div>
                         </div>
-                      ))
-                    )}
-                  </div>
-                </ScrollArea>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </header>
-      </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
+        </div>
+      </header>
 
-      {/* Sidebar — clean white surface */}
+      {/* Sidebar — clean white surface, animates independently */}
       <aside
         className={cn(
           "fixed left-0 z-40 flex flex-col transition-all duration-300 lg:relative lg:translate-x-0 lg:z-auto shrink-0",
