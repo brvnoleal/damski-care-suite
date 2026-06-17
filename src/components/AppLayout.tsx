@@ -193,14 +193,13 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Top bar — clean white, centered search */}
-        <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 glass-header grid grid-cols-3 items-center gap-4">
-          <div />
-          <div className="flex justify-center px-2">
+        {/* Top bar — clean white, centered search in available space */}
+        <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 glass-header flex items-center gap-4">
+          <div className="flex justify-center px-2 max-w-md w-full">
             <GlobalSearch />
           </div>
 
-          <div className="flex items-center justify-end gap-4">
+          <div className="flex items-center justify-end gap-4 ml-auto">
             <Popover>
               <PopoverTrigger asChild>
                 <button className="relative text-muted-foreground hover:text-foreground transition-colors">
