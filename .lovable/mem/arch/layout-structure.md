@@ -1,6 +1,6 @@
 ---
 name: App Layout Structure
-description: Sidebar has a fixed hamburger Menu toggle at the top, separated by a line from the navigation icons below; the toggle expands/retracts only the nav icons. Header is white, clinic name removed, search centered.
+description: Sidebar has a fixed hamburger Menu toggle at the top, separated by a line from the navigation icons below. Header is white, clinic name removed, search centered in the available space between the left edge and the right-side icons.
 ---
 # App Layout Structure
 
@@ -15,11 +15,10 @@ description: Sidebar has a fixed hamburger Menu toggle at the top, separated by 
 ## Header
 - Pure white surface (`#FFFFFF`).
 - **No menu toggle** and **no clinic name** inside the header.
-- Layout is a 3-column grid:
-  1. Empty left spacer.
-  2. Centered patient search.
-  3. Notifications + settings icons, aligned to the right.
+- Layout is a single flex row:
+  - Patient search is centered in the available space between the left edge and the right-side icons.
+  - Notifications + settings icons are pushed to the right (`ml-auto`).
 - The header has a bottom border separating it from the main content; no extra line is introduced by the menu control.
 
 ## Why
-Keeping the menu control inside the sidebar, fixed above the navigation, makes the toggle relationship explicit: it directly controls the icons below it. Removing the clinic name and centering the search keeps the header minimal and balanced.
+Keeping the menu control inside the sidebar, fixed above the navigation, makes the toggle relationship explicit: it directly controls the icons below it. Removing the clinic name and centering the search in the available space keeps the header minimal and balanced while letting the search breathe on smaller viewports.
