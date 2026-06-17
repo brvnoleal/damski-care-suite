@@ -32,7 +32,7 @@ description: Menu toggle and header (search + notifications) share a single fixe
 - Separated from the toggle segment by the sidebar's right border logic.
 
 ## Behavior
-- On desktop: the toggle switches the sidebar between `72px` (icon-only) and `260px` (icons + labels). The header and main area resize to fill the remaining width.
+- On desktop: the toggle switches the sidebar between `72px` (icon-only) and `260px` (icons + labels). The width transition/animation is applied **only to the sidebar**; the top bar and header adjust instantly to keep the layout crisp.
 - On mobile: the toggle opens/closes the off-canvas sidebar drawer; the toggle stays in the top bar and the header remains visible beside it.
 - The sidebar and main content area are both offset `56px` from the top so the fixed top bar sits above them.
 
