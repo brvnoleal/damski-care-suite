@@ -14,6 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
+        sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "SF Pro Display", "sans-serif"],
         display: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "SF Pro Display", "sans-serif"],
         body: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "SF Pro Display", "sans-serif"],
       },
