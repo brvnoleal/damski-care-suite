@@ -63,7 +63,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   }, [collapsed]);
   const location = useLocation();
   const navigate = useNavigate();
-  const { clinicaNome, isSuperAdmin } = useClinicaContext();
+  const { isSuperAdmin } = useClinicaContext();
 
   const handleLogout = async () => {
     setSidebarOpen(false);
