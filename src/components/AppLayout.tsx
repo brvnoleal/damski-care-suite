@@ -57,6 +57,15 @@ const navigation = [
 const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<boolean>(() => localStorage.getItem("sidebar_collapsed") === "1");
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== "undefined" && window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 1024px)");
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mql.addEventListener("change", handler);
+    setIsDesktop(mql.matches);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("sidebar_collapsed", collapsed ? "1" : "0");
@@ -69,6 +78,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     setSidebarOpen(false);
     await supabase.auth.signOut();
     navigate("/login", { replace: true });
+  };
+
+  const handleMenuToggle = () => {
+    if (isDesktop) {
+      setCollapsed((c) => !c);
+    } else {
+      setSidebarOpen((o) => !o);
+    }
   };
 
   const notifications = useSyncExternalStore(
