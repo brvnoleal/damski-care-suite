@@ -200,7 +200,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Sidebar — clean white surface, animates independently */}
       <aside
         className={cn(
-          "fixed left-0 z-40 flex flex-col overflow-hidden transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 lg:z-auto shrink-0 rounded-tr-3xl border-t border-sidebar-border",
+          "fixed left-0 z-40 flex flex-col overflow-hidden transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 lg:z-auto shrink-0",
           "glass-sidebar text-sidebar-foreground",
           collapsed ? "lg:w-[72px] w-[260px]" : "w-[260px]",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
