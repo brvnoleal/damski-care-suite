@@ -185,15 +185,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         {/* Top bar — clean white, centered search */}
         <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 glass-header grid grid-cols-3 items-center gap-4">
           <div />
-
-          {clinicaNome && (
-            <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-foreground/80 shrink-0">
-              <Building2 className="w-4 h-4 text-primary" />
-              <span>{clinicaNome}</span>
-            </div>
-          )}
-
-          <div className="flex-1 flex justify-center px-2">
+          <div className="flex justify-center px-2">
             <GlobalSearch />
           </div>
 
