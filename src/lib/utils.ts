@@ -49,3 +49,17 @@ export function maskCpf(cpf?: string | null): string {
   return `${digits.slice(0, 3)}.***.***-**`;
 }
 
+/**
+ * Gera um slug URL-friendly a partir de um texto (remove acentos, espaços e caracteres especiais).
+ */
+export function slugify(text?: string | null): string {
+  if (!text) return "";
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
