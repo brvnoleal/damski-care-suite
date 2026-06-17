@@ -108,40 +108,46 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-foreground/30 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-30 bg-foreground/30 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar — clean white surface */}
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:relative lg:translate-x-0 lg:z-auto shrink-0",
-          "glass-sidebar text-sidebar-foreground",
-          collapsed ? "lg:w-[72px] w-[260px]" : "w-[260px]",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        )}
-      >
-        {/* Sidebar toggle + mobile close */}
-        <div className={cn(
-          "flex items-center h-14 border-b border-sidebar-border",
-          collapsed ? "lg:px-2 px-5 lg:justify-center justify-between" : "px-5 lg:px-3 justify-between"
-        )}>
-          <button
-            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
-            onClick={handleMenuToggle}
-            title={isDesktop ? (collapsed ? "Expandir menu" : "Recolher menu") : "Menu"}
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+      {/* Menu toggle — fixed top-left, outside the sidebar menu */}
+      <div className={cn(
+        "fixed top-0 left-0 z-50 h-14 flex items-center border-b border-sidebar-border bg-sidebar transition-all duration-300",
+        collapsed ? "lg:w-[72px] w-[260px]" : "w-[260px]",
+        collapsed ? "lg:px-2 px-5" : "px-5 lg:px-3",
+        collapsed ? "lg:justify-center justify-between" : "justify-between"
+      )}>
+        <button
+          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
+          onClick={handleMenuToggle}
+          title={isDesktop ? (collapsed ? "Expandir menu" : "Recolher menu") : "Menu"}
+        >
+          <Menu className="w-5 h-5" />
+        </button>
 
+        {sidebarOpen && (
           <button
             className="lg:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="w-5 h-5" />
           </button>
-        </div>
+        )}
+      </div>
+
+      {/* Sidebar — clean white surface */}
+      <aside
+        className={cn(
+          "fixed left-0 z-40 flex flex-col transition-all duration-300 lg:relative lg:translate-x-0 lg:z-auto shrink-0",
+          "glass-sidebar text-sidebar-foreground",
+          collapsed ? "lg:w-[72px] w-[260px]" : "w-[260px]",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          "mt-14 h-[calc(100vh-56px)]"
+        )}
+      >
 
         {/* Nav */}
         <TooltipProvider delayDuration={200}>
