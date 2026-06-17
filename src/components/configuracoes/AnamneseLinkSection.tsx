@@ -1,38 +1,24 @@
-import { useMemo, useState } from "react";
-import { FileText, Copy, ExternalLink, Loader2 } from "lucide-react";
+import { useMemo } from "react";
+import { FileText, Copy, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { toast } from "sonner";
 import { useClinicaContext } from "@/hooks/useClinicaContext";
-import { anamneseService } from "@/services/anamneseService";
+import { slugify } from "@/lib/utils";
 
 export const AnamneseLinkSection = () => {
-  const { clinicaId, loading } = useClinicaContext();
-  const [generating, setGenerating] = useState(false);
+  const { clinicaNome, loading } = useClinicaContext();
 
+  const slug = useMemo(() => slugify(clinicaNome), [clinicaNome]);
   const linkPublico = useMemo(() => {
-    if (!clinicaId) return "";
-    return `${window.location.origin}/anamnese/${clinicaId}`;
-  }, [clinicaId]);
+    if (!slug) return "";
+    return `${window.location.origin}/anamnese/${slug}`;
+  }, [slug]);
 
   const copiar = async () => {
     await navigator.clipboard.writeText(linkPublico);
     toast.success("Link público copiado");
-  };
-
-  const gerarTokenAvulso = async () => {
-    setGenerating(true);
-    try {
-      const t = await anamneseService.gerarTokenIndividual(null);
-      const url = `${window.location.origin}/anamnese/t/${t.token}`;
-      await navigator.clipboard.writeText(url);
-      toast.success("Link de uso único copiado", { description: "Válido por 7 dias." });
-    } catch (e: any) {
-      toast.error(e.message || "Falha ao gerar link");
-    } finally {
-      setGenerating(false);
-    }
   };
 
   return (
@@ -48,8 +34,10 @@ export const AnamneseLinkSection = () => {
           </div>
         </div>
 
-        {loading || !clinicaId ? (
-          <p className="text-sm text-muted-foreground">Carregando...</p>
+        {loading || !slug ? (
+          <p className="text-sm text-muted-foreground">
+            {loading ? "Carregando..." : "Cadastre o nome da clínica em Configurações para gerar o link."}
+          </p>
         ) : (
           <div className="space-y-3">
             <div>
@@ -62,12 +50,8 @@ export const AnamneseLinkSection = () => {
                 </Button>
               </div>
             </div>
-            <Button onClick={gerarTokenAvulso} disabled={generating} variant="outline" className="gap-2 w-full">
-              {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-              Gerar link individual de uso único
-            </Button>
             <p className="text-[11px] text-muted-foreground">
-              O link individual expira em 7 dias e só pode ser usado uma vez. Útil para enviar via WhatsApp/e-mail a um paciente específico.
+              Compartilhe este link para que o paciente preencha a ficha de anamnese antes da consulta.
             </p>
           </div>
         )}

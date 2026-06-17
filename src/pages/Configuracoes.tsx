@@ -2,7 +2,6 @@ import { Shield, Bell } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import PerfilConsultorio from "@/components/configuracoes/PerfilConsultorio";
-import { AnamneseLinkSection } from "@/components/configuracoes/AnamneseLinkSection";
 import { FadeIn } from "@/components/FadeIn";
 
 const Configuracoes = () => {
@@ -18,7 +17,6 @@ const Configuracoes = () => {
       <FadeIn delay={0.1}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <PerfilConsultorio />
-          <AnamneseLinkSection />
 
           {/* Security */}
           <LiquidGlassCard draggable={false} className="p-5">
