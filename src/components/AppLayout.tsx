@@ -187,6 +187,30 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
               <Tooltip>
                 <TooltipTrigger asChild>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  >
+                    <Link
+                      to="/configuracoes"
+                      onClick={() => setSidebarOpen(false)}
+                      className={cn(
+                        "relative flex items-center gap-3 px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors",
+                        collapsed && "lg:justify-center lg:px-2",
+                        location.pathname === "/configuracoes" && "text-sidebar-accent-foreground font-semibold bg-sidebar-accent shadow-[0_1px_2px_0_rgba(17,17,17,0.04),0_4px_12px_-6px_rgba(17,17,17,0.08)]"
+                      )}
+                    >
+                      <Settings className={cn("w-[18px] h-[18px] shrink-0", location.pathname === "/configuracoes" && "scale-110")} />
+                      <span className={cn(collapsed && "lg:hidden")}>Configurações</span>
+                    </Link>
+                  </motion.div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Configurações</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -287,13 +311,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
               </PopoverContent>
             </Popover>
 
-            <button
-              onClick={() => navigate("/configuracoes")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-              title="Configurações"
-            >
-              <Settings className="w-[18px] h-[18px]" />
-            </button>
           </div>
         </header>
 

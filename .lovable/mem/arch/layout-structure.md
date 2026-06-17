@@ -1,6 +1,6 @@
 ---
 name: App Layout Structure
-description: Sidebar has a fixed hamburger Menu toggle at the very top, separated by a hairline from the navigation icons below. Header has no menu toggle; search bar is centered and clinic name is removed.
+description: Sidebar has a fixed hamburger Menu toggle at the very top, separated by a hairline from the navigation icons below. Footer actions hold Configurações above Sair, with a hairline separating Sair from the items above. Header has no menu toggle, no clinic name, and no settings icon; search bar is centered.
 ---
 # App Layout Structure
 
@@ -9,6 +9,8 @@ description: Sidebar has a fixed hamburger Menu toggle at the very top, separate
 - **Top section**: fixed hamburger Menu icon (3 horizontal lines) that toggles the collapsed/expanded state of the navigation icons below.
 - **Separator**: a single hairline below the menu toggle separates it from the navigation icons (Início, Agenda, etc.).
 - **Navigation**: icons sit below the separator. When collapsed, only icons show; when expanded, icons + labels show.
+- **Footer actions**: a "Configurações" link sits just above the "Sair" button.
+- **Separator**: a hairline (`border-t`) separates the "Sair" button from the navigation and "Configurações" items above it.
 - On mobile, the sidebar is an off-canvas drawer; the menu row also contains a close (X) button on the right.
 - The menu toggle itself does not expand/retract — it only controls the icons below it.
 
@@ -18,7 +20,7 @@ description: Sidebar has a fixed hamburger Menu toggle at the very top, separate
 - Layout is a single grid row: `1fr auto 1fr`.
   - Left column: empty spacer.
   - Center column: patient search centered within the remaining space (up to `max-w-md`).
-  - Right column: notifications + settings icons aligned to the right.
+  - Right column: notifications icon aligned to the right.
 - Only the standard header bottom border separates it from the main content.
 
 ## Behavior
