@@ -100,10 +100,21 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        {/* Mobile close row only */}
-        <div className="lg:hidden flex items-center h-14 px-5 justify-end border-b border-sidebar-border">
+        {/* Sidebar toggle + mobile close */}
+        <div className={cn(
+          "flex items-center h-14 border-b border-sidebar-border",
+          collapsed ? "lg:px-2 px-5 lg:justify-center justify-between" : "px-5 lg:px-3 justify-between"
+        )}>
           <button
-            className="text-sidebar-foreground/70 hover:text-sidebar-foreground"
+            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
+            onClick={() => setCollapsed((c) => !c)}
+            title={collapsed ? "Expandir menu" : "Recolher menu"}
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          <button
+            className="lg:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="w-5 h-5" />
