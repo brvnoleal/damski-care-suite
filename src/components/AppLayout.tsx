@@ -117,10 +117,21 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        {/* Mobile close row only */}
-        <div className="lg:hidden flex items-center h-14 px-5 justify-end border-b border-sidebar-border">
+        {/* Sidebar toggle + mobile close */}
+        <div className={cn(
+          "flex items-center h-14 border-b border-sidebar-border",
+          collapsed ? "lg:px-2 px-5 lg:justify-center justify-between" : "px-5 lg:px-3 justify-between"
+        )}>
           <button
-            className="text-sidebar-foreground/70 hover:text-sidebar-foreground"
+            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
+            onClick={handleMenuToggle}
+            title={isDesktop ? (collapsed ? "Expandir menu" : "Recolher menu") : "Menu"}
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          <button
+            className="lg:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="w-5 h-5" />
@@ -199,17 +210,11 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Top bar — clean white, static menu toggle + centered search */}
-        <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 glass-header flex items-center gap-4">
-          <button
-            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            onClick={handleMenuToggle}
-            title={isDesktop ? (collapsed ? "Expandir menu" : "Recolher menu") : "Menu"}
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+        {/* Top bar — clean white, centered search */}
+        <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 glass-header grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+          <div />
 
-          <div className="flex-1 flex justify-center px-2">
+          <div className="flex justify-center px-2 w-full">
             <GlobalSearch />
           </div>
 
