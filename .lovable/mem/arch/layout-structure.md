@@ -33,11 +33,6 @@ description: A single fixed top bar spans the full width and contains the menu t
   - Center column: patient search centered within the remaining space.
   - Right column: notifications icon aligned to the right.
 
-## Main Content Area
-- The gray app canvas sits below the top bar and to the right of the sidebar.
-- On desktop, the top-left corner of the content area is rounded (`rounded-tl-2xl`) and has a subtle top/left hairline (`border-t`, `border-l`). The straight segments sit behind the fixed top bar and the sidebar, so only the rounded corner remains visible where the gray area meets the white frame.
-- On mobile, the main area keeps the full-width, sharp-cornered look because the sidebar is off-canvas; the rounding is only relevant where the sidebar meets the content.
-
 ## Behavior
 - On desktop: the toggle switches the sidebar between `72px` (icon-only) and `260px` (icons + labels). The width transition/animation is applied **only to the sidebar**; the top bar stays fixed and its controls do not move or resize.
 - On mobile: the toggle opens/closes the off-canvas sidebar drawer; the top bar remains visible and unchanged while the drawer slides in below it.
