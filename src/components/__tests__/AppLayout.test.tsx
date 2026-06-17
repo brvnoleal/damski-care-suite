@@ -4,12 +4,12 @@ import { MemoryRouter } from "react-router-dom";
 import AppLayout from "@/components/AppLayout";
 
 /**
- * Guards the Liquid Glass chrome of AppLayout:
- *  - sidebar uses .glass-sidebar (not solid bg-sidebar)
- *  - header uses .glass-header (not solid bg-card)
- *  - main content is transparent (no bg-background) so body gradient shows
+ * Guards the Soft UI Minimal chrome of AppLayout:
+ *  - sidebar uses .glass-sidebar (clean white surface)
+ *  - header uses .glass-header (clean white surface)
+ *  - main content is transparent (no bg-background) so the cream canvas shows
  */
-describe("AppLayout — Liquid Glass chrome", () => {
+describe("AppLayout — Soft UI Minimal chrome", () => {
   const renderLayout = () =>
     render(
       <MemoryRouter>

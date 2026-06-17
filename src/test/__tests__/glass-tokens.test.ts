@@ -3,13 +3,13 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 /**
- * Ensures the Liquid Glass design tokens and utility classes remain
+ * Ensures the Soft UI Minimal SaaS design tokens and utility classes remain
  * defined in index.css. Guards against accidental removal of:
  *  - .glass / .glass-strong / .glass-hover / .glass-header / .glass-sidebar
  *  - --shadow-glass token
- *  - backdrop-filter blur
+ *  - monochrome surface tokens (background, card, border)
  */
-describe("Liquid Glass CSS tokens", () => {
+describe("Soft UI Minimal CSS tokens", () => {
   const css = readFileSync(resolve(__dirname, "../../index.css"), "utf-8");
 
   it.each([
@@ -26,12 +26,12 @@ describe("Liquid Glass CSS tokens", () => {
     expect(css).toMatch(/--shadow-glass\s*:/);
   });
 
-  it("uses backdrop-filter blur (translucency effect)", () => {
-    expect(css).toMatch(/backdrop-filter:\s*blur\(/);
-    expect(css).toMatch(/-webkit-backdrop-filter:\s*blur\(/);
+  it("uses flat white surfaces (no backdrop blur)", () => {
+    expect(css).toMatch(/background-color:\s*hsl\(var\(--card\)\)/);
+    expect(css).not.toMatch(/backdrop-filter:\s*blur\(/);
   });
 
-  it("body has decorative radial-gradient background", () => {
-    expect(css).toMatch(/body\s*\{[\s\S]*radial-gradient/);
+  it("body has a clean neutral background", () => {
+    expect(css).toMatch(/@apply\s+.*\bbg-background\b/);
   });
 });
