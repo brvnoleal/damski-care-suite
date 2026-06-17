@@ -254,8 +254,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   )}
                 </button>
               </PopoverTrigger>
-              <PopoverContent align="end" className="w-[360px] p-0" sideOffset={8}>
-                <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <PopoverContent align="end" className="w-[360px] p-0 my-4 rounded-2xl overflow-hidden border border-border shadow-2xl" sideOffset={8}>
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-popover">
                   <h3 className="text-sm font-semibold text-foreground">Notificações</h3>
                   {unreadCount > 0 && (
                     <Button
