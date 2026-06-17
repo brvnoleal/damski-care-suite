@@ -289,7 +289,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           </LayoutGroup>
 
           {/* Logout — fixed at bottom of sidebar */}
-          <div className={cn("border-t border-sidebar-border py-3", collapsed ? "lg:px-2 px-3" : "px-3")}>
+          <div className="border-t border-sidebar-border py-3 px-3">
             <Tooltip>
               <TooltipTrigger asChild>
                 <motion.button
@@ -298,14 +298,15 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   onClick={handleLogout}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors",
-                    collapsed && "lg:justify-center lg:px-2"
+                    "w-full flex items-center gap-3 px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors"
                   )}
                 >
-                  <LogOut className="w-[18px] h-[18px] shrink-0" />
+                  <span className="flex items-center justify-center w-5 h-5 shrink-0">
+                    <LogOut className="w-[18px] h-[18px]" />
+                  </span>
                   <span className={cn(
-                    "whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden",
-                    collapsed ? "lg:w-0 lg:opacity-0" : "w-auto opacity-100"
+                    "whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out",
+                    collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100"
                   )}>Sair</span>
                 </motion.button>
               </TooltipTrigger>
