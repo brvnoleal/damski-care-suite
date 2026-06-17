@@ -1,6 +1,6 @@
 ---
 name: App Layout Structure
-description: Sidebar has a fixed hamburger Menu toggle at the very top, separated by a hairline from the navigation icons below. Header has no menu toggle; search bar is centered and clinic name is removed.
+description: Sidebar has a fixed hamburger Menu toggle at the very top, separated by a hairline from the navigation icons below. Footer actions hold Configurações above Sair, with a hairline separating Sair from the items above. Header has no menu toggle, no clinic name, and no settings icon; search bar is centered.
 ---
 # App Layout Structure
 
