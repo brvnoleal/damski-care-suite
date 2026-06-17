@@ -108,7 +108,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         />
       )}
 
-      {/* Sidebar — liquid glass dark surface */}
+      {/* Sidebar — clean white surface */}
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex flex-col transition-all duration-300 lg:relative lg:translate-x-0 lg:z-auto shrink-0",
