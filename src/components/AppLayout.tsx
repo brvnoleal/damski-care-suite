@@ -240,7 +240,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                       )}
                     >
                       <item.icon className={cn("w-[18px] h-[18px] shrink-0 transition-transform duration-200", isActive && "scale-110")} />
-                      <span className={cn(collapsed && "lg:hidden")}>{item.name}</span>
+                      <span className={cn(
+                        "whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden",
+                        collapsed ? "lg:w-0 lg:opacity-0" : "w-auto opacity-100"
+                      )}>{item.name}</span>
                     </Link>
                   </motion.div>
                 );
