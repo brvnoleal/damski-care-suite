@@ -18,6 +18,7 @@ import { Dentista } from "@/types";
 import { dentistaService } from "@/services/dentistaService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { FadeIn } from "@/components/FadeIn";
+import { ControleAcessoSection } from "@/components/usuarios/ControleAcessoSection";
 
 const emptyDentista = (): Omit<Dentista, "id" | "created_at"> => ({
   nome: "", especialidade: "", cro: "", telefone: "", email: "", instagram: "",
@@ -106,9 +107,9 @@ const Dentistas = () => {
       <FadeIn>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Dentistas</h1>
+            <h1 className="text-2xl font-bold text-foreground">Usuários</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Cadastro e gerenciamento do corpo clínico
+              Corpo clínico e controle de acesso ao sistema
             </p>
           </div>
           <div className="flex gap-2">
@@ -201,6 +202,10 @@ const Dentistas = () => {
           </Table>
         </div>
       </LiquidGlassCard>
+      </FadeIn>
+
+      <FadeIn delay={0.2}>
+        <ControleAcessoSection />
       </FadeIn>
 
       <ResponsiveDialog
