@@ -213,27 +213,30 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                 </TooltipTrigger>
                 <TooltipContent side="right">Configurações</TooltipContent>
               </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    onClick={handleLogout}
-                    className={cn(
-                      "w-full mt-2 pt-3 border-t border-sidebar-border flex items-center gap-3 px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors",
-                      collapsed && "lg:justify-center lg:px-2"
-                    )}
-                  >
-                    <LogOut className="w-[18px] h-[18px] shrink-0" />
-                    <span className={cn(collapsed && "lg:hidden")}>Sair</span>
-                  </motion.button>
-                </TooltipTrigger>
-                <TooltipContent side="right">Sair</TooltipContent>
-              </Tooltip>
             </nav>
           </LayoutGroup>
+
+          {/* Logout — fixed at bottom of sidebar */}
+          <div className={cn("border-t border-sidebar-border py-3", collapsed ? "lg:px-2 px-3" : "px-3")}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  onClick={handleLogout}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors",
+                    collapsed && "lg:justify-center lg:px-2"
+                  )}
+                >
+                  <LogOut className="w-[18px] h-[18px] shrink-0" />
+                  <span className={cn(collapsed && "lg:hidden")}>Sair</span>
+                </motion.button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Sair</TooltipContent>
+            </Tooltip>
+          </div>
         </TooltipProvider>
       </aside>
 
