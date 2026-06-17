@@ -1,18 +1,21 @@
 ---
 name: App Layout Structure
-description: Menu toggle and header (search + notifications) share a single fixed top bar. Toggle sits on the left with the sidebar width; header fills the remaining width. Sidebar and main content sit below this top bar.
+description: A single fixed top bar spans the full width and contains the menu toggle, centered search, and notifications. The sidebar sits below it and collapses/expands independently without moving the top bar controls.
 ---
 # App Layout Structure
 
 ## Top Bar
-- A single fixed bar at the very top of the viewport (`z-40`, `h-14`).
-- **Left segment**: menu toggle. On desktop it matches the sidebar width (`72px` collapsed, `260px` expanded). On mobile it is a compact button with a close (X) button next to it when the drawer is open.
-- **Right segment**: header containing the centered patient search and the notifications icon on the right.
-- Both segments share the same visual hairline (`border-b`) and sit above the sidebar and main content.
+- A single fixed bar spanning the full width at the very top of the viewport (`z-50`, `h-14`).
+- **Left**: menu toggle button (fixed size, does not move or resize with the sidebar).
+- **Center**: patient search, centered within the remaining space (up to `max-w-md`).
+- **Right**: notifications icon.
+- The top bar is visually separated from the content below by a hairline (`border-b`).
+- It is completely independent of the sidebar width: expanding or collapsing the sidebar does **not** move or resize any top bar element.
 
 ## Menu Toggle
-- Hamburger icon inside the left segment of the top bar, completely outside the sidebar.
+- Hamburger icon at the top-left, always visible and static.
 - Toggles the sidebar collapsed/expanded state on desktop and opens/closes the mobile drawer.
+- On mobile, the icon switches to an X when the drawer is open.
 - It is NOT part of the sidebar menu and does not expand/retract with the sidebar.
 
 ## Sidebar
@@ -23,18 +26,16 @@ description: Menu toggle and header (search + notifications) share a single fixe
 - On mobile, the sidebar is an off-canvas drawer that slides in below the fixed top bar.
 
 ## Header
-- Fills the right segment of the fixed top bar.
-- **No menu toggle** and **no clinic name** inside the header.
-- Layout is a single grid row: `1fr auto 1fr`.
-  - Left column: empty spacer.
-  - Center column: patient search centered within the remaining space (up to `max-w-md`).
+- The header is the top bar itself; it contains no clinic name, no settings icon, and no extra elements besides the toggle, search, and notifications.
+- Layout is a single grid row: `auto 1fr auto`.
+  - Left column: menu toggle.
+  - Center column: patient search centered within the remaining space.
   - Right column: notifications icon aligned to the right.
-- Separated from the toggle segment by the sidebar's right border logic.
 
 ## Behavior
-- On desktop: the toggle switches the sidebar between `72px` (icon-only) and `260px` (icons + labels). The width transition/animation is applied **only to the sidebar**; the top bar and header adjust instantly to keep the layout crisp.
-- On mobile: the toggle opens/closes the off-canvas sidebar drawer; the toggle stays in the top bar and the header remains visible beside it.
+- On desktop: the toggle switches the sidebar between `72px` (icon-only) and `260px` (icons + labels). The width transition/animation is applied **only to the sidebar**; the top bar stays fixed and its controls do not move or resize.
+- On mobile: the toggle opens/closes the off-canvas sidebar drawer; the top bar remains visible and unchanged while the drawer slides in below it.
 - The sidebar and main content area are both offset `56px` from the top so the fixed top bar sits above them.
 
 ## Why
-Combining the menu toggle and the header into one top bar keeps the primary controls (navigation, search, notifications) together and always visible. The sidebar can then focus entirely on navigation and action items below.
+Keeping the top bar full-width and independent of the sidebar makes the primary controls (navigation, search, notifications) always stable and easy to reach. The sidebar can animate smoothly without causing visual jumps in the header or pushing the menu button around.
