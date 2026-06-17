@@ -182,8 +182,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Top bar — clean white, fixed menu toggle */}
-        <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 flex items-center gap-4 glass-header">
+        {/* Top bar — clean white, centered search */}
+        <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 glass-header grid grid-cols-3 items-center gap-4">
           <button
             className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
             onClick={handleMenuToggle}
