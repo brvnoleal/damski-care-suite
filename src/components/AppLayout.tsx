@@ -117,7 +117,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         {/* Toggle area */}
         <div
           className={cn(
-            "h-full flex items-center border-b border-sidebar-border bg-sidebar transition-all duration-300 shrink-0",
+            "h-full flex items-center border-b border-sidebar-border bg-sidebar shrink-0",
             collapsed
               ? "lg:w-[72px] lg:px-2 lg:justify-center"
               : "lg:w-[260px] lg:px-3",
