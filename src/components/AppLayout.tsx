@@ -210,7 +210,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         {/* Nav */}
         <TooltipProvider delayDuration={200}>
           <LayoutGroup id="sidebar-nav">
-            <nav className={cn("flex-1 py-4 space-y-1 overflow-y-auto", collapsed ? "lg:px-2 px-3" : "px-3")}>
+            <nav className="flex-1 py-4 space-y-1 overflow-y-auto px-3">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.href;
                 const link = (
