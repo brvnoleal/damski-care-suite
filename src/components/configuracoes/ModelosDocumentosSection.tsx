@@ -239,6 +239,27 @@ export const ModelosDocumentosSection = () => {
               <Textarea
                 value={conteudo}
                 onChange={(e) => setConteudo(e.target.value)}
+                onDragOver={(e) => {
+                  if (e.dataTransfer.types.includes("application/x-variavel")) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = "copy";
+                  }
+                }}
+                onDrop={(e) => {
+                  const variavel = e.dataTransfer.getData("application/x-variavel");
+                  if (!variavel) return;
+                  e.preventDefault();
+                  const ta = e.currentTarget;
+                  const start = ta.selectionStart ?? conteudo.length;
+                  const end = ta.selectionEnd ?? conteudo.length;
+                  const novo = conteudo.slice(0, start) + variavel + conteudo.slice(end);
+                  setConteudo(novo);
+                  requestAnimationFrame(() => {
+                    ta.focus();
+                    const pos = start + variavel.length;
+                    ta.setSelectionRange(pos, pos);
+                  });
+                }}
                 rows={16}
                 className="font-mono text-xs"
               />
@@ -253,14 +274,20 @@ export const ModelosDocumentosSection = () => {
             </label>
           </div>
           <div className="space-y-2">
-            <Label className="text-xs">Variáveis (clique para inserir)</Label>
+            <Label className="text-xs">Variáveis (arraste ou clique para inserir)</Label>
             <div className="space-y-1 max-h-[420px] overflow-auto pr-1">
               {VARIAVEIS_DISPONIVEIS.map((v) => (
                 <button
                   key={v.chave}
                   type="button"
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.effectAllowed = "copy";
+                    e.dataTransfer.setData("text/plain", v.chave);
+                    e.dataTransfer.setData("application/x-variavel", v.chave);
+                  }}
                   onClick={() => inserirVariavel(v.chave)}
-                  className="w-full text-left text-xs p-2 rounded hover:bg-white/5 border border-white/10"
+                  className="w-full text-left text-xs p-2 rounded hover:bg-white/5 border border-white/10 cursor-grab active:cursor-grabbing"
                 >
                   <code className="text-primary">{v.chave}</code>
                   <p className="text-muted-foreground mt-0.5">{v.rotulo}</p>
