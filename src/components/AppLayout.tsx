@@ -16,8 +16,6 @@ import {
   Bell,
   CheckCheck,
   LogOut,
-  ChevronsLeft,
-  ChevronsRight,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
