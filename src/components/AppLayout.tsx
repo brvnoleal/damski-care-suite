@@ -274,7 +274,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                       )}
                     >
                       <Settings className={cn("w-[18px] h-[18px] shrink-0", location.pathname === "/configuracoes" && "scale-110")} />
-                      <span className={cn(collapsed && "lg:hidden")}>Configurações</span>
+                      <span className={cn(
+                        "whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden",
+                        collapsed ? "lg:w-0 lg:opacity-0" : "w-auto opacity-100"
+                      )}>Configurações</span>
                     </Link>
                   </motion.div>
                 </TooltipTrigger>
