@@ -197,12 +197,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
       </header>
 
-      {/* Sidebar — clean white surface, fixed width, labels expand/collapse */}
+      {/* Sidebar — clean white surface, animates independently */}
       <aside
         className={cn(
           "fixed left-0 z-40 flex flex-col overflow-hidden transition-all duration-300 ease-in-out lg:relative lg:translate-x-0 lg:z-auto shrink-0",
           "glass-sidebar text-sidebar-foreground",
-          "w-[260px]",
+          collapsed ? "lg:w-[72px] w-[260px]" : "w-[260px]",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           "mt-14 h-[calc(100vh-56px)]"
         )}
@@ -210,7 +210,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         {/* Nav */}
         <TooltipProvider delayDuration={200}>
           <LayoutGroup id="sidebar-nav">
-            <nav className="flex-1 py-4 space-y-1 overflow-y-auto px-3">
+            <nav className={cn("flex-1 py-4 space-y-1 overflow-y-auto", collapsed ? "lg:px-2 px-3" : "px-3")}>
               {navItems.map((item) => {
                 const isActive = location.pathname === item.href;
                 const link = (
@@ -232,7 +232,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                       to={item.href}
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
-                        "relative flex items-center px-3 py-2 rounded-full text-sm transition-colors duration-200",
+                        "relative flex items-center gap-3 px-3 py-2 rounded-full text-sm transition-colors duration-200",
+                        collapsed && "lg:justify-center lg:px-2",
                         isActive
                           ? "text-sidebar-accent-foreground font-semibold"
                           : "text-sidebar-foreground/60 hover:text-sidebar-foreground font-medium"
@@ -240,11 +241,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                     >
                       <item.icon className={cn("w-[18px] h-[18px] shrink-0 transition-transform duration-200", isActive && "scale-110")} />
                       <span className={cn(
-                        "overflow-hidden transition-all duration-300 ease-in-out",
-                        collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[180px] opacity-100 ml-3"
-                      )}>
-                        <span className="whitespace-nowrap">{item.name}</span>
-                      </span>
+                        "whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden",
+                        collapsed ? "lg:w-0 lg:opacity-0" : "w-auto opacity-100"
+                      )}>{item.name}</span>
                     </Link>
                   </motion.div>
                 );
@@ -269,17 +268,16 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                       to="/configuracoes"
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
-                        "relative flex items-center px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors",
+                        "relative flex items-center gap-3 px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors",
+                        collapsed && "lg:justify-center lg:px-2",
                         location.pathname === "/configuracoes" && "text-sidebar-accent-foreground font-semibold bg-sidebar-accent shadow-[0_1px_2px_0_rgba(17,17,17,0.04),0_4px_12px_-6px_rgba(17,17,17,0.08)]"
                       )}
                     >
                       <Settings className={cn("w-[18px] h-[18px] shrink-0", location.pathname === "/configuracoes" && "scale-110")} />
                       <span className={cn(
-                        "overflow-hidden transition-all duration-300 ease-in-out",
-                        collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[180px] opacity-100 ml-3"
-                      )}>
-                        <span className="whitespace-nowrap">Configurações</span>
-                      </span>
+                        "whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden",
+                        collapsed ? "lg:w-0 lg:opacity-0" : "w-auto opacity-100"
+                      )}>Configurações</span>
                     </Link>
                   </motion.div>
                 </TooltipTrigger>
@@ -289,7 +287,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           </LayoutGroup>
 
           {/* Logout — fixed at bottom of sidebar */}
-          <div className="border-t border-sidebar-border py-3 px-3">
+          <div className={cn("border-t border-sidebar-border py-3", collapsed ? "lg:px-2 px-3" : "px-3")}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <motion.button
@@ -297,15 +295,16 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   whileTap={{ scale: 0.98 }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   onClick={handleLogout}
-                  className="w-full flex items-center px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors"
+                  className={cn(
+                    "w-full flex items-center gap-3 px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors",
+                    collapsed && "lg:justify-center lg:px-2"
+                  )}
                 >
                   <LogOut className="w-[18px] h-[18px] shrink-0" />
                   <span className={cn(
-                    "overflow-hidden transition-all duration-300 ease-in-out",
-                    collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[180px] opacity-100 ml-3"
-                  )}>
-                    <span className="whitespace-nowrap">Sair</span>
-                  </span>
+                    "whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden",
+                    collapsed ? "lg:w-0 lg:opacity-0" : "w-auto opacity-100"
+                  )}>Sair</span>
                 </motion.button>
               </TooltipTrigger>
               <TooltipContent side="right">Sair</TooltipContent>
@@ -315,7 +314,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 mt-14 h-[calc(100vh-56px)] overflow-hidden rounded-tr-2xl">
+      <div className="flex-1 flex flex-col min-w-0 mt-14 h-[calc(100vh-56px)] overflow-hidden">
         {/* Content */}
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
           <div className="animate-fade-in">{children}</div>
