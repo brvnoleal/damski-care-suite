@@ -19,9 +19,10 @@ description: A single fixed top bar spans the full width and contains the menu t
 - It is NOT part of the sidebar menu and does not expand/retract with the sidebar.
 
 ## Sidebar
-- White surface with a subtle right border (`#E8E8E8`).
+- White surface with a subtle right border (`#E8E8E8`) and `overflow-hidden` so content is clipped during the collapse/expand animation.
 - Contains all navigation and action items: Início, Agenda, Consultas, Pacientes, Procedimentos, Usuários, Documentos, Insumos, Relatórios, Configurações, Sair.
 - **Navigation**: icons sit at the top. When collapsed, only icons show; when expanded, icons + labels show.
+- **Labels**: navigation labels and the "Sair" label fade and scale their width with a smooth `transition-all duration-300 ease-in-out`, so the collapse and expand animations are visually symmetric.
 - **Footer actions**: the "Sair" button sits at the bottom, separated from the items above by a hairline (`border-t`).
 - On mobile, the sidebar is an off-canvas drawer that slides in below the fixed top bar.
 
