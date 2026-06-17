@@ -1,24 +1,26 @@
 ---
 name: App Layout Structure
-description: Sidebar has a fixed hamburger Menu toggle at the top, separated by a line from the navigation icons below. Header is white, clinic name removed, search centered in the available space between the left edge and the right-side icons.
+description: Header has a static hamburger Menu toggle on the left, a centered search bar in the remaining space, and right-side icons. No divider between the toggle and the search. Toggle expands/retracts sidebar and dashboard while staying fixed.
 ---
 # App Layout Structure
 
-## Sidebar
-- White surface with a subtle right border (`#E8E8E8`).
-- **Top section**: fixed hamburger Menu icon (3 horizontal lines) that toggles the collapsed/expanded state of the navigation icons below.
-- **Separator**: a single hairline below the menu toggle separates it from the navigation icons and the rest of the dashboard.
-- **Navigation**: icons (Início, Agenda, etc.) sit below the separator. When collapsed, only icons show; when expanded, icons + labels show.
-- On mobile, the sidebar is an off-canvas drawer; the menu row also contains a close (X) button on the right.
-- The menu toggle itself does not expand/retract — it only controls the icons below it.
-
 ## Header
 - Pure white surface (`#FFFFFF`).
-- **No menu toggle** and **no clinic name** inside the header.
-- Layout is a single flex row:
-  - Patient search is centered in the available space between the left edge and the right-side icons.
-  - Notifications + settings icons are pushed to the right (`ml-auto`).
-- The header has a bottom border separating it from the main content; no extra line is introduced by the menu control.
+- Single flex row with three sections:
+  1. **Static hamburger Menu toggle** (3 horizontal lines) on the far left. Clicking it expands/retracts the sidebar and dashboard; the button itself does not move.
+  2. **Search bar** centered in the remaining space between the toggle and the right-side icons. It uses `flex-1` with `justify-center`.
+  3. **Notifications + settings icons** on the far right.
+- No divider/line between the menu toggle and the search bar. The only visual separation is the standard header bottom border.
+
+## Sidebar
+- White surface with a subtle right border (`#E8E8E8`).
+- No menu toggle inside the sidebar. On mobile, the sidebar is an off-canvas drawer with a close (X) button in a top row.
+- Navigation icons (Início, Agenda, etc.) collapse/expand their labels when the sidebar is toggled.
+
+## Behavior
+- On desktop: the toggle switches the sidebar between `72px` (icon-only) and `260px` (icons + labels). The dashboard main area resizes to fill the remaining width.
+- On mobile: the toggle opens/closes the off-canvas sidebar drawer.
+- The toggle button stays in the same position in the header at all times.
 
 ## Why
-Keeping the menu control inside the sidebar, fixed above the navigation, makes the toggle relationship explicit: it directly controls the icons below it. Removing the clinic name and centering the search in the available space keeps the header minimal and balanced while letting the search breathe on smaller viewports.
+Putting the menu control in the header keeps the chrome consistent and makes the toggle always accessible. Centering the search in the flex-1 remaining space gives a balanced, calm header without extra dividers.
