@@ -80,6 +80,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     navigate("/login", { replace: true });
   };
 
+  const handleMenuToggle = () => {
+    if (isDesktop) {
+      setCollapsed((c) => !c);
+    } else {
+      setSidebarOpen((o) => !o);
+    }
+  };
+
   const notifications = useSyncExternalStore(
     notificationStore.subscribe,
     notificationStore.getSnapshot
