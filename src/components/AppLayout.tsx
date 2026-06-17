@@ -301,7 +301,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   )}
                 >
                   <LogOut className="w-[18px] h-[18px] shrink-0" />
-                  <span className={cn(collapsed && "lg:hidden")}>Sair</span>
+                  <span className={cn(
+                    "whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden",
+                    collapsed ? "lg:w-0 lg:opacity-0" : "w-auto opacity-100"
+                  )}>Sair</span>
                 </motion.button>
               </TooltipTrigger>
               <TooltipContent side="right">Sair</TooltipContent>
