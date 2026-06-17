@@ -269,16 +269,17 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                       to="/configuracoes"
                       onClick={() => setSidebarOpen(false)}
                       className={cn(
-                        "relative flex items-center gap-3 px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors",
-                        collapsed && "lg:justify-center lg:px-2",
+                        "relative flex items-center px-3 py-2 rounded-full text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40 transition-colors",
                         location.pathname === "/configuracoes" && "text-sidebar-accent-foreground font-semibold bg-sidebar-accent shadow-[0_1px_2px_0_rgba(17,17,17,0.04),0_4px_12px_-6px_rgba(17,17,17,0.08)]"
                       )}
                     >
                       <Settings className={cn("w-[18px] h-[18px] shrink-0", location.pathname === "/configuracoes" && "scale-110")} />
                       <span className={cn(
-                        "whitespace-nowrap transition-all duration-300 ease-in-out overflow-hidden",
-                        collapsed ? "lg:w-0 lg:opacity-0" : "w-auto opacity-100"
-                      )}>Configurações</span>
+                        "overflow-hidden transition-all duration-300 ease-in-out",
+                        collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[180px] opacity-100 ml-3"
+                      )}>
+                        <span className="whitespace-nowrap">Configurações</span>
+                      </span>
                     </Link>
                   </motion.div>
                 </TooltipTrigger>
