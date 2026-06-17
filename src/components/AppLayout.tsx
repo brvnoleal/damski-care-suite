@@ -57,6 +57,15 @@ const navigation = [
 const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<boolean>(() => localStorage.getItem("sidebar_collapsed") === "1");
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== "undefined" && window.innerWidth >= 1024);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 1024px)");
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mql.addEventListener("change", handler);
+    setIsDesktop(mql.matches);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("sidebar_collapsed", collapsed ? "1" : "0");
@@ -69,6 +78,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     setSidebarOpen(false);
     await supabase.auth.signOut();
     navigate("/login", { replace: true });
+  };
+
+  const handleMenuToggle = () => {
+    if (isDesktop) {
+      setCollapsed((c) => !c);
+    } else {
+      setSidebarOpen((o) => !o);
+    }
   };
 
   const notifications = useSyncExternalStore(
@@ -100,21 +117,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        {/* Sidebar toggle + mobile close */}
-        <div className={cn(
-          "flex items-center h-14 border-b border-sidebar-border",
-          collapsed ? "lg:px-2 px-5 lg:justify-center justify-between" : "px-5 lg:px-3 justify-between"
-        )}>
+        {/* Mobile close row only */}
+        <div className="lg:hidden flex items-center h-14 px-5 justify-end border-b border-sidebar-border">
           <button
-            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
-            onClick={() => setCollapsed((c) => !c)}
-            title={collapsed ? "Expandir menu" : "Recolher menu"}
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-
-          <button
-            className="lg:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground"
+            className="text-sidebar-foreground/70 hover:text-sidebar-foreground"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="w-5 h-5" />
@@ -193,13 +199,21 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Top bar — clean white, centered search in available space */}
+        {/* Top bar — clean white, static menu toggle + centered search */}
         <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 glass-header flex items-center gap-4">
-          <div className="flex justify-center px-2 max-w-md w-full">
+          <button
+            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            onClick={handleMenuToggle}
+            title={isDesktop ? (collapsed ? "Expandir menu" : "Recolher menu") : "Menu"}
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          <div className="flex-1 flex justify-center px-2">
             <GlobalSearch />
           </div>
 
-          <div className="flex items-center justify-end gap-4 ml-auto">
+          <div className="flex items-center justify-end gap-4">
             <Popover>
               <PopoverTrigger asChild>
                 <button className="relative text-muted-foreground hover:text-foreground transition-colors">
