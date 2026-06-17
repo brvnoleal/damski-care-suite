@@ -57,35 +57,18 @@ const navigation = [
 const AppLayout = ({ children }: AppLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState<boolean>(() => localStorage.getItem("sidebar_collapsed") === "1");
-  const [isDesktop, setIsDesktop] = useState(() => typeof window !== "undefined" && window.innerWidth >= 1024);
-
-  useEffect(() => {
-    const mql = window.matchMedia("(min-width: 1024px)");
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    mql.addEventListener("change", handler);
-    setIsDesktop(mql.matches);
-    return () => mql.removeEventListener("change", handler);
-  }, []);
 
   useEffect(() => {
     localStorage.setItem("sidebar_collapsed", collapsed ? "1" : "0");
   }, [collapsed]);
   const location = useLocation();
   const navigate = useNavigate();
-  const { clinicaNome, isSuperAdmin } = useClinicaContext();
+  const { isSuperAdmin } = useClinicaContext();
 
   const handleLogout = async () => {
     setSidebarOpen(false);
     await supabase.auth.signOut();
     navigate("/login", { replace: true });
-  };
-
-  const handleMenuToggle = () => {
-    if (isDesktop) {
-      setCollapsed((c) => !c);
-    } else {
-      setSidebarOpen((o) => !o);
-    }
   };
 
   const notifications = useSyncExternalStore(
@@ -117,10 +100,21 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        {/* Mobile close row only */}
-        <div className="lg:hidden flex items-center h-14 px-5 justify-end border-b border-sidebar-border">
+        {/* Sidebar toggle + mobile close */}
+        <div className={cn(
+          "flex items-center h-14 border-b border-sidebar-border",
+          collapsed ? "lg:px-2 px-5 lg:justify-center justify-between" : "px-5 lg:px-3 justify-between"
+        )}>
           <button
-            className="text-sidebar-foreground/70 hover:text-sidebar-foreground"
+            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 transition-colors"
+            onClick={() => setCollapsed((c) => !c)}
+            title={collapsed ? "Expandir menu" : "Recolher menu"}
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          <button
+            className="lg:hidden text-sidebar-foreground/70 hover:text-sidebar-foreground"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="w-5 h-5" />
@@ -199,102 +193,90 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Top bar — clean white, fixed menu toggle */}
-        <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 flex items-center gap-4 glass-header">
-          <button
-            className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            onClick={handleMenuToggle}
-            title={isDesktop ? (collapsed ? "Expandir menu" : "Recolher menu") : "Menu"}
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-
-          {clinicaNome && (
-            <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-foreground/80 shrink-0">
-              <Building2 className="w-4 h-4 text-primary" />
-              <span>{clinicaNome}</span>
-            </div>
-          )}
-
-          <div className="flex-1 flex justify-center px-2">
+        {/* Top bar — clean white, centered search */}
+        <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 glass-header grid grid-cols-3 items-center gap-4">
+          <div />
+          <div className="flex justify-center px-2">
             <GlobalSearch />
           </div>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="relative text-muted-foreground hover:text-foreground transition-colors">
-                <Bell className="w-[18px] h-[18px]" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[10px] text-destructive-foreground flex items-center justify-center font-bold">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
-              </button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-[360px] p-0" sideOffset={8}>
-              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-                <h3 className="text-sm font-semibold text-foreground">Notificações</h3>
-                {unreadCount > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs h-7 gap-1 text-muted-foreground"
-                    onClick={() => notificationStore.markAllRead()}
-                  >
-                    <CheckCheck className="w-3.5 h-3.5" />
-                    Marcar lidas
-                  </Button>
-                )}
-              </div>
-              <ScrollArea className="h-[400px]">
-                <div className="divide-y divide-border">
-                  {notifications.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-8">Nenhuma notificação.</p>
-                  ) : (
-                    notifications.slice(0, 20).map((n) => (
-                      <div
-                        key={n.id}
-                        className={cn(
-                          "px-4 py-3 cursor-pointer hover:bg-muted transition-colors",
-                          !n.read && "bg-accent/30"
-                        )}
-                        onClick={() => notificationStore.markRead(n.id)}
-                      >
-                        <div className="flex gap-3">
-                          <span className="text-base shrink-0 leading-none mt-0.5">{notificationStore.getIcon(n.type)}</span>
-                          <div className="flex-1 min-w-0 space-y-1">
-                            <div className="flex items-start justify-between gap-2">
-                              <p className={cn("text-sm leading-snug", !n.read ? "font-semibold text-foreground" : "text-foreground")}>
-                                {n.title}
-                              </p>
-                              {!n.read && <span className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />}
-                            </div>
-                            <p className="text-xs text-muted-foreground leading-relaxed">{n.description}</p>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0">
-                                {notificationStore.getModuleLabel(n.module)}
-                              </Badge>
-                              <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                                {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true, locale: ptBR })}
-                              </span>
+          <div className="flex items-center justify-end gap-4">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="relative text-muted-foreground hover:text-foreground transition-colors">
+                  <Bell className="w-[18px] h-[18px]" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[10px] text-destructive-foreground flex items-center justify-center font-bold">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-[360px] p-0" sideOffset={8}>
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                  <h3 className="text-sm font-semibold text-foreground">Notificações</h3>
+                  {unreadCount > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs h-7 gap-1 text-muted-foreground"
+                      onClick={() => notificationStore.markAllRead()}
+                    >
+                      <CheckCheck className="w-3.5 h-3.5" />
+                      Marcar lidas
+                    </Button>
+                  )}
+                </div>
+                <ScrollArea className="h-[400px]">
+                  <div className="divide-y divide-border">
+                    {notifications.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-8">Nenhuma notificação.</p>
+                    ) : (
+                      notifications.slice(0, 20).map((n) => (
+                        <div
+                          key={n.id}
+                          className={cn(
+                            "px-4 py-3 cursor-pointer hover:bg-muted transition-colors",
+                            !n.read && "bg-accent/30"
+                          )}
+                          onClick={() => notificationStore.markRead(n.id)}
+                        >
+                          <div className="flex gap-3">
+                            <span className="text-base shrink-0 leading-none mt-0.5">{notificationStore.getIcon(n.type)}</span>
+                            <div className="flex-1 min-w-0 space-y-1">
+                              <div className="flex items-start justify-between gap-2">
+                                <p className={cn("text-sm leading-snug", !n.read ? "font-semibold text-foreground" : "text-foreground")}>
+                                  {n.title}
+                                </p>
+                                {!n.read && <span className="w-2 h-2 rounded-full bg-primary shrink-0 mt-1.5" />}
+                              </div>
+                              <p className="text-xs text-muted-foreground leading-relaxed">{n.description}</p>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0">
+                                  {notificationStore.getModuleLabel(n.module)}
+                                </Badge>
+                                <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                  {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true, locale: ptBR })}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </ScrollArea>
-            </PopoverContent>
-          </Popover>
+                      ))
+                    )}
+                  </div>
+                </ScrollArea>
+              </PopoverContent>
+            </Popover>
 
-          <button
-            onClick={() => navigate("/configuracoes")}
-            className="text-muted-foreground hover:text-foreground transition-colors"
-            title="Configurações"
-          >
-            <Settings className="w-[18px] h-[18px]" />
-          </button>
+            <button
+              onClick={() => navigate("/configuracoes")}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              title="Configurações"
+            >
+              <Settings className="w-[18px] h-[18px]" />
+            </button>
+          </div>
         </header>
 
         {/* Content */}

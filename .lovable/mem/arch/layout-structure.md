@@ -1,27 +1,25 @@
 ---
 name: App Layout Structure
-description: Header is white and fixed at the top; sidebar expand/retract toggle is a hamburger Menu icon fixed in the header, not inside the sidebar
+description: Sidebar has a fixed hamburger Menu toggle at the top, separated by a line from the navigation icons below; the toggle expands/retracts only the nav icons. Header is white, clinic name removed, search centered.
 ---
 # App Layout Structure
 
-## Header
-- Pure white surface (`#FFFFFF`) connected to the white sidebar via the shared menu toggle.
-- Contains, from left to right:
-  1. Fixed hamburger Menu toggle (3 horizontal lines) that expands/retracts the sidebar.
-  2. Clinic name (optional, hidden on very small screens).
-  3. Patient search (centered, flex-1).
-  4. Notifications bell.
-  5. Settings gear.
-- The menu toggle stays fixed in the header; only the sidebar width changes when toggled.
-
 ## Sidebar
 - White surface with a subtle right border (`#E8E8E8`).
-- On desktop it can be expanded (`260px`) or collapsed (`72px`).
-- On mobile it is an off-canvas drawer with a close (X) button inside.
-- No expand/collapse chevron inside the sidebar — the control lives in the header.
+- **Top section**: fixed hamburger Menu icon (3 horizontal lines) that toggles the collapsed/expanded state of the navigation icons below.
+- **Separator**: a single hairline below the menu toggle separates it from the navigation icons and the rest of the dashboard.
+- **Navigation**: icons (Início, Agenda, etc.) sit below the separator. When collapsed, only icons show; when expanded, icons + labels show.
+- On mobile, the sidebar is an off-canvas drawer; the menu row also contains a close (X) button on the right.
+- The menu toggle itself does not expand/retract — it only controls the icons below it.
 
-## Active route pill
-- Light-gray rounded-2xl pill (`#F1F1EF`) with a very soft shadow.
+## Header
+- Pure white surface (`#FFFFFF`).
+- **No menu toggle** and **no clinic name** inside the header.
+- Layout is a 3-column grid:
+  1. Empty left spacer.
+  2. Centered patient search.
+  3. Notifications + settings icons, aligned to the right.
+- The header has a bottom border separating it from the main content; no extra line is introduced by the menu control.
 
 ## Why
-Keeping the toggle in the white header creates a continuous visual connection between the header and sidebar, reinforces the fixed chrome of the app, and avoids a floating control inside the sidebar.
+Keeping the menu control inside the sidebar, fixed above the navigation, makes the toggle relationship explicit: it directly controls the icons below it. Removing the clinic name and centering the search keeps the header minimal and balanced.
