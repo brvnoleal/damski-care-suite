@@ -247,7 +247,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 mt-14 h-[calc(100vh-56px)] overflow-hidden">
         {/* Top bar — clean white, centered search */}
         <header className="sticky top-0 z-30 px-4 lg:px-6 h-14 glass-header grid grid-cols-[1fr_auto_1fr] items-center gap-4">
           <div />
