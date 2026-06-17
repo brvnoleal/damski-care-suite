@@ -37,11 +37,27 @@ Deno.serve(async (req) => {
       pacienteId = t.paciente_id;
     }
 
-    const { data: c, error: ce } = await admin
-      .from("clinica")
-      .select("id, nome, status")
-      .eq("id", clinicaId!)
-      .maybeSingle();
+    const isUuid = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+    const slugify = (s: string) =>
+      s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim()
+        .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
+    let clinicaQuery = admin.from("clinica").select("id, nome, status");
+    if (clinicaId && isUuid(clinicaId)) {
+      clinicaQuery = clinicaQuery.eq("id", clinicaId);
+    } else if (clinicaId) {
+      const { data: candidates, error: lookupErr } = await admin
+        .from("clinica").select("id, nome, status");
+      if (lookupErr) return json({ error: "erro_interno" }, 500);
+      const match = (candidates || []).find((c) => slugify(c.nome || "") === clinicaId);
+      if (!match) return json({ error: "clinica_indisponivel" }, 404);
+      clinicaId = match.id;
+      clinicaQuery = clinicaQuery.eq("id", match.id);
+    } else {
+      return json({ error: "parametros_invalidos" }, 400);
+    }
+
+    const { data: c, error: ce } = await clinicaQuery.maybeSingle();
     if (ce) return json({ error: "erro_interno" }, 500);
     if (!c || (c.status !== "ativa" && c.status !== "ativo")) return json({ error: "clinica_indisponivel" }, 404);
 
