@@ -131,9 +131,7 @@
     box-shadow: var(--shadow-glass-hover);
   }
   .glass-header {
-    background-color: hsl(var(--background) / 0.85);
-    backdrop-filter: blur(10px) saturate(120%);
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    background-color: hsl(var(--card));
     border-bottom: 1px solid hsl(var(--border));
   }
   .glass-sidebar {
