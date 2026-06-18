@@ -53,9 +53,9 @@ Deno.serve(async (req) => {
 
     const allowedRoles = isSuper
       ? ["admin", "responsavel_tecnico", "recepcionista"]
-      : ["admin", "responsavel_tecnico", "recepcionista"];
+      : ["recepcionista"];
     if (!allowedRoles.includes(role)) {
-      return json({ error: "Papel inválido" }, 400);
+      return json({ error: "Papel inválido para o seu nível de acesso" }, 403);
     }
 
     const targetClinicaId = isSuper ? (bodyClinicaId ?? callerMembership?.clinica_id) : callerMembership!.clinica_id;
@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
     if (membroError) {
       console.error("clinica_membro insert falhou:", membroError);
       await supabaseAdmin.auth.admin.deleteUser(newUserId);
-      return json({ error: membroError.message || "Falha ao vincular usuário à clínica" }, 400);
+      return json({ error: "Falha ao vincular usuário à clínica" }, 500);
     }
 
     // Se for admin ou responsável técnico, cria registro em dentista automaticamente
@@ -112,6 +112,6 @@ Deno.serve(async (req) => {
     return json({ success: true, user_id: newUserId, password }, 200);
   } catch (error: any) {
     console.error("create-user erro inesperado:", error);
-    return json({ error: error?.message || "Erro inesperado" }, 500);
+    return json({ error: "Erro inesperado" }, 500);
   }
 });

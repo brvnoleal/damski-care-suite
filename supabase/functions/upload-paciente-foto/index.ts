@@ -75,7 +75,8 @@ Deno.serve(async (req) => {
       upsert: false,
     });
     if (upErr) {
-      return new Response(JSON.stringify({ error: upErr.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      console.error("upload-paciente-foto storage error:", upErr);
+      return new Response(JSON.stringify({ error: "Falha ao salvar a foto" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const { data: row, error: insErr } = await supabase
@@ -93,7 +94,8 @@ Deno.serve(async (req) => {
 
     if (insErr) {
       await supabase.storage.from(BUCKET).remove([path]);
-      return new Response(JSON.stringify({ error: insErr.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      console.error("upload-paciente-foto insert error:", insErr);
+      return new Response(JSON.stringify({ error: "Falha ao registrar a foto" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     return new Response(JSON.stringify({ ok: true, foto: row }), {
@@ -101,7 +103,8 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: (e as Error).message }), {
+    console.error("upload-paciente-foto error:", e);
+    return new Response(JSON.stringify({ error: "Erro inesperado" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
