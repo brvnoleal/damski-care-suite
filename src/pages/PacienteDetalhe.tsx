@@ -1290,8 +1290,17 @@ const PacienteDetalhe = () => {
               value={consultaForm.procedimento}
               onChange={(v) => setConsultaForm({ ...consultaForm, procedimento: v as ProcedimentoConsulta })}
             />
-
           </div>
+
+          <div className="sm:col-span-2">
+            <ConsultaInsumosEditor
+              procedimentoNome={consultaForm.procedimento}
+              value={consultaInsumos}
+              onChange={setConsultaInsumos}
+              resetKey="new"
+            />
+          </div>
+
 
           <div className="sm:col-span-2 pt-1">
             <div className="flex items-center gap-2 mb-3">
