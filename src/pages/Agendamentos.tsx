@@ -467,8 +467,17 @@ const Agendamentos = () => {
               value={form.procedimento}
               onChange={(v) => setForm({ ...form, procedimento: v })}
             />
-
           </div>
+
+          <div className="sm:col-span-2">
+            <ConsultaInsumosEditor
+              procedimentoNome={form.procedimento}
+              value={insumosConsulta}
+              onChange={setInsumosConsulta}
+              resetKey={editingId || "new"}
+            />
+          </div>
+
 
           <div className="sm:col-span-2 pt-1">
             <div className="flex items-center gap-2 mb-3">
