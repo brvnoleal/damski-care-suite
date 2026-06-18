@@ -75,7 +75,8 @@ Deno.serve(async (req) => {
       upsert: false,
     });
     if (upErr) {
-      return new Response(JSON.stringify({ error: upErr.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      console.error("upload-paciente-foto storage error:", upErr);
+      return new Response(JSON.stringify({ error: "Falha ao salvar a foto" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const { data: row, error: insErr } = await supabase
