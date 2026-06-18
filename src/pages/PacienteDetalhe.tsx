@@ -432,9 +432,9 @@ const PacienteDetalhe = () => {
 
 
 
-  const totalRecebido = debitos.filter((d) => d.status === "pago").reduce((s, d) => s + d.valor, 0);
+  const totalRecebido = agendamentos.filter((a) => a.status_pagamento === "pago").reduce((s, a) => s + Number(a.valor || 0), 0);
   const totalAtrasado = debitos.filter((d) => isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
-  const totalAReceber = debitos.filter((d) => d.status === "pendente" && !isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
+  const totalAReceber = agendamentos.filter((a) => a.status_pagamento === "pendente" && a.status !== "cancelado").reduce((s, a) => s + Number(a.valor || 0), 0);
 
 
   if (loading) {
