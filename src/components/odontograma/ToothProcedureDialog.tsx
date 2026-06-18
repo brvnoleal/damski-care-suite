@@ -40,7 +40,6 @@ interface ToothProcedureDialogProps {
 const initialForm = {
   status: "pendente" as OdontogramaStatus,
   procedimento: "restauracao" as ProcedimentoOdonto,
-  valor: "",
   dentista_id: "",
   observacoes: "",
 };
@@ -84,7 +83,7 @@ export const ToothProcedureDialog = ({
         dente,
         status: form.status,
         procedimento: form.procedimento,
-        valor: Number(form.valor) || 0,
+        valor: 0,
         dentista_id: form.dentista_id || undefined,
         observacoes: form.observacoes || undefined,
         data: new Date().toISOString().slice(0, 10),
