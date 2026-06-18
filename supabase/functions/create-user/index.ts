@@ -112,6 +112,6 @@ Deno.serve(async (req) => {
     return json({ success: true, user_id: newUserId, password }, 200);
   } catch (error: any) {
     console.error("create-user erro inesperado:", error);
-    return json({ error: error?.message || "Erro inesperado" }, 500);
+    return json({ error: "Erro inesperado" }, 500);
   }
 });
