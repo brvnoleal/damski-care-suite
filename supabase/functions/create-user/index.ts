@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
     if (membroError) {
       console.error("clinica_membro insert falhou:", membroError);
       await supabaseAdmin.auth.admin.deleteUser(newUserId);
-      return json({ error: membroError.message || "Falha ao vincular usuário à clínica" }, 400);
+      return json({ error: "Falha ao vincular usuário à clínica" }, 500);
     }
 
     // Se for admin ou responsável técnico, cria registro em dentista automaticamente
