@@ -277,21 +277,48 @@ const Dashboard = () => {
             </div>
             <Badge variant="outline" className="text-[10px]">{agendaDoDia.length} consulta{agendaDoDia.length !== 1 ? "s" : ""}</Badge>
           </div>
-          <div className="divide-y divide-white/5 max-h-[320px] overflow-y-auto">
+          <div className="max-h-[320px] overflow-y-auto">
             {agendaDoDia.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">Nenhuma consulta agendada para hoje</p>
-            ) : agendaDoDia.map((a, i) => (
-              <div key={i} className="flex items-center gap-3 px-4 sm:px-5 py-3">
-                <span className="text-sm font-mono font-semibold text-primary w-12 shrink-0">{a.time}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{a.patient}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">{a.proc}</p>
-                </div>
-                <Badge variant="outline" className={cn("text-[10px] shrink-0 capitalize", a.status === "confirmado" ? "text-success border-success/30" : a.status === "realizado" ? "text-primary border-primary/30" : "text-warning border-warning/30")}>
-                  {a.status}
-                </Badge>
-              </div>
-            ))}
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent border-b border-white/10">
+                    <TableHead className="text-[10px] text-muted-foreground font-medium w-14">Hora</TableHead>
+                    <TableHead className="text-[10px] text-muted-foreground font-medium">Paciente</TableHead>
+                    <TableHead className="text-[10px] text-muted-foreground font-medium hidden sm:table-cell">Procedimento</TableHead>
+                    <TableHead className="text-[10px] text-muted-foreground font-medium text-right">Status</TableHead>
+                    <TableHead className="text-[10px] text-muted-foreground font-medium text-right">Pagamento</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {agendaDoDia.map((a, i) => (
+                    <TableRow key={i} className="border-b border-white/5 hover:bg-white/[0.02]">
+                      <TableCell className="py-2.5">
+                        <span className="text-sm font-mono font-semibold text-primary">{a.time}</span>
+                      </TableCell>
+                      <TableCell className="py-2.5">
+                        <p className="text-sm font-medium text-foreground truncate">{a.patient}</p>
+                        <p className="text-[11px] text-muted-foreground truncate sm:hidden">{a.proc}</p>
+                      </TableCell>
+                      <TableCell className="py-2.5 hidden sm:table-cell">
+                        <span className="text-xs text-muted-foreground">{a.proc}</span>
+                      </TableCell>
+                      <TableCell className="py-2.5 text-right">
+                        <Badge variant="outline" className={cn("text-[10px] capitalize", a.status === "confirmado" ? "text-success border-success/30" : a.status === "realizado" ? "text-primary border-primary/30" : "text-warning border-warning/30")}>
+                          {a.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-2.5 text-right">
+                        <Badge variant="outline" className={cn("text-[10px] capitalize", a.paymentStatus === "pago" ? "text-success border-success/30" : "text-warning border-warning/30")}>
+                          {a.paymentStatus}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </div>
         </LiquidGlassCard>
       </FadeIn>
