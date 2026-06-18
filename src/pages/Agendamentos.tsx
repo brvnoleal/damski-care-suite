@@ -27,6 +27,9 @@ import { dentistaService } from "@/services/dentistaService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
+import { ConsultaInsumosEditor, ConsultaInsumoItem } from "@/components/agendamento/ConsultaInsumosEditor";
+import { agendamentoInsumoService } from "@/services/agendamentoInsumoService";
+
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
   data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
