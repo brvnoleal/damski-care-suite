@@ -71,6 +71,7 @@ const Dashboard = () => {
   const [topProcedures, setTopProcedures] = useState<{name: string; count: number}[]>([]);
   const [nextAppointments, setNextAppointments] = useState<{time: string; patient: string; proc: string; status: string}[]>([]);
   const [criticalSupplies, setCriticalSupplies] = useState<{name: string; lot: string; expiry: string; daysLeft: number}[]>([]);
+  const [tratamentosAndamento, setTratamentosAndamento] = useState<{date: string; patient: string; proc: string; dente: number}[]>([]);
   const [receitaSemana, setReceitaSemana] = useState({ total: 0, realizadas: 0, previstas: 0, items: [] as { proc: string; valor: number }[] });
 
   useEffect(() => {
@@ -167,6 +168,23 @@ const Dashboard = () => {
           status: a.status,
         })));
       }
+
+      // Tratamentos em andamento (Odontograma com status "em_andamento")
+      const { data: odontoRows } = await supabase
+        .from("odontograma_procedimento")
+        .select("dente, procedimento, data, paciente_id, paciente:paciente_id(nome)")
+        .eq("status", "em_andamento")
+        .order("data", { ascending: false })
+        .limit(20);
+      setTratamentosAndamento(
+        (odontoRows || []).map((r: any) => ({
+          date: r.data,
+          patient: r.paciente?.nome || "—",
+          proc: r.procedimento,
+          dente: r.dente,
+        }))
+      );
+
 
       // Critical supplies — só com validade dentro de 15 dias e sem_validade=false
       const critical = insumos
