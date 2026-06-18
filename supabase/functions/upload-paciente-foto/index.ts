@@ -94,7 +94,8 @@ Deno.serve(async (req) => {
 
     if (insErr) {
       await supabase.storage.from(BUCKET).remove([path]);
-      return new Response(JSON.stringify({ error: insErr.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      console.error("upload-paciente-foto insert error:", insErr);
+      return new Response(JSON.stringify({ error: "Falha ao registrar a foto" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     return new Response(JSON.stringify({ ok: true, foto: row }), {
