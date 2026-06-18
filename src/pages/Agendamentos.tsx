@@ -87,7 +87,8 @@ const gerarDatasSugeridas = (tipo: RepetirTipo, base: string): string[] => {
 const statusConfig: Record<string, { label: string; className: string }> = {
   agendado: { label: "Agendado", className: "bg-info/10 text-info border-info/20" },
   confirmado: { label: "Confirmado", className: "bg-primary/10 text-primary border-primary/20" },
-  realizado: { label: "Realizado", className: "bg-success/10 text-success border-success/20" },
+  realizado: { label: "Realizada", className: "bg-success/10 text-success border-success/20" },
+  nao_compareceu: { label: "Não Compareceu", className: "bg-destructive/10 text-destructive border-destructive/20" },
   cancelado: { label: "Cancelado", className: "bg-destructive/10 text-destructive border-destructive/20" },
 };
 
