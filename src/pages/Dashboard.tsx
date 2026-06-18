@@ -135,6 +135,7 @@ const Dashboard = () => {
           patient: a.paciente?.nome || "—",
           proc: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
           status: a.status,
+          paymentStatus: a.status_pagamento || "pendente",
         }));
       setAgendaDoDia(dia);
 
