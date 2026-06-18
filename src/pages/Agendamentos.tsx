@@ -150,16 +150,24 @@ const Agendamentos = () => {
   const openCreate = () => {
     setEditingId(null);
     setForm(emptyAgendamento());
+    setInsumosConsulta([]);
     resetRepetir();
     setDialogOpen(true);
   };
 
-  const openEdit = (a: Agendamento) => {
+  const openEdit = async (a: Agendamento) => {
     setEditingId(a.id);
     setForm({ data: a.data, horario: a.horario, horario_fim: a.horario_fim || "", paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, observacoes: a.observacoes || "" });
+    try {
+      const existing = await agendamentoInsumoService.listarPorAgendamento(a.id);
+      setInsumosConsulta(existing.map((i) => ({ insumo_id: i.insumo_id, quantidade: i.quantidade })));
+    } catch {
+      setInsumosConsulta([]);
+    }
     resetRepetir();
     setDialogOpen(true);
   };
+
 
   // sincroniza seleção quando muda tipo de repetição ou data base
   useEffect(() => {
