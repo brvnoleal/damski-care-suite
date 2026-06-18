@@ -103,9 +103,11 @@ const Agendamentos = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyAgendamento());
+  const [insumosConsulta, setInsumosConsulta] = useState<ConsultaInsumoItem[]>([]);
   const [repetir, setRepetir] = useState<RepetirTipo>("nao");
   const [datasSelecionadas, setDatasSelecionadas] = useState<string[]>([]);
   const [datasPersonalizadas, setDatasPersonalizadas] = useState<string[]>([]);
+
 
   const datasSugeridas = repetir !== "nao" && repetir !== "personalizado" ? gerarDatasSugeridas(repetir, form.data) : [];
 
