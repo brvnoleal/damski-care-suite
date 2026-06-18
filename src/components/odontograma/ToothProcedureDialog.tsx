@@ -151,25 +151,16 @@ export const ToothProcedureDialog = ({
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label>Valor (R$)</Label>
-            <CurrencyInput
-              value={form.valor}
-              onChange={(n) => setForm({ ...form, valor: n ? String(n) : "" })}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Profissional</Label>
-            <Select value={form.dentista_id} onValueChange={(v) => setForm({ ...form, dentista_id: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                {dentistas.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-1.5">
+          <Label>Profissional</Label>
+          <Select value={form.dentista_id} onValueChange={(v) => setForm({ ...form, dentista_id: v })}>
+            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+            <SelectContent>
+              {dentistas.map((d) => (
+                <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-1.5">
           <Label>Observações</Label>
