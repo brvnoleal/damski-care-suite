@@ -179,10 +179,13 @@ export const ModelosDocumentosSection = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Button variant="ghost" size="sm" onClick={() => editar(m)}>
+                  <Button variant="ghost" size="sm" onClick={() => setVisualizando(m)} title="Visualizar">
+                    <Eye className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => editar(m)} title="Editar">
                     <Edit className="w-3.5 h-3.5" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => excluir(m)}>
+                  <Button variant="ghost" size="sm" onClick={() => excluir(m)} title="Excluir">
                     <Trash2 className="w-3.5 h-3.5 text-destructive" />
                   </Button>
                 </div>
