@@ -1400,9 +1400,14 @@ const PacienteDetalhe = () => {
                 </div>
                 <div className="col-span-2">
                   <p className="text-xs text-muted-foreground">Pagamento</p>
-                  <p className="text-foreground">
-                    {formaPagamentoLabels[detalheConsulta.forma_pagamento]}
-                    {detalheConsulta.parcelas > 1 ? ` · ${detalheConsulta.parcelas}x` : ""}
+                  <p className="text-foreground flex items-center gap-2 flex-wrap">
+                    <span>
+                      {formaPagamentoLabels[detalheConsulta.forma_pagamento]}
+                      {detalheConsulta.parcelas > 1 ? ` · ${detalheConsulta.parcelas}x` : ""}
+                    </span>
+                    <Badge className={detalheConsulta.status_pagamento === "pago" ? "bg-success/10 text-success border-success/20" : "bg-warning/10 text-warning border-warning/20"}>
+                      {detalheConsulta.status_pagamento === "pago" ? "Pago" : "Pendente"}
+                    </Badge>
                   </p>
                 </div>
                 {detalheConsulta.observacoes && (
