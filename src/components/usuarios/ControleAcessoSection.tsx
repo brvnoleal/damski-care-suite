@@ -119,7 +119,22 @@ export const ControleAcessoSection = () => {
       const response = await supabase.functions.invoke("create-user", {
         body: { nome: newNome, email: newEmail, cpf: newCpf, role: newRole },
       });
-      if (response.error) throw new Error(response.error.message);
+      // Quando a função responde com status != 2xx, o SDK coloca o body em response.error.context
+      if (response.error) {
+        let msg = response.error.message;
+        const ctx: any = (response.error as any).context;
+        try {
+          if (ctx) {
+            const parsed = typeof ctx.json === "function"
+              ? await ctx.json()
+              : ctx.body
+                ? await new Response(ctx.body).json()
+                : null;
+            if (parsed?.error) msg = parsed.error;
+          }
+        } catch { /* ignore */ }
+        throw new Error(msg);
+      }
       if (response.data?.error) throw new Error(response.data.error);
       const tempPassword = response.data?.password as string | undefined;
       setGeneratedPassword(tempPassword || null);
@@ -136,6 +151,7 @@ export const ControleAcessoSection = () => {
       setCreating(false);
     }
   };
+
 
   const formatCpf = (value: string) => {
     const digits = value.replace(/\D/g, "").slice(0, 11);
