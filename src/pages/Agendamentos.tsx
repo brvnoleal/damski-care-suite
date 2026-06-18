@@ -111,8 +111,9 @@ const Agendamentos = () => {
       const [ag, pac, den] = await Promise.all([
         agendamentoService.listar(),
         pacienteService.listar(),
-        dentistaService.listar(),
+        dentistaService.listarUsuariosDentistas(),
       ]);
+
       setAgendamentos(ag);
       setPacientes(pac);
       setDentistas(den);
