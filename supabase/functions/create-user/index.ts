@@ -53,9 +53,9 @@ Deno.serve(async (req) => {
 
     const allowedRoles = isSuper
       ? ["admin", "responsavel_tecnico", "recepcionista"]
-      : ["admin", "responsavel_tecnico", "recepcionista"];
+      : ["recepcionista"];
     if (!allowedRoles.includes(role)) {
-      return json({ error: "Papel inválido" }, 400);
+      return json({ error: "Papel inválido para o seu nível de acesso" }, 403);
     }
 
     const targetClinicaId = isSuper ? (bodyClinicaId ?? callerMembership?.clinica_id) : callerMembership!.clinica_id;
