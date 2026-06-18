@@ -192,25 +192,35 @@ const Agendamentos = () => {
     try {
       if (editingId) {
         await agendamentoService.atualizar(editingId, form);
+        await agendamentoInsumoService.sincronizar(editingId, insumosConsulta);
         toast({ title: "Agendamento atualizado com sucesso" });
       } else {
         const datasExtras = repetir === "personalizado"
           ? datasPersonalizadas.filter((d) => d && d !== form.data)
           : repetir !== "nao" ? datasSelecionadas.filter((d) => d !== form.data) : [];
         const lista = [form, ...datasExtras.map((d) => ({ ...form, data: d }))];
+        let createdIds: string[] = [];
         if (lista.length === 1) {
-          await agendamentoService.criar(form);
+          const c = await agendamentoService.criar(form);
+          createdIds = [c.id];
         } else {
-          await agendamentoService.criarVarios(lista);
+          const created = await agendamentoService.criarVarios(lista);
+          createdIds = created.map((c) => c.id);
         }
+        // baixa de estoque para todas as datas geradas
+        await Promise.all(
+          createdIds.map((id) => agendamentoInsumoService.sincronizar(id, insumosConsulta))
+        );
         toast({ title: lista.length > 1 ? `${lista.length} agendamentos criados` : "Agendamento criado com sucesso" });
       }
       await loadData();
       setDialogOpen(false);
-    } catch (err) {
-      toast({ title: "Erro ao salvar agendamento", variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Erro ao salvar agendamento", description: err?.message, variant: "destructive" });
     }
   };
+
+
 
 
   const handleDelete = async () => {
