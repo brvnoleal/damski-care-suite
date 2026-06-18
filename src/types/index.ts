@@ -103,6 +103,7 @@ export interface Agendamento {
   valor: number;
   forma_pagamento: FormaPagamento;
   parcelas: number;
+  status_pagamento: "pendente" | "pago";
   observacoes?: string;
   created_at?: string;
 }

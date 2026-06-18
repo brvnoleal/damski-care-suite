@@ -32,7 +32,7 @@ import { agendamentoInsumoService } from "@/services/agendamentoInsumoService";
 
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
-  data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
+  data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, status_pagamento: "pendente", observacoes: "",
 });
 
 const formatDataBR = (data: string) => {
@@ -157,7 +157,7 @@ const Agendamentos = () => {
 
   const openEdit = async (a: Agendamento) => {
     setEditingId(a.id);
-    setForm({ data: a.data, horario: a.horario, horario_fim: a.horario_fim || "", paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, observacoes: a.observacoes || "" });
+    setForm({ data: a.data, horario: a.horario, horario_fim: a.horario_fim || "", paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, status_pagamento: a.status_pagamento || "pendente", observacoes: a.observacoes || "" });
     try {
       const existing = await agendamentoInsumoService.listarPorAgendamento(a.id);
       setInsumosConsulta(existing.map((i) => ({ insumo_id: i.insumo_id, quantidade: i.quantidade })));
@@ -515,7 +515,17 @@ const Agendamentos = () => {
               </Select>
             </div>
           )}
-          <div className={form.forma_pagamento === "credito" || form.forma_pagamento === "boleto" ? "" : "sm:col-span-2"}>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Status do Pagamento *</Label>
+            <Select value={form.status_pagamento} onValueChange={(v: "pendente" | "pago") => setForm({ ...form, status_pagamento: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pendente">Pendente</SelectItem>
+                <SelectItem value="pago">Pago</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className={form.forma_pagamento === "credito" || form.forma_pagamento === "boleto" ? "sm:col-span-2" : ""}>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Observações</Label>
             <Input value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} placeholder="Observações opcionais" />
           </div>

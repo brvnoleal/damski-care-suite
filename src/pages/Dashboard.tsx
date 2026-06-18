@@ -71,6 +71,7 @@ const Dashboard = () => {
   const [topProcedures, setTopProcedures] = useState<{name: string; count: number}[]>([]);
   const [nextAppointments, setNextAppointments] = useState<{time: string; patient: string; proc: string; status: string}[]>([]);
   const [criticalSupplies, setCriticalSupplies] = useState<{name: string; lot: string; expiry: string; daysLeft: number}[]>([]);
+  const [tratamentosAndamento, setTratamentosAndamento] = useState<{date: string; patient: string; proc: string; dente: number}[]>([]);
   const [receitaSemana, setReceitaSemana] = useState({ total: 0, realizadas: 0, previstas: 0, items: [] as { proc: string; valor: number }[] });
 
   useEffect(() => {
@@ -97,8 +98,9 @@ const Dashboard = () => {
 
       const todayDone = todayAg.filter((a: any) => a.status === "realizado").length;
       const criticalCount = insumos.filter((i: any) => {
+        if (i.sem_validade || !i.validade) return false;
         const d = Math.ceil((new Date(i.validade).getTime() - now.getTime()) / 86400000);
-        return d <= 15;
+        return d >= 0 && d <= 15;
       }).length;
       const weekConfirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
 
@@ -167,14 +169,32 @@ const Dashboard = () => {
         })));
       }
 
-      // Critical supplies
+      // Tratamentos em andamento (Odontograma com status "em_andamento")
+      const { data: odontoRows } = await supabase
+        .from("odontograma_procedimento")
+        .select("dente, procedimento, data, paciente_id, paciente:paciente_id(nome)")
+        .eq("status", "em_andamento")
+        .order("data", { ascending: false })
+        .limit(20);
+      setTratamentosAndamento(
+        (odontoRows || []).map((r: any) => ({
+          date: r.data,
+          patient: r.paciente?.nome || "—",
+          proc: r.procedimento,
+          dente: r.dente,
+        }))
+      );
+
+
+      // Critical supplies — só com validade dentro de 15 dias e sem_validade=false
       const critical = insumos
+        .filter((i: any) => !i.sem_validade && i.validade)
         .map((i: any) => ({
           name: i.nome, lot: i.lote,
           expiry: new Date(i.validade).toLocaleDateString("pt-BR"),
           daysLeft: Math.ceil((new Date(i.validade).getTime() - now.getTime()) / 86400000),
         }))
-        .filter((i) => i.daysLeft <= 15)
+        .filter((i) => i.daysLeft >= 0 && i.daysLeft <= 15)
         .sort((a, b) => a.daysLeft - b.daysLeft);
       setCriticalSupplies(critical);
     };
@@ -315,22 +335,22 @@ const Dashboard = () => {
                 <Smile className="w-4 h-4 text-primary" />
                 <h2 className="text-xs sm:text-sm font-semibold text-foreground">Tratamentos em andamento</h2>
               </div>
-              <Badge variant="outline" className="text-[10px]">{nextAppointments.length}</Badge>
+              <Badge variant="outline" className="text-[10px]">{tratamentosAndamento.length}</Badge>
             </div>
             <div className="divide-y divide-white/5 flex-1 overflow-y-auto max-h-[220px]">
-              {nextAppointments.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-6">Nenhum atendimento hoje</p>
+              {tratamentosAndamento.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-6">Nenhum tratamento em andamento</p>
               )}
-              {nextAppointments.map((a, i) => (
+              {tratamentosAndamento.map((t, i) => (
                 <div key={i} className="flex items-center gap-3 px-4 sm:px-5 py-2.5">
-                  <span className="text-xs font-mono font-semibold text-primary w-10 shrink-0">{a.time}</span>
+                  <span className="text-xs font-mono font-semibold text-primary w-10 shrink-0">{t.dente}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{a.patient}</p>
-                    <p className="text-[11px] text-muted-foreground truncate">{a.proc}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{t.patient}</p>
+                    <p className="text-[11px] text-muted-foreground truncate capitalize">{t.proc.replace(/_/g, " ")}</p>
                   </div>
-                  <Badge variant="outline" className={cn("text-[10px] shrink-0", a.status === "confirmado" ? "text-success border-success/30" : "text-warning border-warning/30")}>
-                    {a.status === "confirmado" ? "✓" : "⏳"}
-                  </Badge>
+                  <span className="text-[10px] text-muted-foreground shrink-0">
+                    {t.date ? new Date(t.date + "T00:00:00").toLocaleDateString("pt-BR") : ""}
+                  </span>
                 </div>
               ))}
             </div>

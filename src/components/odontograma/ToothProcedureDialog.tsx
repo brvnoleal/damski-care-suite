@@ -27,7 +27,7 @@ import {
   procedimentoOdontoLabels,
 } from "@/types";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
-import { CurrencyInput } from "@/components/ui/currency-input";
+
 
 interface ToothProcedureDialogProps {
   open: boolean;
@@ -40,7 +40,6 @@ interface ToothProcedureDialogProps {
 const initialForm = {
   status: "pendente" as OdontogramaStatus,
   procedimento: "restauracao" as ProcedimentoOdonto,
-  valor: "",
   dentista_id: "",
   observacoes: "",
 };
@@ -84,7 +83,7 @@ export const ToothProcedureDialog = ({
         dente,
         status: form.status,
         procedimento: form.procedimento,
-        valor: Number(form.valor) || 0,
+        valor: 0,
         dentista_id: form.dentista_id || undefined,
         observacoes: form.observacoes || undefined,
         data: new Date().toISOString().slice(0, 10),
@@ -152,25 +151,16 @@ export const ToothProcedureDialog = ({
             />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label>Valor (R$)</Label>
-            <CurrencyInput
-              value={form.valor}
-              onChange={(n) => setForm({ ...form, valor: n ? String(n) : "" })}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Profissional</Label>
-            <Select value={form.dentista_id} onValueChange={(v) => setForm({ ...form, dentista_id: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                {dentistas.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-1.5">
+          <Label>Profissional</Label>
+          <Select value={form.dentista_id} onValueChange={(v) => setForm({ ...form, dentista_id: v })}>
+            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+            <SelectContent>
+              {dentistas.map((d) => (
+                <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-1.5">
           <Label>Observações</Label>
@@ -205,7 +195,7 @@ export const ToothProcedureDialog = ({
                       <Badge variant={statusBadgeVariant(p.status)} className="text-[10px]">{odontogramaStatusLabels[p.status]}</Badge>
                     </div>
                     <p className="text-[11px] text-muted-foreground">
-                      {new Date(p.data).toLocaleDateString("pt-BR")} • R$ {p.valor.toFixed(2)} {dt && `• ${dt.nome}`}
+                      {new Date(p.data).toLocaleDateString("pt-BR")} {dt && `• ${dt.nome}`}
                     </p>
                     {p.observacoes && <p className="text-[11px] text-muted-foreground mt-1">{p.observacoes}</p>}
                   </div>

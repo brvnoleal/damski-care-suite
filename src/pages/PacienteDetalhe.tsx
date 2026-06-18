@@ -151,7 +151,7 @@ const PacienteDetalhe = () => {
   const emptyConsulta = (): Omit<Agendamento, "id" | "created_at" | "paciente_id"> => ({
     data: "", horario: "", horario_fim: "", dentista_id: "",
     procedimento: "avaliacao", status: "agendado",
-    valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
+    valor: 0, forma_pagamento: "dinheiro", parcelas: 1, status_pagamento: "pendente", observacoes: "",
   });
   const [consultaForm, setConsultaForm] = useState(emptyConsulta());
   const [consultaInsumos, setConsultaInsumos] = useState<ConsultaInsumoItem[]>([]);
@@ -432,9 +432,9 @@ const PacienteDetalhe = () => {
 
 
 
-  const totalRecebido = debitos.filter((d) => d.status === "pago").reduce((s, d) => s + d.valor, 0);
+  const totalRecebido = agendamentos.filter((a) => a.status_pagamento === "pago").reduce((s, a) => s + Number(a.valor || 0), 0);
   const totalAtrasado = debitos.filter((d) => isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
-  const totalAReceber = debitos.filter((d) => d.status === "pendente" && !isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
+  const totalAReceber = agendamentos.filter((a) => a.status_pagamento === "pendente" && a.status !== "cancelado").reduce((s, a) => s + Number(a.valor || 0), 0);
 
 
   if (loading) {
@@ -1338,7 +1338,17 @@ const PacienteDetalhe = () => {
               </Select>
             </div>
           )}
-          <div className={consultaForm.forma_pagamento === "credito" || consultaForm.forma_pagamento === "boleto" ? "" : "sm:col-span-2"}>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Status do Pagamento *</Label>
+            <Select value={consultaForm.status_pagamento} onValueChange={(v: "pendente" | "pago") => setConsultaForm({ ...consultaForm, status_pagamento: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pendente">Pendente</SelectItem>
+                <SelectItem value="pago">Pago</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className={consultaForm.forma_pagamento === "credito" || consultaForm.forma_pagamento === "boleto" ? "sm:col-span-2" : ""}>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Observações</Label>
             <Input value={consultaForm.observacoes} onChange={(e) => setConsultaForm({ ...consultaForm, observacoes: e.target.value })} placeholder="Observações opcionais" />
           </div>
@@ -1390,9 +1400,14 @@ const PacienteDetalhe = () => {
                 </div>
                 <div className="col-span-2">
                   <p className="text-xs text-muted-foreground">Pagamento</p>
-                  <p className="text-foreground">
-                    {formaPagamentoLabels[detalheConsulta.forma_pagamento]}
-                    {detalheConsulta.parcelas > 1 ? ` · ${detalheConsulta.parcelas}x` : ""}
+                  <p className="text-foreground flex items-center gap-2 flex-wrap">
+                    <span>
+                      {formaPagamentoLabels[detalheConsulta.forma_pagamento]}
+                      {detalheConsulta.parcelas > 1 ? ` · ${detalheConsulta.parcelas}x` : ""}
+                    </span>
+                    <Badge className={detalheConsulta.status_pagamento === "pago" ? "bg-success/10 text-success border-success/20" : "bg-warning/10 text-warning border-warning/20"}>
+                      {detalheConsulta.status_pagamento === "pago" ? "Pago" : "Pendente"}
+                    </Badge>
                   </p>
                 </div>
                 {detalheConsulta.observacoes && (

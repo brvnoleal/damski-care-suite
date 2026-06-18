@@ -29,6 +29,7 @@ export type Database = {
           parcelas: number
           procedimento: string
           status: string
+          status_pagamento: string
           updated_at: string
           valor: number
         }
@@ -46,6 +47,7 @@ export type Database = {
           parcelas?: number
           procedimento?: string
           status?: string
+          status_pagamento?: string
           updated_at?: string
           valor?: number
         }
@@ -63,6 +65,7 @@ export type Database = {
           parcelas?: number
           procedimento?: string
           status?: string
+          status_pagamento?: string
           updated_at?: string
           valor?: number
         }
