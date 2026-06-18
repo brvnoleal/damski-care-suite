@@ -151,7 +151,7 @@ const PacienteDetalhe = () => {
   const emptyConsulta = (): Omit<Agendamento, "id" | "created_at" | "paciente_id"> => ({
     data: "", horario: "", horario_fim: "", dentista_id: "",
     procedimento: "avaliacao", status: "agendado",
-    valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
+    valor: 0, forma_pagamento: "dinheiro", parcelas: 1, status_pagamento: "pendente", observacoes: "",
   });
   const [consultaForm, setConsultaForm] = useState(emptyConsulta());
   const [consultaInsumos, setConsultaInsumos] = useState<ConsultaInsumoItem[]>([]);

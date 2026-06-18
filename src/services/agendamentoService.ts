@@ -18,6 +18,7 @@ const mapRow = (row: any): Agendamento => ({
   valor: Number(row.valor),
   forma_pagamento: row.forma_pagamento,
   parcelas: row.parcelas,
+  status_pagamento: (row.status_pagamento as "pendente" | "pago") || "pendente",
   observacoes: row.observacoes || undefined,
   created_at: row.created_at,
 });
