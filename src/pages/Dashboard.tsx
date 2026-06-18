@@ -284,11 +284,11 @@ const Dashboard = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent border-b border-white/10">
-                    <TableHead className="text-[10px] text-muted-foreground font-medium w-14">Hora</TableHead>
-                    <TableHead className="text-[10px] text-muted-foreground font-medium">Paciente</TableHead>
-                    <TableHead className="text-[10px] text-muted-foreground font-medium hidden sm:table-cell">Procedimento</TableHead>
-                    <TableHead className="text-[10px] text-muted-foreground font-medium text-right">Status</TableHead>
-                    <TableHead className="text-[10px] text-muted-foreground font-medium text-right">Pagamento</TableHead>
+                    <TableHead className="text-sm text-foreground font-semibold w-16">Hora</TableHead>
+                    <TableHead className="text-sm text-foreground font-semibold">Paciente</TableHead>
+                    <TableHead className="text-sm text-foreground font-semibold hidden sm:table-cell">Procedimento</TableHead>
+                    <TableHead className="text-sm text-foreground font-semibold text-right">Status</TableHead>
+                    <TableHead className="text-sm text-foreground font-semibold text-right">Pagamento</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -299,14 +299,14 @@ const Dashboard = () => {
                       </TableCell>
                       <TableCell className="py-2.5">
                         <p className="text-sm font-medium text-foreground truncate">{a.patient}</p>
-                        <p className="text-[11px] text-muted-foreground truncate sm:hidden">{a.proc}</p>
+                        <p className="text-sm text-foreground truncate sm:hidden">{a.proc}</p>
                       </TableCell>
                       <TableCell className="py-2.5 hidden sm:table-cell">
-                        <span className="text-xs text-muted-foreground">{a.proc}</span>
+                        <span className="text-sm font-medium text-foreground">{a.proc}</span>
                       </TableCell>
                       <TableCell className="py-2.5 text-right">
-                        <Badge variant="outline" className={cn("text-[10px] capitalize", a.status === "confirmado" ? "text-success border-success/30" : a.status === "realizado" ? "text-primary border-primary/30" : "text-warning border-warning/30")}>
-                          {a.status}
+                        <Badge variant="outline" className={cn("text-[10px] capitalize", a.status === "confirmado" ? "text-success border-success/30" : a.status === "realizado" ? "text-primary border-primary/30" : a.status === "nao_compareceu" ? "text-destructive border-destructive/30" : "text-warning border-warning/30")}>
+                          {a.status === "nao_compareceu" ? "Não Compareceu" : a.status}
                         </Badge>
                       </TableCell>
                       <TableCell className="py-2.5 text-right">
