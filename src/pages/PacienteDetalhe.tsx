@@ -719,15 +719,28 @@ const PacienteDetalhe = () => {
                 <LiquidGlassCard key={a.id} draggable={false} className="p-5 space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-semibold text-foreground">{procedimentoConsultaLabels[a.procedimento]}</p>
+                      <p className="text-sm font-semibold text-foreground">{procedimentoConsultaLabels[a.procedimento] || a.procedimento}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {formatDateBR(a.data)} · {a.horario}{a.horario_fim ? ` – ${a.horario_fim}` : ""}
                       </p>
                     </div>
-                    <Badge className={statusMap[a.status] || statusMap.agendado}>
-                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge className={statusMap[a.status] || statusMap.agendado}>
+                        {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                      </Badge>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8"
+                        onClick={() => openDetalheConsulta(a)}
+                        aria-label="Ver detalhes da consulta"
+                        title="Ver detalhes"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
                     <div>
                       <p className="text-xs text-muted-foreground">Dentista</p>
