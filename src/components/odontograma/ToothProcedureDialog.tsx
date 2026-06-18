@@ -27,7 +27,7 @@ import {
   procedimentoOdontoLabels,
 } from "@/types";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
-import { CurrencyInput } from "@/components/ui/currency-input";
+
 
 interface ToothProcedureDialogProps {
   open: boolean;
@@ -195,7 +195,7 @@ export const ToothProcedureDialog = ({
                       <Badge variant={statusBadgeVariant(p.status)} className="text-[10px]">{odontogramaStatusLabels[p.status]}</Badge>
                     </div>
                     <p className="text-[11px] text-muted-foreground">
-                      {new Date(p.data).toLocaleDateString("pt-BR")} • R$ {p.valor.toFixed(2)} {dt && `• ${dt.nome}`}
+                      {new Date(p.data).toLocaleDateString("pt-BR")} {dt && `• ${dt.nome}`}
                     </p>
                     {p.observacoes && <p className="text-[11px] text-muted-foreground mt-1">{p.observacoes}</p>}
                   </div>
