@@ -87,7 +87,8 @@ const gerarDatasSugeridas = (tipo: RepetirTipo, base: string): string[] => {
 const statusConfig: Record<string, { label: string; className: string }> = {
   agendado: { label: "Agendado", className: "bg-info/10 text-info border-info/20" },
   confirmado: { label: "Confirmado", className: "bg-primary/10 text-primary border-primary/20" },
-  realizado: { label: "Realizado", className: "bg-success/10 text-success border-success/20" },
+  realizado: { label: "Realizada", className: "bg-success/10 text-success border-success/20" },
+  nao_compareceu: { label: "Não Compareceu", className: "bg-destructive/10 text-destructive border-destructive/20" },
   cancelado: { label: "Cancelado", className: "bg-destructive/10 text-destructive border-destructive/20" },
 };
 
@@ -336,7 +337,29 @@ const Agendamentos = () => {
                       <Badge variant="outline" className="font-medium">{procedimentoConsultaLabels[a.procedimento]}</Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge className={st.className}>{st.label}</Badge>
+                      <Select
+                        value={a.status}
+                        onValueChange={async (novoStatus) => {
+                          try {
+                            await agendamentoService.atualizar(a.id, { status: novoStatus as Agendamento["status"] });
+                            await loadData();
+                            toast({ title: `Status atualizado para "${statusConfig[novoStatus]?.label || novoStatus}"` });
+                          } catch (err: any) {
+                            toast({ title: "Erro ao atualizar status", description: err?.message, variant: "destructive" });
+                          }
+                        }}
+                      >
+                        <SelectTrigger className={`h-7 w-auto min-w-[140px] px-2 text-xs font-medium border ${st.className}`}>
+                          <SelectValue>{st.label}</SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="agendado">Agendado</SelectItem>
+                          <SelectItem value="confirmado">Confirmado</SelectItem>
+                          <SelectItem value="realizado">Realizada</SelectItem>
+                          <SelectItem value="nao_compareceu">Não Compareceu</SelectItem>
+                          <SelectItem value="cancelado">Cancelado</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">

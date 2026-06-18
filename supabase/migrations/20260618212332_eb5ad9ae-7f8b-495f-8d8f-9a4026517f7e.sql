@@ -1,0 +1,2 @@
+ALTER TABLE public.agendamento DROP CONSTRAINT IF EXISTS agendamento_status_check;
+ALTER TABLE public.agendamento ADD CONSTRAINT agendamento_status_check CHECK (status IN ('agendado','confirmado','realizado','cancelado','nao_compareceu'));

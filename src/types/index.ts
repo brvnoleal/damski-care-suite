@@ -99,7 +99,7 @@ export interface Agendamento {
   paciente_id: string;
   dentista_id: string;
   procedimento: ProcedimentoConsulta | string;
-  status: "agendado" | "confirmado" | "realizado" | "cancelado";
+  status: "agendado" | "confirmado" | "realizado" | "cancelado" | "nao_compareceu";
   valor: number;
   forma_pagamento: FormaPagamento;
   parcelas: number;
