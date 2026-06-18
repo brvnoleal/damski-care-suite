@@ -515,7 +515,17 @@ const Agendamentos = () => {
               </Select>
             </div>
           )}
-          <div className={form.forma_pagamento === "credito" || form.forma_pagamento === "boleto" ? "" : "sm:col-span-2"}>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Status do Pagamento *</Label>
+            <Select value={form.status_pagamento} onValueChange={(v: "pendente" | "pago") => setForm({ ...form, status_pagamento: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pendente">Pendente</SelectItem>
+                <SelectItem value="pago">Pago</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className={form.forma_pagamento === "credito" || form.forma_pagamento === "boleto" ? "sm:col-span-2" : ""}>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Observações</Label>
             <Input value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} placeholder="Observações opcionais" />
           </div>
