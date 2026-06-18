@@ -201,6 +201,29 @@ const Dashboard = () => {
     };
 
     loadDashboard();
+
+    // Realtime: atualiza ao mudar agendamentos (ex.: status de pagamento)
+    const channel = supabase
+      .channel("dashboard-agendamento-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "agendamento" },
+        () => { loadDashboard(); },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "odontograma_procedimento" },
+        () => { loadDashboard(); },
+      )
+      .subscribe();
+
+    const onFocus = () => loadDashboard();
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener("focus", onFocus);
+    };
   }, []);
 
   return (
