@@ -23,6 +23,7 @@ import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import AnamnesePublica from "./pages/AnamnesePublica";
 import DocumentoAssinar from "./pages/DocumentoAssinar";
+import Confianca from "./pages/Confianca";
 import { useCodeProtection } from "./hooks/useCodeProtection";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => {
             <Route path="/anamnese/:clinicaId" element={<AnamnesePublica />} />
             <Route path="/anamnese/t/:token" element={<AnamnesePublica />} />
             <Route path="/d/:token" element={<DocumentoAssinar />} />
+            <Route path="/confianca" element={<Confianca />} />
             <Route
               path="/*"
               element={
