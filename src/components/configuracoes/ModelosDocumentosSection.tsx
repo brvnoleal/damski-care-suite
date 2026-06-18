@@ -31,6 +31,7 @@ export const ModelosDocumentosSection = () => {
   const [loading, setLoading] = useState(true);
 
   const [openEditor, setOpenEditor] = useState(false);
+  const [visualizando, setVisualizando] = useState<DocumentoModelo | null>(null);
   const [editando, setEditando] = useState<DocumentoModelo | null>(null);
   const [nome, setNome] = useState("");
   const [tipo, setTipo] = useState<TipoDocumento>("personalizado");
