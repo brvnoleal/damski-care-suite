@@ -67,7 +67,7 @@ const Dashboard = () => {
     { label: "Consultas Semana", value: "—", change: "", icon: FileCheck, color: "success" as const, trend: "up" },
   ]);
 
-  const [agendaDoDia, setAgendaDoDia] = useState<{time: string; patient: string; proc: string; status: string}[]>([]);
+  const [agendaDoDia, setAgendaDoDia] = useState<{time: string; patient: string; proc: string; status: string; paymentStatus: string}[]>([]);
   const [sessionsWeekly, setSessionsWeekly] = useState<{day: string; sessoes: number}[]>([]);
   const [topProcedures, setTopProcedures] = useState<{name: string; count: number}[]>([]);
   const [nextAppointments, setNextAppointments] = useState<{time: string; patient: string; proc: string; status: string}[]>([]);
