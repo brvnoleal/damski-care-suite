@@ -97,8 +97,9 @@ const Dashboard = () => {
 
       const todayDone = todayAg.filter((a: any) => a.status === "realizado").length;
       const criticalCount = insumos.filter((i: any) => {
+        if (i.sem_validade || !i.validade) return false;
         const d = Math.ceil((new Date(i.validade).getTime() - now.getTime()) / 86400000);
-        return d <= 15;
+        return d >= 0 && d <= 15;
       }).length;
       const weekConfirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
 
@@ -167,14 +168,15 @@ const Dashboard = () => {
         })));
       }
 
-      // Critical supplies
+      // Critical supplies — só com validade dentro de 15 dias e sem_validade=false
       const critical = insumos
+        .filter((i: any) => !i.sem_validade && i.validade)
         .map((i: any) => ({
           name: i.nome, lot: i.lote,
           expiry: new Date(i.validade).toLocaleDateString("pt-BR"),
           daysLeft: Math.ceil((new Date(i.validade).getTime() - now.getTime()) / 86400000),
         }))
-        .filter((i) => i.daysLeft <= 15)
+        .filter((i) => i.daysLeft >= 0 && i.daysLeft <= 15)
         .sort((a, b) => a.daysLeft - b.daysLeft);
       setCriticalSupplies(critical);
     };
