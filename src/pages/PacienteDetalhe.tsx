@@ -1344,7 +1344,96 @@ const PacienteDetalhe = () => {
           </div>
         </div>
       </ResponsiveDialog>
+
+      {/* Detalhe da Consulta (Sheet à direita) */}
+      <Sheet open={!!detalheConsulta} onOpenChange={(o) => !o && setDetalheConsulta(null)}>
+        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Detalhes da Consulta</SheetTitle>
+            <SheetDescription>
+              Informações completas, pagamento e insumos consumidos.
+            </SheetDescription>
+          </SheetHeader>
+          {detalheConsulta && (
+            <div className="space-y-4 mt-4">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-muted-foreground">Procedimento</p>
+                  <p className="text-foreground font-medium">
+                    {procedimentoConsultaLabels[detalheConsulta.procedimento] || detalheConsulta.procedimento}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Status</p>
+                  <p className="text-foreground font-medium capitalize">{detalheConsulta.status}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Data</p>
+                  <p className="text-foreground">{formatDateBR(detalheConsulta.data)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Horário</p>
+                  <p className="text-foreground">
+                    {detalheConsulta.horario}
+                    {detalheConsulta.horario_fim ? ` – ${detalheConsulta.horario_fim}` : ""}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Dentista</p>
+                  <p className="text-foreground">
+                    {dentistas.find((d) => d.id === detalheConsulta.dentista_id)?.nome || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Valor</p>
+                  <p className="text-foreground">{formatBRL(detalheConsulta.valor)}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-xs text-muted-foreground">Pagamento</p>
+                  <p className="text-foreground">
+                    {formaPagamentoLabels[detalheConsulta.forma_pagamento]}
+                    {detalheConsulta.parcelas > 1 ? ` · ${detalheConsulta.parcelas}x` : ""}
+                  </p>
+                </div>
+                {detalheConsulta.observacoes && (
+                  <div className="col-span-2">
+                    <p className="text-xs text-muted-foreground">Observações</p>
+                    <p className="text-foreground">{detalheConsulta.observacoes}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-border pt-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Insumos consumidos
+                </p>
+                {detalheInsumos.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nenhum insumo registrado.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {detalheInsumos.map((i) => (
+                      <div
+                        key={i.id}
+                        className="flex items-center justify-between rounded-lg border border-border/40 px-3 py-2"
+                      >
+                        <span className="text-sm text-foreground">{i.insumo_nome}</span>
+                        <span className="text-sm font-medium text-foreground">{i.quantidade}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          <SheetFooter className="mt-6">
+            <Button variant="outline" onClick={() => setDetalheConsulta(null)}>
+              Fechar
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
+
 
 
   );
