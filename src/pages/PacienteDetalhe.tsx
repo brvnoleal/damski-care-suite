@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X, User, DollarSign, Activity, Smile } from "lucide-react";
+import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X, User, DollarSign, Activity, Smile, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn, isValidCpf } from "@/lib/utils";
@@ -28,7 +28,10 @@ import { Paciente, Dentista, Agendamento, ProcedimentoConsulta, procedimentoCons
 import { sessaoService, type Sessao } from "@/services/sessaoService";
 import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/services/pacienteFotoService";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
+import { ConsultaInsumosEditor, ConsultaInsumoItem } from "@/components/agendamento/ConsultaInsumosEditor";
+import { agendamentoInsumoService, AgendamentoInsumo } from "@/services/agendamentoInsumoService";
 import { CurrencyInput } from "@/components/ui/currency-input";
+
 import { processClinicalPhoto } from "@/lib/imageProcessing";
 import { CameraCapture } from "@/components/CameraCapture";
 
@@ -151,6 +154,10 @@ const PacienteDetalhe = () => {
     valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
   });
   const [consultaForm, setConsultaForm] = useState(emptyConsulta());
+  const [consultaInsumos, setConsultaInsumos] = useState<ConsultaInsumoItem[]>([]);
+  const [detalheConsulta, setDetalheConsulta] = useState<Agendamento | null>(null);
+  const [detalheInsumos, setDetalheInsumos] = useState<AgendamentoInsumo[]>([]);
+
 
   useEffect(() => {
     const load = async () => {
@@ -390,6 +397,7 @@ const PacienteDetalhe = () => {
 
   const openConsultaDialog = () => {
     setConsultaForm(emptyConsulta());
+    setConsultaInsumos([]);
     setConsultaOpen(true);
   };
 
@@ -400,13 +408,29 @@ const PacienteDetalhe = () => {
     }
     try {
       const created = await agendamentoService.criar({ ...consultaForm, paciente_id: id });
+      if (consultaInsumos.length > 0) {
+        await agendamentoInsumoService.sincronizar(created.id, consultaInsumos);
+      }
       setAgendamentos((prev) => [created, ...prev]);
       setConsultaOpen(false);
       toast({ title: "Consulta agendada com sucesso" });
-    } catch {
-      toast({ title: "Erro ao salvar consulta", variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Erro ao salvar consulta", description: err?.message, variant: "destructive" });
     }
   };
+
+  const openDetalheConsulta = async (a: Agendamento) => {
+    setDetalheConsulta(a);
+    setDetalheInsumos([]);
+    try {
+      const list = await agendamentoInsumoService.listarPorAgendamento(a.id);
+      setDetalheInsumos(list);
+    } catch {
+      /* ignore */
+    }
+  };
+
+
 
   const totalRecebido = debitos.filter((d) => d.status === "pago").reduce((s, d) => s + d.valor, 0);
   const totalAtrasado = debitos.filter((d) => isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
@@ -695,15 +719,28 @@ const PacienteDetalhe = () => {
                 <LiquidGlassCard key={a.id} draggable={false} className="p-5 space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-semibold text-foreground">{procedimentoConsultaLabels[a.procedimento]}</p>
+                      <p className="text-sm font-semibold text-foreground">{procedimentoConsultaLabels[a.procedimento] || a.procedimento}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {formatDateBR(a.data)} · {a.horario}{a.horario_fim ? ` – ${a.horario_fim}` : ""}
                       </p>
                     </div>
-                    <Badge className={statusMap[a.status] || statusMap.agendado}>
-                      {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge className={statusMap[a.status] || statusMap.agendado}>
+                        {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
+                      </Badge>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8"
+                        onClick={() => openDetalheConsulta(a)}
+                        aria-label="Ver detalhes da consulta"
+                        title="Ver detalhes"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
                     <div>
                       <p className="text-xs text-muted-foreground">Dentista</p>
@@ -1253,8 +1290,17 @@ const PacienteDetalhe = () => {
               value={consultaForm.procedimento}
               onChange={(v) => setConsultaForm({ ...consultaForm, procedimento: v as ProcedimentoConsulta })}
             />
-
           </div>
+
+          <div className="sm:col-span-2">
+            <ConsultaInsumosEditor
+              procedimentoNome={consultaForm.procedimento}
+              value={consultaInsumos}
+              onChange={setConsultaInsumos}
+              resetKey="new"
+            />
+          </div>
+
 
           <div className="sm:col-span-2 pt-1">
             <div className="flex items-center gap-2 mb-3">
@@ -1298,7 +1344,96 @@ const PacienteDetalhe = () => {
           </div>
         </div>
       </ResponsiveDialog>
+
+      {/* Detalhe da Consulta (Sheet à direita) */}
+      <Sheet open={!!detalheConsulta} onOpenChange={(o) => !o && setDetalheConsulta(null)}>
+        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Detalhes da Consulta</SheetTitle>
+            <SheetDescription>
+              Informações completas, pagamento e insumos consumidos.
+            </SheetDescription>
+          </SheetHeader>
+          {detalheConsulta && (
+            <div className="space-y-4 mt-4">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-xs text-muted-foreground">Procedimento</p>
+                  <p className="text-foreground font-medium">
+                    {procedimentoConsultaLabels[detalheConsulta.procedimento] || detalheConsulta.procedimento}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Status</p>
+                  <p className="text-foreground font-medium capitalize">{detalheConsulta.status}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Data</p>
+                  <p className="text-foreground">{formatDateBR(detalheConsulta.data)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Horário</p>
+                  <p className="text-foreground">
+                    {detalheConsulta.horario}
+                    {detalheConsulta.horario_fim ? ` – ${detalheConsulta.horario_fim}` : ""}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Dentista</p>
+                  <p className="text-foreground">
+                    {dentistas.find((d) => d.id === detalheConsulta.dentista_id)?.nome || "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Valor</p>
+                  <p className="text-foreground">{formatBRL(detalheConsulta.valor)}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-xs text-muted-foreground">Pagamento</p>
+                  <p className="text-foreground">
+                    {formaPagamentoLabels[detalheConsulta.forma_pagamento]}
+                    {detalheConsulta.parcelas > 1 ? ` · ${detalheConsulta.parcelas}x` : ""}
+                  </p>
+                </div>
+                {detalheConsulta.observacoes && (
+                  <div className="col-span-2">
+                    <p className="text-xs text-muted-foreground">Observações</p>
+                    <p className="text-foreground">{detalheConsulta.observacoes}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-border pt-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Insumos consumidos
+                </p>
+                {detalheInsumos.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nenhum insumo registrado.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {detalheInsumos.map((i) => (
+                      <div
+                        key={i.id}
+                        className="flex items-center justify-between rounded-lg border border-border/40 px-3 py-2"
+                      >
+                        <span className="text-sm text-foreground">{i.insumo_nome}</span>
+                        <span className="text-sm font-medium text-foreground">{i.quantidade}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          <SheetFooter className="mt-6">
+            <Button variant="outline" onClick={() => setDetalheConsulta(null)}>
+              Fechar
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
+
 
 
   );

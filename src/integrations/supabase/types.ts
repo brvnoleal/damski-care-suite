@@ -90,6 +90,58 @@ export type Database = {
           },
         ]
       }
+      agendamento_insumo: {
+        Row: {
+          agendamento_id: string
+          clinica_id: string
+          created_at: string
+          id: string
+          insumo_id: string
+          quantidade: number
+          updated_at: string
+        }
+        Insert: {
+          agendamento_id: string
+          clinica_id: string
+          created_at?: string
+          id?: string
+          insumo_id: string
+          quantidade?: number
+          updated_at?: string
+        }
+        Update: {
+          agendamento_id?: string
+          clinica_id?: string
+          created_at?: string
+          id?: string
+          insumo_id?: string
+          quantidade?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agendamento_insumo_agendamento_id_fkey"
+            columns: ["agendamento_id"]
+            isOneToOne: false
+            referencedRelation: "agendamento"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agendamento_insumo_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agendamento_insumo_insumo_id_fkey"
+            columns: ["insumo_id"]
+            isOneToOne: false
+            referencedRelation: "insumo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       anamnese_tentativa: {
         Row: {
           bloqueado_ate: string | null
@@ -1068,6 +1120,58 @@ export type Database = {
             columns: ["clinica_id"]
             isOneToOne: false
             referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      procedimento_insumo: {
+        Row: {
+          clinica_id: string
+          created_at: string
+          id: string
+          insumo_id: string
+          procedimento_id: string
+          quantidade: number
+          updated_at: string
+        }
+        Insert: {
+          clinica_id: string
+          created_at?: string
+          id?: string
+          insumo_id: string
+          procedimento_id: string
+          quantidade?: number
+          updated_at?: string
+        }
+        Update: {
+          clinica_id?: string
+          created_at?: string
+          id?: string
+          insumo_id?: string
+          procedimento_id?: string
+          quantidade?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "procedimento_insumo_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "procedimento_insumo_insumo_id_fkey"
+            columns: ["insumo_id"]
+            isOneToOne: false
+            referencedRelation: "insumo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "procedimento_insumo_procedimento_id_fkey"
+            columns: ["procedimento_id"]
+            isOneToOne: false
+            referencedRelation: "procedimento"
             referencedColumns: ["id"]
           },
         ]

@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, Package } from "lucide-react";
+import { ProcedimentoInsumosDialog } from "@/components/configuracoes/ProcedimentoInsumosDialog";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
@@ -43,8 +45,10 @@ export default function ProcedimentosSection() {
   const [editing, setEditing] = useState<ProcedimentoRecord | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<ProcedimentoRecord | null>(null);
+  const [insumosTarget, setInsumosTarget] = useState<ProcedimentoRecord | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
+
 
   const { data: procedimentos = [], isLoading } = useQuery({
     queryKey: ["procedimentos"],
@@ -189,6 +193,15 @@ export default function ProcedimentosSection() {
                         <Button
                           size="icon"
                           variant="ghost"
+                          onClick={() => setInsumosTarget(p)}
+                          aria-label="Gerenciar insumos"
+                          title="Gerenciar insumos do procedimento"
+                        >
+                          <Package className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
                           onClick={() => handleOpenEdit(p)}
                           aria-label="Editar"
                         >
@@ -205,6 +218,7 @@ export default function ProcedimentosSection() {
                         </Button>
                       </div>
                     </TableCell>
+
                   </TableRow>
                 ))
               )}
@@ -319,6 +333,14 @@ export default function ProcedimentosSection() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ProcedimentoInsumosDialog
+        open={!!insumosTarget}
+        onOpenChange={(o) => !o && setInsumosTarget(null)}
+        procedimentoId={insumosTarget?.id || null}
+        procedimentoNome={insumosTarget?.nome || ""}
+      />
+
     </LiquidGlassCard>
   );
 }

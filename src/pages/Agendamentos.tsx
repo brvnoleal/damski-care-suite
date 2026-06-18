@@ -27,6 +27,9 @@ import { dentistaService } from "@/services/dentistaService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
+import { ConsultaInsumosEditor, ConsultaInsumoItem } from "@/components/agendamento/ConsultaInsumosEditor";
+import { agendamentoInsumoService } from "@/services/agendamentoInsumoService";
+
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
   data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
@@ -100,9 +103,11 @@ const Agendamentos = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyAgendamento());
+  const [insumosConsulta, setInsumosConsulta] = useState<ConsultaInsumoItem[]>([]);
   const [repetir, setRepetir] = useState<RepetirTipo>("nao");
   const [datasSelecionadas, setDatasSelecionadas] = useState<string[]>([]);
   const [datasPersonalizadas, setDatasPersonalizadas] = useState<string[]>([]);
+
 
   const datasSugeridas = repetir !== "nao" && repetir !== "personalizado" ? gerarDatasSugeridas(repetir, form.data) : [];
 
@@ -145,16 +150,24 @@ const Agendamentos = () => {
   const openCreate = () => {
     setEditingId(null);
     setForm(emptyAgendamento());
+    setInsumosConsulta([]);
     resetRepetir();
     setDialogOpen(true);
   };
 
-  const openEdit = (a: Agendamento) => {
+  const openEdit = async (a: Agendamento) => {
     setEditingId(a.id);
     setForm({ data: a.data, horario: a.horario, horario_fim: a.horario_fim || "", paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, observacoes: a.observacoes || "" });
+    try {
+      const existing = await agendamentoInsumoService.listarPorAgendamento(a.id);
+      setInsumosConsulta(existing.map((i) => ({ insumo_id: i.insumo_id, quantidade: i.quantidade })));
+    } catch {
+      setInsumosConsulta([]);
+    }
     resetRepetir();
     setDialogOpen(true);
   };
+
 
   // sincroniza seleção quando muda tipo de repetição ou data base
   useEffect(() => {
@@ -179,25 +192,35 @@ const Agendamentos = () => {
     try {
       if (editingId) {
         await agendamentoService.atualizar(editingId, form);
+        await agendamentoInsumoService.sincronizar(editingId, insumosConsulta);
         toast({ title: "Agendamento atualizado com sucesso" });
       } else {
         const datasExtras = repetir === "personalizado"
           ? datasPersonalizadas.filter((d) => d && d !== form.data)
           : repetir !== "nao" ? datasSelecionadas.filter((d) => d !== form.data) : [];
         const lista = [form, ...datasExtras.map((d) => ({ ...form, data: d }))];
+        let createdIds: string[] = [];
         if (lista.length === 1) {
-          await agendamentoService.criar(form);
+          const c = await agendamentoService.criar(form);
+          createdIds = [c.id];
         } else {
-          await agendamentoService.criarVarios(lista);
+          const created = await agendamentoService.criarVarios(lista);
+          createdIds = created.map((c) => c.id);
         }
+        // baixa de estoque para todas as datas geradas
+        await Promise.all(
+          createdIds.map((id) => agendamentoInsumoService.sincronizar(id, insumosConsulta))
+        );
         toast({ title: lista.length > 1 ? `${lista.length} agendamentos criados` : "Agendamento criado com sucesso" });
       }
       await loadData();
       setDialogOpen(false);
-    } catch (err) {
-      toast({ title: "Erro ao salvar agendamento", variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Erro ao salvar agendamento", description: err?.message, variant: "destructive" });
     }
   };
+
+
 
 
   const handleDelete = async () => {
@@ -444,8 +467,17 @@ const Agendamentos = () => {
               value={form.procedimento}
               onChange={(v) => setForm({ ...form, procedimento: v })}
             />
-
           </div>
+
+          <div className="sm:col-span-2">
+            <ConsultaInsumosEditor
+              procedimentoNome={form.procedimento}
+              value={insumosConsulta}
+              onChange={setInsumosConsulta}
+              resetKey={editingId || "new"}
+            />
+          </div>
+
 
           <div className="sm:col-span-2 pt-1">
             <div className="flex items-center gap-2 mb-3">
