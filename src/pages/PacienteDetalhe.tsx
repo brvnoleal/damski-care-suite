@@ -154,6 +154,10 @@ const PacienteDetalhe = () => {
     valor: 0, forma_pagamento: "dinheiro", parcelas: 1, observacoes: "",
   });
   const [consultaForm, setConsultaForm] = useState(emptyConsulta());
+  const [consultaInsumos, setConsultaInsumos] = useState<ConsultaInsumoItem[]>([]);
+  const [detalheConsulta, setDetalheConsulta] = useState<Agendamento | null>(null);
+  const [detalheInsumos, setDetalheInsumos] = useState<AgendamentoInsumo[]>([]);
+
 
   useEffect(() => {
     const load = async () => {
