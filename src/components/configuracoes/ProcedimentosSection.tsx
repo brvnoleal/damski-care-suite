@@ -193,6 +193,15 @@ export default function ProcedimentosSection() {
                         <Button
                           size="icon"
                           variant="ghost"
+                          onClick={() => setInsumosTarget(p)}
+                          aria-label="Gerenciar insumos"
+                          title="Gerenciar insumos do procedimento"
+                        >
+                          <Package className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
                           onClick={() => handleOpenEdit(p)}
                           aria-label="Editar"
                         >
@@ -209,6 +218,7 @@ export default function ProcedimentosSection() {
                         </Button>
                       </div>
                     </TableCell>
+
                   </TableRow>
                 ))
               )}
