@@ -295,6 +295,7 @@ export type Database = {
           status: string
           telefone: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           bairro?: string | null
@@ -316,6 +317,7 @@ export type Database = {
           status?: string
           telefone?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           bairro?: string | null
@@ -337,6 +339,7 @@ export type Database = {
           status?: string
           telefone?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -344,6 +347,13 @@ export type Database = {
             columns: ["clinica_id"]
             isOneToOne: false
             referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dentista_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
