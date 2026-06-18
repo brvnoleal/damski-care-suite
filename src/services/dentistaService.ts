@@ -33,6 +33,29 @@ export const dentistaService = {
     return (data || []).map(mapRow);
   },
 
+  /**
+   * Lista apenas dentistas vinculados a usuários do sistema com perfil
+   * Administrador ou Responsável Técnico. Usado no combo de agendamentos.
+   */
+  listarUsuariosDentistas: async (): Promise<Dentista[]> => {
+    const { data: membros, error: mErr } = await supabase
+      .from("clinica_membro")
+      .select("user_id, role")
+      .in("role", ["admin", "responsavel_tecnico"]);
+    if (mErr) throw mErr;
+    const userIds = (membros || []).map((m: any) => m.user_id).filter(Boolean);
+    if (userIds.length === 0) return [];
+    const { data, error } = await supabase
+      .from("dentista")
+      .select("*")
+      .in("user_id", userIds)
+      .order("nome");
+    if (error) throw error;
+    return (data || []).map(mapRow);
+  },
+
+
+
   buscarPorId: async (id: string): Promise<Dentista | null> => {
     const { data, error } = await supabase.from("dentista").select("*").eq("id", id).maybeSingle();
     if (error) throw error;

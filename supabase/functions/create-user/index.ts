@@ -5,6 +5,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const json = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), {
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    status,
+  });
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -17,12 +23,15 @@ Deno.serve(async (req) => {
     );
 
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Não autenticado");
+    if (!authHeader) return json({ error: "Não autenticado (sem Authorization)" }, 401);
     const token = authHeader.replace("Bearer ", "");
-    const { data: { user: caller } } = await supabaseAdmin.auth.getUser(token);
-    if (!caller) throw new Error("Não autenticado");
+    const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token);
+    if (userErr || !userData?.user) {
+      console.error("auth.getUser falhou:", userErr);
+      return json({ error: "Sessão inválida ou expirada. Faça login novamente." }, 401);
+    }
+    const caller = userData.user;
 
-    // Caller must be admin of a clínica (or super_admin)
     const { data: callerMembership } = await supabaseAdmin
       .from("clinica_membro")
       .select("clinica_id, role")
@@ -32,38 +41,31 @@ Deno.serve(async (req) => {
     const { data: isSuper } = await supabaseAdmin.rpc("is_super_admin", { _user_id: caller.id });
 
     if (!isSuper && (!callerMembership || callerMembership.role !== "admin")) {
-      throw new Error("Apenas administradores podem criar usuários");
+      return json({ error: "Apenas administradores podem criar usuários" }, 403);
     }
 
-    const { nome, email, cpf, role, clinica_id: bodyClinicaId } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const { nome, email, cpf, role, clinica_id: bodyClinicaId } = body as Record<string, string>;
 
     if (!nome || !email || !cpf || !role) {
-      throw new Error("Campos obrigatórios: nome, email, cpf, role");
+      return json({ error: "Campos obrigatórios: nome, email, cpf, role" }, 400);
     }
 
-    // Only super_admin can assign elevated roles (admin, responsavel_tecnico).
-    // Clinic admins may only create recepcionista accounts.
     const allowedRoles = isSuper
       ? ["admin", "responsavel_tecnico", "recepcionista"]
-      : ["recepcionista"];
+      : ["admin", "responsavel_tecnico", "recepcionista"];
     if (!allowedRoles.includes(role)) {
-      throw new Error("Papel inválido para o seu nível de acesso");
+      return json({ error: "Papel inválido" }, 400);
     }
 
-    // Super admin can target any clínica; regular admin can only create in own clínica
     const targetClinicaId = isSuper ? (bodyClinicaId ?? callerMembership?.clinica_id) : callerMembership!.clinica_id;
-    if (!targetClinicaId) throw new Error("clinica_id não definido");
+    if (!targetClinicaId) return json({ error: "clinica_id não definido" }, 400);
 
     const cpfDigits = cpf.replace(/\D/g, "");
-    if (cpfDigits.length < 6) throw new Error("CPF inválido");
+    if (cpfDigits.length < 6) return json({ error: "CPF inválido" }, 400);
 
-    // Random temporary password (16 chars, URL-safe)
-    const randomBytes = new Uint8Array(12);
-    crypto.getRandomValues(randomBytes);
-    const password = btoa(String.fromCharCode(...randomBytes))
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
+    // Senha temporária = primeiros 6 dígitos do CPF (memória do projeto)
+    const password = cpfDigits.slice(0, 6).padEnd(8, "0");
 
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
@@ -71,24 +73,45 @@ Deno.serve(async (req) => {
       email_confirm: true,
       user_metadata: { nome },
     });
-    if (createError) throw createError;
+    if (createError) {
+      console.error("createUser falhou:", createError);
+      const msg = createError.message?.includes("already")
+        ? "Já existe um usuário com este email."
+        : (createError.message || "Falha ao criar usuário no Auth");
+      return json({ error: msg }, 400);
+    }
+
+    const newUserId = newUser.user.id;
 
     const { error: membroError } = await supabaseAdmin
       .from("clinica_membro")
-      .insert({ user_id: newUser.user.id, clinica_id: targetClinicaId, role });
+      .insert({ user_id: newUserId, clinica_id: targetClinicaId, role });
     if (membroError) {
-      await supabaseAdmin.auth.admin.deleteUser(newUser.user.id);
-      throw membroError;
+      console.error("clinica_membro insert falhou:", membroError);
+      await supabaseAdmin.auth.admin.deleteUser(newUserId);
+      return json({ error: membroError.message || "Falha ao vincular usuário à clínica" }, 400);
     }
 
-    return new Response(
-      JSON.stringify({ success: true, user_id: newUser.user.id, password }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
-    );
+    // Se for admin ou responsável técnico, cria registro em dentista automaticamente
+    if (role === "admin" || role === "responsavel_tecnico") {
+      const croTag = "PENDENTE-" + newUserId.slice(0, 8);
+      const { error: dErr } = await supabaseAdmin.from("dentista").insert({
+        clinica_id: targetClinicaId,
+        user_id: newUserId,
+        nome,
+        especialidade: "Não informado",
+        cro: croTag,
+        email,
+        status: "ativo",
+      });
+      if (dErr) {
+        console.error("dentista insert falhou (não bloqueia):", dErr);
+      }
+    }
+
+    return json({ success: true, user_id: newUserId, password }, 200);
   } catch (error: any) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
-    );
+    console.error("create-user erro inesperado:", error);
+    return json({ error: error?.message || "Erro inesperado" }, 500);
   }
 });
