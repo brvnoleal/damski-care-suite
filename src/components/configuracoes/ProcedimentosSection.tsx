@@ -333,6 +333,14 @@ export default function ProcedimentosSection() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ProcedimentoInsumosDialog
+        open={!!insumosTarget}
+        onOpenChange={(o) => !o && setInsumosTarget(null)}
+        procedimentoId={insumosTarget?.id || null}
+        procedimentoNome={insumosTarget?.nome || ""}
+      />
+
     </LiquidGlassCard>
   );
 }
