@@ -337,7 +337,29 @@ const Agendamentos = () => {
                       <Badge variant="outline" className="font-medium">{procedimentoConsultaLabels[a.procedimento]}</Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge className={st.className}>{st.label}</Badge>
+                      <Select
+                        value={a.status}
+                        onValueChange={async (novoStatus) => {
+                          try {
+                            await agendamentoService.atualizar(a.id, { status: novoStatus as Agendamento["status"] });
+                            await loadData();
+                            toast({ title: `Status atualizado para "${statusConfig[novoStatus]?.label || novoStatus}"` });
+                          } catch (err: any) {
+                            toast({ title: "Erro ao atualizar status", description: err?.message, variant: "destructive" });
+                          }
+                        }}
+                      >
+                        <SelectTrigger className={`h-7 w-auto min-w-[140px] px-2 text-xs font-medium border ${st.className}`}>
+                          <SelectValue>{st.label}</SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="agendado">Agendado</SelectItem>
+                          <SelectItem value="confirmado">Confirmado</SelectItem>
+                          <SelectItem value="realizado">Realizada</SelectItem>
+                          <SelectItem value="nao_compareceu">Não Compareceu</SelectItem>
+                          <SelectItem value="cancelado">Cancelado</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
