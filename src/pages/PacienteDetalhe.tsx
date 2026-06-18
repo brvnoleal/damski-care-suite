@@ -397,6 +397,7 @@ const PacienteDetalhe = () => {
 
   const openConsultaDialog = () => {
     setConsultaForm(emptyConsulta());
+    setConsultaInsumos([]);
     setConsultaOpen(true);
   };
 
@@ -407,13 +408,29 @@ const PacienteDetalhe = () => {
     }
     try {
       const created = await agendamentoService.criar({ ...consultaForm, paciente_id: id });
+      if (consultaInsumos.length > 0) {
+        await agendamentoInsumoService.sincronizar(created.id, consultaInsumos);
+      }
       setAgendamentos((prev) => [created, ...prev]);
       setConsultaOpen(false);
       toast({ title: "Consulta agendada com sucesso" });
-    } catch {
-      toast({ title: "Erro ao salvar consulta", variant: "destructive" });
+    } catch (err: any) {
+      toast({ title: "Erro ao salvar consulta", description: err?.message, variant: "destructive" });
     }
   };
+
+  const openDetalheConsulta = async (a: Agendamento) => {
+    setDetalheConsulta(a);
+    setDetalheInsumos([]);
+    try {
+      const list = await agendamentoInsumoService.listarPorAgendamento(a.id);
+      setDetalheInsumos(list);
+    } catch {
+      /* ignore */
+    }
+  };
+
+
 
   const totalRecebido = debitos.filter((d) => d.status === "pago").reduce((s, d) => s + d.valor, 0);
   const totalAtrasado = debitos.filter((d) => isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
