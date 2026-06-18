@@ -335,22 +335,22 @@ const Dashboard = () => {
                 <Smile className="w-4 h-4 text-primary" />
                 <h2 className="text-xs sm:text-sm font-semibold text-foreground">Tratamentos em andamento</h2>
               </div>
-              <Badge variant="outline" className="text-[10px]">{nextAppointments.length}</Badge>
+              <Badge variant="outline" className="text-[10px]">{tratamentosAndamento.length}</Badge>
             </div>
             <div className="divide-y divide-white/5 flex-1 overflow-y-auto max-h-[220px]">
-              {nextAppointments.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-6">Nenhum atendimento hoje</p>
+              {tratamentosAndamento.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-6">Nenhum tratamento em andamento</p>
               )}
-              {nextAppointments.map((a, i) => (
+              {tratamentosAndamento.map((t, i) => (
                 <div key={i} className="flex items-center gap-3 px-4 sm:px-5 py-2.5">
-                  <span className="text-xs font-mono font-semibold text-primary w-10 shrink-0">{a.time}</span>
+                  <span className="text-xs font-mono font-semibold text-primary w-10 shrink-0">{t.dente}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{a.patient}</p>
-                    <p className="text-[11px] text-muted-foreground truncate">{a.proc}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{t.patient}</p>
+                    <p className="text-[11px] text-muted-foreground truncate capitalize">{t.proc.replace(/_/g, " ")}</p>
                   </div>
-                  <Badge variant="outline" className={cn("text-[10px] shrink-0", a.status === "confirmado" ? "text-success border-success/30" : "text-warning border-warning/30")}>
-                    {a.status === "confirmado" ? "✓" : "⏳"}
-                  </Badge>
+                  <span className="text-[10px] text-muted-foreground shrink-0">
+                    {t.date ? new Date(t.date + "T00:00:00").toLocaleDateString("pt-BR") : ""}
+                  </span>
                 </div>
               ))}
             </div>
