@@ -1,0 +1,1 @@
+ALTER TABLE public.agendamento ADD COLUMN IF NOT EXISTS status_pagamento text NOT NULL DEFAULT 'pendente' CHECK (status_pagamento IN ('pendente','pago'));
