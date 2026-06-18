@@ -28,7 +28,10 @@ import { Paciente, Dentista, Agendamento, ProcedimentoConsulta, procedimentoCons
 import { sessaoService, type Sessao } from "@/services/sessaoService";
 import { pacienteFotoService, type PacienteFoto, type FotoCategoria } from "@/services/pacienteFotoService";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
+import { ConsultaInsumosEditor, ConsultaInsumoItem } from "@/components/agendamento/ConsultaInsumosEditor";
+import { agendamentoInsumoService, AgendamentoInsumo } from "@/services/agendamentoInsumoService";
 import { CurrencyInput } from "@/components/ui/currency-input";
+
 import { processClinicalPhoto } from "@/lib/imageProcessing";
 import { CameraCapture } from "@/components/CameraCapture";
 
