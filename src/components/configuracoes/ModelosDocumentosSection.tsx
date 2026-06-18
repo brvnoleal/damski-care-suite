@@ -301,6 +301,36 @@ export const ModelosDocumentosSection = () => {
           </div>
         </div>
       </ResponsiveDialog>
+
+      <ResponsiveDialog
+        open={!!visualizando}
+        onOpenChange={(o) => !o && setVisualizando(null)}
+        title={visualizando?.nome || "Visualizar modelo"}
+        description={visualizando ? tipoDocumentoLabels[visualizando.tipo] : undefined}
+        footer={
+          <Button variant="outline" onClick={() => setVisualizando(null)} className="flex-1 sm:flex-none">
+            Fechar
+          </Button>
+        }
+      >
+        {visualizando && (
+          <div className="space-y-3">
+            {visualizando.requer_assinatura_paciente && (
+              <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px]">
+                Requer assinatura do paciente
+              </Badge>
+            )}
+            <div className="max-h-[60vh] overflow-auto rounded-lg border border-white/10 bg-white/5 p-4">
+              <pre className="whitespace-pre-wrap text-xs font-mono text-foreground">
+                {visualizando.conteudo}
+              </pre>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              As variáveis entre chaves (ex.: {"{{paciente.nome}}"}) serão substituídas ao emitir o documento.
+            </p>
+          </div>
+        )}
+      </ResponsiveDialog>
     </LiquidGlassCard>
   );
 };
