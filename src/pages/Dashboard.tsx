@@ -111,18 +111,19 @@ const Dashboard = () => {
         { label: "Consultas Semana", value: String(weekAg.length), change: `${weekConfirmed} confirmadas`, icon: FileCheck, color: "success", trend: "up" },
       ]);
 
-      // Receita da Semana
-      const realizadasAg = weekAg.filter((a: any) => a.status === "realizado");
-      const previstasAg = weekAg.filter((a: any) => ["agendado", "confirmado"].includes(a.status));
-      const totalRealizado = realizadasAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
-      const totalPrevisto = previstasAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
+      // Receita da Semana — baseada no status de pagamento
+      const naoCanceladas = weekAg.filter((a: any) => a.status !== "cancelado");
+      const pagasAg = naoCanceladas.filter((a: any) => a.status_pagamento === "pago");
+      const pendentesAg = naoCanceladas.filter((a: any) => a.status_pagamento !== "pago");
+      const totalRealizado = pagasAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
+      const totalPrevisto = pendentesAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
       const procMap: Record<string, number> = {};
-      realizadasAg.forEach((a: any) => {
+      pagasAg.forEach((a: any) => {
         const k = (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento;
         procMap[k] = (procMap[k] || 0) + Number(a.valor || 0);
       });
       const procItems = Object.entries(procMap).sort((a, b) => b[1] - a[1]).map(([proc, valor]) => ({ proc, valor }));
-      setReceitaSemana({ total: totalRealizado, realizadas: realizadasAg.length, previstas: totalPrevisto, items: procItems });
+      setReceitaSemana({ total: totalRealizado, realizadas: pagasAg.length, previstas: totalPrevisto, items: procItems });
 
       // Agenda do Dia
       const dia = todayAg
@@ -200,6 +201,29 @@ const Dashboard = () => {
     };
 
     loadDashboard();
+
+    // Realtime: atualiza ao mudar agendamentos (ex.: status de pagamento)
+    const channel = supabase
+      .channel("dashboard-agendamento-changes")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "agendamento" },
+        () => { loadDashboard(); },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "odontograma_procedimento" },
+        () => { loadDashboard(); },
+      )
+      .subscribe();
+
+    const onFocus = () => loadDashboard();
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener("focus", onFocus);
+    };
   }, []);
 
   return (

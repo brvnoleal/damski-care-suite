@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { FileText, Plus, Edit, Trash2, Loader2 } from "lucide-react";
+import { FileText, Plus, Edit, Trash2, Loader2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +31,7 @@ export const ModelosDocumentosSection = () => {
   const [loading, setLoading] = useState(true);
 
   const [openEditor, setOpenEditor] = useState(false);
+  const [visualizando, setVisualizando] = useState<DocumentoModelo | null>(null);
   const [editando, setEditando] = useState<DocumentoModelo | null>(null);
   const [nome, setNome] = useState("");
   const [tipo, setTipo] = useState<TipoDocumento>("personalizado");
@@ -178,10 +179,13 @@ export const ModelosDocumentosSection = () => {
                   </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
-                  <Button variant="ghost" size="sm" onClick={() => editar(m)}>
+                  <Button variant="ghost" size="sm" onClick={() => setVisualizando(m)} title="Visualizar">
+                    <Eye className="w-3.5 h-3.5" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => editar(m)} title="Editar">
                     <Edit className="w-3.5 h-3.5" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => excluir(m)}>
+                  <Button variant="ghost" size="sm" onClick={() => excluir(m)} title="Excluir">
                     <Trash2 className="w-3.5 h-3.5 text-destructive" />
                   </Button>
                 </div>
@@ -296,6 +300,36 @@ export const ModelosDocumentosSection = () => {
             </div>
           </div>
         </div>
+      </ResponsiveDialog>
+
+      <ResponsiveDialog
+        open={!!visualizando}
+        onOpenChange={(o) => !o && setVisualizando(null)}
+        title={visualizando?.nome || "Visualizar modelo"}
+        description={visualizando ? tipoDocumentoLabels[visualizando.tipo] : undefined}
+        footer={
+          <Button variant="outline" onClick={() => setVisualizando(null)} className="flex-1 sm:flex-none">
+            Fechar
+          </Button>
+        }
+      >
+        {visualizando && (
+          <div className="space-y-3">
+            {visualizando.requer_assinatura_paciente && (
+              <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px]">
+                Requer assinatura do paciente
+              </Badge>
+            )}
+            <div className="max-h-[60vh] overflow-auto rounded-lg border border-white/10 bg-white/5 p-4">
+              <pre className="whitespace-pre-wrap text-xs font-mono text-foreground">
+                {visualizando.conteudo}
+              </pre>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              As variáveis entre chaves (ex.: {"{{paciente.nome}}"}) serão substituídas ao emitir o documento.
+            </p>
+          </div>
+        )}
       </ResponsiveDialog>
     </LiquidGlassCard>
   );
