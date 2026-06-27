@@ -37,6 +37,7 @@ import { CameraCapture } from "@/components/CameraCapture";
 
 import { AnamneseTab } from "@/components/anamnese/AnamneseTab";
 import { DocumentosPacienteTab } from "@/components/paciente/DocumentosPacienteTab";
+import { INDICACAO_OPTIONS, INDICACAO_LABELS, indicacaoExigeNome, TAG_OPTIONS, tagClassName } from "@/lib/pacienteOptions";
 
 const formatDateBR = (iso: string) => {
   if (!iso) return "";
