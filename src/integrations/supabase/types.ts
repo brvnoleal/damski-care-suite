@@ -329,6 +329,64 @@ export type Database = {
           },
         ]
       }
+      comissao: {
+        Row: {
+          ativo: boolean
+          clinica_id: string
+          created_at: string
+          dentista_id: string
+          id: string
+          procedimento_id: string
+          tipo: string
+          updated_at: string
+          valor: number
+        }
+        Insert: {
+          ativo?: boolean
+          clinica_id: string
+          created_at?: string
+          dentista_id: string
+          id?: string
+          procedimento_id: string
+          tipo?: string
+          updated_at?: string
+          valor?: number
+        }
+        Update: {
+          ativo?: boolean
+          clinica_id?: string
+          created_at?: string
+          dentista_id?: string
+          id?: string
+          procedimento_id?: string
+          tipo?: string
+          updated_at?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comissao_clinica_id_fkey"
+            columns: ["clinica_id"]
+            isOneToOne: false
+            referencedRelation: "clinica"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comissao_dentista_id_fkey"
+            columns: ["dentista_id"]
+            isOneToOne: false
+            referencedRelation: "dentista"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comissao_procedimento_id_fkey"
+            columns: ["procedimento_id"]
+            isOneToOne: false
+            referencedRelation: "procedimento"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dentista: {
         Row: {
           bairro: string | null

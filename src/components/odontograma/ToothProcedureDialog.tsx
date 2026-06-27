@@ -76,6 +76,14 @@ export const ToothProcedureDialog = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dente) return;
+    if (!form.dentista_id) {
+      toast({
+        title: "Dentista obrigatório",
+        description: "Selecione o profissional responsável pelo procedimento.",
+        variant: "destructive",
+      });
+      return;
+    }
     setSaving(true);
     try {
       await odontogramaService.criar({
@@ -84,7 +92,7 @@ export const ToothProcedureDialog = ({
         status: form.status,
         procedimento: form.procedimento,
         valor: 0,
-        dentista_id: form.dentista_id || undefined,
+        dentista_id: form.dentista_id,
         observacoes: form.observacoes || undefined,
         data: new Date().toISOString().slice(0, 10),
       });
@@ -152,12 +160,21 @@ export const ToothProcedureDialog = ({
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label>Profissional</Label>
-          <Select value={form.dentista_id} onValueChange={(v) => setForm({ ...form, dentista_id: v })}>
-            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+          <Label>
+            Profissional responsável <span className="text-destructive">*</span>
+          </Label>
+          <Select
+            value={form.dentista_id}
+            onValueChange={(v) => setForm({ ...form, dentista_id: v })}
+          >
+            <SelectTrigger aria-required="true">
+              <SelectValue placeholder="Selecione o dentista responsável" />
+            </SelectTrigger>
             <SelectContent>
               {dentistas.map((d) => (
-                <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
+                <SelectItem key={d.id} value={d.id}>
+                  {d.nome}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
