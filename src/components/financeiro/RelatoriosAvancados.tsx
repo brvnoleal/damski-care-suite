@@ -28,13 +28,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Download, Wallet, TrendingDown, TrendingUp, AlertTriangle, Percent } from "lucide-react";
+import { Loader2, Download, Wallet, TrendingDown, TrendingUp, AlertTriangle, Percent, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { comissaoService, type ComissaoRecord } from "@/services/comissaoService";
 import { procedimentoService, type ProcedimentoRecord } from "@/services/procedimentoService";
 import { dentistaService } from "@/services/dentistaService";
-import type { Dentista } from "@/types";
+import { pacienteService } from "@/services/pacienteService";
+import type { Dentista, Paciente } from "@/types";
 import { procedimentoConsultaLabels } from "@/types";
 import { exportToXlsx } from "@/lib/exportXlsx";
 
@@ -98,23 +99,26 @@ const RelatoriosAvancados = () => {
   const [comissoes, setComissoes] = useState<ComissaoRecord[]>([]);
   const [procedimentos, setProcedimentos] = useState<ProcedimentoRecord[]>([]);
   const [dentistas, setDentistas] = useState<Dentista[]>([]);
+  const [pacientes, setPacientes] = useState<Paciente[]>([]);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
       try {
-        const [agRes, despRes, com, procs, dts] = await Promise.all([
+        const [agRes, despRes, com, procs, dts, pacs] = await Promise.all([
           supabase.from("agendamento").select("id,data,paciente_id,dentista_id,procedimento,status,status_pagamento,valor"),
           supabase.from("despesa").select("id,descricao,valor,status,vencimento"),
           comissaoService.list(),
           procedimentoService.list(),
           dentistaService.listar(),
+          pacienteService.listar(),
         ]);
         setAgs(((agRes.data as any[]) || []).map((a) => ({ ...a, valor: Number(a.valor) || 0 })));
         setDespesas(((despRes.data as any[]) || []).map((d) => ({ ...d, valor: Number(d.valor) || 0 })));
         setComissoes(com);
         setProcedimentos(procs);
         setDentistas(dts);
+        setPacientes(pacs);
       } catch (e: any) {
         toast.error("Erro ao carregar relatórios: " + e.message);
       } finally {
@@ -333,6 +337,45 @@ const RelatoriosAvancados = () => {
 
     return Object.values(result).sort((a, b) => b.comissaoTotal - a.comissaoTotal);
   }, [agsFiltrados, comissaoLookup, procedimentos, dentistas, dentistaFiltro]);
+
+  // ============ Demografia ============
+  const demografia = useMemo(() => {
+    const pacIdsAtivos = new Set(agsFiltrados.map((a) => a.paciente_id));
+    const base = pacientes.filter((p) => pacIdsAtivos.size === 0 || pacIdsAtivos.has(p.id));
+    const total = base.length;
+    const calcIdade = (iso?: string) => {
+      if (!iso) return null;
+      const dt = new Date(iso + "T00:00:00");
+      if (isNaN(dt.getTime())) return null;
+      const now = new Date();
+      let age = now.getFullYear() - dt.getFullYear();
+      const mo = now.getMonth() - dt.getMonth();
+      if (mo < 0 || (mo === 0 && now.getDate() < dt.getDate())) age--;
+      return age;
+    };
+    const sexoMap: Record<string, number> = {};
+    const faixaMap: Record<string, number> = { "0-17": 0, "18-29": 0, "30-44": 0, "45-59": 0, "60+": 0, "—": 0 };
+    const profMap: Record<string, number> = {};
+    let somaIdade = 0;
+    let countIdade = 0;
+    base.forEach((p) => {
+      const s = (p.sexo || "Não informado").trim() || "Não informado";
+      sexoMap[s] = (sexoMap[s] || 0) + 1;
+      const idade = calcIdade(p.data_nascimento);
+      if (idade != null) {
+        somaIdade += idade; countIdade++;
+        const f = idade < 18 ? "0-17" : idade < 30 ? "18-29" : idade < 45 ? "30-44" : idade < 60 ? "45-59" : "60+";
+        faixaMap[f]++;
+      } else {
+        faixaMap["—"]++;
+      }
+      const pr = (p.profissao || "Não informada").trim() || "Não informada";
+      profMap[pr] = (profMap[pr] || 0) + 1;
+    });
+    const topProfissoes = Object.entries(profMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const idadeMedia = countIdade > 0 ? Math.round(somaIdade / countIdade) : 0;
+    return { total, sexoMap, faixaMap, topProfissoes, idadeMedia };
+  }, [pacientes, agsFiltrados]);
 
   if (loading) {
     return (
@@ -653,6 +696,109 @@ const RelatoriosAvancados = () => {
             ))}
           </div>
         )}
+      </section>
+
+      {/* ===== Demografia ===== */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Demografia dos Pacientes</h2>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => {
+              const rows = pacientes.map((p) => {
+                const dt = p.data_nascimento ? new Date(p.data_nascimento + "T00:00:00") : null;
+                let idade: number | string = "";
+                if (dt && !isNaN(dt.getTime())) {
+                  const now = new Date();
+                  let a = now.getFullYear() - dt.getFullYear();
+                  const mo = now.getMonth() - dt.getMonth();
+                  if (mo < 0 || (mo === 0 && now.getDate() < dt.getDate())) a--;
+                  idade = a;
+                }
+                return {
+                  Nome: p.nome,
+                  Sexo: p.sexo || "—",
+                  Idade: idade,
+                  Profissão: p.profissao || "—",
+                  "Estado civil": p.estado_civil || "—",
+                  Cidade: p.cidade || "—",
+                  Estado: p.estado || "—",
+                };
+              });
+              exportToXlsx<Record<string, any>>(rows.length ? rows : [{ aviso: "Sem pacientes" }], "demografia-pacientes");
+              toast.success("Demografia exportada");
+            }}
+          >
+            <Download className="w-4 h-4" /> Exportar
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <LiquidGlassCard className="p-5" draggable={false}>
+            <h3 className="text-sm font-semibold text-foreground mb-3">Por sexo</h3>
+            <div className="space-y-2">
+              {Object.entries(demografia.sexoMap).sort((a, b) => b[1] - a[1]).map(([k, v]) => {
+                const pct = demografia.total > 0 ? Math.round((v / demografia.total) * 100) : 0;
+                return (
+                  <div key={k} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-foreground">{k}</span>
+                      <span className="text-muted-foreground">{v} ({pct}%)</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-muted/40 overflow-hidden">
+                      <div className="h-full bg-primary/60" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+              {demografia.total === 0 && <p className="text-xs text-muted-foreground">Sem dados.</p>}
+            </div>
+          </LiquidGlassCard>
+
+          <LiquidGlassCard className="p-5" draggable={false}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-foreground">Por faixa etária</h3>
+              <Badge variant="outline">Média: {demografia.idadeMedia} anos</Badge>
+            </div>
+            <div className="space-y-2">
+              {Object.entries(demografia.faixaMap).map(([k, v]) => {
+                const pct = demografia.total > 0 ? Math.round((v / demografia.total) * 100) : 0;
+                return (
+                  <div key={k} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-foreground">{k}</span>
+                      <span className="text-muted-foreground">{v} ({pct}%)</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-muted/40 overflow-hidden">
+                      <div className="h-full bg-success/60" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </LiquidGlassCard>
+
+          <LiquidGlassCard className="p-5" draggable={false}>
+            <h3 className="text-sm font-semibold text-foreground mb-3">Top profissões</h3>
+            <div className="space-y-2">
+              {demografia.topProfissoes.length === 0 && <p className="text-xs text-muted-foreground">Sem dados.</p>}
+              {demografia.topProfissoes.map(([k, v]) => {
+                const pct = demografia.total > 0 ? Math.round((v / demografia.total) * 100) : 0;
+                return (
+                  <div key={k} className="flex justify-between text-sm">
+                    <span className="text-foreground truncate pr-2">{k}</span>
+                    <span className="text-muted-foreground whitespace-nowrap">{v} ({pct}%)</span>
+                  </div>
+                );
+              })}
+            </div>
+          </LiquidGlassCard>
+        </div>
       </section>
     </div>
   );

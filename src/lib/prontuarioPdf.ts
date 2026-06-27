@@ -109,8 +109,23 @@ export const exportProntuarioPDF = ({ dump, clinica }: ExportInput) => {
   kv("CPF", p.cpf);
   kv("RG", p.rg ? `${p.rg}${p.emissor ? " — " + p.emissor : ""}` : "—");
   kv("Data de nascimento", fmtDateOnly(p.data_nascimento));
+  // Dados demográficos para relatórios e fiscalização
+  const calcIdade = (iso?: string) => {
+    if (!iso) return null;
+    const dt = new Date(iso + "T00:00:00");
+    if (isNaN(dt.getTime())) return null;
+    const now = new Date();
+    let age = now.getFullYear() - dt.getFullYear();
+    const mo = now.getMonth() - dt.getMonth();
+    if (mo < 0 || (mo === 0 && now.getDate() < dt.getDate())) age--;
+    return age;
+  };
+  const idade = calcIdade(p.data_nascimento);
+  kv("Idade", idade != null ? `${idade} anos` : "—");
   kv("Sexo", p.sexo);
+  kv("Estado civil", p.estado_civil);
   kv("Profissão", p.profissao);
+  kv("Indicação", p.indicacao_tipo ? `${p.indicacao_tipo}${p.indicacao_nome ? " — " + p.indicacao_nome : ""}` : "—");
   kv("Nº prontuário", p.numero_prontuario);
 
   section("Contato");

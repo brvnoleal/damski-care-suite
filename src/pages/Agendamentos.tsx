@@ -29,6 +29,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 import { ConsultaInsumosEditor, ConsultaInsumoItem } from "@/components/agendamento/ConsultaInsumosEditor";
 import { agendamentoInsumoService } from "@/services/agendamentoInsumoService";
+import { ParcelamentoBreakdown } from "@/components/agendamento/ParcelamentoBreakdown";
 
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
@@ -548,7 +549,10 @@ const Agendamentos = () => {
               </SelectContent>
             </Select>
           </div>
-          <div className={form.forma_pagamento === "credito" || form.forma_pagamento === "boleto" ? "sm:col-span-2" : ""}>
+          <div className="sm:col-span-2">
+            <ParcelamentoBreakdown valor={form.valor || 0} forma={form.forma_pagamento} parcelas={form.parcelas || 1} />
+          </div>
+          <div className="sm:col-span-2">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Observações</Label>
             <Input value={form.observacoes} onChange={(e) => setForm({ ...form, observacoes: e.target.value })} placeholder="Observações opcionais" />
           </div>
