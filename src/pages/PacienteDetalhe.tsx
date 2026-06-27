@@ -108,6 +108,9 @@ const isAtrasado = (d: PacienteDebito) =>
 const PacienteDetalhe = () => {
   const { id } = useParams();
   const { toast } = useToast();
+  const { clinicaId } = useClinicaContext();
+  const [exportandoPdf, setExportandoPdf] = useState(false);
+
 
   const [patientData, setPatientData] = useState<Paciente | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string>("");
