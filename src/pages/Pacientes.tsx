@@ -24,7 +24,8 @@ import { FadeIn } from "@/components/FadeIn";
 import { supabase } from "@/integrations/supabase/client";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
-  nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", situacao_profissional: "",
+  nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", profissao: "",
+  indicacao_tipo: "", indicacao_nome: "", tags: [],
   plano: "", numero_plano: "", numero_prontuario: "",
   telefone: "", email: "", instagram: "", data_nascimento: "",
   cep: "", estado: "", cidade: "", bairro: "", rua: "", numero: "", complemento: "", ponto_referencia: "",
