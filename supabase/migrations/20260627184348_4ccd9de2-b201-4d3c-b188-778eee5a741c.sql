@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.adjust_insumo_estoque() FROM anon, public;
