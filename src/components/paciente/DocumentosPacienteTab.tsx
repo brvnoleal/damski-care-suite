@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { FileText, Plus, Copy, Eye, XCircle, CheckCircle2, Clock, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { FileText, Plus, Copy, Eye, XCircle, CheckCircle2, Clock, Loader2, Upload, Download, Paperclip, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { documentoService, type DocumentoModelo, type PacienteDocumento } from "@/services/documentoService";
+import { pacienteArquivoService, type PacienteArquivo } from "@/services/pacienteArquivoService";
 import { useClinicaContext } from "@/hooks/useClinicaContext";
 import { renderTemplate, tipoDocumentoLabels, type TipoDocumento } from "@/lib/documentoTemplates";
 import { supabase } from "@/integrations/supabase/client";
