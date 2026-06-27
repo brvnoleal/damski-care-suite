@@ -5,6 +5,7 @@ import { lgpdService } from "@/services/lgpdService";
 import { exportProntuarioPDF } from "@/lib/prontuarioPdf";
 import { useClinicaContext } from "@/hooks/useClinicaContext";
 import { calcularTaxa } from "@/lib/maquininhaCalc";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn, isValidCpf } from "@/lib/utils";
