@@ -64,8 +64,11 @@ Deno.serve(async (req) => {
     const cpfDigits = cpf.replace(/\D/g, "");
     if (cpfDigits.length < 6) return json({ error: "CPF inválido" }, 400);
 
-    // Senha temporária = primeiros 6 dígitos do CPF (memória do projeto)
-    const password = cpfDigits.slice(0, 6).padEnd(8, "0");
+    // Senha temporária aleatória e segura (não derivada de CPF)
+    const randomBytes = new Uint8Array(12);
+    crypto.getRandomValues(randomBytes);
+    const password = btoa(String.fromCharCode(...randomBytes))
+      .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 
     const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
