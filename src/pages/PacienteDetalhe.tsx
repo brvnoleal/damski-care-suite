@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X, User, DollarSign, Activity, Smile, Eye, Tag } from "lucide-react";
+import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X, User, DollarSign, Activity, Smile, Eye, Tag, Download } from "lucide-react";
+import { lgpdService } from "@/services/lgpdService";
+import { exportProntuarioPDF } from "@/lib/prontuarioPdf";
+import { useClinicaContext } from "@/hooks/useClinicaContext";
+import { calcularTaxa } from "@/lib/maquininhaCalc";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn, isValidCpf } from "@/lib/utils";
