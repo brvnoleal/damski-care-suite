@@ -539,10 +539,37 @@ const PacienteDetalhe = () => {
           </div>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            disabled={exportandoPdf}
+            onClick={async () => {
+              if (!id) return;
+              setExportandoPdf(true);
+              try {
+                const [dump, clinicaRes] = await Promise.all([
+                  lgpdService.exportarDados(id),
+                  clinicaId
+                    ? supabase.from("clinica").select("nome,cnpj,telefone,email").eq("id", clinicaId).maybeSingle()
+                    : Promise.resolve({ data: null } as any),
+                ]);
+                exportProntuarioPDF({ dump, clinica: (clinicaRes as any)?.data });
+                toast({ title: "Prontuário exportado em PDF" });
+              } catch (e: any) {
+                toast({ title: "Falha ao exportar prontuário", description: e?.message, variant: "destructive" });
+              } finally {
+                setExportandoPdf(false);
+              }
+            }}
+          >
+            <Download className="w-3.5 h-3.5" /> {exportandoPdf ? "Gerando…" : "Exportar PDF"}
+          </Button>
           <Button variant="outline" size="sm" className="gap-1.5" onClick={openEditDialog}>
             <Edit className="w-3.5 h-3.5" /> Editar
           </Button>
         </div>
+
       </div>
 
       <Tabs defaultValue="detalhes" className="space-y-4">
