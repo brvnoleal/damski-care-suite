@@ -1,5 +1,7 @@
 import ProcedimentosSection from "@/components/configuracoes/ProcedimentosSection";
+import ComissoesMatrix from "@/components/comissoes/ComissoesMatrix";
 import { FadeIn } from "@/components/FadeIn";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Procedimentos = () => {
   return (
@@ -8,14 +10,23 @@ const Procedimentos = () => {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Procedimentos</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Catálogo de procedimentos do consultório
+            Catálogo de procedimentos e regras de comissão
           </p>
         </div>
       </FadeIn>
       <FadeIn delay={0.1}>
-        <div className="grid grid-cols-1 gap-6">
-          <ProcedimentosSection />
-        </div>
+        <Tabs defaultValue="catalogo" className="w-full">
+          <TabsList>
+            <TabsTrigger value="catalogo">Catálogo</TabsTrigger>
+            <TabsTrigger value="comissoes">Comissões</TabsTrigger>
+          </TabsList>
+          <TabsContent value="catalogo" className="mt-6">
+            <ProcedimentosSection />
+          </TabsContent>
+          <TabsContent value="comissoes" className="mt-6">
+            <ComissoesMatrix />
+          </TabsContent>
+        </Tabs>
       </FadeIn>
     </div>
   );
