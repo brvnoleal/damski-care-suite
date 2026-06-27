@@ -339,9 +339,18 @@ const RelatoriosAvancados = () => {
   }, [agsFiltrados, comissaoLookup, procedimentos, dentistas, dentistaFiltro]);
 
   // ============ Demografia ============
+  // Respeita: período (cutoff) + filtro de dentista (quando aplicável).
+  // Considera somente pacientes que tiveram agendamento no recorte.
   const demografia = useMemo(() => {
-    const pacIdsAtivos = new Set(agsFiltrados.map((a) => a.paciente_id));
-    const base = pacientes.filter((p) => pacIdsAtivos.size === 0 || pacIdsAtivos.has(p.id));
+    const agsEscopo = agsFiltrados.filter(
+      (a) => dentistaFiltro === "all" || a.dentista_id === dentistaFiltro,
+    );
+    const pacIdsAtivos = new Set(agsEscopo.map((a) => a.paciente_id));
+    // Se não há agendamentos no período, mostra todos os pacientes (visão geral).
+    const base =
+      pacIdsAtivos.size === 0
+        ? pacientes
+        : pacientes.filter((p) => pacIdsAtivos.has(p.id));
     const total = base.length;
     const calcIdade = (iso?: string) => {
       if (!iso) return null;
@@ -374,8 +383,11 @@ const RelatoriosAvancados = () => {
     });
     const topProfissoes = Object.entries(profMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
     const idadeMedia = countIdade > 0 ? Math.round(somaIdade / countIdade) : 0;
-    return { total, sexoMap, faixaMap, topProfissoes, idadeMedia };
-  }, [pacientes, agsFiltrados]);
+    const sexoChart = Object.entries(sexoMap).map(([name, value]) => ({ name, value }));
+    const faixaChart = Object.entries(faixaMap).map(([name, value]) => ({ name, value }));
+    const profChart = topProfissoes.map(([name, value]) => ({ name, value }));
+    return { total, sexoMap, faixaMap, topProfissoes, idadeMedia, base, sexoChart, faixaChart, profChart };
+  }, [pacientes, agsFiltrados, dentistaFiltro]);
 
   if (loading) {
     return (
