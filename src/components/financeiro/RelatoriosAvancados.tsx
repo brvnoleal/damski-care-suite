@@ -697,6 +697,109 @@ const RelatoriosAvancados = () => {
           </div>
         )}
       </section>
+
+      {/* ===== Demografia ===== */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Demografia dos Pacientes</h2>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => {
+              const rows = pacientes.map((p) => {
+                const dt = p.data_nascimento ? new Date(p.data_nascimento + "T00:00:00") : null;
+                let idade: number | string = "";
+                if (dt && !isNaN(dt.getTime())) {
+                  const now = new Date();
+                  let a = now.getFullYear() - dt.getFullYear();
+                  const mo = now.getMonth() - dt.getMonth();
+                  if (mo < 0 || (mo === 0 && now.getDate() < dt.getDate())) a--;
+                  idade = a;
+                }
+                return {
+                  Nome: p.nome,
+                  Sexo: p.sexo || "—",
+                  Idade: idade,
+                  Profissão: p.profissao || "—",
+                  "Estado civil": p.estado_civil || "—",
+                  Cidade: p.cidade || "—",
+                  Estado: p.estado || "—",
+                };
+              });
+              exportToXlsx(rows.length ? rows : [{ aviso: "Sem pacientes" }], "demografia-pacientes");
+              toast.success("Demografia exportada");
+            }}
+          >
+            <Download className="w-4 h-4" /> Exportar
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <LiquidGlassCard className="p-5" draggable={false}>
+            <h3 className="text-sm font-semibold text-foreground mb-3">Por sexo</h3>
+            <div className="space-y-2">
+              {Object.entries(demografia.sexoMap).sort((a, b) => b[1] - a[1]).map(([k, v]) => {
+                const pct = demografia.total > 0 ? Math.round((v / demografia.total) * 100) : 0;
+                return (
+                  <div key={k} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-foreground">{k}</span>
+                      <span className="text-muted-foreground">{v} ({pct}%)</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-muted/40 overflow-hidden">
+                      <div className="h-full bg-primary/60" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+              {demografia.total === 0 && <p className="text-xs text-muted-foreground">Sem dados.</p>}
+            </div>
+          </LiquidGlassCard>
+
+          <LiquidGlassCard className="p-5" draggable={false}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-foreground">Por faixa etária</h3>
+              <Badge variant="outline">Média: {demografia.idadeMedia} anos</Badge>
+            </div>
+            <div className="space-y-2">
+              {Object.entries(demografia.faixaMap).map(([k, v]) => {
+                const pct = demografia.total > 0 ? Math.round((v / demografia.total) * 100) : 0;
+                return (
+                  <div key={k} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-foreground">{k}</span>
+                      <span className="text-muted-foreground">{v} ({pct}%)</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-muted/40 overflow-hidden">
+                      <div className="h-full bg-success/60" style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </LiquidGlassCard>
+
+          <LiquidGlassCard className="p-5" draggable={false}>
+            <h3 className="text-sm font-semibold text-foreground mb-3">Top profissões</h3>
+            <div className="space-y-2">
+              {demografia.topProfissoes.length === 0 && <p className="text-xs text-muted-foreground">Sem dados.</p>}
+              {demografia.topProfissoes.map(([k, v]) => {
+                const pct = demografia.total > 0 ? Math.round((v / demografia.total) * 100) : 0;
+                return (
+                  <div key={k} className="flex justify-between text-sm">
+                    <span className="text-foreground truncate pr-2">{k}</span>
+                    <span className="text-muted-foreground whitespace-nowrap">{v} ({pct}%)</span>
+                  </div>
+                );
+              })}
+            </div>
+          </LiquidGlassCard>
+        </div>
+      </section>
     </div>
   );
 };
