@@ -584,7 +584,7 @@ const RelatoriosAvancados = () => {
                     Comissão: d.comissao,
                   })),
                 );
-                exportToXlsx(rows.length ? rows : [{ aviso: "Sem comissões no período" }], "holerite");
+                exportToXlsx<Record<string, any>>(rows.length ? rows : [{ aviso: "Sem comissões no período" }], "holerite");
                 toast.success("Holerite exportado");
               }}
             >
