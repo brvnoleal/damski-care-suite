@@ -572,7 +572,7 @@ const PacienteDetalhe = () => {
                   { label: "RG", value: patientData.rg ? `${formatRG(patientData.rg)}${patientData.emissor ? " — " + patientData.emissor : ""}` : "—" },
                   { label: "Sexo", value: patientData.sexo ? patientData.sexo.charAt(0).toUpperCase() + patientData.sexo.slice(1).replace("_", " ") : "—" },
                   { label: "Estado Civil", value: patientData.estado_civil ? patientData.estado_civil.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
-                  { label: "Situação Profissional", value: patientData.situacao_profissional ? patientData.situacao_profissional.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+                  { label: "Profissão", value: patientData.profissao || "—" },
                 ],
               },
               {
@@ -581,6 +581,14 @@ const PacienteDetalhe = () => {
                   { label: "Telefone", value: patientData.telefone || "—" },
                   { label: "Email", value: patientData.email || "—" },
                   { label: "Instagram", value: patientData.instagram || "—" },
+                  {
+                    label: "Indicação",
+                    value: patientData.indicacao_tipo
+                      ? `${INDICACAO_LABELS[patientData.indicacao_tipo] || patientData.indicacao_tipo}${
+                          patientData.indicacao_nome ? ` — ${patientData.indicacao_nome}` : ""
+                        }`
+                      : "—",
+                  },
                 ],
               },
               {
