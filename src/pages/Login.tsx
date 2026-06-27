@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
 import logo from "@/assets/cloudsmile-logo.png.asset.json";
+import loginAnimation from "@/assets/login.mp4.asset.json";
 
 export default function Login() {
   const navigate = useNavigate();
