@@ -126,14 +126,18 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
     }
   };
 
-  const excluirArquivo = async (arq: PacienteArquivo) => {
-    if (!confirm(`Excluir arquivo "${arq.nome}"?`)) return;
+  const confirmarExclusaoArquivo = async () => {
+    if (!arquivoParaExcluir) return;
+    setExcluindoArquivo(true);
     try {
-      await pacienteArquivoService.excluir(arq);
-      setArquivos((prev) => prev.filter((a) => a.id !== arq.id));
-      toast.success("Arquivo excluído");
+      await pacienteArquivoService.excluir(arquivoParaExcluir);
+      setArquivos((prev) => prev.filter((a) => a.id !== arquivoParaExcluir.id));
+      toast.success("Arquivo excluído (registrado em auditoria)");
+      setArquivoParaExcluir(null);
     } catch (e: any) {
       toast.error(e.message || "Falha ao excluir");
+    } finally {
+      setExcluindoArquivo(false);
     }
   };
 
