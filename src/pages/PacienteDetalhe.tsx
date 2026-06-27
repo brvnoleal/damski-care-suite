@@ -447,6 +447,10 @@ const PacienteDetalhe = () => {
   const totalRecebido = agendamentos.filter((a) => a.status_pagamento === "pago").reduce((s, a) => s + Number(a.valor || 0), 0);
   const totalAtrasado = debitos.filter((d) => isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
   const totalAReceber = agendamentos.filter((a) => a.status_pagamento === "pendente" && a.status !== "cancelado").reduce((s, a) => s + Number(a.valor || 0), 0);
+  const totalTaxas = agendamentos
+    .filter((a) => a.status_pagamento === "pago")
+    .reduce((s, a) => s + calcularTaxa(a.valor, a.forma_pagamento, a.parcelas).valorTaxa, 0);
+  const totalRecebidoLiquido = totalRecebido - totalTaxas;
 
 
   if (loading) {
