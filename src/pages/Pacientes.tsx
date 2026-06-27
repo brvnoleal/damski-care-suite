@@ -76,7 +76,8 @@ const Pacientes = () => {
     setForm({
       nome: p.nome, cpf: p.cpf,
       rg: p.rg || "", emissor: p.emissor || "", sexo: p.sexo || "",
-      estado_civil: p.estado_civil || "", situacao_profissional: p.situacao_profissional || "",
+      estado_civil: p.estado_civil || "", profissao: p.profissao || "",
+      indicacao_tipo: p.indicacao_tipo || "", indicacao_nome: p.indicacao_nome || "", tags: p.tags || [],
       plano: p.plano || "", numero_plano: p.numero_plano || "", numero_prontuario: p.numero_prontuario || "",
       telefone: p.telefone, email: p.email, instagram: p.instagram || "",
       data_nascimento: p.data_nascimento, cep: p.cep || "", estado: p.estado || "", cidade: p.cidade || "",
