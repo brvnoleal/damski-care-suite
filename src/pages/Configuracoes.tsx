@@ -1,10 +1,28 @@
-import { Shield, Bell } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
+import { Bell } from "lucide-react";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
+import { Switch } from "@/components/ui/switch";
 import PerfilConsultorio from "@/components/configuracoes/PerfilConsultorio";
+import MaquininhasSection from "@/components/configuracoes/MaquininhasSection";
 import { FadeIn } from "@/components/FadeIn";
+import { alertPrefs, type AlertKey, type AlertPrefs } from "@/lib/configuracoesPrefs";
+
+const ALERTAS: { key: AlertKey; label: string }[] = [
+  { key: "insumos_vencimento", label: "Vencimento de insumos (15 dias)" },
+  { key: "assinaturas_pendentes", label: "Sessões pendentes de assinatura" },
+  { key: "campos_obrigatorios", label: "Campos obrigatórios não preenchidos" },
+];
 
 const Configuracoes = () => {
+  const [prefs, setPrefs] = useState<AlertPrefs>(() => alertPrefs.load());
+
+  useEffect(() => {
+    alertPrefs.save(prefs);
+  }, [prefs]);
+
+  const setToggle = (key: AlertKey, value: boolean) =>
+    setPrefs((p) => ({ ...p, toggles: { ...p.toggles, [key]: value } }));
+
   return (
     <div className="space-y-6">
       <FadeIn>
@@ -18,73 +36,59 @@ const Configuracoes = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <PerfilConsultorio />
 
-          {/* Security */}
-          <LiquidGlassCard draggable={false} className="p-5">
+          {/* Notifications */}
+          <LiquidGlassCard draggable={false} className="p-5 lg:col-span-2">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-success/10 flex items-center justify-center">
-                  <Shield className="w-4 h-4 text-success" />
+                <div className="w-9 h-9 rounded-lg bg-warning/10 flex items-center justify-center">
+                  <Bell className="w-4 h-4 text-warning" />
                 </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">Segurança & Conformidade</h2>
-                  <p className="text-xs text-muted-foreground">Criptografia, backup e auditoria</p>
+                <div className="flex-1">
+                  <h2 className="text-sm font-semibold text-foreground">Alertas Automáticos</h2>
+                  <p className="text-xs text-muted-foreground">
+                    Ative ou desative as notificações do sistema.
+                  </p>
                 </div>
               </div>
 
-              <div className="space-y-3">
-                {[
-                  { label: "Criptografia de dados", status: "Ativo", ok: true },
-                  { label: "Backup automático semanal", status: "Ativo", ok: true },
-                  { label: "Logs de auditoria", status: "Ativo", ok: true },
-                  { label: "Versionamento de registros", status: "Ativo", ok: true },
-                  { label: "Exclusão definitiva", status: "Bloqueada", ok: true },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center justify-between py-2 text-sm">
-                    <span className="text-foreground">{item.label}</span>
-                    <Badge
+              <div className="flex items-center justify-between p-3 rounded-lg bg-warning/5 border border-warning/20">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Pausar todas as notificações</p>
+                  <p className="text-xs text-muted-foreground">
+                    Quando ativado, nenhum alerta automático será gerado.
+                  </p>
+                </div>
+                <Switch
+                  checked={prefs.pausarTodas}
+                  onCheckedChange={(v) => setPrefs((p) => ({ ...p, pausarTodas: v }))}
+                />
+              </div>
+
+              <div className="space-y-1">
+                {ALERTAS.map((a) => (
+                  <div
+                    key={a.key}
+                    className="flex items-center justify-between py-2 px-1 text-sm border-b border-border/40 last:border-0"
+                  >
+                    <span
                       className={
-                        item.ok
-                          ? "bg-success/10 text-success border-success/20"
-                          : "bg-destructive/10 text-destructive border-destructive/20"
+                        prefs.pausarTodas ? "text-muted-foreground line-through" : "text-foreground"
                       }
                     >
-                      {item.status}
-                    </Badge>
+                      {a.label}
+                    </span>
+                    <Switch
+                      checked={!prefs.pausarTodas && prefs.toggles[a.key] !== false}
+                      disabled={prefs.pausarTodas}
+                      onCheckedChange={(v) => setToggle(a.key, v)}
+                    />
                   </div>
                 ))}
               </div>
             </div>
           </LiquidGlassCard>
 
-          {/* Notifications */}
-          <LiquidGlassCard draggable={false} className="p-5">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-warning/10 flex items-center justify-center">
-                  <Bell className="w-4 h-4 text-warning" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-foreground">Alertas Automáticos</h2>
-                  <p className="text-xs text-muted-foreground">Notificações e avisos</p>
-                </div>
-              </div>
-
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between py-1.5">
-                  <span className="text-foreground">Vencimento de insumos (15 dias)</span>
-                  <span className="text-success text-xs font-medium">Ativo</span>
-                </div>
-                <div className="flex justify-between py-1.5">
-                  <span className="text-foreground">Sessões pendentes de assinatura</span>
-                  <span className="text-success text-xs font-medium">Ativo</span>
-                </div>
-                <div className="flex justify-between py-1.5">
-                  <span className="text-foreground">Campos obrigatórios não preenchidos</span>
-                  <span className="text-success text-xs font-medium">Ativo</span>
-                </div>
-              </div>
-            </div>
-          </LiquidGlassCard>
+          <MaquininhasSection />
         </div>
       </FadeIn>
     </div>
