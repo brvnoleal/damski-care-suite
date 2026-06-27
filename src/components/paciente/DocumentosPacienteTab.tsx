@@ -500,6 +500,28 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
           </div>
         )}
       </ResponsiveDialog>
+
+      <AlertDialog open={!!arquivoParaExcluir} onOpenChange={(o) => !o && setArquivoParaExcluir(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir arquivo anexado?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação remove permanentemente <strong>{arquivoParaExcluir?.nome}</strong> do prontuário do paciente.
+              A exclusão será registrada no log de auditoria para fins de fiscalização e LGPD.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={excluindoArquivo}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); confirmarExclusaoArquivo(); }}
+              disabled={excluindoArquivo}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {excluindoArquivo ? "Excluindo…" : "Excluir definitivamente"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
