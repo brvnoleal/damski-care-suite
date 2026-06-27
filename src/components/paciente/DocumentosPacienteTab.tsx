@@ -221,7 +221,7 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs text-muted-foreground">
           Documentos emitidos para este paciente. Cada link é único, temporário e exige assinatura LGPD.
