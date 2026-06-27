@@ -353,56 +353,6 @@ const RelatoriosAvancados = () => {
     return Object.values(result).sort((a, b) => b.comissaoTotal - a.comissaoTotal);
   }, [agsFiltrados, comissaoLookup, procedimentos, dentistas, dentistaFiltro]);
 
-  // ============ Demografia ============
-  // Respeita: período (cutoff) + filtro de dentista (quando aplicável).
-  // Considera somente pacientes que tiveram agendamento no recorte.
-  const demografia = useMemo(() => {
-    const agsEscopo = agsFiltrados.filter(
-      (a) => dentistaFiltro === "all" || a.dentista_id === dentistaFiltro,
-    );
-    const pacIdsAtivos = new Set(agsEscopo.map((a) => a.paciente_id));
-    // Se não há agendamentos no período, mostra todos os pacientes (visão geral).
-    const base =
-      pacIdsAtivos.size === 0
-        ? pacientes
-        : pacientes.filter((p) => pacIdsAtivos.has(p.id));
-    const total = base.length;
-    const calcIdade = (iso?: string) => {
-      if (!iso) return null;
-      const dt = new Date(iso + "T00:00:00");
-      if (isNaN(dt.getTime())) return null;
-      const now = new Date();
-      let age = now.getFullYear() - dt.getFullYear();
-      const mo = now.getMonth() - dt.getMonth();
-      if (mo < 0 || (mo === 0 && now.getDate() < dt.getDate())) age--;
-      return age;
-    };
-    const sexoMap: Record<string, number> = {};
-    const faixaMap: Record<string, number> = { "0-17": 0, "18-29": 0, "30-44": 0, "45-59": 0, "60+": 0, "—": 0 };
-    const profMap: Record<string, number> = {};
-    let somaIdade = 0;
-    let countIdade = 0;
-    base.forEach((p) => {
-      const s = (p.sexo || "Não informado").trim() || "Não informado";
-      sexoMap[s] = (sexoMap[s] || 0) + 1;
-      const idade = calcIdade(p.data_nascimento);
-      if (idade != null) {
-        somaIdade += idade; countIdade++;
-        const f = idade < 18 ? "0-17" : idade < 30 ? "18-29" : idade < 45 ? "30-44" : idade < 60 ? "45-59" : "60+";
-        faixaMap[f]++;
-      } else {
-        faixaMap["—"]++;
-      }
-      const pr = (p.profissao || "Não informada").trim() || "Não informada";
-      profMap[pr] = (profMap[pr] || 0) + 1;
-    });
-    const topProfissoes = Object.entries(profMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
-    const idadeMedia = countIdade > 0 ? Math.round(somaIdade / countIdade) : 0;
-    const sexoChart = Object.entries(sexoMap).map(([name, value]) => ({ name, value }));
-    const faixaChart = Object.entries(faixaMap).map(([name, value]) => ({ name, value }));
-    const profChart = topProfissoes.map(([name, value]) => ({ name, value }));
-    return { total, sexoMap, faixaMap, topProfissoes, idadeMedia, base, sexoChart, faixaChart, profChart };
-  }, [pacientes, agsFiltrados, dentistaFiltro]);
 
   if (loading) {
     return (
