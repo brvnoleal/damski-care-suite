@@ -722,7 +722,8 @@ const RelatoriosAvancados = () => {
             size="sm"
             className="gap-2"
             onClick={() => {
-              const rows = pacientes.map((p) => {
+              // Respeita os filtros aplicados na tela (período + dentista).
+              const rows = demografia.base.map((p) => {
                 const dt = p.data_nascimento ? new Date(p.data_nascimento + "T00:00:00") : null;
                 let idade: number | string = "";
                 if (dt && !isNaN(dt.getTime())) {
@@ -742,8 +743,23 @@ const RelatoriosAvancados = () => {
                   Estado: p.estado || "—",
                 };
               });
-              exportToXlsx<Record<string, any>>(rows.length ? rows : [{ aviso: "Sem pacientes" }], "demografia-pacientes");
-              toast.success("Demografia exportada");
+              const resumo = [
+                { Métrica: "Período (dias)", Valor: periodo === "all" ? "Tudo" : periodo },
+                { Métrica: "Dentista", Valor: dentistaFiltro === "all" ? "Todos" : dentistas.find((d) => d.id === dentistaFiltro)?.nome || dentistaFiltro },
+                { Métrica: "Total de pacientes", Valor: demografia.total },
+                { Métrica: "Idade média", Valor: demografia.idadeMedia },
+                ...Object.entries(demografia.sexoMap).map(([k, v]) => ({ Métrica: `Sexo: ${k}`, Valor: v })),
+                ...Object.entries(demografia.faixaMap).map(([k, v]) => ({ Métrica: `Faixa ${k}`, Valor: v })),
+                ...demografia.topProfissoes.map(([k, v]) => ({ Métrica: `Profissão: ${k}`, Valor: v })),
+              ];
+              exportMultiSheetXlsx(
+                [
+                  { name: "Resumo", rows: resumo },
+                  { name: "Pacientes", rows: rows.length ? rows : [{ aviso: "Sem pacientes no filtro" }] },
+                ],
+                "demografia-pacientes",
+              );
+              toast.success("Demografia exportada (com filtros aplicados)");
             }}
           >
             <Download className="w-4 h-4" /> Exportar
