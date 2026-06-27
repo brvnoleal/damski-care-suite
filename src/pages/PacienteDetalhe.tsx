@@ -209,7 +209,9 @@ const PacienteDetalhe = () => {
     setEditForm({
       nome: patientData.nome, cpf: patientData.cpf,
       rg: patientData.rg || "", emissor: patientData.emissor || "", sexo: patientData.sexo || "",
-      estado_civil: patientData.estado_civil || "", situacao_profissional: patientData.situacao_profissional || "",
+      estado_civil: patientData.estado_civil || "", profissao: patientData.profissao || "",
+      indicacao_tipo: patientData.indicacao_tipo || "", indicacao_nome: patientData.indicacao_nome || "",
+      tags: patientData.tags || [],
       plano: patientData.plano || "", numero_plano: patientData.numero_plano || "", numero_prontuario: patientData.numero_prontuario || "",
       telefone: patientData.telefone, email: patientData.email, instagram: patientData.instagram || "",
       data_nascimento: patientData.data_nascimento,
