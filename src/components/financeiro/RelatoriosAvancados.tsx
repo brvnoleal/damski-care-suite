@@ -730,7 +730,7 @@ const RelatoriosAvancados = () => {
                   Estado: p.estado || "—",
                 };
               });
-              exportToXlsx(rows.length ? rows : [{ aviso: "Sem pacientes" }], "demografia-pacientes");
+              exportToXlsx<Record<string, any>>(rows.length ? rows : [{ aviso: "Sem pacientes" }], "demografia-pacientes");
               toast.success("Demografia exportada");
             }}
           >
