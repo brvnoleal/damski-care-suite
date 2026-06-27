@@ -366,9 +366,10 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
                 >
                   <Download className="w-3.5 h-3.5" /> Abrir
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => excluirArquivo(arq)}>
+                <Button variant="ghost" size="sm" onClick={() => setArquivoParaExcluir(arq)}>
                   <Trash2 className="w-3.5 h-3.5 text-destructive" />
                 </Button>
+
               </div>
             </LiquidGlassCard>
           ))
