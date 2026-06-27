@@ -989,20 +989,12 @@ const PacienteDetalhe = () => {
             </Select>
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Situação Profissional</Label>
-            <Select value={editForm.situacao_profissional || ""} onValueChange={(v) => setEditForm({ ...editForm, situacao_profissional: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="clt">CLT</SelectItem>
-                <SelectItem value="autonomo">Autônomo</SelectItem>
-                <SelectItem value="empresario">Empresário</SelectItem>
-                <SelectItem value="servidor_publico">Servidor Público</SelectItem>
-                <SelectItem value="aposentado">Aposentado</SelectItem>
-                <SelectItem value="estudante">Estudante</SelectItem>
-                <SelectItem value="desempregado">Desempregado</SelectItem>
-                <SelectItem value="outro">Outro</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Profissão</Label>
+            <Input
+              value={editForm.profissao || ""}
+              onChange={(e) => setEditForm({ ...editForm, profissao: e.target.value })}
+              placeholder="Ex: Dentista, Professor, Empresário"
+            />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Plano</Label>
