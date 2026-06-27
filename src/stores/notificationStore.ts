@@ -121,6 +121,16 @@ export const notificationStore = {
    * Deduplica via chave por insumo + threshold.
    */
   syncInsumoAlerts(insumos: InsumoLike[]) {
+    // Respeita as preferências de alertas configuradas em Configurações.
+    try {
+      const raw = localStorage.getItem("app_alert_prefs_v1");
+      if (raw) {
+        const p = JSON.parse(raw);
+        if (p?.pausarTodas) return;
+        if (p?.toggles?.insumos_vencimento === false) return;
+      }
+    } catch { /* ignore */ }
+
     const thresholds = [15, 5];
     let changed = false;
     insumos.forEach((insumo) => {

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { FileText, Plus, Copy, Eye, XCircle, CheckCircle2, Clock, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { FileText, Plus, Copy, Eye, XCircle, CheckCircle2, Clock, Loader2, Upload, Download, Paperclip, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { documentoService, type DocumentoModelo, type PacienteDocumento } from "@/services/documentoService";
+import { pacienteArquivoService, type PacienteArquivo } from "@/services/pacienteArquivoService";
 import { useClinicaContext } from "@/hooks/useClinicaContext";
 import { renderTemplate, tipoDocumentoLabels, type TipoDocumento } from "@/lib/documentoTemplates";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,6 +36,9 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
   const { clinicaId } = useClinicaContext();
   const [docs, setDocs] = useState<PacienteDocumento[]>([]);
   const [modelos, setModelos] = useState<DocumentoModelo[]>([]);
+  const [arquivos, setArquivos] = useState<PacienteArquivo[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const uploadRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
 
   const [openNovo, setOpenNovo] = useState(false);
@@ -56,9 +60,10 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
     setLoading(true);
     try {
       if (clinicaId) await documentoService.garantirModelosPadrao(clinicaId);
-      const [d, m, { data: p }, { data: c }] = await Promise.all([
+      const [d, m, arqs, { data: p }, { data: c }] = await Promise.all([
         documentoService.listarPorPaciente(pacienteId),
         documentoService.listarModelos(),
+        pacienteArquivoService.listarPorPaciente(pacienteId).catch(() => [] as PacienteArquivo[]),
         supabase.from("paciente").select("*").eq("id", pacienteId).maybeSingle(),
         clinicaId
           ? supabase.from("clinica").select("*").eq("id", clinicaId).maybeSingle()
@@ -66,6 +71,7 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
       ]);
       setDocs(d);
       setModelos(m.filter((x) => x.ativo));
+      setArquivos(arqs);
       setPaciente(p);
       setClinica(c);
     } catch (e: any) {
@@ -79,6 +85,58 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
     carregar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pacienteId, clinicaId]);
+
+  const handleUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const created: PacienteArquivo[] = [];
+      for (const file of Array.from(files)) {
+        if (file.size > 25 * 1024 * 1024) {
+          toast.error(`${file.name}: máximo 25MB.`);
+          continue;
+        }
+        const arq = await pacienteArquivoService.upload(pacienteId, file);
+        created.push(arq);
+      }
+      if (created.length) {
+        setArquivos((prev) => [...created, ...prev]);
+        toast.success(`${created.length} arquivo(s) anexado(s).`);
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Falha ao enviar arquivo");
+    } finally {
+      setUploading(false);
+      if (uploadRef.current) uploadRef.current.value = "";
+    }
+  };
+
+  const baixarArquivo = async (arq: PacienteArquivo) => {
+    try {
+      const url = await pacienteArquivoService.getSignedUrl(arq.storage_path);
+      window.open(url, "_blank", "noopener");
+    } catch (e: any) {
+      toast.error(e.message || "Falha ao abrir arquivo");
+    }
+  };
+
+  const excluirArquivo = async (arq: PacienteArquivo) => {
+    if (!confirm(`Excluir arquivo "${arq.nome}"?`)) return;
+    try {
+      await pacienteArquivoService.excluir(arq);
+      setArquivos((prev) => prev.filter((a) => a.id !== arq.id));
+      toast.success("Arquivo excluído");
+    } catch (e: any) {
+      toast.error(e.message || "Falha ao excluir");
+    }
+  };
+
+  const formatBytes = (n: number | null) => {
+    if (!n) return "";
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+    return `${(n / 1024 / 1024).toFixed(1)} MB`;
+  };
 
   const abrirNovo = () => {
     setModeloId("");
@@ -163,7 +221,7 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs text-muted-foreground">
           Documentos emitidos para este paciente. Cada link é único, temporário e exige assinatura LGPD.
@@ -232,6 +290,81 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
           );
         })
       )}
+
+      {/* Arquivos anexados (exames, atestados, PDFs, imagens) */}
+      <div className="space-y-3 pt-2">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <Paperclip className="w-4 h-4" /> Arquivos anexados
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Exames, atestados e outros documentos do paciente (máx. 25MB por arquivo).
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1.5"
+            onClick={() => uploadRef.current?.click()}
+            disabled={uploading}
+          >
+            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+            Anexar arquivo
+          </Button>
+          <input
+            ref={uploadRef}
+            type="file"
+            multiple
+            className="hidden"
+            accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
+            onChange={(e) => handleUpload(e.target.files)}
+          />
+        </div>
+
+        {arquivos.length === 0 ? (
+          <LiquidGlassCard draggable={false} className="p-6 text-center">
+            <Paperclip className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+            <p className="text-xs text-muted-foreground">
+              Nenhum arquivo anexado. Clique em "Anexar arquivo" para enviar exames ou documentos.
+            </p>
+          </LiquidGlassCard>
+        ) : (
+          arquivos.map((arq) => (
+            <LiquidGlassCard
+              key={arq.id}
+              draggable={false}
+              className="p-3 flex items-center justify-between gap-4"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <Paperclip className="w-5 h-5 text-muted-foreground shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{arq.nome}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {formatBytes(arq.tamanho)}
+                    {arq.tamanho ? " • " : ""}
+                    {new Date(arq.created_at).toLocaleString("pt-BR")}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 text-xs"
+                  onClick={() => baixarArquivo(arq)}
+                >
+                  <Download className="w-3.5 h-3.5" /> Abrir
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => excluirArquivo(arq)}>
+                  <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                </Button>
+              </div>
+            </LiquidGlassCard>
+          ))
+        )}
+      </div>
+
 
       <ResponsiveDialog
         open={openNovo}

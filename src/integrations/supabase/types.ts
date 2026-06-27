@@ -833,6 +833,56 @@ export type Database = {
           },
         ]
       }
+      paciente_arquivo: {
+        Row: {
+          clinica_id: string
+          created_at: string
+          descricao: string | null
+          id: string
+          mime_type: string | null
+          nome: string
+          paciente_id: string
+          storage_path: string
+          tamanho: number | null
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          clinica_id: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          mime_type?: string | null
+          nome: string
+          paciente_id: string
+          storage_path: string
+          tamanho?: number | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          clinica_id?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          mime_type?: string | null
+          nome?: string
+          paciente_id?: string
+          storage_path?: string
+          tamanho?: number | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paciente_arquivo_paciente_id_fkey"
+            columns: ["paciente_id"]
+            isOneToOne: false
+            referencedRelation: "paciente"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       paciente_consentimento: {
         Row: {
           aceito: boolean
