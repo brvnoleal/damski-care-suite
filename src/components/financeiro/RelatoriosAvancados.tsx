@@ -28,13 +28,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Download, Wallet, TrendingDown, TrendingUp, AlertTriangle, Percent } from "lucide-react";
+import { Loader2, Download, Wallet, TrendingDown, TrendingUp, AlertTriangle, Percent, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { comissaoService, type ComissaoRecord } from "@/services/comissaoService";
 import { procedimentoService, type ProcedimentoRecord } from "@/services/procedimentoService";
 import { dentistaService } from "@/services/dentistaService";
-import type { Dentista } from "@/types";
+import { pacienteService } from "@/services/pacienteService";
+import type { Dentista, Paciente } from "@/types";
 import { procedimentoConsultaLabels } from "@/types";
 import { exportToXlsx } from "@/lib/exportXlsx";
 
@@ -98,23 +99,26 @@ const RelatoriosAvancados = () => {
   const [comissoes, setComissoes] = useState<ComissaoRecord[]>([]);
   const [procedimentos, setProcedimentos] = useState<ProcedimentoRecord[]>([]);
   const [dentistas, setDentistas] = useState<Dentista[]>([]);
+  const [pacientes, setPacientes] = useState<Paciente[]>([]);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
       try {
-        const [agRes, despRes, com, procs, dts] = await Promise.all([
+        const [agRes, despRes, com, procs, dts, pacs] = await Promise.all([
           supabase.from("agendamento").select("id,data,paciente_id,dentista_id,procedimento,status,status_pagamento,valor"),
           supabase.from("despesa").select("id,descricao,valor,status,vencimento"),
           comissaoService.list(),
           procedimentoService.list(),
           dentistaService.listar(),
+          pacienteService.listar(),
         ]);
         setAgs(((agRes.data as any[]) || []).map((a) => ({ ...a, valor: Number(a.valor) || 0 })));
         setDespesas(((despRes.data as any[]) || []).map((d) => ({ ...d, valor: Number(d.valor) || 0 })));
         setComissoes(com);
         setProcedimentos(procs);
         setDentistas(dts);
+        setPacientes(pacs);
       } catch (e: any) {
         toast.error("Erro ao carregar relatórios: " + e.message);
       } finally {
