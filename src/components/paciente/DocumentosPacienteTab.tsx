@@ -36,6 +36,9 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
   const { clinicaId } = useClinicaContext();
   const [docs, setDocs] = useState<PacienteDocumento[]>([]);
   const [modelos, setModelos] = useState<DocumentoModelo[]>([]);
+  const [arquivos, setArquivos] = useState<PacienteArquivo[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const uploadRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
 
   const [openNovo, setOpenNovo] = useState(false);
@@ -57,9 +60,10 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
     setLoading(true);
     try {
       if (clinicaId) await documentoService.garantirModelosPadrao(clinicaId);
-      const [d, m, { data: p }, { data: c }] = await Promise.all([
+      const [d, m, arqs, { data: p }, { data: c }] = await Promise.all([
         documentoService.listarPorPaciente(pacienteId),
         documentoService.listarModelos(),
+        pacienteArquivoService.listarPorPaciente(pacienteId).catch(() => [] as PacienteArquivo[]),
         supabase.from("paciente").select("*").eq("id", pacienteId).maybeSingle(),
         clinicaId
           ? supabase.from("clinica").select("*").eq("id", clinicaId).maybeSingle()
@@ -67,6 +71,7 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
       ]);
       setDocs(d);
       setModelos(m.filter((x) => x.ativo));
+      setArquivos(arqs);
       setPaciente(p);
       setClinica(c);
     } catch (e: any) {
@@ -80,6 +85,58 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
     carregar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pacienteId, clinicaId]);
+
+  const handleUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const created: PacienteArquivo[] = [];
+      for (const file of Array.from(files)) {
+        if (file.size > 25 * 1024 * 1024) {
+          toast.error(`${file.name}: máximo 25MB.`);
+          continue;
+        }
+        const arq = await pacienteArquivoService.upload(pacienteId, file);
+        created.push(arq);
+      }
+      if (created.length) {
+        setArquivos((prev) => [...created, ...prev]);
+        toast.success(`${created.length} arquivo(s) anexado(s).`);
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Falha ao enviar arquivo");
+    } finally {
+      setUploading(false);
+      if (uploadRef.current) uploadRef.current.value = "";
+    }
+  };
+
+  const baixarArquivo = async (arq: PacienteArquivo) => {
+    try {
+      const url = await pacienteArquivoService.getSignedUrl(arq.storage_path);
+      window.open(url, "_blank", "noopener");
+    } catch (e: any) {
+      toast.error(e.message || "Falha ao abrir arquivo");
+    }
+  };
+
+  const excluirArquivo = async (arq: PacienteArquivo) => {
+    if (!confirm(`Excluir arquivo "${arq.nome}"?`)) return;
+    try {
+      await pacienteArquivoService.excluir(arq);
+      setArquivos((prev) => prev.filter((a) => a.id !== arq.id));
+      toast.success("Arquivo excluído");
+    } catch (e: any) {
+      toast.error(e.message || "Falha ao excluir");
+    }
+  };
+
+  const formatBytes = (n: number | null) => {
+    if (!n) return "";
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+    return `${(n / 1024 / 1024).toFixed(1)} MB`;
+  };
 
   const abrirNovo = () => {
     setModeloId("");
