@@ -37,7 +37,22 @@ import { dentistaService } from "@/services/dentistaService";
 import { pacienteService } from "@/services/pacienteService";
 import type { Dentista, Paciente } from "@/types";
 import { procedimentoConsultaLabels } from "@/types";
-import { exportToXlsx } from "@/lib/exportXlsx";
+import { exportToXlsx, exportMultiSheetXlsx } from "@/lib/exportXlsx";
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+const SEXO_COLORS = ["hsl(var(--primary))", "hsl(var(--success))", "hsl(var(--warning))", "hsl(var(--muted-foreground))"];
 
 interface Agendamento {
   id: string;
@@ -339,9 +354,18 @@ const RelatoriosAvancados = () => {
   }, [agsFiltrados, comissaoLookup, procedimentos, dentistas, dentistaFiltro]);
 
   // ============ Demografia ============
+  // Respeita: período (cutoff) + filtro de dentista (quando aplicável).
+  // Considera somente pacientes que tiveram agendamento no recorte.
   const demografia = useMemo(() => {
-    const pacIdsAtivos = new Set(agsFiltrados.map((a) => a.paciente_id));
-    const base = pacientes.filter((p) => pacIdsAtivos.size === 0 || pacIdsAtivos.has(p.id));
+    const agsEscopo = agsFiltrados.filter(
+      (a) => dentistaFiltro === "all" || a.dentista_id === dentistaFiltro,
+    );
+    const pacIdsAtivos = new Set(agsEscopo.map((a) => a.paciente_id));
+    // Se não há agendamentos no período, mostra todos os pacientes (visão geral).
+    const base =
+      pacIdsAtivos.size === 0
+        ? pacientes
+        : pacientes.filter((p) => pacIdsAtivos.has(p.id));
     const total = base.length;
     const calcIdade = (iso?: string) => {
       if (!iso) return null;
@@ -374,8 +398,11 @@ const RelatoriosAvancados = () => {
     });
     const topProfissoes = Object.entries(profMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
     const idadeMedia = countIdade > 0 ? Math.round(somaIdade / countIdade) : 0;
-    return { total, sexoMap, faixaMap, topProfissoes, idadeMedia };
-  }, [pacientes, agsFiltrados]);
+    const sexoChart = Object.entries(sexoMap).map(([name, value]) => ({ name, value }));
+    const faixaChart = Object.entries(faixaMap).map(([name, value]) => ({ name, value }));
+    const profChart = topProfissoes.map(([name, value]) => ({ name, value }));
+    return { total, sexoMap, faixaMap, topProfissoes, idadeMedia, base, sexoChart, faixaChart, profChart };
+  }, [pacientes, agsFiltrados, dentistaFiltro]);
 
   if (loading) {
     return (
@@ -710,7 +737,8 @@ const RelatoriosAvancados = () => {
             size="sm"
             className="gap-2"
             onClick={() => {
-              const rows = pacientes.map((p) => {
+              // Respeita os filtros aplicados na tela (período + dentista).
+              const rows = demografia.base.map((p) => {
                 const dt = p.data_nascimento ? new Date(p.data_nascimento + "T00:00:00") : null;
                 let idade: number | string = "";
                 if (dt && !isNaN(dt.getTime())) {
@@ -730,8 +758,23 @@ const RelatoriosAvancados = () => {
                   Estado: p.estado || "—",
                 };
               });
-              exportToXlsx<Record<string, any>>(rows.length ? rows : [{ aviso: "Sem pacientes" }], "demografia-pacientes");
-              toast.success("Demografia exportada");
+              const resumo = [
+                { Métrica: "Período (dias)", Valor: periodo === "all" ? "Tudo" : periodo },
+                { Métrica: "Dentista", Valor: dentistaFiltro === "all" ? "Todos" : dentistas.find((d) => d.id === dentistaFiltro)?.nome || dentistaFiltro },
+                { Métrica: "Total de pacientes", Valor: demografia.total },
+                { Métrica: "Idade média", Valor: demografia.idadeMedia },
+                ...Object.entries(demografia.sexoMap).map(([k, v]) => ({ Métrica: `Sexo: ${k}`, Valor: v })),
+                ...Object.entries(demografia.faixaMap).map(([k, v]) => ({ Métrica: `Faixa ${k}`, Valor: v })),
+                ...demografia.topProfissoes.map(([k, v]) => ({ Métrica: `Profissão: ${k}`, Valor: v })),
+              ];
+              exportMultiSheetXlsx(
+                [
+                  { name: "Resumo", rows: resumo },
+                  { name: "Pacientes", rows: rows.length ? rows : [{ aviso: "Sem pacientes no filtro" }] },
+                ],
+                "demografia-pacientes",
+              );
+              toast.success("Demografia exportada (com filtros aplicados)");
             }}
           >
             <Download className="w-4 h-4" /> Exportar
@@ -741,23 +784,45 @@ const RelatoriosAvancados = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           <LiquidGlassCard className="p-5" draggable={false}>
             <h3 className="text-sm font-semibold text-foreground mb-3">Por sexo</h3>
-            <div className="space-y-2">
-              {Object.entries(demografia.sexoMap).sort((a, b) => b[1] - a[1]).map(([k, v]) => {
-                const pct = demografia.total > 0 ? Math.round((v / demografia.total) * 100) : 0;
-                return (
-                  <div key={k} className="space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-foreground">{k}</span>
-                      <span className="text-muted-foreground">{v} ({pct}%)</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-muted/40 overflow-hidden">
-                      <div className="h-full bg-primary/60" style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                );
-              })}
-              {demografia.total === 0 && <p className="text-xs text-muted-foreground">Sem dados.</p>}
-            </div>
+            {demografia.total === 0 ? (
+              <p className="text-xs text-muted-foreground">Sem dados.</p>
+            ) : (
+              <>
+                <div style={{ width: "100%", height: 180 }}>
+                  <ResponsiveContainer>
+                    <PieChart>
+                      <Pie
+                        data={demografia.sexoChart}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={40}
+                        outerRadius={70}
+                        paddingAngle={2}
+                      >
+                        {demografia.sexoChart.map((_, i) => (
+                          <Cell key={i} fill={SEXO_COLORS[i % SEXO_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(v: number, n: string) => [`${v} pacientes`, n]} />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="space-y-1 mt-3">
+                  {Object.entries(demografia.sexoMap).sort((a, b) => b[1] - a[1]).map(([k, v]) => {
+                    const pct = demografia.total > 0 ? Math.round((v / demografia.total) * 100) : 0;
+                    return (
+                      <div key={k} className="flex justify-between text-xs">
+                        <span className="text-foreground">{k}</span>
+                        <span className="text-muted-foreground">{v} ({pct}%)</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </LiquidGlassCard>
 
           <LiquidGlassCard className="p-5" draggable={false}>
@@ -765,38 +830,40 @@ const RelatoriosAvancados = () => {
               <h3 className="text-sm font-semibold text-foreground">Por faixa etária</h3>
               <Badge variant="outline">Média: {demografia.idadeMedia} anos</Badge>
             </div>
-            <div className="space-y-2">
-              {Object.entries(demografia.faixaMap).map(([k, v]) => {
-                const pct = demografia.total > 0 ? Math.round((v / demografia.total) * 100) : 0;
-                return (
-                  <div key={k} className="space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-foreground">{k}</span>
-                      <span className="text-muted-foreground">{v} ({pct}%)</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-muted/40 overflow-hidden">
-                      <div className="h-full bg-success/60" style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                );
-              })}
+            <div style={{ width: "100%", height: 180 }}>
+              <ResponsiveContainer>
+                <BarChart data={demografia.faixaChart} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                  <XAxis dataKey="name" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis allowDecimals={false} tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                  <Tooltip formatter={(v: number) => [`${v} pacientes`, "Quantidade"]} />
+                  <Bar dataKey="value" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </LiquidGlassCard>
 
           <LiquidGlassCard className="p-5" draggable={false}>
             <h3 className="text-sm font-semibold text-foreground mb-3">Top profissões</h3>
-            <div className="space-y-2">
-              {demografia.topProfissoes.length === 0 && <p className="text-xs text-muted-foreground">Sem dados.</p>}
-              {demografia.topProfissoes.map(([k, v]) => {
-                const pct = demografia.total > 0 ? Math.round((v / demografia.total) * 100) : 0;
-                return (
-                  <div key={k} className="flex justify-between text-sm">
-                    <span className="text-foreground truncate pr-2">{k}</span>
-                    <span className="text-muted-foreground whitespace-nowrap">{v} ({pct}%)</span>
-                  </div>
-                );
-              })}
-            </div>
+            {demografia.profChart.length === 0 ? (
+              <p className="text-xs text-muted-foreground">Sem dados.</p>
+            ) : (
+              <div style={{ width: "100%", height: Math.max(180, demografia.profChart.length * 26) }}>
+                <ResponsiveContainer>
+                  <BarChart
+                    data={demografia.profChart}
+                    layout="vertical"
+                    margin={{ top: 4, right: 12, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
+                    <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                    <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip formatter={(v: number) => [`${v} pacientes`, "Quantidade"]} />
+                    <Bar dataKey="value" fill="hsl(var(--success))" radius={[0, 6, 6, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </LiquidGlassCard>
         </div>
       </section>
