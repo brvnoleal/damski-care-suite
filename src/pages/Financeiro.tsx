@@ -24,6 +24,7 @@ import { FadeIn } from "@/components/FadeIn";
 import { despesaService } from "@/services/despesaService";
 import { procedimentoConsultaLabels, formaPagamentoLabels } from "@/types";
 import { exportMultiSheetXlsx } from "@/lib/exportXlsx";
+import RelatoriosAvancados from "@/components/financeiro/RelatoriosAvancados";
 
 const pagamentoColors = ["hsl(160 84% 39%)", "hsl(239 84% 67%)", "hsl(38 92% 50%)", "hsl(0 72% 51%)", "hsl(280 60% 55%)"];
 const procedimentoColors = [
@@ -329,6 +330,7 @@ const Relatorios = () => {
         <TabsList>
           <TabsTrigger value="visao">Visão Geral</TabsTrigger>
           <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
+          <TabsTrigger value="avancado">DRE · Funil · Holerite</TabsTrigger>
         </TabsList>
 
         {/* ========== VISÃO GERAL ========== */}
@@ -578,6 +580,11 @@ const Relatorios = () => {
               </Table>
             </div>
           </LiquidGlassCard>
+        </TabsContent>
+
+        {/* ========== DRE · FUNIL · HOLERITE ========== */}
+        <TabsContent value="avancado" className="space-y-4">
+          <RelatoriosAvancados />
         </TabsContent>
       </Tabs>
     </div>
