@@ -59,6 +59,8 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
   // dados de paciente/clinica para preview
   const [paciente, setPaciente] = useState<any>(null);
   const [clinica, setClinica] = useState<any>(null);
+  const [arquivoParaExcluir, setArquivoParaExcluir] = useState<PacienteArquivo | null>(null);
+  const [excluindoArquivo, setExcluindoArquivo] = useState(false);
 
   const carregar = async () => {
     setLoading(true);
