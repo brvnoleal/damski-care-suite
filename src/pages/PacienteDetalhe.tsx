@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X, User, DollarSign, Activity, Smile, Eye, Tag } from "lucide-react";
+import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X, User, DollarSign, Activity, Smile, Eye, Tag, Download } from "lucide-react";
+import { lgpdService } from "@/services/lgpdService";
+import { exportProntuarioPDF } from "@/lib/prontuarioPdf";
+import { useClinicaContext } from "@/hooks/useClinicaContext";
+import { calcularTaxa } from "@/lib/maquininhaCalc";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn, isValidCpf } from "@/lib/utils";
@@ -104,6 +109,9 @@ const isAtrasado = (d: PacienteDebito) =>
 const PacienteDetalhe = () => {
   const { id } = useParams();
   const { toast } = useToast();
+  const { clinicaId } = useClinicaContext();
+  const [exportandoPdf, setExportandoPdf] = useState(false);
+
 
   const [patientData, setPatientData] = useState<Paciente | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string>("");
@@ -439,6 +447,10 @@ const PacienteDetalhe = () => {
   const totalRecebido = agendamentos.filter((a) => a.status_pagamento === "pago").reduce((s, a) => s + Number(a.valor || 0), 0);
   const totalAtrasado = debitos.filter((d) => isAtrasado(d)).reduce((s, d) => s + d.valor, 0);
   const totalAReceber = agendamentos.filter((a) => a.status_pagamento === "pendente" && a.status !== "cancelado").reduce((s, a) => s + Number(a.valor || 0), 0);
+  const totalTaxas = agendamentos
+    .filter((a) => a.status_pagamento === "pago")
+    .reduce((s, a) => s + calcularTaxa(a.valor, a.forma_pagamento, a.parcelas).valorTaxa, 0);
+  const totalRecebidoLiquido = totalRecebido - totalTaxas;
 
 
   if (loading) {
@@ -532,10 +544,37 @@ const PacienteDetalhe = () => {
           </div>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            disabled={exportandoPdf}
+            onClick={async () => {
+              if (!id) return;
+              setExportandoPdf(true);
+              try {
+                const [dump, clinicaRes] = await Promise.all([
+                  lgpdService.exportarDados(id),
+                  clinicaId
+                    ? supabase.from("clinica").select("nome,cnpj,telefone,email").eq("id", clinicaId).maybeSingle()
+                    : Promise.resolve({ data: null } as any),
+                ]);
+                exportProntuarioPDF({ dump, clinica: (clinicaRes as any)?.data });
+                toast({ title: "Prontuário exportado em PDF" });
+              } catch (e: any) {
+                toast({ title: "Falha ao exportar prontuário", description: e?.message, variant: "destructive" });
+              } finally {
+                setExportandoPdf(false);
+              }
+            }}
+          >
+            <Download className="w-3.5 h-3.5" /> {exportandoPdf ? "Gerando…" : "Exportar PDF"}
+          </Button>
           <Button variant="outline" size="sm" className="gap-1.5" onClick={openEditDialog}>
             <Edit className="w-3.5 h-3.5" /> Editar
           </Button>
         </div>
+
       </div>
 
       <Tabs defaultValue="detalhes" className="space-y-4">
@@ -636,7 +675,7 @@ const PacienteDetalhe = () => {
         </TabsContent>
 
         <TabsContent value="financeiro" className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <LiquidGlassCard draggable={false} className="p-4">
               <p className="text-xs text-muted-foreground">Total atrasado</p>
               <p className="text-xl font-bold text-destructive mt-1">{formatBRL(totalAtrasado)}</p>
@@ -649,7 +688,15 @@ const PacienteDetalhe = () => {
               <p className="text-xs text-muted-foreground">Total recebido</p>
               <p className="text-xl font-bold text-success mt-1">{formatBRL(totalRecebido)}</p>
             </LiquidGlassCard>
+            <LiquidGlassCard draggable={false} className="p-4">
+              <p className="text-xs text-muted-foreground">Líquido após taxas</p>
+              <p className="text-xl font-bold text-success mt-1">{formatBRL(totalRecebidoLiquido)}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Taxas descontadas: {formatBRL(totalTaxas)}
+              </p>
+            </LiquidGlassCard>
           </div>
+
           <div className="flex justify-end">
             <Button size="sm" className="gap-1.5" onClick={openDebitoDialog}>
               <Plus className="w-3.5 h-3.5" /> Novo Débito
@@ -769,7 +816,17 @@ const PacienteDetalhe = () => {
                     <div>
                       <p className="text-xs text-muted-foreground">Valor</p>
                       <p className="text-foreground">{formatBRL(a.valor)}</p>
+                      {(() => {
+                        const t = calcularTaxa(a.valor, a.forma_pagamento, a.parcelas);
+                        if (!t.maquininha || t.taxaPercent <= 0) return null;
+                        return (
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            Líquido: {formatBRL(t.valorLiquido)} ({t.maquininha.nome} · {t.taxaPercent.toFixed(2)}%)
+                          </p>
+                        );
+                      })()}
                     </div>
+
                     <div>
                       <p className="text-xs text-muted-foreground">Pagamento</p>
                       <p className="text-foreground">

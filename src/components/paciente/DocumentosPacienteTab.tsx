@@ -7,6 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { documentoService, type DocumentoModelo, type PacienteDocumento } from "@/services/documentoService";
@@ -55,6 +59,8 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
   // dados de paciente/clinica para preview
   const [paciente, setPaciente] = useState<any>(null);
   const [clinica, setClinica] = useState<any>(null);
+  const [arquivoParaExcluir, setArquivoParaExcluir] = useState<PacienteArquivo | null>(null);
+  const [excluindoArquivo, setExcluindoArquivo] = useState(false);
 
   const carregar = async () => {
     setLoading(true);
@@ -120,14 +126,18 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
     }
   };
 
-  const excluirArquivo = async (arq: PacienteArquivo) => {
-    if (!confirm(`Excluir arquivo "${arq.nome}"?`)) return;
+  const confirmarExclusaoArquivo = async () => {
+    if (!arquivoParaExcluir) return;
+    setExcluindoArquivo(true);
     try {
-      await pacienteArquivoService.excluir(arq);
-      setArquivos((prev) => prev.filter((a) => a.id !== arq.id));
-      toast.success("Arquivo excluído");
+      await pacienteArquivoService.excluir(arquivoParaExcluir);
+      setArquivos((prev) => prev.filter((a) => a.id !== arquivoParaExcluir.id));
+      toast.success("Arquivo excluído (registrado em auditoria)");
+      setArquivoParaExcluir(null);
     } catch (e: any) {
       toast.error(e.message || "Falha ao excluir");
+    } finally {
+      setExcluindoArquivo(false);
     }
   };
 
@@ -356,9 +366,10 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
                 >
                   <Download className="w-3.5 h-3.5" /> Abrir
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => excluirArquivo(arq)}>
+                <Button variant="ghost" size="sm" onClick={() => setArquivoParaExcluir(arq)}>
                   <Trash2 className="w-3.5 h-3.5 text-destructive" />
                 </Button>
+
               </div>
             </LiquidGlassCard>
           ))
@@ -489,6 +500,28 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
           </div>
         )}
       </ResponsiveDialog>
+
+      <AlertDialog open={!!arquivoParaExcluir} onOpenChange={(o) => !o && setArquivoParaExcluir(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir arquivo anexado?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação remove permanentemente <strong>{arquivoParaExcluir?.nome}</strong> do prontuário do paciente.
+              A exclusão será registrada no log de auditoria para fins de fiscalização e LGPD.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={excluindoArquivo}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); confirmarExclusaoArquivo(); }}
+              disabled={excluindoArquivo}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {excluindoArquivo ? "Excluindo…" : "Excluir definitivamente"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
