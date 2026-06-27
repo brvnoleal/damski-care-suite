@@ -291,6 +291,81 @@ export const DocumentosPacienteTab = ({ pacienteId }: Props) => {
         })
       )}
 
+      {/* Arquivos anexados (exames, atestados, PDFs, imagens) */}
+      <div className="space-y-3 pt-2">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <Paperclip className="w-4 h-4" /> Arquivos anexados
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Exames, atestados e outros documentos do paciente (máx. 25MB por arquivo).
+            </p>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1.5"
+            onClick={() => uploadRef.current?.click()}
+            disabled={uploading}
+          >
+            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+            Anexar arquivo
+          </Button>
+          <input
+            ref={uploadRef}
+            type="file"
+            multiple
+            className="hidden"
+            accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx"
+            onChange={(e) => handleUpload(e.target.files)}
+          />
+        </div>
+
+        {arquivos.length === 0 ? (
+          <LiquidGlassCard draggable={false} className="p-6 text-center">
+            <Paperclip className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
+            <p className="text-xs text-muted-foreground">
+              Nenhum arquivo anexado. Clique em "Anexar arquivo" para enviar exames ou documentos.
+            </p>
+          </LiquidGlassCard>
+        ) : (
+          arquivos.map((arq) => (
+            <LiquidGlassCard
+              key={arq.id}
+              draggable={false}
+              className="p-3 flex items-center justify-between gap-4"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <Paperclip className="w-5 h-5 text-muted-foreground shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{arq.nome}</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {formatBytes(arq.tamanho)}
+                    {arq.tamanho ? " • " : ""}
+                    {new Date(arq.created_at).toLocaleString("pt-BR")}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 text-xs"
+                  onClick={() => baixarArquivo(arq)}
+                >
+                  <Download className="w-3.5 h-3.5" /> Abrir
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => excluirArquivo(arq)}>
+                  <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                </Button>
+              </div>
+            </LiquidGlassCard>
+          ))
+        )}
+      </div>
+
+
       <ResponsiveDialog
         open={openNovo}
         onOpenChange={setOpenNovo}
