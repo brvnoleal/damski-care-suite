@@ -477,8 +477,11 @@ const Dashboard = () => {
               ))}
             </div>
           </LiquidGlassCard>
-        </FadeIn>
       </div>
+
+      <FadeIn delay={1.0}>
+        <DemografiaPanel />
+      </FadeIn>
     </div>
   );
 };
