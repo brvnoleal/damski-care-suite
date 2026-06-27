@@ -675,7 +675,7 @@ const PacienteDetalhe = () => {
         </TabsContent>
 
         <TabsContent value="financeiro" className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <LiquidGlassCard draggable={false} className="p-4">
               <p className="text-xs text-muted-foreground">Total atrasado</p>
               <p className="text-xl font-bold text-destructive mt-1">{formatBRL(totalAtrasado)}</p>
@@ -688,7 +688,15 @@ const PacienteDetalhe = () => {
               <p className="text-xs text-muted-foreground">Total recebido</p>
               <p className="text-xl font-bold text-success mt-1">{formatBRL(totalRecebido)}</p>
             </LiquidGlassCard>
+            <LiquidGlassCard draggable={false} className="p-4">
+              <p className="text-xs text-muted-foreground">Líquido após taxas</p>
+              <p className="text-xl font-bold text-success mt-1">{formatBRL(totalRecebidoLiquido)}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Taxas descontadas: {formatBRL(totalTaxas)}
+              </p>
+            </LiquidGlassCard>
           </div>
+
           <div className="flex justify-end">
             <Button size="sm" className="gap-1.5" onClick={openDebitoDialog}>
               <Plus className="w-3.5 h-3.5" /> Novo Débito
