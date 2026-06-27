@@ -19,9 +19,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Paciente } from "@/types";
 import { pacienteService } from "@/services/pacienteService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
-import { maskCpf, isValidCpf } from "@/lib/utils";
+import { maskCpf, isValidCpf, cn } from "@/lib/utils";
 import { FadeIn } from "@/components/FadeIn";
 import { supabase } from "@/integrations/supabase/client";
+import { INDICACAO_OPTIONS, indicacaoExigeNome, TAG_OPTIONS, tagClassName } from "@/lib/pacienteOptions";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
   nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", profissao: "",
