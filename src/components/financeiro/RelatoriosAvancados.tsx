@@ -38,6 +38,21 @@ import { pacienteService } from "@/services/pacienteService";
 import type { Dentista, Paciente } from "@/types";
 import { procedimentoConsultaLabels } from "@/types";
 import { exportToXlsx, exportMultiSheetXlsx } from "@/lib/exportXlsx";
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+const SEXO_COLORS = ["hsl(var(--primary))", "hsl(var(--success))", "hsl(var(--warning))", "hsl(var(--muted-foreground))"];
 
 interface Agendamento {
   id: string;
