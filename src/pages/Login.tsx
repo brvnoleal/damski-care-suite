@@ -37,9 +37,13 @@ export default function Login() {
     <main className="min-h-screen grid lg:grid-cols-2 bg-background">
       <section className="hidden lg:flex items-center justify-center p-10 bg-white">
         <div className="flex flex-col items-center text-center max-w-md">
-          <img
-            src={logo.url}
-            alt="CloudSmile - Sistema de gestão para clínicas odontológicas"
+          <video
+            src={loginAnimation.url}
+            autoPlay
+            loop
+            muted
+            playsInline
+            aria-label="CloudSmile - Sistema de gestão para clínicas odontológicas"
             className="w-full max-w-sm h-auto"
           />
           <p className="mt-6 text-muted-foreground">
