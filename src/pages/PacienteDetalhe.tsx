@@ -939,6 +939,55 @@ const PacienteDetalhe = () => {
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Instagram</Label>
             <Input value={editForm.instagram} onChange={(e) => setEditForm({ ...editForm, instagram: e.target.value })} placeholder="@usuario" />
           </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Indicação</Label>
+            <Select
+              value={editForm.indicacao_tipo || ""}
+              onValueChange={(v) => setEditForm({ ...editForm, indicacao_tipo: v, indicacao_nome: indicacaoExigeNome(v) ? editForm.indicacao_nome : "" })}
+            >
+              <SelectTrigger><SelectValue placeholder="Como nos conheceu?" /></SelectTrigger>
+              <SelectContent>
+                {INDICACAO_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {indicacaoExigeNome(editForm.indicacao_tipo) && (
+            <div className="sm:col-span-2">
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nome de quem indicou</Label>
+              <Input
+                value={editForm.indicacao_nome || ""}
+                onChange={(e) => setEditForm({ ...editForm, indicacao_nome: e.target.value })}
+                placeholder="Nome completo"
+              />
+            </div>
+          )}
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Etiquetas</Label>
+            <div className="flex flex-wrap gap-2">
+              {TAG_OPTIONS.map((tag) => {
+                const active = (editForm.tags || []).includes(tag.value);
+                return (
+                  <button
+                    key={tag.value}
+                    type="button"
+                    onClick={() => {
+                      const current = new Set(editForm.tags || []);
+                      if (active) current.delete(tag.value); else current.add(tag.value);
+                      setEditForm({ ...editForm, tags: Array.from(current) });
+                    }}
+                    className={cn(
+                      "px-3 py-1 rounded-full text-xs font-medium border transition-all",
+                      active ? tag.className : "bg-muted/40 text-muted-foreground border-border hover:bg-muted",
+                    )}
+                  >
+                    {tag.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Documentos & Dados Pessoais */}
           <div className="sm:col-span-2 pt-3">
