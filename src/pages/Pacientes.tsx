@@ -19,12 +19,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Paciente } from "@/types";
 import { pacienteService } from "@/services/pacienteService";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
-import { maskCpf, isValidCpf } from "@/lib/utils";
+import { maskCpf, isValidCpf, cn } from "@/lib/utils";
 import { FadeIn } from "@/components/FadeIn";
 import { supabase } from "@/integrations/supabase/client";
+import { INDICACAO_OPTIONS, indicacaoExigeNome, TAG_OPTIONS, tagClassName } from "@/lib/pacienteOptions";
 
 const emptyPaciente = (): Omit<Paciente, "id" | "created_at"> => ({
-  nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", situacao_profissional: "",
+  nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", profissao: "",
+  indicacao_tipo: "", indicacao_nome: "", tags: [],
   plano: "", numero_plano: "", numero_prontuario: "",
   telefone: "", email: "", instagram: "", data_nascimento: "",
   cep: "", estado: "", cidade: "", bairro: "", rua: "", numero: "", complemento: "", ponto_referencia: "",
@@ -75,7 +77,8 @@ const Pacientes = () => {
     setForm({
       nome: p.nome, cpf: p.cpf,
       rg: p.rg || "", emissor: p.emissor || "", sexo: p.sexo || "",
-      estado_civil: p.estado_civil || "", situacao_profissional: p.situacao_profissional || "",
+      estado_civil: p.estado_civil || "", profissao: p.profissao || "",
+      indicacao_tipo: p.indicacao_tipo || "", indicacao_nome: p.indicacao_nome || "", tags: p.tags || [],
       plano: p.plano || "", numero_plano: p.numero_plano || "", numero_prontuario: p.numero_prontuario || "",
       telefone: p.telefone, email: p.email, instagram: p.instagram || "",
       data_nascimento: p.data_nascimento, cep: p.cep || "", estado: p.estado || "", cidade: p.cidade || "",
@@ -317,6 +320,55 @@ const Pacientes = () => {
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Instagram</Label>
             <Input value={form.instagram} onChange={(e) => setForm({ ...form, instagram: e.target.value })} placeholder="@usuario" />
           </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Indicação</Label>
+            <Select
+              value={form.indicacao_tipo || ""}
+              onValueChange={(v) => setForm({ ...form, indicacao_tipo: v, indicacao_nome: indicacaoExigeNome(v) ? form.indicacao_nome : "" })}
+            >
+              <SelectTrigger><SelectValue placeholder="Como nos conheceu?" /></SelectTrigger>
+              <SelectContent>
+                {INDICACAO_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {indicacaoExigeNome(form.indicacao_tipo) && (
+            <div className="sm:col-span-2">
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nome de quem indicou</Label>
+              <Input
+                value={form.indicacao_nome || ""}
+                onChange={(e) => setForm({ ...form, indicacao_nome: e.target.value })}
+                placeholder="Nome completo"
+              />
+            </div>
+          )}
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Etiquetas</Label>
+            <div className="flex flex-wrap gap-2">
+              {TAG_OPTIONS.map((tag) => {
+                const active = (form.tags || []).includes(tag.value);
+                return (
+                  <button
+                    key={tag.value}
+                    type="button"
+                    onClick={() => {
+                      const current = new Set(form.tags || []);
+                      if (active) current.delete(tag.value); else current.add(tag.value);
+                      setForm({ ...form, tags: Array.from(current) });
+                    }}
+                    className={cn(
+                      "px-3 py-1 rounded-full text-xs font-medium border transition-all",
+                      active ? tag.className : "bg-muted/40 text-muted-foreground border-border hover:bg-muted",
+                    )}
+                  >
+                    {tag.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Documentos & Dados Pessoais */}
           <div className="sm:col-span-2 pt-3">
@@ -367,20 +419,12 @@ const Pacientes = () => {
             </Select>
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Situação Profissional</Label>
-            <Select value={form.situacao_profissional || ""} onValueChange={(v) => setForm({ ...form, situacao_profissional: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="clt">CLT</SelectItem>
-                <SelectItem value="autonomo">Autônomo</SelectItem>
-                <SelectItem value="empresario">Empresário</SelectItem>
-                <SelectItem value="servidor_publico">Servidor Público</SelectItem>
-                <SelectItem value="aposentado">Aposentado</SelectItem>
-                <SelectItem value="estudante">Estudante</SelectItem>
-                <SelectItem value="desempregado">Desempregado</SelectItem>
-                <SelectItem value="outro">Outro</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Profissão</Label>
+            <Input
+              value={form.profissao || ""}
+              onChange={(e) => setForm({ ...form, profissao: e.target.value })}
+              placeholder="Ex: Dentista, Professor, Empresário"
+            />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Plano</Label>

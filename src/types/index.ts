@@ -11,7 +11,10 @@ export interface Paciente {
   emissor?: string;
   sexo?: string;
   estado_civil?: string;
-  situacao_profissional?: string;
+  profissao?: string;
+  indicacao_tipo?: string;
+  indicacao_nome?: string;
+  tags?: string[];
   plano?: string;
   numero_plano?: string;
   numero_prontuario?: string;

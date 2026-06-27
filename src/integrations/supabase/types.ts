@@ -676,6 +676,8 @@ export type Database = {
           estado: string | null
           estado_civil: string | null
           id: string
+          indicacao_nome: string | null
+          indicacao_tipo: string | null
           instagram: string | null
           nome: string
           numero: string | null
@@ -683,11 +685,12 @@ export type Database = {
           numero_prontuario: string | null
           plano: string | null
           ponto_referencia: string | null
+          profissao: string | null
           rg: string | null
           rua: string | null
           sexo: string | null
-          situacao_profissional: string | null
           status: string
+          tags: string[]
           telefone: string | null
           updated_at: string
         }
@@ -706,6 +709,8 @@ export type Database = {
           estado?: string | null
           estado_civil?: string | null
           id?: string
+          indicacao_nome?: string | null
+          indicacao_tipo?: string | null
           instagram?: string | null
           nome: string
           numero?: string | null
@@ -713,11 +718,12 @@ export type Database = {
           numero_prontuario?: string | null
           plano?: string | null
           ponto_referencia?: string | null
+          profissao?: string | null
           rg?: string | null
           rua?: string | null
           sexo?: string | null
-          situacao_profissional?: string | null
           status?: string
+          tags?: string[]
           telefone?: string | null
           updated_at?: string
         }
@@ -736,6 +742,8 @@ export type Database = {
           estado?: string | null
           estado_civil?: string | null
           id?: string
+          indicacao_nome?: string | null
+          indicacao_tipo?: string | null
           instagram?: string | null
           nome?: string
           numero?: string | null
@@ -743,11 +751,12 @@ export type Database = {
           numero_prontuario?: string | null
           plano?: string | null
           ponto_referencia?: string | null
+          profissao?: string | null
           rg?: string | null
           rua?: string | null
           sexo?: string | null
-          situacao_profissional?: string | null
           status?: string
+          tags?: string[]
           telefone?: string | null
           updated_at?: string
         }

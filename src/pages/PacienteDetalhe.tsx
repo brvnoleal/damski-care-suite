@@ -37,6 +37,7 @@ import { CameraCapture } from "@/components/CameraCapture";
 
 import { AnamneseTab } from "@/components/anamnese/AnamneseTab";
 import { DocumentosPacienteTab } from "@/components/paciente/DocumentosPacienteTab";
+import { INDICACAO_OPTIONS, INDICACAO_LABELS, indicacaoExigeNome, TAG_OPTIONS, tagClassName } from "@/lib/pacienteOptions";
 
 const formatDateBR = (iso: string) => {
   if (!iso) return "";
@@ -110,7 +111,8 @@ const PacienteDetalhe = () => {
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
   const emptyEditForm = (): Omit<Paciente, "id" | "created_at"> => ({
-    nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", situacao_profissional: "",
+    nome: "", cpf: "", rg: "", emissor: "", sexo: "", estado_civil: "", profissao: "",
+    indicacao_tipo: "", indicacao_nome: "", tags: [],
     plano: "", numero_plano: "", numero_prontuario: "",
     telefone: "", email: "", instagram: "", data_nascimento: "",
     cep: "", estado: "", cidade: "", bairro: "", rua: "", numero: "", complemento: "", ponto_referencia: "",
@@ -208,7 +210,9 @@ const PacienteDetalhe = () => {
     setEditForm({
       nome: patientData.nome, cpf: patientData.cpf,
       rg: patientData.rg || "", emissor: patientData.emissor || "", sexo: patientData.sexo || "",
-      estado_civil: patientData.estado_civil || "", situacao_profissional: patientData.situacao_profissional || "",
+      estado_civil: patientData.estado_civil || "", profissao: patientData.profissao || "",
+      indicacao_tipo: patientData.indicacao_tipo || "", indicacao_nome: patientData.indicacao_nome || "",
+      tags: patientData.tags || [],
       plano: patientData.plano || "", numero_plano: patientData.numero_plano || "", numero_prontuario: patientData.numero_prontuario || "",
       telefone: patientData.telefone, email: patientData.email, instagram: patientData.instagram || "",
       data_nascimento: patientData.data_nascimento,
@@ -511,11 +515,16 @@ const PacienteDetalhe = () => {
                 ) : null;
               })()}
             </div>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
               <span className="text-xs font-mono text-primary font-semibold">{id}</span>
               <Badge className={patientData.status === "ativo" ? "bg-success/10 text-success border-success/20 text-xs" : "bg-muted text-muted-foreground text-xs"}>
                 {patientData.status === "ativo" ? "Ativo" : "Inativo"}
               </Badge>
+              {(patientData.tags || []).map((t) => (
+                <Badge key={t} className={cn("text-xs border", tagClassName(t))}>
+                  {TAG_OPTIONS.find((x) => x.value === t)?.label || t}
+                </Badge>
+              ))}
             </div>
           </div>
         </div>
@@ -569,7 +578,7 @@ const PacienteDetalhe = () => {
                   { label: "RG", value: patientData.rg ? `${formatRG(patientData.rg)}${patientData.emissor ? " — " + patientData.emissor : ""}` : "—" },
                   { label: "Sexo", value: patientData.sexo ? patientData.sexo.charAt(0).toUpperCase() + patientData.sexo.slice(1).replace("_", " ") : "—" },
                   { label: "Estado Civil", value: patientData.estado_civil ? patientData.estado_civil.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
-                  { label: "Situação Profissional", value: patientData.situacao_profissional ? patientData.situacao_profissional.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "—" },
+                  { label: "Profissão", value: patientData.profissao || "—" },
                 ],
               },
               {
@@ -578,6 +587,14 @@ const PacienteDetalhe = () => {
                   { label: "Telefone", value: patientData.telefone || "—" },
                   { label: "Email", value: patientData.email || "—" },
                   { label: "Instagram", value: patientData.instagram || "—" },
+                  {
+                    label: "Indicação",
+                    value: patientData.indicacao_tipo
+                      ? `${INDICACAO_LABELS[patientData.indicacao_tipo] || patientData.indicacao_tipo}${
+                          patientData.indicacao_nome ? ` — ${patientData.indicacao_nome}` : ""
+                        }`
+                      : "—",
+                  },
                 ],
               },
               {
@@ -927,6 +944,55 @@ const PacienteDetalhe = () => {
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Instagram</Label>
             <Input value={editForm.instagram} onChange={(e) => setEditForm({ ...editForm, instagram: e.target.value })} placeholder="@usuario" />
           </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Indicação</Label>
+            <Select
+              value={editForm.indicacao_tipo || ""}
+              onValueChange={(v) => setEditForm({ ...editForm, indicacao_tipo: v, indicacao_nome: indicacaoExigeNome(v) ? editForm.indicacao_nome : "" })}
+            >
+              <SelectTrigger><SelectValue placeholder="Como nos conheceu?" /></SelectTrigger>
+              <SelectContent>
+                {INDICACAO_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {indicacaoExigeNome(editForm.indicacao_tipo) && (
+            <div className="sm:col-span-2">
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nome de quem indicou</Label>
+              <Input
+                value={editForm.indicacao_nome || ""}
+                onChange={(e) => setEditForm({ ...editForm, indicacao_nome: e.target.value })}
+                placeholder="Nome completo"
+              />
+            </div>
+          )}
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Etiquetas</Label>
+            <div className="flex flex-wrap gap-2">
+              {TAG_OPTIONS.map((tag) => {
+                const active = (editForm.tags || []).includes(tag.value);
+                return (
+                  <button
+                    key={tag.value}
+                    type="button"
+                    onClick={() => {
+                      const current = new Set(editForm.tags || []);
+                      if (active) current.delete(tag.value); else current.add(tag.value);
+                      setEditForm({ ...editForm, tags: Array.from(current) });
+                    }}
+                    className={cn(
+                      "px-3 py-1 rounded-full text-xs font-medium border transition-all",
+                      active ? tag.className : "bg-muted/40 text-muted-foreground border-border hover:bg-muted",
+                    )}
+                  >
+                    {tag.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Documentos & Dados Pessoais */}
           <div className="sm:col-span-2 pt-3">
@@ -977,20 +1043,12 @@ const PacienteDetalhe = () => {
             </Select>
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Situação Profissional</Label>
-            <Select value={editForm.situacao_profissional || ""} onValueChange={(v) => setEditForm({ ...editForm, situacao_profissional: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="clt">CLT</SelectItem>
-                <SelectItem value="autonomo">Autônomo</SelectItem>
-                <SelectItem value="empresario">Empresário</SelectItem>
-                <SelectItem value="servidor_publico">Servidor Público</SelectItem>
-                <SelectItem value="aposentado">Aposentado</SelectItem>
-                <SelectItem value="estudante">Estudante</SelectItem>
-                <SelectItem value="desempregado">Desempregado</SelectItem>
-                <SelectItem value="outro">Outro</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Profissão</Label>
+            <Input
+              value={editForm.profissao || ""}
+              onChange={(e) => setEditForm({ ...editForm, profissao: e.target.value })}
+              placeholder="Ex: Dentista, Professor, Empresário"
+            />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Plano</Label>
