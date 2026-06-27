@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X, User, DollarSign, Activity, Smile, Eye } from "lucide-react";
+import { ArrowLeft, FileText, Syringe, Camera, ClipboardList, ShieldCheck, Edit, Plus, Upload, Trash2, ZoomIn, X, User, DollarSign, Activity, Smile, Eye, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn, isValidCpf } from "@/lib/utils";
@@ -520,6 +520,9 @@ const PacienteDetalhe = () => {
               <Badge className={patientData.status === "ativo" ? "bg-success/10 text-success border-success/20 text-xs" : "bg-muted text-muted-foreground text-xs"}>
                 {patientData.status === "ativo" ? "Ativo" : "Inativo"}
               </Badge>
+              {(patientData.tags || []).length > 0 && (
+                <Tag className="w-3.5 h-3.5 text-muted-foreground ml-1" aria-label="Etiquetas" />
+              )}
               {(patientData.tags || []).map((t) => (
                 <Badge key={t} className={cn("text-xs border", tagClassName(t))}>
                   {TAG_OPTIONS.find((x) => x.value === t)?.label || t}
