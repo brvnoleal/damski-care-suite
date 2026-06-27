@@ -804,7 +804,17 @@ const PacienteDetalhe = () => {
                     <div>
                       <p className="text-xs text-muted-foreground">Valor</p>
                       <p className="text-foreground">{formatBRL(a.valor)}</p>
+                      {(() => {
+                        const t = calcularTaxa(a.valor, a.forma_pagamento, a.parcelas);
+                        if (!t.maquininha || t.taxaPercent <= 0) return null;
+                        return (
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            Líquido: {formatBRL(t.valorLiquido)} ({t.maquininha.nome} · {t.taxaPercent.toFixed(2)}%)
+                          </p>
+                        );
+                      })()}
                     </div>
+
                     <div>
                       <p className="text-xs text-muted-foreground">Pagamento</p>
                       <p className="text-foreground">
