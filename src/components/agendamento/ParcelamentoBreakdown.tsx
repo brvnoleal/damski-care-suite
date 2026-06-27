@@ -20,9 +20,9 @@ export const ParcelamentoBreakdown = ({ valor, forma, parcelas }: Props) => {
   // Aplica taxa só para formas eletrônicas
   if (forma !== "credito" && forma !== "debito" && forma !== "pix") return null;
 
-  const { maquininha, taxaPercent, valorTaxa, valorLiquido } = calcularTaxa(base, forma, parcelas);
-  const n = forma === "credito" ? Math.max(1, Math.min(12, parcelas || 1)) : 1;
-  const valorParcela = +(base / n).toFixed(2);
+  const { maquininha, taxaPercent, valorTaxa, valorLiquido, parcelasEfetivas, valorParcela } =
+    calcularTaxa(base, forma, parcelas);
+  const n = parcelasEfetivas;
 
   return (
     <div className="rounded-xl border border-border/50 bg-primary/5 p-3 text-sm space-y-1.5">
