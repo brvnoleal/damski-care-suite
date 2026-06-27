@@ -37,7 +37,7 @@ import { dentistaService } from "@/services/dentistaService";
 import { pacienteService } from "@/services/pacienteService";
 import type { Dentista, Paciente } from "@/types";
 import { procedimentoConsultaLabels } from "@/types";
-import { exportToXlsx } from "@/lib/exportXlsx";
+import { exportToXlsx, exportMultiSheetXlsx } from "@/lib/exportXlsx";
 
 interface Agendamento {
   id: string;
