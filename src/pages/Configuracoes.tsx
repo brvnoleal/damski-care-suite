@@ -58,7 +58,7 @@ const Configuracoes = () => {
                     Quando ativado, nenhum alerta automático será gerado.
                   </p>
                 </div>
-                <Switch
+                <NeuToggle
                   checked={prefs.pausarTodas}
                   onCheckedChange={(v) => setPrefs((p) => ({ ...p, pausarTodas: v }))}
                 />
@@ -77,7 +77,7 @@ const Configuracoes = () => {
                     >
                       {a.label}
                     </span>
-                    <Switch
+                    <NeuToggle
                       checked={!prefs.pausarTodas && prefs.toggles[a.key] !== false}
                       disabled={prefs.pausarTodas}
                       onCheckedChange={(v) => setToggle(a.key, v)}
