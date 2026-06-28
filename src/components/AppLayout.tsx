@@ -168,7 +168,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                         onClick={() => notificationStore.markRead(n.id)}
                       >
                         <div className="flex gap-3">
-                          <span className="text-base shrink-0 leading-none mt-0.5">{notificationStore.getIcon(n.type)}</span>
+                          {(() => { const IconEl = notificationStore.getIcon(n.type); return <IconEl className="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />; })()}
                           <div className="flex-1 min-w-0 space-y-1">
                             <div className="flex items-start justify-between gap-2">
                               <p className={cn("text-sm leading-snug", !n.read ? "font-semibold text-foreground" : "text-foreground")}>
