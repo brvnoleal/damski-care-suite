@@ -51,7 +51,7 @@ const Configuracoes = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-lg bg-warning/5 border border-warning/20">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-white border border-border">
                 <div>
                   <p className="text-sm font-medium text-foreground">Pausar todas as notificações</p>
                   <p className="text-xs text-muted-foreground">
