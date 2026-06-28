@@ -588,9 +588,6 @@ const PacienteDetalhe = () => {
           <TabsTrigger value="consultas" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <ClipboardList className="w-3.5 h-3.5" /> Consultas
           </TabsTrigger>
-          <TabsTrigger value="evolucoes" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
-            <Activity className="w-3.5 h-3.5" /> Evoluções
-          </TabsTrigger>
           <TabsTrigger value="financeiro" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
             <DollarSign className="w-3.5 h-3.5" /> Financeiro
           </TabsTrigger>
@@ -738,29 +735,6 @@ const PacienteDetalhe = () => {
           )}
         </TabsContent>
 
-        <TabsContent value="evolucoes" className="space-y-4">
-          <div className="flex justify-end">
-            <Button size="sm" className="gap-1.5" onClick={openEvolucaoDialog}>
-              <Plus className="w-3.5 h-3.5" /> Nova Evolução
-            </Button>
-          </div>
-          {evolucoes.length === 0 ? (
-            <div className="rounded-xl glass p-8 text-center">
-              <Activity className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">Nenhuma evolução registrada.</p>
-            </div>
-          ) : (
-            evolucoes.map((ev) => (
-              <LiquidGlassCard key={ev.id} draggable={false} className="p-5 space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-foreground">{formatDateBR(ev.data)}</p>
-                  <p className="text-xs text-muted-foreground">{ev.dentista_nome || "—"}</p>
-                </div>
-                <p className="text-sm text-foreground whitespace-pre-wrap">{ev.conteudo}</p>
-              </LiquidGlassCard>
-            ))
-          )}
-        </TabsContent>
 
         <TabsContent value="consultas" className="space-y-4">
           <div className="flex justify-end">
