@@ -52,11 +52,13 @@ function emit() {
   listeners.forEach((fn) => fn());
 }
 
-const iconMap: Record<NotificationType, string> = {
-  create: "➕",
-  update: "✏️",
-  delete: "🗑️",
-  alert: "⚠️",
+import { Plus, Pencil, Trash2, AlertTriangle, type LucideIcon } from "lucide-react";
+
+const iconMap: Record<NotificationType, LucideIcon> = {
+  create: Plus,
+  update: Pencil,
+  delete: Trash2,
+  alert: AlertTriangle,
 };
 
 const moduleLabel: Record<NotificationModule, string> = {
