@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
-import { Switch } from "@/components/ui/switch";
+import { NeuToggle } from "@/components/ui/neu-toggle";
 import PerfilConsultorio from "@/components/configuracoes/PerfilConsultorio";
 import MaquininhasSection from "@/components/configuracoes/MaquininhasSection";
 import { FadeIn } from "@/components/FadeIn";
