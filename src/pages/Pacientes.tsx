@@ -150,7 +150,7 @@ const Pacientes = () => {
           <div>
             <h1 className="text-2xl font-bold text-foreground">Pacientes</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Cadastro e gerenciamento de pacientes — CRUD completo
+              Cadastro e gerenciamento de pacientes
             </p>
           </div>
           <div className="flex gap-2">
@@ -185,15 +185,9 @@ const Pacientes = () => {
       </FadeIn>
 
       <FadeIn delay={0.1}>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Buscar por nome ou CPF..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
-          </div>
-          <Button variant="outline" className="gap-2">
-            <Filter className="w-4 h-4" />
-            Filtros
-          </Button>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input placeholder="Buscar por nome ou CPF..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
       </FadeIn>
 

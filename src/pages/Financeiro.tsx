@@ -439,7 +439,7 @@ const Relatorios = () => {
 
         {/* ========== FINANCEIRO ========== */}
         <TabsContent value="financeiro" className="space-y-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
             <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
               <div className="flex items-center justify-between">
                 <div>
