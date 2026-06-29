@@ -332,13 +332,15 @@ const Agenda = () => {
                         {items.slice(0, 3).map((a) => {
                           const nome = getPaciente(a.paciente_id)?.nome || "—";
                           const st = statusConfig[a.status];
+                          const firstTag = (a.tags || [])[0];
+                          const dotClass = firstTag ? agendamentoTagDotClass(firstTag) : st?.dot;
                           return (
                             <button
                               key={a.id}
                               onClick={() => setSelected(a)}
                               className="group flex items-center gap-1 px-1 py-0.5 text-left hover:bg-white/10 transition-colors"
                             >
-                              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${st?.dot}`} />
+                              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotClass}`} />
                               <span className="text-[11px] sm:text-sm font-mono text-muted-foreground shrink-0 hidden sm:inline">{a.horario}</span>
                               <span className="text-[11px] sm:text-sm truncate text-foreground group-hover:text-primary">{nome}</span>
                             </button>
