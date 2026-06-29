@@ -226,7 +226,7 @@ const Agenda = () => {
 
       <FadeIn delay={0.05}>
         <LiquidGlassCard className="p-3 sm:p-4" draggable={false}>
-          <div className="flex flex-wrap items-center gap-3 mb-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
               <TabsList className="h-8">
                 <TabsTrigger value="dia" className="text-xs px-3">Dia</TabsTrigger>
@@ -238,45 +238,37 @@ const Agenda = () => {
               <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev}>
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <div className="min-w-[220px] text-center text-sm font-semibold capitalize">
+              <div className="min-w-[200px] text-center text-sm font-semibold capitalize">
                 {headerLabel}
               </div>
               <Button variant="outline" size="icon" className="h-8 w-8" onClick={goNext}>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
+            <Select value={filtroDentista} onValueChange={setFiltroDentista}>
+              <SelectTrigger className="h-8 text-xs w-[170px]"><SelectValue placeholder="Dentista" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os dentistas</SelectItem>
+                {dentistas.map((d) => (
+                  <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+              <SelectTrigger className="h-8 text-xs w-[150px]"><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os status</SelectItem>
+                <SelectItem value="agendado">Agendado</SelectItem>
+                <SelectItem value="confirmado">Confirmado</SelectItem>
+                <SelectItem value="realizado">Realizado</SelectItem>
+                <SelectItem value="cancelado">Cancelado</SelectItem>
+              </SelectContent>
+            </Select>
             {filtrosAtivos && (
               <Button variant="ghost" size="sm" className="h-7 ml-auto text-xs" onClick={limparFiltros}>
                 <X className="w-3 h-3 mr-1" /> Limpar
               </Button>
             )}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Dentista</Label>
-              <Select value={filtroDentista} onValueChange={setFiltroDentista}>
-                <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Todos" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos os dentistas</SelectItem>
-                  {dentistas.map((d) => (
-                    <SelectItem key={d.id} value={d.id}>{d.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Status</Label>
-              <Select value={filtroStatus} onValueChange={setFiltroStatus}>
-                <SelectTrigger className="h-9 text-sm"><SelectValue placeholder="Todos" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos os status</SelectItem>
-                  <SelectItem value="agendado">Agendado</SelectItem>
-                  <SelectItem value="confirmado">Confirmado</SelectItem>
-                  <SelectItem value="realizado">Realizado</SelectItem>
-                  <SelectItem value="cancelado">Cancelado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         </LiquidGlassCard>
       </FadeIn>

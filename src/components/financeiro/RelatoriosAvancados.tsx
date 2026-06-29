@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Loader2, Download, Wallet, TrendingDown, TrendingUp, AlertTriangle, Percent, Users, FileText, FileCheck2 } from "lucide-react";
 import { HoleriteDialog, loadHoleriteSignature, type HoleriteData } from "./HoleriteDialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -110,7 +111,9 @@ const matchProcedimento = (
 
 const RelatoriosAvancados = () => {
   const [loading, setLoading] = useState(true);
-  const [periodo, setPeriodo] = useState<"30" | "90" | "365" | "all">("90");
+  const [periodo, setPeriodo] = useState<"30" | "90" | "365" | "all" | "custom">("90");
+  const [dataInicio, setDataInicio] = useState<string>("");
+  const [dataFim, setDataFim] = useState<string>("");
   const [dentistaFiltro, setDentistaFiltro] = useState<string>("all");
 
   const [ags, setAgs] = useState<Agendamento[]>([]);
@@ -123,6 +126,10 @@ const RelatoriosAvancados = () => {
   const [sigVersion, setSigVersion] = useState(0);
 
   const periodoLabel = useMemo(() => {
+    if (periodo === "custom") {
+      if (dataInicio && dataFim) return `${dataInicio} → ${dataFim}`;
+      return "Período personalizado";
+    }
     const map: Record<string, string> = {
       "30": "Últimos 30 dias",
       "90": "Últimos 90 dias",
@@ -130,9 +137,9 @@ const RelatoriosAvancados = () => {
       all: "Período completo",
     };
     return map[periodo];
-  }, [periodo]);
+  }, [periodo, dataInicio, dataFim]);
 
-  const periodoSigKey = `p-${periodo}`;
+  const periodoSigKey = periodo === "custom" ? `c-${dataInicio}-${dataFim}` : `p-${periodo}`;
 
   useEffect(() => {
     (async () => {
@@ -162,7 +169,7 @@ const RelatoriosAvancados = () => {
 
   // ============ Filtragem por período ============
   const cutoff = useMemo(() => {
-    if (periodo === "all") return null;
+    if (periodo === "all" || periodo === "custom") return null;
     const days = Number(periodo);
     const d = new Date();
     d.setDate(d.getDate() - days);
@@ -170,13 +177,27 @@ const RelatoriosAvancados = () => {
   }, [periodo]);
 
   const agsFiltrados = useMemo(
-    () => ags.filter((a) => !cutoff || a.data >= cutoff),
-    [ags, cutoff],
+    () => ags.filter((a) => {
+      if (periodo === "custom") {
+        if (dataInicio && a.data < dataInicio) return false;
+        if (dataFim && a.data > dataFim) return false;
+        return true;
+      }
+      return !cutoff || a.data >= cutoff;
+    }),
+    [ags, cutoff, periodo, dataInicio, dataFim],
   );
 
   const despesasFiltradas = useMemo(
-    () => despesas.filter((d) => !cutoff || d.vencimento >= cutoff),
-    [despesas, cutoff],
+    () => despesas.filter((d) => {
+      if (periodo === "custom") {
+        if (dataInicio && d.vencimento < dataInicio) return false;
+        if (dataFim && d.vencimento > dataFim) return false;
+        return true;
+      }
+      return !cutoff || d.vencimento >= cutoff;
+    }),
+    [despesas, cutoff, periodo, dataInicio, dataFim],
   );
 
   // ============ Mapa de comissão ============
@@ -393,52 +414,75 @@ const RelatoriosAvancados = () => {
     );
   }
 
+  const renderPeriodoFilter = () => (
+    <div className="flex flex-wrap gap-2 items-center">
+      <Select value={periodo} onValueChange={(v) => setPeriodo(v as any)}>
+        <SelectTrigger className="w-[170px] h-9 text-sm">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="30">Últimos 30 dias</SelectItem>
+          <SelectItem value="90">Últimos 90 dias</SelectItem>
+          <SelectItem value="365">Último ano</SelectItem>
+          <SelectItem value="all">Tudo</SelectItem>
+          <SelectItem value="custom">Personalizado</SelectItem>
+        </SelectContent>
+      </Select>
+      {periodo === "custom" && (
+        <>
+          <Input
+            type="date"
+            value={dataInicio}
+            onChange={(e) => setDataInicio(e.target.value)}
+            className="h-9 w-[150px] text-sm"
+          />
+          <span className="text-xs text-muted-foreground">até</span>
+          <Input
+            type="date"
+            value={dataFim}
+            onChange={(e) => setDataFim(e.target.value)}
+            className="h-9 w-[150px] text-sm"
+          />
+        </>
+      )}
+    </div>
+  );
+
   return (
     <div className="space-y-6">
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-sm text-muted-foreground">Período:</span>
-        <Select value={periodo} onValueChange={(v) => setPeriodo(v as any)}>
-          <SelectTrigger className="w-[180px] h-9 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="30">Últimos 30 dias</SelectItem>
-            <SelectItem value="90">Últimos 90 dias</SelectItem>
-            <SelectItem value="365">Último ano</SelectItem>
-            <SelectItem value="all">Tudo</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+
 
       {/* ===== DRE ===== */}
       <section className="space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">DRE — Demonstrativo de Resultado</h2>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={() => {
-              exportToXlsx(
-                [
-                  { Linha: "(+) Receita paga (bruta)", Valor: dre.receitaPaga },
-                  { Linha: "(-) Taxas de maquininha", Valor: dre.taxasMaquininha },
-                  { Linha: "(=) Receita líquida", Valor: dre.receitaLiquida },
-                  { Linha: "(-) Despesas pagas", Valor: dre.despesaPaga },
-                  { Linha: "(=) Resultado bruto", Valor: dre.resultadoBruto },
-                  { Linha: "(-) Comissões devidas", Valor: dre.comissaoTotal },
-                  { Linha: "(=) Resultado líquido", Valor: dre.resultadoLiquido },
-                  { Linha: "Receita pendente (a receber)", Valor: dre.receitaPendente },
-                  { Linha: "Despesas pendentes", Valor: dre.despesaPendente },
-                ],
-                "dre",
-              );
-              toast.success("DRE exportado");
-            }}
-          >
-            <Download className="w-4 h-4" /> Exportar
-          </Button>
+          <div className="flex flex-wrap gap-2 items-center">
+            {renderPeriodoFilter()}
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => {
+                exportToXlsx(
+                  [
+                    { Linha: "(+) Receita paga (bruta)", Valor: dre.receitaPaga },
+                    { Linha: "(-) Taxas de maquininha", Valor: dre.taxasMaquininha },
+                    { Linha: "(=) Receita líquida", Valor: dre.receitaLiquida },
+                    { Linha: "(-) Despesas pagas", Valor: dre.despesaPaga },
+                    { Linha: "(=) Resultado bruto", Valor: dre.resultadoBruto },
+                    { Linha: "(-) Comissões devidas", Valor: dre.comissaoTotal },
+                    { Linha: "(=) Resultado líquido", Valor: dre.resultadoLiquido },
+                    { Linha: "Receita pendente (a receber)", Valor: dre.receitaPendente },
+                    { Linha: "Despesas pendentes", Valor: dre.despesaPendente },
+                  ],
+                  "dre",
+                );
+                toast.success("DRE exportado");
+              }}
+            >
+              <Download className="w-4 h-4" /> Exportar
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -529,7 +573,10 @@ const RelatoriosAvancados = () => {
 
       {/* ===== Funil & Conversão ===== */}
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground">Funil de Vendas & Conversão</h2>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h2 className="text-lg font-semibold text-foreground">Funil de Vendas & Conversão</h2>
+          {renderPeriodoFilter()}
+        </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <LiquidGlassCard className="p-4" draggable={false}>
@@ -611,7 +658,8 @@ const RelatoriosAvancados = () => {
       <section className="space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">Holerite / Pró-labore por Dentista</h2>
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center flex-wrap">
+            {renderPeriodoFilter()}
             <Select value={dentistaFiltro} onValueChange={setDentistaFiltro}>
               <SelectTrigger className="w-[220px] h-9 text-sm">
                 <SelectValue />
