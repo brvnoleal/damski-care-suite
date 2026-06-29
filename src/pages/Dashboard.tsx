@@ -15,7 +15,7 @@ import {
   BarChart, Bar,
 } from "recharts";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/FadeIn";
-import DemografiaPanel from "@/components/dashboard/DemografiaPanel";
+
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { supabase } from "@/integrations/supabase/client";
 import { procedimentoConsultaLabels } from "@/types";
@@ -511,9 +511,6 @@ const Dashboard = () => {
         </FadeIn>
       </div>
 
-      <FadeIn delay={1.0}>
-        <DemografiaPanel />
-      </FadeIn>
     </div>
   );
 };
