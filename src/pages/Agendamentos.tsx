@@ -112,6 +112,11 @@ const Agendamentos = () => {
   const [repetir, setRepetir] = useState<RepetirTipo>("nao");
   const [datasSelecionadas, setDatasSelecionadas] = useState<string[]>([]);
   const [datasPersonalizadas, setDatasPersonalizadas] = useState<string[]>([]);
+  const [customTags, setCustomTags] = useState<CustomAgendamentoTag[]>([]);
+  const [newTagOpen, setNewTagOpen] = useState(false);
+  const [newTagName, setNewTagName] = useState("");
+  const [newTagColor, setNewTagColor] = useState("#3b82f6");
+  const [pendingStatus, setPendingStatus] = useState<{ ag: Agendamento; novo: string } | null>(null);
 
 
   const datasSugeridas = repetir !== "nao" && repetir !== "personalizado" ? gerarDatasSugeridas(repetir, form.data) : [];
