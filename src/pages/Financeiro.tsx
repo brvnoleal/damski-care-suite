@@ -207,7 +207,7 @@ const Relatorios = () => {
     load();
   }, []);
 
-  const lucroLiquido = receitaTotal - despesaTotal;
+  const lucroLiquido = receitaLiquida - despesaTotal;
   const ticketMedio = pacientesAtendidos > 0 ? Math.round(receitaTotal / pacientesAtendidos) : 0;
 
   const handleDespesaChange = (field: string, value: string) => setNovaDespesa((prev) => ({ ...prev, [field]: value }));
