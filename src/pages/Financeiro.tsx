@@ -454,14 +454,20 @@ const Relatorios = () => {
 
         {/* ========== PACIENTES ========== */}
         <TabsContent value="pacientes" className="space-y-4">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <PeriodoFilter {...periodoFilterProps} />
+          </div>
           <DemografiaPanel />
         </TabsContent>
 
-
-
-
         {/* ========== FINANCEIRO ========== */}
         <TabsContent value="financeiro" className="space-y-4">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <PeriodoFilter {...periodoFilterProps} />
+            <Button variant="outline" size="sm" className="gap-2" onClick={handleExportFinanceiro}>
+              <Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span>
+            </Button>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
             <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
               <div className="flex items-center justify-between">
