@@ -656,60 +656,113 @@ const RelatoriosAvancados = () => {
           </LiquidGlassCard>
         ) : (
           <div className="space-y-4">
-            {holerite.map((h) => (
-              <LiquidGlassCard key={h.dentista?.id || "sd"} className="overflow-hidden" draggable={false}>
-                <div className="p-5 pb-3 flex items-center justify-between flex-wrap gap-2">
-                  <div>
-                    <h3 className="text-base font-semibold text-foreground">
-                      {h.dentista?.nome || "Dentista removido"}
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      {h.dentista?.especialidade} {h.dentista?.cro && `· ${h.dentista.cro}`}
-                    </p>
+            {holerite.map((h) => {
+              const dentistaId = h.dentista?.id || "sd";
+              const sig = h.dentista?.id
+                ? loadHoleriteSignature(h.dentista.id, periodoSigKey)
+                : null;
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const _v = sigVersion; // força re-render quando assinatura muda
+              const holeriteData: HoleriteData = {
+                dentistaId,
+                dentistaNome: h.dentista?.nome || "Dentista removido",
+                dentistaCro: h.dentista?.cro,
+                especialidade: h.dentista?.especialidade,
+                consultasPagas: h.consultasPagas,
+                valorAtendido: h.valorAtendido,
+                comissaoTotal: h.comissaoTotal,
+                detalhes: h.detalhes,
+              };
+              return (
+                <LiquidGlassCard key={dentistaId} className="overflow-hidden" draggable={false}>
+                  <div className="p-5 pb-3 flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                      <h3 className="text-base font-semibold text-foreground">
+                        {h.dentista?.nome || "Dentista removido"}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {h.dentista?.especialidade} {h.dentista?.cro && `· ${h.dentista.cro}`}
+                      </p>
+                    </div>
+                    <div className="flex gap-2 flex-wrap items-center">
+                      <Badge variant="outline">{h.consultasPagas} consultas pagas</Badge>
+                      <Badge variant="secondary">Atendido: {fmtBRL(h.valorAtendido)}</Badge>
+                      <Badge className="bg-success text-success-foreground">
+                        Comissão: {fmtBRL(h.comissaoTotal)}
+                      </Badge>
+                      {sig ? (
+                        <button
+                          type="button"
+                          onClick={() => setHoleriteAberto(holeriteData)}
+                          className="inline-flex items-center gap-1.5 rounded-md border border-success/40 bg-success/10 px-2 py-1 hover:bg-success/15 transition"
+                          title="Holerite assinado — clique para visualizar"
+                        >
+                          <FileCheck2 className="w-3.5 h-3.5 text-success" />
+                          <img
+                            src={sig}
+                            alt="Assinatura"
+                            className="h-6 w-16 object-contain bg-background/80 rounded-sm"
+                          />
+                          <span className="text-[11px] text-success font-medium">Assinado</span>
+                        </button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="gap-1.5"
+                          onClick={() => setHoleriteAberto(holeriteData)}
+                        >
+                          <FileText className="w-3.5 h-3.5" /> Visualizar Holerite
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex gap-2 flex-wrap">
-                    <Badge variant="outline">{h.consultasPagas} consultas pagas</Badge>
-                    <Badge variant="secondary">Atendido: {fmtBRL(h.valorAtendido)}</Badge>
-                    <Badge className="bg-success text-success-foreground">
-                      Comissão: {fmtBRL(h.comissaoTotal)}
-                    </Badge>
+                  <div className="px-5 pb-5 overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Data</TableHead>
+                          <TableHead>Procedimento</TableHead>
+                          <TableHead className="text-right">Valor consulta</TableHead>
+                          <TableHead>Base</TableHead>
+                          <TableHead className="text-right">Comissão</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {h.detalhes
+                          .sort((a, b) => b.data.localeCompare(a.data))
+                          .map((d) => (
+                            <TableRow key={d.id}>
+                              <TableCell className="text-muted-foreground">
+                                {new Date(d.data + "T00:00:00").toLocaleDateString("pt-BR")}
+                              </TableCell>
+                              <TableCell className="text-foreground">{d.procedimento}</TableCell>
+                              <TableCell className="text-right">{fmtBRL(d.valor)}</TableCell>
+                              <TableCell className="text-muted-foreground">{d.base}</TableCell>
+                              <TableCell className="text-right font-semibold">
+                                {d.comissao > 0 ? fmtBRL(d.comissao) : "—"}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
                   </div>
-                </div>
-                <div className="px-5 pb-5 overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Data</TableHead>
-                        <TableHead>Procedimento</TableHead>
-                        <TableHead className="text-right">Valor consulta</TableHead>
-                        <TableHead>Base</TableHead>
-                        <TableHead className="text-right">Comissão</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {h.detalhes
-                        .sort((a, b) => b.data.localeCompare(a.data))
-                        .map((d) => (
-                          <TableRow key={d.id}>
-                            <TableCell className="text-muted-foreground">
-                              {new Date(d.data + "T00:00:00").toLocaleDateString("pt-BR")}
-                            </TableCell>
-                            <TableCell className="text-foreground">{d.procedimento}</TableCell>
-                            <TableCell className="text-right">{fmtBRL(d.valor)}</TableCell>
-                            <TableCell className="text-muted-foreground">{d.base}</TableCell>
-                            <TableCell className="text-right font-semibold">
-                              {d.comissao > 0 ? fmtBRL(d.comissao) : "—"}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </LiquidGlassCard>
-            ))}
+                </LiquidGlassCard>
+              );
+            })}
           </div>
         )}
       </section>
+
+      <HoleriteDialog
+        open={!!holeriteAberto}
+        onOpenChange={(v) => !v && setHoleriteAberto(null)}
+        holerite={holeriteAberto}
+        periodoKey={periodoSigKey}
+        periodoLabel={periodoLabel}
+        onSigned={() => setSigVersion((v) => v + 1)}
+      />
+
 
     </div>
   );
