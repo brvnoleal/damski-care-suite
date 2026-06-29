@@ -27,6 +27,7 @@ import { exportMultiSheetXlsx } from "@/lib/exportXlsx";
 import { calcularTaxa, formatBRL } from "@/lib/maquininhaCalc";
 import RelatoriosAvancados from "@/components/financeiro/RelatoriosAvancados";
 import DemografiaPanel from "@/components/dashboard/DemografiaPanel";
+import { PeriodoFilter, filtrarPorPeriodo, type PeriodoValue } from "@/components/financeiro/PeriodoFilter";
 
 const pagamentoColors = ["hsl(160 84% 39%)", "hsl(239 84% 67%)", "hsl(38 92% 50%)", "hsl(0 72% 51%)", "hsl(280 60% 55%)"];
 const procedimentoColors = [
