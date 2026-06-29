@@ -77,8 +77,8 @@ const Relatorios = () => {
           supabase.from("paciente").select("id, nome"),
         ]);
 
-        const agendamentos = agRes.data || [];
-        const despesas = despRes.data || [];
+        const agendamentos = filtrarPorPeriodo(agRes.data || [], "data", periodo, dataInicio, dataFim);
+        const despesas = filtrarPorPeriodo(despRes.data || [], "vencimento", periodo, dataInicio, dataFim);
         const pacientes = pacRes.data || [];
         const pacMap = Object.fromEntries(pacientes.map((p: any) => [p.id, p.nome]));
 
