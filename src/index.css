@@ -146,48 +146,6 @@
   }
 }
 
-/* ── iOS-style toggle (Uiverse zanina-yassine) ───────────────── */
-.neu-toggle {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 26px;
-}
-.neu-toggle-state {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  position: absolute;
-  margin: 0;
-}
-.neu-toggle-indicator {
-  position: absolute;
-  inset: 0;
-  display: block;
-  background-color: #e9e9eb;
-  border-radius: 16px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-out;
-}
-.neu-toggle-indicator::after {
-  content: "";
-  position: absolute;
-  width: 22px;
-  height: 22px;
-  left: 2px;
-  top: 2px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.15), 0px 3px 1px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease-out;
-}
-.neu-toggle-state:checked ~ .neu-toggle-indicator {
-  background-color: #34c759;
-}
-.neu-toggle-state:checked ~ .neu-toggle-indicator::after {
-  transform: translateX(18px);
-}
-.neu-toggle-state:disabled ~ .neu-toggle-indicator { cursor: not-allowed; }
 
 /* Minimal scrollbar */
 ::-webkit-scrollbar {

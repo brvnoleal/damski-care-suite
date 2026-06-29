@@ -1,10 +1,11 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { AnimatedSwitchSvg } from "./AnimatedSwitchSvg";
 
 /**
- * Neumorphic toggle switch (Uiverse "mobinkakei" style).
- * Drop-in substitute for shadcn <Switch /> on screens where the soft neumorphic
- * look is desired. Controlled API mirrors Radix Switch: `checked` + `onCheckedChange`.
+ * Animated switch button (SVG-based, iOS-style toggle).
+ * Drop-in substitute for shadcn <Switch />. Controlled API mirrors Radix Switch:
+ * `checked` + `onCheckedChange`.
  */
 export interface NeuToggleProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange" | "type" | "size"> {
@@ -24,18 +25,20 @@ export const NeuToggle = React.forwardRef<HTMLInputElement, NeuToggleProps>(
           className,
         )}
       >
-        <span className="neu-toggle">
+        <span className="relative inline-flex items-center w-[44px] h-[26px] shrink-0">
           <input
             ref={ref}
             type="checkbox"
-            className="neu-toggle-state"
+            className="peer absolute inset-0 z-10 opacity-0 w-full h-full cursor-pointer disabled:cursor-not-allowed"
             checked={checked}
             defaultChecked={defaultChecked}
             disabled={disabled}
             onChange={(e) => onCheckedChange?.(e.target.checked)}
             {...rest}
           />
-          <span className="neu-toggle-indicator" />
+          <span className="absolute inset-0 pointer-events-none">
+            <AnimatedSwitchSvg className="w-full h-full" />
+          </span>
         </span>
         {label != null && <span className="ml-3 text-sm">{label}</span>}
       </label>
@@ -43,3 +46,4 @@ export const NeuToggle = React.forwardRef<HTMLInputElement, NeuToggleProps>(
   },
 );
 NeuToggle.displayName = "NeuToggle";
+
