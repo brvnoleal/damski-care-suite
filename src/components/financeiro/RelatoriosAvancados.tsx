@@ -38,6 +38,7 @@ import { pacienteService } from "@/services/pacienteService";
 import type { Dentista, Paciente } from "@/types";
 import { procedimentoConsultaLabels } from "@/types";
 import { exportToXlsx, exportMultiSheetXlsx } from "@/lib/exportXlsx";
+import { calcularTaxa } from "@/lib/maquininhaCalc";
 import {
   ResponsiveContainer,
   PieChart,
