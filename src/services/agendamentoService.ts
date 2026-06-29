@@ -20,6 +20,7 @@ const mapRow = (row: any): Agendamento => ({
   parcelas: row.parcelas,
   status_pagamento: (row.status_pagamento as "pendente" | "pago") || "pendente",
   observacoes: row.observacoes || undefined,
+  tags: Array.isArray(row.tags) ? row.tags : [],
   created_at: row.created_at,
 });
 
