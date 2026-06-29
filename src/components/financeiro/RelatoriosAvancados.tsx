@@ -407,7 +407,9 @@ const RelatoriosAvancados = () => {
             onClick={() => {
               exportToXlsx(
                 [
-                  { Linha: "(+) Receita paga", Valor: dre.receitaPaga },
+                  { Linha: "(+) Receita paga (bruta)", Valor: dre.receitaPaga },
+                  { Linha: "(-) Taxas de maquininha", Valor: dre.taxasMaquininha },
+                  { Linha: "(=) Receita líquida", Valor: dre.receitaLiquida },
                   { Linha: "(-) Despesas pagas", Valor: dre.despesaPaga },
                   { Linha: "(=) Resultado bruto", Valor: dre.resultadoBruto },
                   { Linha: "(-) Comissões devidas", Valor: dre.comissaoTotal },
