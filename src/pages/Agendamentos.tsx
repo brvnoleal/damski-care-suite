@@ -544,7 +544,7 @@ const Agendamentos = () => {
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
               <TagIcon className="w-3.5 h-3.5" /> Etiquetas
             </Label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 items-center">
               {AGENDAMENTO_TAG_OPTIONS.map((opt) => {
                 const active = (form.tags || []).includes(opt.value);
                 return (
@@ -553,10 +553,7 @@ const Agendamentos = () => {
                     type="button"
                     onClick={() => {
                       const cur = form.tags || [];
-                      setForm({
-                        ...form,
-                        tags: active ? cur.filter((t) => t !== opt.value) : [...cur, opt.value],
-                      });
+                      setForm({ ...form, tags: active ? cur.filter((t) => t !== opt.value) : [...cur, opt.value] });
                     }}
                     className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
                       active ? opt.className + " ring-2 ring-offset-1 ring-offset-background ring-current/40" : "bg-transparent text-muted-foreground border-border hover:bg-white/5"
@@ -566,8 +563,51 @@ const Agendamentos = () => {
                   </button>
                 );
               })}
+              {customTags.map((opt) => {
+                const active = (form.tags || []).includes(opt.value);
+                return (
+                  <span key={opt.value} className="inline-flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = form.tags || [];
+                        setForm({ ...form, tags: active ? cur.filter((t) => t !== opt.value) : [...cur, opt.value] });
+                      }}
+                      className="px-2.5 py-1 rounded-full text-xs font-medium border transition-all"
+                      style={{
+                        backgroundColor: active ? `${opt.color}33` : "transparent",
+                        color: active ? opt.color : undefined,
+                        borderColor: active ? `${opt.color}80` : undefined,
+                      }}
+                    >
+                      <span className="inline-block w-2 h-2 rounded-full mr-1.5 align-middle" style={{ backgroundColor: opt.color }} />
+                      {opt.label}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        deleteCustomAgendamentoTag(opt.value);
+                        setCustomTags(getCustomAgendamentoTags());
+                        setForm({ ...form, tags: (form.tags || []).filter((t) => t !== opt.value) });
+                      }}
+                      className="text-muted-foreground hover:text-destructive transition-colors"
+                      title="Excluir etiqueta"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => { setNewTagName(""); setNewTagColor("#3b82f6"); setNewTagOpen(true); }}
+                className="px-2.5 py-1 rounded-full text-xs font-medium border border-dashed border-border text-muted-foreground hover:text-primary hover:border-primary transition-all inline-flex items-center gap-1"
+              >
+                <Plus className="w-3 h-3" /> Nova etiqueta
+              </button>
             </div>
           </div>
+
 
 
           <div className="sm:col-span-2">
