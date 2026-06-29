@@ -51,8 +51,10 @@ export default function ProcedimentosSection() {
   const [form, setForm] = useState(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<ProcedimentoRecord | null>(null);
   const [insumosTarget, setInsumosTarget] = useState<ProcedimentoRecord | null>(null);
+  const [comissoesTarget, setComissoesTarget] = useState<ProcedimentoRecord | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
+  const comissoesEditorRef = useRef<ProcedimentoComissoesEditorHandle>(null);
 
 
   const { data: procedimentos = [], isLoading } = useQuery({
