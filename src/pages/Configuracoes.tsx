@@ -94,26 +94,26 @@ const Configuracoes = () => {
 
       <FadeIn delay={0.1}>
         <Tabs defaultValue="perfil" className="space-y-4">
-          <TabsList className="bg-muted/50 p-1 flex flex-wrap gap-1 h-auto">
-            <TabsTrigger value="perfil" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+          <TabsList className="h-auto flex-wrap">
+            <TabsTrigger value="perfil" className="gap-1.5 text-xs">
               <Building2 className="w-3.5 h-3.5" /> Perfil do Consultório
             </TabsTrigger>
-            <TabsTrigger value="alertas" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <TabsTrigger value="alertas" className="gap-1.5 text-xs">
               <Bell className="w-3.5 h-3.5" /> Alertas Automáticos
             </TabsTrigger>
-            <TabsTrigger value="maquininhas" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <TabsTrigger value="maquininhas" className="gap-1.5 text-xs">
               <CreditCard className="w-3.5 h-3.5" /> Maquininhas
             </TabsTrigger>
-            <TabsTrigger value="procedimentos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <TabsTrigger value="procedimentos" className="gap-1.5 text-xs">
               <ClipboardList className="w-3.5 h-3.5" /> Procedimentos
             </TabsTrigger>
-            <TabsTrigger value="usuarios" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <TabsTrigger value="usuarios" className="gap-1.5 text-xs">
               <UserCog className="w-3.5 h-3.5" /> Usuários
             </TabsTrigger>
-            <TabsTrigger value="documentos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <TabsTrigger value="documentos" className="gap-1.5 text-xs">
               <FileText className="w-3.5 h-3.5" /> Documentos
             </TabsTrigger>
-            <TabsTrigger value="insumos" className="gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm">
+            <TabsTrigger value="insumos" className="gap-1.5 text-xs">
               <Package className="w-3.5 h-3.5" /> Insumos
             </TabsTrigger>
           </TabsList>
