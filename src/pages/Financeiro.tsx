@@ -699,7 +699,10 @@ const Relatorios = () => {
 
         {/* ========== DRE · FUNIL · HOLERITE ========== */}
         <TabsContent value="avancado" className="space-y-4">
-          <RelatoriosAvancados />
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <PeriodoFilter {...periodoFilterProps} />
+          </div>
+          <RelatoriosAvancados periodo={periodo} dataInicio={dataInicio} dataFim={dataFim} />
         </TabsContent>
       </Tabs>
     </div>
