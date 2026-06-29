@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
-  Users, Calendar, Package, FileCheck,
+  Users, Calendar, DollarSign, FileCheck,
   AlertTriangle, ArrowUpRight, ChevronRight, Star, Activity,
   Smile, Clock,
 } from "lucide-react";
