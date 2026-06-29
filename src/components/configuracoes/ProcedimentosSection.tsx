@@ -1,11 +1,10 @@
 import { useRef, useState } from "react";
-import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, Package, BadgeDollarSign } from "lucide-react";
-import { ProcedimentoInsumosDialog } from "@/components/configuracoes/ProcedimentoInsumosDialog";
+import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { ProcedimentoInsumosEditor } from "@/components/configuracoes/ProcedimentoInsumosEditor";
 import {
   ProcedimentoComissoesEditor,
   type ProcedimentoComissoesEditorHandle,
 } from "@/components/comissoes/ProcedimentoComissoesEditor";
-import { ResponsiveDialog as ComissoesDialog } from "@/components/ui/responsive-dialog";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -13,6 +12,7 @@ import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableHeader,
@@ -50,12 +50,9 @@ export default function ProcedimentosSection() {
   const [editing, setEditing] = useState<ProcedimentoRecord | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<ProcedimentoRecord | null>(null);
-  const [insumosTarget, setInsumosTarget] = useState<ProcedimentoRecord | null>(null);
-  const [comissoesTarget, setComissoesTarget] = useState<ProcedimentoRecord | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const comissoesEditorRef = useRef<ProcedimentoComissoesEditorHandle>(null);
-
 
   const { data: procedimentos = [], isLoading } = useQuery({
     queryKey: ["procedimentos"],
@@ -82,7 +79,6 @@ export default function ProcedimentosSection() {
       const saved = editing
         ? await procedimentoService.update(editing.id, payload)
         : await procedimentoService.create(payload);
-      // Persiste as comissões configuradas no editor inline
       if (saved?.id && comissoesEditorRef.current) {
         try {
           await comissoesEditorRef.current.saveAll(saved.id);
@@ -210,26 +206,9 @@ export default function ProcedimentosSection() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => setInsumosTarget(p)}
-                          aria-label="Gerenciar insumos"
-                          title="Gerenciar insumos do procedimento"
-                        >
-                          <Package className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setComissoesTarget(p)}
-                          aria-label="Configurar comissões"
-                          title="Configurar comissões por dentista"
-                        >
-                          <BadgeDollarSign className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
                           onClick={() => handleOpenEdit(p)}
                           aria-label="Editar"
+                          title="Editar procedimento, insumos e comissões"
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -244,7 +223,6 @@ export default function ProcedimentosSection() {
                         </Button>
                       </div>
                     </TableCell>
-
                   </TableRow>
                 ))
               )}
@@ -301,67 +279,71 @@ export default function ProcedimentosSection() {
           </>
         }
       >
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Procedimento</Label>
-            <Input
-              value={form.nome}
-              onChange={(e) => setForm({ ...form, nome: e.target.value })}
-              placeholder="Ex: Limpeza"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Plano</Label>
-            <Input
-              value={form.plano}
-              onChange={(e) => setForm({ ...form, plano: e.target.value })}
-              placeholder="Ex: Particular, Unimed..."
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Especialidade</Label>
-            <Input
-              value={form.especialidade}
-              onChange={(e) => setForm({ ...form, especialidade: e.target.value })}
-              placeholder="Ex: Ortodontia"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Preço (R$)</Label>
-            <Input
-              type="number"
-              step="0.01"
-              min="0"
-              value={form.preco}
-              onChange={(e) => setForm({ ...form, preco: e.target.value })}
-              placeholder="0,00"
-            />
-          </div>
+        <Tabs defaultValue="dados" className="w-full">
+          <TabsList className="w-full">
+            <TabsTrigger value="dados" className="flex-1">Dados</TabsTrigger>
+            <TabsTrigger value="insumos" className="flex-1">Insumos</TabsTrigger>
+            <TabsTrigger value="comissoes" className="flex-1">Comissões</TabsTrigger>
+          </TabsList>
 
-          <div className="space-y-2 pt-2 border-t border-border/40">
-            <div>
-              <Label>Comissões por dentista</Label>
-              <p className="text-[11px] text-muted-foreground">
-                Defina o tipo (% ou R$ fixo) e o valor que cada dentista recebe neste procedimento.
-                Apurada somente quando o pagamento estiver como <strong>pago</strong>.
-              </p>
+          <TabsContent value="dados" className="mt-4 space-y-4">
+            <div className="space-y-2">
+              <Label>Procedimento</Label>
+              <Input
+                value={form.nome}
+                onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                placeholder="Ex: Limpeza"
+              />
             </div>
+            <div className="space-y-2">
+              <Label>Plano</Label>
+              <Input
+                value={form.plano}
+                onChange={(e) => setForm({ ...form, plano: e.target.value })}
+                placeholder="Ex: Particular, Unimed..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Especialidade</Label>
+              <Input
+                value={form.especialidade}
+                onChange={(e) => setForm({ ...form, especialidade: e.target.value })}
+                placeholder="Ex: Ortodontia"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Preço (R$)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                min="0"
+                value={form.preco}
+                onChange={(e) => setForm({ ...form, preco: e.target.value })}
+                placeholder="0,00"
+              />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="insumos" className="mt-4">
+            <p className="text-[11px] text-muted-foreground mb-3">
+              Insumos vinculados são carregados automaticamente ao agendar uma consulta com este procedimento.
+            </p>
+            <ProcedimentoInsumosEditor procedimentoId={editing?.id ?? null} />
+          </TabsContent>
+
+          <TabsContent value="comissoes" className="mt-4">
+            <p className="text-[11px] text-muted-foreground mb-3">
+              Defina o tipo (% ou R$ fixo) e o valor que cada dentista recebe neste procedimento.
+              Apurada somente quando o pagamento estiver como <strong>pago</strong>.
+            </p>
             <ProcedimentoComissoesEditor
               ref={comissoesEditorRef}
               procedimentoId={editing?.id ?? null}
               inline
             />
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </ResponsiveDialog>
-
-      <ComissoesDialog
-        open={!!comissoesTarget}
-        onOpenChange={(o) => !o && setComissoesTarget(null)}
-        title={`Comissões — ${comissoesTarget?.nome ?? ""}`}
-      >
-        <ProcedimentoComissoesEditor procedimentoId={comissoesTarget?.id ?? null} />
-      </ComissoesDialog>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>
@@ -382,14 +364,6 @@ export default function ProcedimentosSection() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <ProcedimentoInsumosDialog
-        open={!!insumosTarget}
-        onOpenChange={(o) => !o && setInsumosTarget(null)}
-        procedimentoId={insumosTarget?.id || null}
-        procedimentoNome={insumosTarget?.nome || ""}
-      />
-
     </LiquidGlassCard>
   );
 }
