@@ -25,7 +25,7 @@ export const NeuToggle = React.forwardRef<HTMLInputElement, NeuToggleProps>(
           className,
         )}
       >
-        <span className="relative inline-flex items-center w-[56px] h-[34px] shrink-0">
+        <span className="relative inline-flex items-center w-[64px] h-[64px] shrink-0">
           <input
             ref={ref}
             type="checkbox"
@@ -37,7 +37,7 @@ export const NeuToggle = React.forwardRef<HTMLInputElement, NeuToggleProps>(
             {...rest}
           />
           <span className="absolute inset-0 pointer-events-none">
-            <AnimatedSwitchSvg className="w-full h-full" checked={checked ?? defaultChecked} />
+            <AnimatedSwitchSvg />
           </span>
         </span>
         {label != null && <span className="ml-3 text-sm">{label}</span>}
