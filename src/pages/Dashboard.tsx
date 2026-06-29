@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
-  Users, Calendar, Package, FileCheck,
+  Users, Calendar, DollarSign, FileCheck,
   AlertTriangle, ArrowUpRight, ChevronRight, Star, Activity,
   Smile, Clock,
 } from "lucide-react";
@@ -19,7 +19,7 @@ import { FadeIn, StaggerContainer, StaggerItem } from "@/components/FadeIn";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { supabase } from "@/integrations/supabase/client";
 import { procedimentoConsultaLabels } from "@/types";
-import { calcularTaxa } from "@/lib/maquininhaCalc";
+import { calcularTaxa, formatBRL } from "@/lib/maquininhaCalc";
 
 const colorMap = {
   primary: { bg: "bg-primary/10", text: "text-primary" },
@@ -65,7 +65,7 @@ const Dashboard = () => {
   const [kpis, setKpis] = useState([
     { label: "Novos Pacientes este mês", value: "—", change: "carregando...", icon: Users, color: "primary" as const, trend: "neutral" },
     { label: "Consultas Hoje", value: "—", change: "", icon: Calendar, color: "info" as const, trend: "neutral" },
-    { label: "Insumos Críticos", value: "—", change: "", icon: Package, color: "warning" as const, trend: "neutral" },
+    { label: "Pagamentos Pendentes", value: "—", change: "", icon: DollarSign, color: "warning" as const, trend: "neutral" },
     { label: "Consultas Semana", value: "—", change: "", icon: FileCheck, color: "success" as const, trend: "up" },
   ]);
 
@@ -107,10 +107,13 @@ const Dashboard = () => {
       }).length;
       const weekConfirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
 
+      const pendentesSemana = weekAg.filter((a: any) => a.status !== "cancelado" && a.status_pagamento !== "pago");
+      const totalPendente = pendentesSemana.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
+
       setKpis([
         { label: "Novos Pacientes este mês", value: String(novosPacCount), change: "", icon: Users, color: "primary", trend: "up" },
         { label: "Consultas Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "info", trend: "neutral" },
-        { label: "Insumos Críticos", value: String(criticalCount), change: "", icon: Package, color: "warning", trend: "neutral" },
+        { label: "Pagamentos Pendentes", value: formatBRL(totalPendente), change: `${pendentesSemana.length} consulta${pendentesSemana.length !== 1 ? "s" : ""}`, icon: DollarSign, color: "warning", trend: "neutral" },
         { label: "Consultas Semana", value: String(weekAg.length), change: `${weekConfirmed} confirmadas`, icon: FileCheck, color: "success", trend: "up" },
       ]);
 
