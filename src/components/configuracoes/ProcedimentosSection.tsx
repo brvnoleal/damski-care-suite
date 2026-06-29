@@ -79,8 +79,18 @@ export default function ProcedimentosSection() {
         preco: Number(form.preco) || 0,
       };
       if (!payload.nome) throw new Error("Informe o nome do procedimento.");
-      if (editing) return procedimentoService.update(editing.id, payload);
-      return procedimentoService.create(payload);
+      const saved = editing
+        ? await procedimentoService.update(editing.id, payload)
+        : await procedimentoService.create(payload);
+      // Persiste as comissões configuradas no editor inline
+      if (saved?.id && comissoesEditorRef.current) {
+        try {
+          await comissoesEditorRef.current.saveAll(saved.id);
+        } catch (e) {
+          console.error("Erro ao salvar comissões:", e);
+        }
+      }
+      return saved;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["procedimentos"] });
