@@ -377,25 +377,23 @@ const Agendamentos = () => {
                         {(a.tags || []).length === 0 ? (
                           <span className="text-xs text-muted-foreground">—</span>
                         ) : (
-                          (a.tags || []).map((t) => (
-                            <Badge key={t} variant="outline" className={`text-[10px] py-0 ${agendamentoTagClassName(t)}`}>
-                              {AGENDAMENTO_TAG_LABELS[t] || t}
-                            </Badge>
-                          ))
+                          (a.tags || []).map((t) => {
+                            const disp = resolveAgendamentoTagDisplay(t);
+                            return (
+                              <Badge key={t} variant="outline" className={`text-[10px] py-0 ${disp.className}`} style={disp.style}>
+                                {disp.label}
+                              </Badge>
+                            );
+                          })
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
                       <Select
                         value={a.status}
-                        onValueChange={async (novoStatus) => {
-                          try {
-                            await agendamentoService.atualizar(a.id, { status: novoStatus as Agendamento["status"] });
-                            await loadData();
-                            toast({ title: `Status atualizado para "${statusConfig[novoStatus]?.label || novoStatus}"` });
-                          } catch (err: any) {
-                            toast({ title: "Erro ao atualizar status", description: err?.message, variant: "destructive" });
-                          }
+                        onValueChange={(novoStatus) => {
+                          if (novoStatus === a.status) return;
+                          setPendingStatus({ ag: a, novo: novoStatus });
                         }}
                       >
                         <SelectTrigger className={`h-7 w-auto min-w-[140px] px-2 text-xs font-medium border ${st.className}`}>
