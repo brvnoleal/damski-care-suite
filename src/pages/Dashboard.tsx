@@ -107,10 +107,13 @@ const Dashboard = () => {
       }).length;
       const weekConfirmed = weekAg.filter((a: any) => a.status === "confirmado").length;
 
+      const pendentesSemana = weekAg.filter((a: any) => a.status !== "cancelado" && a.status_pagamento !== "pago");
+      const totalPendente = pendentesSemana.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
+
       setKpis([
         { label: "Novos Pacientes este mês", value: String(novosPacCount), change: "", icon: Users, color: "primary", trend: "up" },
         { label: "Consultas Hoje", value: String(todayAg.length), change: `${todayDone} concluídas`, icon: Calendar, color: "info", trend: "neutral" },
-        { label: "Insumos Críticos", value: String(criticalCount), change: "", icon: Package, color: "warning", trend: "neutral" },
+        { label: "Pagamentos Pendentes", value: formatBRL(totalPendente), change: `${pendentesSemana.length} consulta${pendentesSemana.length !== 1 ? "s" : ""}`, icon: DollarSign, color: "warning", trend: "neutral" },
         { label: "Consultas Semana", value: String(weekAg.length), change: `${weekConfirmed} confirmadas`, icon: FileCheck, color: "success", trend: "up" },
       ]);
 
