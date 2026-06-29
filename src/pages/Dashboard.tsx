@@ -471,10 +471,13 @@ const Dashboard = () => {
             </div>
             <div className="px-4 sm:px-5 py-3 border-b border-white/5">
               <p className="text-xl sm:text-2xl font-bold text-foreground">
-                {receitaSemana.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                {receitaSemana.liquido.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
               </p>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                {receitaSemana.realizadas} consulta{receitaSemana.realizadas !== 1 ? "s" : ""} realizada{receitaSemana.realizadas !== 1 ? "s" : ""} · previsto {receitaSemana.previstas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                Líquido (após taxas) · Bruto {receitaSemana.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} · Taxas {receitaSemana.taxas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                {receitaSemana.realizadas} consulta{receitaSemana.realizadas !== 1 ? "s" : ""} paga{receitaSemana.realizadas !== 1 ? "s" : ""} · previsto {receitaSemana.previstas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
               </p>
             </div>
             <div className="divide-y divide-white/5 flex-1 overflow-y-auto">
@@ -483,10 +486,24 @@ const Dashboard = () => {
               )}
               {receitaSemana.items.map((it, i) => (
                 <div key={i} className="flex items-center justify-between gap-3 px-4 sm:px-5 py-2.5">
-                  <p className="text-sm text-foreground truncate">{it.proc}</p>
-                  <p className="text-sm font-semibold text-success shrink-0">
-                    {it.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                  </p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-foreground truncate">{it.proc}</p>
+                    {it.taxa > 0 && (
+                      <p className="text-[10px] text-muted-foreground">
+                        Taxa {it.taxa.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-semibold text-success">
+                      {it.liquido.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                    </p>
+                    {it.taxa > 0 && (
+                      <p className="text-[10px] text-muted-foreground line-through">
+                        {it.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      </p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
