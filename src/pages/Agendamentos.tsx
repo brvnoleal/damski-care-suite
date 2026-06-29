@@ -30,10 +30,12 @@ import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 import { ConsultaInsumosEditor, ConsultaInsumoItem } from "@/components/agendamento/ConsultaInsumosEditor";
 import { agendamentoInsumoService } from "@/services/agendamentoInsumoService";
 import { ParcelamentoBreakdown } from "@/components/agendamento/ParcelamentoBreakdown";
+import { AGENDAMENTO_TAG_OPTIONS, agendamentoTagClassName, AGENDAMENTO_TAG_LABELS } from "@/lib/pacienteOptions";
+import { Tag as TagIcon } from "lucide-react";
 
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
-  data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, status_pagamento: "pendente", observacoes: "",
+  data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, status_pagamento: "pendente", observacoes: "", tags: [],
 });
 
 const formatDataBR = (data: string) => {
@@ -159,7 +161,7 @@ const Agendamentos = () => {
 
   const openEdit = async (a: Agendamento) => {
     setEditingId(a.id);
-    setForm({ data: a.data, horario: a.horario, horario_fim: a.horario_fim || "", paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, status_pagamento: a.status_pagamento || "pendente", observacoes: a.observacoes || "" });
+    setForm({ data: a.data, horario: a.horario, horario_fim: a.horario_fim || "", paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, status_pagamento: a.status_pagamento || "pendente", observacoes: a.observacoes || "", tags: a.tags || [] });
     try {
       const existing = await agendamentoInsumoService.listarPorAgendamento(a.id);
       setInsumosConsulta(existing.map((i) => ({ insumo_id: i.insumo_id, quantidade: i.quantidade })));
@@ -302,6 +304,7 @@ const Agendamentos = () => {
                 <TableHead className="font-semibold">Paciente</TableHead>
                 <TableHead className="font-semibold hidden md:table-cell">Dentista</TableHead>
                 <TableHead className="font-semibold hidden sm:table-cell">Procedimento</TableHead>
+                <TableHead className="font-semibold hidden lg:table-cell">Etiquetas</TableHead>
                 <TableHead className="font-semibold">Status</TableHead>
                 <TableHead className="font-semibold text-right">Ações</TableHead>
               </TableRow>
@@ -309,7 +312,7 @@ const Agendamentos = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
                 </TableRow>
               ) : filtered.map((a) => {
                 const st = statusConfig[a.status] || statusConfig.agendado;
@@ -336,6 +339,19 @@ const Agendamentos = () => {
                     <TableCell className="text-muted-foreground hidden md:table-cell">{getDentistaNome(a.dentista_id)}</TableCell>
                     <TableCell className="hidden sm:table-cell">
                       <Badge variant="outline" className="font-medium">{procedimentoConsultaLabels[a.procedimento]}</Badge>
+                    </TableCell>
+                    <TableCell className="hidden lg:table-cell">
+                      <div className="flex flex-wrap gap-1">
+                        {(a.tags || []).length === 0 ? (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        ) : (
+                          (a.tags || []).map((t) => (
+                            <Badge key={t} variant="outline" className={`text-[10px] py-0 ${agendamentoTagClassName(t)}`}>
+                              {AGENDAMENTO_TAG_LABELS[t] || t}
+                            </Badge>
+                          ))
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Select
@@ -377,7 +393,7 @@ const Agendamentos = () => {
               })}
               {!loading && filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                     Nenhum agendamento encontrado.
                   </TableCell>
                 </TableRow>
@@ -492,6 +508,36 @@ const Agendamentos = () => {
               onChange={(v) => setForm({ ...form, procedimento: v })}
             />
           </div>
+
+          <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <TagIcon className="w-3.5 h-3.5" /> Etiquetas
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {AGENDAMENTO_TAG_OPTIONS.map((opt) => {
+                const active = (form.tags || []).includes(opt.value);
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      const cur = form.tags || [];
+                      setForm({
+                        ...form,
+                        tags: active ? cur.filter((t) => t !== opt.value) : [...cur, opt.value],
+                      });
+                    }}
+                    className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                      active ? opt.className + " ring-2 ring-offset-1 ring-offset-background ring-current/40" : "bg-transparent text-muted-foreground border-border hover:bg-white/5"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
 
           <div className="sm:col-span-2">
             <ConsultaInsumosEditor

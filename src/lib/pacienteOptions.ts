@@ -34,3 +34,51 @@ export const TAG_LABELS: Record<string, string> = Object.fromEntries(
 export const tagClassName = (value: string): string =>
   TAG_OPTIONS.find((t) => t.value === value)?.className ||
   "bg-muted text-foreground border-border";
+
+// Tags aplicáveis a um agendamento (consulta). Reaproveita o vocabulário
+// das etiquetas de paciente para consistência visual.
+export type TagAgendamento = "primeira_consulta" | "cirurgia" | "paciente_finalizado";
+
+export const AGENDAMENTO_TAG_OPTIONS: {
+  value: TagAgendamento;
+  label: string;
+  className: string;
+  dotClass: string;
+  borderClass: string;
+}[] = [
+  {
+    value: "primeira_consulta",
+    label: "Primeira Consulta",
+    className: "bg-blue-500/15 text-blue-600 border-blue-500/30 dark:text-blue-300",
+    dotClass: "bg-blue-500",
+    borderClass: "border-l-blue-500",
+  },
+  {
+    value: "cirurgia",
+    label: "Cirurgia",
+    className: "bg-red-500/15 text-red-600 border-red-500/30 dark:text-red-300",
+    dotClass: "bg-red-500",
+    borderClass: "border-l-red-500",
+  },
+  {
+    value: "paciente_finalizado",
+    label: "Paciente Finalizado",
+    className: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300",
+    dotClass: "bg-emerald-500",
+    borderClass: "border-l-emerald-500",
+  },
+];
+
+export const AGENDAMENTO_TAG_LABELS: Record<string, string> = Object.fromEntries(
+  AGENDAMENTO_TAG_OPTIONS.map((t) => [t.value, t.label]),
+);
+
+export const agendamentoTagClassName = (value: string): string =>
+  AGENDAMENTO_TAG_OPTIONS.find((t) => t.value === value)?.className ||
+  "bg-muted text-foreground border-border";
+
+export const agendamentoTagDotClass = (value: string): string =>
+  AGENDAMENTO_TAG_OPTIONS.find((t) => t.value === value)?.dotClass || "bg-muted-foreground";
+
+export const agendamentoTagBorderClass = (value: string): string =>
+  AGENDAMENTO_TAG_OPTIONS.find((t) => t.value === value)?.borderClass || "border-l-transparent";
