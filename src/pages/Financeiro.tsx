@@ -43,7 +43,9 @@ const faturamentoConfig: ChartConfig = {
 const procedimentoConfig: ChartConfig = { valor: { label: "Valor", color: "hsl(var(--primary))" } };
 
 const Relatorios = () => {
-  const [periodo, setPeriodo] = useState("mensal");
+  const [periodo, setPeriodo] = useState<PeriodoValue>("365");
+  const [dataInicio, setDataInicio] = useState<string>("");
+  const [dataFim, setDataFim] = useState<string>("");
   const [despesaOpen, setDespesaOpen] = useState(false);
   const [novaDespesa, setNovaDespesa] = useState({ descricao: "", categoria: "", fornecedor: "", valor: "", formaPagamento: "", vencimento: "", observacoes: "" });
   const [loading, setLoading] = useState(true);
