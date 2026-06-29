@@ -21,6 +21,7 @@ import {
   procedimentoConsultaLabels,
   formaPagamentoLabels,
 } from "@/types";
+import { AGENDAMENTO_TAG_OPTIONS, AGENDAMENTO_TAG_LABELS, agendamentoTagClassName, agendamentoTagDotClass, agendamentoTagBorderClass } from "@/lib/pacienteOptions";
 
 
 const statusConfig: Record<string, { label: string; className: string; dot: string }> = {
