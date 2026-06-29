@@ -30,8 +30,9 @@ import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 import { ConsultaInsumosEditor, ConsultaInsumoItem } from "@/components/agendamento/ConsultaInsumosEditor";
 import { agendamentoInsumoService } from "@/services/agendamentoInsumoService";
 import { ParcelamentoBreakdown } from "@/components/agendamento/ParcelamentoBreakdown";
-import { AGENDAMENTO_TAG_OPTIONS, agendamentoTagClassName, AGENDAMENTO_TAG_LABELS } from "@/lib/pacienteOptions";
-import { Tag as TagIcon } from "lucide-react";
+import { AGENDAMENTO_TAG_OPTIONS, agendamentoTagClassName, AGENDAMENTO_TAG_LABELS, getCustomAgendamentoTags, saveCustomAgendamentoTag, deleteCustomAgendamentoTag, resolveAgendamentoTagDisplay, type CustomAgendamentoTag } from "@/lib/pacienteOptions";
+import { Tag as TagIcon, Palette } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
@@ -88,11 +89,11 @@ const gerarDatasSugeridas = (tipo: RepetirTipo, base: string): string[] => {
 };
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  agendado: { label: "Agendado", className: "bg-info/10 text-info border-info/20" },
-  confirmado: { label: "Confirmado", className: "bg-primary/10 text-primary border-primary/20" },
-  realizado: { label: "Realizada", className: "bg-success/10 text-success border-success/20" },
-  nao_compareceu: { label: "Não Compareceu", className: "bg-destructive/10 text-destructive border-destructive/20" },
-  cancelado: { label: "Cancelado", className: "bg-destructive/10 text-destructive border-destructive/20" },
+  agendado: { label: "Agendado", className: "bg-blue-500/15 text-blue-600 border-blue-500/30 dark:text-blue-300" },
+  confirmado: { label: "Confirmado", className: "bg-violet-500/15 text-violet-600 border-violet-500/30 dark:text-violet-300" },
+  realizado: { label: "Realizada", className: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30 dark:text-emerald-300" },
+  nao_compareceu: { label: "Não Compareceu", className: "bg-amber-500/15 text-amber-700 border-amber-500/30 dark:text-amber-300" },
+  cancelado: { label: "Cancelado", className: "bg-red-500/15 text-red-600 border-red-500/30 dark:text-red-300" },
 };
 
 const Agendamentos = () => {
@@ -111,6 +112,11 @@ const Agendamentos = () => {
   const [repetir, setRepetir] = useState<RepetirTipo>("nao");
   const [datasSelecionadas, setDatasSelecionadas] = useState<string[]>([]);
   const [datasPersonalizadas, setDatasPersonalizadas] = useState<string[]>([]);
+  const [customTags, setCustomTags] = useState<CustomAgendamentoTag[]>([]);
+  const [newTagOpen, setNewTagOpen] = useState(false);
+  const [newTagName, setNewTagName] = useState("");
+  const [newTagColor, setNewTagColor] = useState("#3b82f6");
+  const [pendingStatus, setPendingStatus] = useState<{ ag: Agendamento; novo: string } | null>(null);
 
 
   const datasSugeridas = repetir !== "nao" && repetir !== "personalizado" ? gerarDatasSugeridas(repetir, form.data) : [];
@@ -134,6 +140,32 @@ const Agendamentos = () => {
   };
 
   useEffect(() => { loadData(); }, []);
+  useEffect(() => { setCustomTags(getCustomAgendamentoTags()); }, []);
+
+  const confirmStatusChange = async () => {
+    if (!pendingStatus) return;
+    const { ag, novo } = pendingStatus;
+    try {
+      await agendamentoService.atualizar(ag.id, { status: novo as Agendamento["status"] });
+      // Tenta salvar log no banco (silencioso se a tabela ainda não existir)
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        await supabase.from("agendamento_status_log" as any).insert({
+          agendamento_id: ag.id,
+          status_anterior: ag.status,
+          status_novo: novo,
+          alterado_por: userData?.user?.id || null,
+        } as any);
+      } catch { /* tabela ainda não criada */ }
+      await loadData();
+      toast({ title: `Status atualizado para "${statusConfig[novo]?.label || novo}"` });
+    } catch (err: any) {
+      toast({ title: "Erro ao atualizar status", description: err?.message, variant: "destructive" });
+    } finally {
+      setPendingStatus(null);
+    }
+  };
+
 
   const getPacienteNome = (id: string) => pacientes.find((p) => p.id === id)?.nome || "—";
   const getDentistaNome = (id: string) => dentistas.find((d) => d.id === id)?.nome || "—";
@@ -345,25 +377,23 @@ const Agendamentos = () => {
                         {(a.tags || []).length === 0 ? (
                           <span className="text-xs text-muted-foreground">—</span>
                         ) : (
-                          (a.tags || []).map((t) => (
-                            <Badge key={t} variant="outline" className={`text-[10px] py-0 ${agendamentoTagClassName(t)}`}>
-                              {AGENDAMENTO_TAG_LABELS[t] || t}
-                            </Badge>
-                          ))
+                          (a.tags || []).map((t) => {
+                            const disp = resolveAgendamentoTagDisplay(t);
+                            return (
+                              <Badge key={t} variant="outline" className={`text-[10px] py-0 ${disp.className}`} style={disp.style}>
+                                {disp.label}
+                              </Badge>
+                            );
+                          })
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
                       <Select
                         value={a.status}
-                        onValueChange={async (novoStatus) => {
-                          try {
-                            await agendamentoService.atualizar(a.id, { status: novoStatus as Agendamento["status"] });
-                            await loadData();
-                            toast({ title: `Status atualizado para "${statusConfig[novoStatus]?.label || novoStatus}"` });
-                          } catch (err: any) {
-                            toast({ title: "Erro ao atualizar status", description: err?.message, variant: "destructive" });
-                          }
+                        onValueChange={(novoStatus) => {
+                          if (novoStatus === a.status) return;
+                          setPendingStatus({ ag: a, novo: novoStatus });
                         }}
                       >
                         <SelectTrigger className={`h-7 w-auto min-w-[140px] px-2 text-xs font-medium border ${st.className}`}>
@@ -422,14 +452,6 @@ const Agendamentos = () => {
             <Input type="date" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} />
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Início *</Label>
-            <Input type="time" value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} />
-          </div>
-          <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Término</Label>
-            <Input type="time" value={form.horario_fim || ""} onChange={(e) => setForm({ ...form, horario_fim: e.target.value })} />
-          </div>
-          <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Paciente *</Label>
             <SearchableSelect
               options={pacientes.map((p) => ({ value: p.id, label: p.nome }))}
@@ -439,6 +461,14 @@ const Agendamentos = () => {
               searchPlaceholder="Buscar paciente..."
               emptyText="Nenhum paciente encontrado."
             />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Início *</Label>
+            <Input type="time" value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Término</Label>
+            <Input type="time" value={form.horario_fim || ""} onChange={(e) => setForm({ ...form, horario_fim: e.target.value })} />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Dentista *</Label>
@@ -451,8 +481,15 @@ const Agendamentos = () => {
               emptyText="Nenhum dentista encontrado."
             />
           </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
+            <ProcedimentoCombobox
+              value={form.procedimento}
+              onChange={(v) => setForm({ ...form, procedimento: v })}
+            />
+          </div>
           {!editingId && (
-            <div>
+            <div className="sm:col-span-2">
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Repetir agendamento</Label>
               <Select value={repetir} onValueChange={(v: RepetirTipo) => setRepetir(v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -501,19 +538,13 @@ const Agendamentos = () => {
               </Button>
             </div>
           )}
-          <div className="sm:col-span-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
-            <ProcedimentoCombobox
-              value={form.procedimento}
-              onChange={(v) => setForm({ ...form, procedimento: v })}
-            />
-          </div>
+
 
           <div className="sm:col-span-2">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
               <TagIcon className="w-3.5 h-3.5" /> Etiquetas
             </Label>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 items-center">
               {AGENDAMENTO_TAG_OPTIONS.map((opt) => {
                 const active = (form.tags || []).includes(opt.value);
                 return (
@@ -522,10 +553,7 @@ const Agendamentos = () => {
                     type="button"
                     onClick={() => {
                       const cur = form.tags || [];
-                      setForm({
-                        ...form,
-                        tags: active ? cur.filter((t) => t !== opt.value) : [...cur, opt.value],
-                      });
+                      setForm({ ...form, tags: active ? cur.filter((t) => t !== opt.value) : [...cur, opt.value] });
                     }}
                     className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
                       active ? opt.className + " ring-2 ring-offset-1 ring-offset-background ring-current/40" : "bg-transparent text-muted-foreground border-border hover:bg-white/5"
@@ -535,8 +563,51 @@ const Agendamentos = () => {
                   </button>
                 );
               })}
+              {customTags.map((opt) => {
+                const active = (form.tags || []).includes(opt.value);
+                return (
+                  <span key={opt.value} className="inline-flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = form.tags || [];
+                        setForm({ ...form, tags: active ? cur.filter((t) => t !== opt.value) : [...cur, opt.value] });
+                      }}
+                      className="px-2.5 py-1 rounded-full text-xs font-medium border transition-all"
+                      style={{
+                        backgroundColor: active ? `${opt.color}33` : "transparent",
+                        color: active ? opt.color : undefined,
+                        borderColor: active ? `${opt.color}80` : undefined,
+                      }}
+                    >
+                      <span className="inline-block w-2 h-2 rounded-full mr-1.5 align-middle" style={{ backgroundColor: opt.color }} />
+                      {opt.label}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        deleteCustomAgendamentoTag(opt.value);
+                        setCustomTags(getCustomAgendamentoTags());
+                        setForm({ ...form, tags: (form.tags || []).filter((t) => t !== opt.value) });
+                      }}
+                      className="text-muted-foreground hover:text-destructive transition-colors"
+                      title="Excluir etiqueta"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => { setNewTagName(""); setNewTagColor("#3b82f6"); setNewTagOpen(true); }}
+                className="px-2.5 py-1 rounded-full text-xs font-medium border border-dashed border-border text-muted-foreground hover:text-primary hover:border-primary transition-all inline-flex items-center gap-1"
+              >
+                <Plus className="w-3 h-3" /> Nova etiqueta
+              </button>
             </div>
           </div>
+
 
 
           <div className="sm:col-span-2">
@@ -621,6 +692,81 @@ const Agendamentos = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={!!pendingStatus} onOpenChange={(o) => { if (!o) setPendingStatus(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar alteração de status</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingStatus ? (
+                <>
+                  Alterar o status da consulta de{" "}
+                  <strong>{getPacienteNome(pendingStatus.ag.paciente_id)}</strong> de{" "}
+                  <strong>{statusConfig[pendingStatus.ag.status]?.label || pendingStatus.ag.status}</strong> para{" "}
+                  <strong>{statusConfig[pendingStatus.novo]?.label || pendingStatus.novo}</strong>?
+                </>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmStatusChange}>Confirmar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <ResponsiveDialog
+        open={newTagOpen}
+        onOpenChange={setNewTagOpen}
+        title="Nova etiqueta"
+        description="Crie uma etiqueta personalizada com cor para identificar consultas."
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setNewTagOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button
+              onClick={() => {
+                const nome = newTagName.trim();
+                if (!nome) { toast({ title: "Informe o nome da etiqueta", variant: "destructive" }); return; }
+                saveCustomAgendamentoTag(nome, newTagColor);
+                setCustomTags(getCustomAgendamentoTags());
+                setNewTagOpen(false);
+                toast({ title: "Etiqueta criada" });
+              }}
+              className="flex-1 sm:flex-none"
+            >
+              Salvar
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4 py-2">
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nome da etiqueta *</Label>
+            <Input value={newTagName} onChange={(e) => setNewTagName(e.target.value)} placeholder="Ex: Urgente" autoFocus />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <Palette className="w-3.5 h-3.5" /> Cor da etiqueta
+            </Label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={newTagColor}
+                onChange={(e) => setNewTagColor(e.target.value)}
+                className="h-10 w-16 rounded-md border border-border bg-transparent cursor-pointer"
+              />
+              <Input value={newTagColor} onChange={(e) => setNewTagColor(e.target.value)} className="flex-1 font-mono" />
+              <span
+                className="px-2.5 py-1 rounded-full text-xs font-medium border"
+                style={{ backgroundColor: `${newTagColor}26`, color: newTagColor, borderColor: `${newTagColor}55` }}
+              >
+                <span className="inline-block w-2 h-2 rounded-full mr-1.5 align-middle" style={{ backgroundColor: newTagColor }} />
+                {newTagName || "Pré-visualização"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </ResponsiveDialog>
     </div>
   );
 };
