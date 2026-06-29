@@ -209,7 +209,7 @@ const Relatorios = () => {
       }
     };
     load();
-  }, []);
+  }, [periodo, dataInicio, dataFim]);
 
   const lucroLiquido = receitaLiquida - despesaTotal;
   const ticketMedio = pacientesAtendidos > 0 ? Math.round(receitaTotal / pacientesAtendidos) : 0;
