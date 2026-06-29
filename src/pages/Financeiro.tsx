@@ -27,6 +27,7 @@ import { exportMultiSheetXlsx } from "@/lib/exportXlsx";
 import { calcularTaxa, formatBRL } from "@/lib/maquininhaCalc";
 import RelatoriosAvancados from "@/components/financeiro/RelatoriosAvancados";
 import DemografiaPanel from "@/components/dashboard/DemografiaPanel";
+import { PeriodoFilter, filtrarPorPeriodo, type PeriodoValue } from "@/components/financeiro/PeriodoFilter";
 
 const pagamentoColors = ["hsl(160 84% 39%)", "hsl(239 84% 67%)", "hsl(38 92% 50%)", "hsl(0 72% 51%)", "hsl(280 60% 55%)"];
 const procedimentoColors = [
@@ -42,7 +43,9 @@ const faturamentoConfig: ChartConfig = {
 const procedimentoConfig: ChartConfig = { valor: { label: "Valor", color: "hsl(var(--primary))" } };
 
 const Relatorios = () => {
-  const [periodo, setPeriodo] = useState("mensal");
+  const [periodo, setPeriodo] = useState<PeriodoValue>("365");
+  const [dataInicio, setDataInicio] = useState<string>("");
+  const [dataFim, setDataFim] = useState<string>("");
   const [despesaOpen, setDespesaOpen] = useState(false);
   const [novaDespesa, setNovaDespesa] = useState({ descricao: "", categoria: "", fornecedor: "", valor: "", formaPagamento: "", vencimento: "", observacoes: "" });
   const [loading, setLoading] = useState(true);
@@ -74,8 +77,8 @@ const Relatorios = () => {
           supabase.from("paciente").select("id, nome"),
         ]);
 
-        const agendamentos = agRes.data || [];
-        const despesas = despRes.data || [];
+        const agendamentos = filtrarPorPeriodo(agRes.data || [], "data", periodo, dataInicio, dataFim);
+        const despesas = filtrarPorPeriodo(despRes.data || [], "vencimento", periodo, dataInicio, dataFim);
         const pacientes = pacRes.data || [];
         const pacMap = Object.fromEntries(pacientes.map((p: any) => [p.id, p.nome]));
 
@@ -206,7 +209,7 @@ const Relatorios = () => {
       }
     };
     load();
-  }, []);
+  }, [periodo, dataInicio, dataFim]);
 
   const lucroLiquido = receitaLiquida - despesaTotal;
   const ticketMedio = pacientesAtendidos > 0 ? Math.round(receitaTotal / pacientesAtendidos) : 0;
@@ -238,129 +241,149 @@ const Relatorios = () => {
     }
   };
 
+  const periodoFilterProps = {
+    periodo,
+    onPeriodoChange: setPeriodo,
+    dataInicio,
+    dataFim,
+    onDataInicioChange: setDataInicio,
+    onDataFimChange: setDataFim,
+  };
+
+  const handleExportVisao = () => {
+    exportMultiSheetXlsx(
+      [
+        {
+          name: "Resumo",
+          rows: [
+            { Métrica: "Total de Consultas", Valor: totalConsultas },
+            { Métrica: "Taxa de Confirmação (%)", Valor: taxaConfirmacao },
+            { Métrica: "Taxa de Comparecimento (%)", Valor: taxaComparecimento },
+          ],
+        },
+        { name: "Procedimentos por Tipo", rows: procPorTipo },
+        { name: "Status Procedimentos", rows: procStatus },
+      ],
+      "relatorio-visao-geral",
+    );
+    toast.success("Visão geral exportada");
+  };
+
+  const handleExportFinanceiro = () => {
+    exportMultiSheetXlsx(
+      [
+        {
+          name: "Resumo",
+          rows: [
+            { Métrica: "Pacientes Atendidos", Valor: pacientesAtendidos },
+            { Métrica: "Receita Bruta", Valor: receitaTotal },
+            { Métrica: "Taxas de Maquininha", Valor: taxasTotal },
+            { Métrica: "Receita Líquida", Valor: receitaLiquida },
+            { Métrica: "Despesa Total", Valor: despesaTotal },
+            { Métrica: "Lucro (Líquida − Despesas)", Valor: receitaLiquida - despesaTotal },
+          ],
+        },
+        { name: "Faturamento Mensal", rows: faturamentoMensal },
+        { name: "Formas Pagamento", rows: formasPagamento },
+        { name: "Entradas", rows: entradas },
+        { name: "Saidas", rows: saidas },
+      ],
+      "relatorio-financeiro",
+    );
+    toast.success("Financeiro exportado");
+  };
+
   return (
     <div className="space-y-6">
       <FadeIn>
-        <div className="flex flex-col gap-4">
-          <div>
-            <h1 className="text-2xl font-display font-bold text-foreground">Relatórios</h1>
-            <p className="text-sm text-muted-foreground mt-1">Insights operacionais e financeiros da clínica</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Select value={periodo} onValueChange={setPeriodo}>
-              <SelectTrigger className="w-[140px] h-9 text-sm"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="semanal">Semanal</SelectItem>
-                <SelectItem value="mensal">Mensal</SelectItem>
-                <SelectItem value="trimestral">Trimestral</SelectItem>
-                <SelectItem value="anual">Anual</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => {
-                exportMultiSheetXlsx(
-                  [
-                    {
-                      name: "Resumo",
-                      rows: [
-                        { Métrica: "Período", Valor: periodo },
-                        { Métrica: "Total de Consultas", Valor: totalConsultas },
-                        { Métrica: "Taxa de Confirmação (%)", Valor: taxaConfirmacao },
-                        { Métrica: "Taxa de Comparecimento (%)", Valor: taxaComparecimento },
-                        { Métrica: "Pacientes Atendidos", Valor: pacientesAtendidos },
-                        { Métrica: "Receita Bruta", Valor: receitaTotal },
-                        { Métrica: "Taxas de Maquininha", Valor: taxasTotal },
-                        { Métrica: "Receita Líquida", Valor: receitaLiquida },
-                        { Métrica: "Despesa Total", Valor: despesaTotal },
-                        { Métrica: "Lucro (Líquida − Despesas)", Valor: receitaLiquida - despesaTotal },
-                      ],
-                    },
-                    { name: "Faturamento Mensal", rows: faturamentoMensal },
-                    { name: "Procedimentos por Tipo", rows: procPorTipo },
-                    { name: "Status Procedimentos", rows: procStatus },
-                    { name: "Formas Pagamento", rows: formasPagamento },
-                    { name: "Entradas", rows: entradas },
-                    { name: "Saidas", rows: saidas },
-                  ],
-                  "relatorio-financeiro",
-                );
-                toast.success("Relatório exportado");
-              }}
-            >
-              <Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span>
-            </Button>
-          <ResponsiveDialog
-            open={despesaOpen}
-            onOpenChange={setDespesaOpen}
-            title="Nova Despesa"
-            description="Cadastre uma nova despesa do consultório."
-            className="sm:max-w-[520px]"
-            footer={
-              <>
-                <Button variant="outline" onClick={() => setDespesaOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
-                <Button onClick={handleSalvarDespesa} className="flex-1 sm:flex-none">Salvar Despesa</Button>
-              </>
-            }
-          >
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Descrição *</Label><Input placeholder="Ex: Aluguel, Material..." value={novaDespesa.descricao} onChange={(e) => handleDespesaChange("descricao", e.target.value)} /></div>
-                <div className="space-y-2">
-                  <Label>Categoria</Label>
-                  <Select value={novaDespesa.categoria} onValueChange={(v) => handleDespesaChange("categoria", v)}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="aluguel">Aluguel</SelectItem>
-                      <SelectItem value="material">Material Odontológico</SelectItem>
-                      <SelectItem value="folha">Folha de Pagamento</SelectItem>
-                      <SelectItem value="utilidades">Utilidades</SelectItem>
-                      <SelectItem value="marketing">Marketing</SelectItem>
-                      <SelectItem value="software">Software</SelectItem>
-                      <SelectItem value="outros">Outros</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>Fornecedor</Label><Input placeholder="Nome do fornecedor" value={novaDespesa.fornecedor} onChange={(e) => handleDespesaChange("fornecedor", e.target.value)} /></div>
-                <div className="space-y-2"><Label>Valor (R$) *</Label><CurrencyInput value={novaDespesa.valor} onChange={(n) => handleDespesaChange("valor", n ? String(n) : "")} /></div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Forma de Pagamento</Label>
-                  <Select value={novaDespesa.formaPagamento} onValueChange={(v) => handleDespesaChange("formaPagamento", v)}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pix">PIX</SelectItem>
-                      <SelectItem value="boleto">Boleto</SelectItem>
-                      <SelectItem value="credito">Cartão de Crédito</SelectItem>
-                      <SelectItem value="debito">Cartão de Débito</SelectItem>
-                      <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2"><Label>Vencimento *</Label><Input type="date" value={novaDespesa.vencimento} onChange={(e) => handleDespesaChange("vencimento", e.target.value)} /></div>
-              </div>
-              <div className="space-y-2"><Label>Observações</Label><Textarea rows={3} value={novaDespesa.observacoes} onChange={(e) => handleDespesaChange("observacoes", e.target.value)} /></div>
-            </div>
-          </ResponsiveDialog>
+        <div>
+          <h1 className="text-2xl font-display font-bold text-foreground">Relatórios</h1>
+          <p className="text-sm text-muted-foreground mt-1">Insights operacionais e financeiros da clínica</p>
         </div>
-      </div>
       </FadeIn>
 
+      <ResponsiveDialog
+        open={despesaOpen}
+        onOpenChange={setDespesaOpen}
+        title="Nova Despesa"
+        description="Cadastre uma nova despesa do consultório."
+        className="sm:max-w-[520px]"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setDespesaOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button onClick={handleSalvarDespesa} className="flex-1 sm:flex-none">Salvar Despesa</Button>
+          </>
+        }
+      >
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2"><Label>Descrição *</Label><Input placeholder="Ex: Aluguel, Material..." value={novaDespesa.descricao} onChange={(e) => handleDespesaChange("descricao", e.target.value)} /></div>
+            <div className="space-y-2">
+              <Label>Categoria</Label>
+              <Select value={novaDespesa.categoria} onValueChange={(v) => handleDespesaChange("categoria", v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="aluguel">Aluguel</SelectItem>
+                  <SelectItem value="material">Material Odontológico</SelectItem>
+                  <SelectItem value="folha">Folha de Pagamento</SelectItem>
+                  <SelectItem value="utilidades">Utilidades</SelectItem>
+                  <SelectItem value="marketing">Marketing</SelectItem>
+                  <SelectItem value="software">Software</SelectItem>
+                  <SelectItem value="outros">Outros</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2"><Label>Fornecedor</Label><Input placeholder="Nome do fornecedor" value={novaDespesa.fornecedor} onChange={(e) => handleDespesaChange("fornecedor", e.target.value)} /></div>
+            <div className="space-y-2"><Label>Valor (R$) *</Label><CurrencyInput value={novaDespesa.valor} onChange={(n) => handleDespesaChange("valor", n ? String(n) : "")} /></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Forma de Pagamento</Label>
+              <Select value={novaDespesa.formaPagamento} onValueChange={(v) => handleDespesaChange("formaPagamento", v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pix">PIX</SelectItem>
+                  <SelectItem value="boleto">Boleto</SelectItem>
+                  <SelectItem value="credito">Cartão de Crédito</SelectItem>
+                  <SelectItem value="debito">Cartão de Débito</SelectItem>
+                  <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2"><Label>Vencimento *</Label><Input type="date" value={novaDespesa.vencimento} onChange={(e) => handleDespesaChange("vencimento", e.target.value)} /></div>
+          </div>
+          <div className="space-y-2"><Label>Observações</Label><Textarea rows={3} value={novaDespesa.observacoes} onChange={(e) => handleDespesaChange("observacoes", e.target.value)} /></div>
+        </div>
+      </ResponsiveDialog>
+
       <Tabs defaultValue="visao" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="visao">Visão Geral</TabsTrigger>
-          <TabsTrigger value="pacientes">Pacientes</TabsTrigger>
-          <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
-          <TabsTrigger value="avancado">DRE · Funil · Holerite</TabsTrigger>
-        </TabsList>
+        <div className="flex justify-center">
+          <TabsList className="h-auto flex-wrap">
+            <TabsTrigger value="visao" className="gap-1.5 text-xs">
+              <ClipboardList className="w-3.5 h-3.5" /> Visão Geral
+            </TabsTrigger>
+            <TabsTrigger value="pacientes" className="gap-1.5 text-xs">
+              <UserCheck className="w-3.5 h-3.5" /> Pacientes
+            </TabsTrigger>
+            <TabsTrigger value="financeiro" className="gap-1.5 text-xs">
+              <DollarSign className="w-3.5 h-3.5" /> Financeiro
+            </TabsTrigger>
+            <TabsTrigger value="avancado" className="gap-1.5 text-xs">
+              <Receipt className="w-3.5 h-3.5" /> DRE · Funil · Holerite
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* ========== VISÃO GERAL ========== */}
         <TabsContent value="visao" className="space-y-4">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <PeriodoFilter {...periodoFilterProps} />
+            <Button variant="outline" size="sm" className="gap-2" onClick={handleExportVisao}>
+              <Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span>
+            </Button>
+          </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
               <div className="flex items-center justify-between">
@@ -431,14 +454,20 @@ const Relatorios = () => {
 
         {/* ========== PACIENTES ========== */}
         <TabsContent value="pacientes" className="space-y-4">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <PeriodoFilter {...periodoFilterProps} />
+          </div>
           <DemografiaPanel />
         </TabsContent>
 
-
-
-
         {/* ========== FINANCEIRO ========== */}
         <TabsContent value="financeiro" className="space-y-4">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <PeriodoFilter {...periodoFilterProps} />
+            <Button variant="outline" size="sm" className="gap-2" onClick={handleExportFinanceiro}>
+              <Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span>
+            </Button>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
             <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
               <div className="flex items-center justify-between">
@@ -670,7 +699,10 @@ const Relatorios = () => {
 
         {/* ========== DRE · FUNIL · HOLERITE ========== */}
         <TabsContent value="avancado" className="space-y-4">
-          <RelatoriosAvancados />
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <PeriodoFilter {...periodoFilterProps} />
+          </div>
+          <RelatoriosAvancados periodo={periodo} dataInicio={dataInicio} dataFim={dataFim} />
         </TabsContent>
       </Tabs>
     </div>

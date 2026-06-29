@@ -109,11 +109,14 @@ const matchProcedimento = (
   });
 };
 
-const RelatoriosAvancados = () => {
+interface RelatoriosAvancadosProps {
+  periodo: "30" | "90" | "365" | "all" | "custom";
+  dataInicio: string;
+  dataFim: string;
+}
+
+const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancadosProps) => {
   const [loading, setLoading] = useState(true);
-  const [periodo, setPeriodo] = useState<"30" | "90" | "365" | "all" | "custom">("90");
-  const [dataInicio, setDataInicio] = useState<string>("");
-  const [dataFim, setDataFim] = useState<string>("");
   const [dentistaFiltro, setDentistaFiltro] = useState<string>("all");
 
   const [ags, setAgs] = useState<Agendamento[]>([]);
@@ -414,39 +417,8 @@ const RelatoriosAvancados = () => {
     );
   }
 
-  const renderPeriodoFilter = () => (
-    <div className="flex flex-wrap gap-2 items-center">
-      <Select value={periodo} onValueChange={(v) => setPeriodo(v as any)}>
-        <SelectTrigger className="w-[170px] h-9 text-sm">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="30">Últimos 30 dias</SelectItem>
-          <SelectItem value="90">Últimos 90 dias</SelectItem>
-          <SelectItem value="365">Último ano</SelectItem>
-          <SelectItem value="all">Tudo</SelectItem>
-          <SelectItem value="custom">Personalizado</SelectItem>
-        </SelectContent>
-      </Select>
-      {periodo === "custom" && (
-        <>
-          <Input
-            type="date"
-            value={dataInicio}
-            onChange={(e) => setDataInicio(e.target.value)}
-            className="h-9 w-[150px] text-sm"
-          />
-          <span className="text-xs text-muted-foreground">até</span>
-          <Input
-            type="date"
-            value={dataFim}
-            onChange={(e) => setDataFim(e.target.value)}
-            className="h-9 w-[150px] text-sm"
-          />
-        </>
-      )}
-    </div>
-  );
+
+
 
   return (
     <div className="space-y-6">
@@ -457,7 +429,7 @@ const RelatoriosAvancados = () => {
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">DRE — Demonstrativo de Resultado</h2>
           <div className="flex flex-wrap gap-2 items-center">
-            {renderPeriodoFilter()}
+            
             <Button
               variant="outline"
               size="sm"
@@ -575,7 +547,7 @@ const RelatoriosAvancados = () => {
       <section className="space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">Funil de Vendas & Conversão</h2>
-          {renderPeriodoFilter()}
+          
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -659,7 +631,7 @@ const RelatoriosAvancados = () => {
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">Holerite / Pró-labore por Dentista</h2>
           <div className="flex gap-2 items-center flex-wrap">
-            {renderPeriodoFilter()}
+            
             <Select value={dentistaFiltro} onValueChange={setDentistaFiltro}>
               <SelectTrigger className="w-[220px] h-9 text-sm">
                 <SelectValue />
