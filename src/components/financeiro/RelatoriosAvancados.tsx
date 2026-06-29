@@ -63,6 +63,8 @@ interface Agendamento {
   status: string;
   status_pagamento: string;
   valor: number;
+  forma_pagamento?: string;
+  parcelas?: number;
 }
 
 interface Despesa {
