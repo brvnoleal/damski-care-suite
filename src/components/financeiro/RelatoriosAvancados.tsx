@@ -456,30 +456,33 @@ const RelatoriosAvancados = () => {
       <section className="space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">DRE — Demonstrativo de Resultado</h2>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={() => {
-              exportToXlsx(
-                [
-                  { Linha: "(+) Receita paga (bruta)", Valor: dre.receitaPaga },
-                  { Linha: "(-) Taxas de maquininha", Valor: dre.taxasMaquininha },
-                  { Linha: "(=) Receita líquida", Valor: dre.receitaLiquida },
-                  { Linha: "(-) Despesas pagas", Valor: dre.despesaPaga },
-                  { Linha: "(=) Resultado bruto", Valor: dre.resultadoBruto },
-                  { Linha: "(-) Comissões devidas", Valor: dre.comissaoTotal },
-                  { Linha: "(=) Resultado líquido", Valor: dre.resultadoLiquido },
-                  { Linha: "Receita pendente (a receber)", Valor: dre.receitaPendente },
-                  { Linha: "Despesas pendentes", Valor: dre.despesaPendente },
-                ],
-                "dre",
-              );
-              toast.success("DRE exportado");
-            }}
-          >
-            <Download className="w-4 h-4" /> Exportar
-          </Button>
+          <div className="flex flex-wrap gap-2 items-center">
+            {renderPeriodoFilter()}
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => {
+                exportToXlsx(
+                  [
+                    { Linha: "(+) Receita paga (bruta)", Valor: dre.receitaPaga },
+                    { Linha: "(-) Taxas de maquininha", Valor: dre.taxasMaquininha },
+                    { Linha: "(=) Receita líquida", Valor: dre.receitaLiquida },
+                    { Linha: "(-) Despesas pagas", Valor: dre.despesaPaga },
+                    { Linha: "(=) Resultado bruto", Valor: dre.resultadoBruto },
+                    { Linha: "(-) Comissões devidas", Valor: dre.comissaoTotal },
+                    { Linha: "(=) Resultado líquido", Valor: dre.resultadoLiquido },
+                    { Linha: "Receita pendente (a receber)", Valor: dre.receitaPendente },
+                    { Linha: "Despesas pendentes", Valor: dre.despesaPendente },
+                  ],
+                  "dre",
+                );
+                toast.success("DRE exportado");
+              }}
+            >
+              <Download className="w-4 h-4" /> Exportar
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
