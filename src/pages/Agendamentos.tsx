@@ -510,6 +510,36 @@ const Agendamentos = () => {
           </div>
 
           <div className="sm:col-span-2">
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <TagIcon className="w-3.5 h-3.5" /> Etiquetas
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {AGENDAMENTO_TAG_OPTIONS.map((opt) => {
+                const active = (form.tags || []).includes(opt.value);
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      const cur = form.tags || [];
+                      setForm({
+                        ...form,
+                        tags: active ? cur.filter((t) => t !== opt.value) : [...cur, opt.value],
+                      });
+                    }}
+                    className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                      active ? opt.className + " ring-2 ring-offset-1 ring-offset-background ring-current/40" : "bg-transparent text-muted-foreground border-border hover:bg-white/5"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+
+          <div className="sm:col-span-2">
             <ConsultaInsumosEditor
               procedimentoNome={form.procedimento}
               value={insumosConsulta}
