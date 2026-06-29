@@ -500,6 +500,16 @@ const Agenda = () => {
               </Badge>
             </div>
 
+            {(selected.tags || []).length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {(selected.tags || []).map((t) => (
+                  <Badge key={t} variant="outline" className={`text-[11px] ${agendamentoTagClassName(t)}`}>
+                    {AGENDAMENTO_TAG_LABELS[t] || t}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
             <div className="space-y-3">
               <DetalheItem icon={<User className="w-4 h-4" />} label="Paciente" value={selectedPaciente?.nome || "—"} sub={selectedPaciente?.telefone} />
               <DetalheItem icon={<Stethoscope className="w-4 h-4" />} label="Dentista" value={selectedDentista?.nome || "—"} sub={selectedDentista?.especialidade} />
