@@ -140,6 +140,32 @@ const Agendamentos = () => {
   };
 
   useEffect(() => { loadData(); }, []);
+  useEffect(() => { setCustomTags(getCustomAgendamentoTags()); }, []);
+
+  const confirmStatusChange = async () => {
+    if (!pendingStatus) return;
+    const { ag, novo } = pendingStatus;
+    try {
+      await agendamentoService.atualizar(ag.id, { status: novo as Agendamento["status"] });
+      // Tenta salvar log no banco (silencioso se a tabela ainda não existir)
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        await supabase.from("agendamento_status_log" as any).insert({
+          agendamento_id: ag.id,
+          status_anterior: ag.status,
+          status_novo: novo,
+          alterado_por: userData?.user?.id || null,
+        } as any);
+      } catch { /* tabela ainda não criada */ }
+      await loadData();
+      toast({ title: `Status atualizado para "${statusConfig[novo]?.label || novo}"` });
+    } catch (err: any) {
+      toast({ title: "Erro ao atualizar status", description: err?.message, variant: "destructive" });
+    } finally {
+      setPendingStatus(null);
+    }
+  };
+
 
   const getPacienteNome = (id: string) => pacientes.find((p) => p.id === id)?.nome || "—";
   const getDentistaNome = (id: string) => dentistas.find((d) => d.id === id)?.nome || "—";
