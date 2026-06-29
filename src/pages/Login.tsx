@@ -46,7 +46,7 @@ export default function Login() {
             aria-label="CloudSmile - Sistema de gestão para clínicas odontológicas"
             className="w-full max-w-sm h-auto"
           />
-          <p className="mt-6 text-shine text-lg font-semibold text-center">
+          <p className="mt-6 text-muted-foreground">
             Gestão inteligente para a sua clínica odontológica.
           </p>
         </div>
