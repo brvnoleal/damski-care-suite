@@ -120,13 +120,26 @@ const Dashboard = () => {
       const pendentesAg = naoCanceladas.filter((a: any) => a.status_pagamento !== "pago");
       const totalRealizado = pagasAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
       const totalPrevisto = pendentesAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
-      const procMap: Record<string, number> = {};
+
+      // Cálculo automático de taxas de maquininha sobre os recebimentos pagos
+      let taxasSemana = 0;
+      let liquidoSemana = 0;
+      const procAgg: Record<string, { valor: number; liquido: number; taxa: number; forma: string; parcelas: number }> = {};
       pagasAg.forEach((a: any) => {
+        const v = Number(a.valor || 0);
+        const r = calcularTaxa(v, a.forma_pagamento, Number(a.parcelas) || 1);
+        taxasSemana += r.valorTaxa;
+        liquidoSemana += r.valorLiquido;
         const k = (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento;
-        procMap[k] = (procMap[k] || 0) + Number(a.valor || 0);
+        if (!procAgg[k]) procAgg[k] = { valor: 0, liquido: 0, taxa: 0, forma: a.forma_pagamento, parcelas: Number(a.parcelas) || 1 };
+        procAgg[k].valor += v;
+        procAgg[k].liquido += r.valorLiquido;
+        procAgg[k].taxa += r.valorTaxa;
       });
-      const procItems = Object.entries(procMap).sort((a, b) => b[1] - a[1]).map(([proc, valor]) => ({ proc, valor }));
-      setReceitaSemana({ total: totalRealizado, realizadas: pagasAg.length, previstas: totalPrevisto, items: procItems });
+      const procItems = Object.entries(procAgg)
+        .sort((a, b) => b[1].valor - a[1].valor)
+        .map(([proc, v]) => ({ proc, ...v }));
+      setReceitaSemana({ total: totalRealizado, liquido: liquidoSemana, taxas: taxasSemana, realizadas: pagasAg.length, previstas: totalPrevisto, items: procItems });
 
       // Agenda do Dia
       const dia = todayAg
