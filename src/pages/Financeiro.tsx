@@ -26,6 +26,7 @@ import { procedimentoConsultaLabels, formaPagamentoLabels } from "@/types";
 import { exportMultiSheetXlsx } from "@/lib/exportXlsx";
 import { calcularTaxa, formatBRL } from "@/lib/maquininhaCalc";
 import RelatoriosAvancados from "@/components/financeiro/RelatoriosAvancados";
+import DemografiaPanel from "@/components/dashboard/DemografiaPanel";
 
 const pagamentoColors = ["hsl(160 84% 39%)", "hsl(239 84% 67%)", "hsl(38 92% 50%)", "hsl(0 72% 51%)", "hsl(280 60% 55%)"];
 const procedimentoColors = [
@@ -427,6 +428,13 @@ const Relatorios = () => {
             </div>
           </LiquidGlassCard>
         </TabsContent>
+
+        {/* ========== PACIENTES ========== */}
+        <TabsContent value="pacientes" className="space-y-4">
+          <DemografiaPanel />
+        </TabsContent>
+
+
 
 
         {/* ========== FINANCEIRO ========== */}
