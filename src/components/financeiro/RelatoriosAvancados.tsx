@@ -417,39 +417,8 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancad
     );
   }
 
-  const renderPeriodoFilter = () => (
-    <div className="flex flex-wrap gap-2 items-center">
-      <Select value={periodo} onValueChange={(v) => setPeriodo(v as any)}>
-        <SelectTrigger className="w-[170px] h-9 text-sm">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="30">Últimos 30 dias</SelectItem>
-          <SelectItem value="90">Últimos 90 dias</SelectItem>
-          <SelectItem value="365">Último ano</SelectItem>
-          <SelectItem value="all">Tudo</SelectItem>
-          <SelectItem value="custom">Personalizado</SelectItem>
-        </SelectContent>
-      </Select>
-      {periodo === "custom" && (
-        <>
-          <Input
-            type="date"
-            value={dataInicio}
-            onChange={(e) => setDataInicio(e.target.value)}
-            className="h-9 w-[150px] text-sm"
-          />
-          <span className="text-xs text-muted-foreground">até</span>
-          <Input
-            type="date"
-            value={dataFim}
-            onChange={(e) => setDataFim(e.target.value)}
-            className="h-9 w-[150px] text-sm"
-          />
-        </>
-      )}
-    </div>
-  );
+
+
 
   return (
     <div className="space-y-6">
