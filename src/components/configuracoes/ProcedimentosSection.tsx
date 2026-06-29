@@ -337,8 +337,31 @@ export default function ProcedimentosSection() {
               placeholder="0,00"
             />
           </div>
+
+          <div className="space-y-2 pt-2 border-t border-border/40">
+            <div>
+              <Label>Comissões por dentista</Label>
+              <p className="text-[11px] text-muted-foreground">
+                Defina o tipo (% ou R$ fixo) e o valor que cada dentista recebe neste procedimento.
+                Apurada somente quando o pagamento estiver como <strong>pago</strong>.
+              </p>
+            </div>
+            <ProcedimentoComissoesEditor
+              ref={comissoesEditorRef}
+              procedimentoId={editing?.id ?? null}
+              inline
+            />
+          </div>
         </div>
       </ResponsiveDialog>
+
+      <ComissoesDialog
+        open={!!comissoesTarget}
+        onOpenChange={(o) => !o && setComissoesTarget(null)}
+        title={`Comissões — ${comissoesTarget?.nome ?? ""}`}
+      >
+        <ProcedimentoComissoesEditor procedimentoId={comissoesTarget?.id ?? null} />
+      </ComissoesDialog>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>
