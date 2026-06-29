@@ -33,7 +33,7 @@ import { ParcelamentoBreakdown } from "@/components/agendamento/ParcelamentoBrea
 
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
-  data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, status_pagamento: "pendente", observacoes: "",
+  data: "", horario: "", horario_fim: "", paciente_id: "", dentista_id: "", procedimento: "avaliacao", status: "agendado", valor: 0, forma_pagamento: "dinheiro", parcelas: 1, status_pagamento: "pendente", observacoes: "", tags: [],
 });
 
 const formatDataBR = (data: string) => {
