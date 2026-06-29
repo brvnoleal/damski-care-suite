@@ -24,12 +24,10 @@ import NotFound from "./pages/NotFound";
 import AnamnesePublica from "./pages/AnamnesePublica";
 import DocumentoAssinar from "./pages/DocumentoAssinar";
 import Confianca from "./pages/Confianca";
-import { useCodeProtection } from "./hooks/useCodeProtection";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  useCodeProtection();
 
   return (
     <QueryClientProvider client={queryClient}>
