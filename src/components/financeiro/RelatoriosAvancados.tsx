@@ -658,7 +658,6 @@ const RelatoriosAvancados = () => {
       <section className="space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">Holerite / Pró-labore por Dentista</h2>
-          <div className="flex gap-2 items-center">
           <div className="flex gap-2 items-center flex-wrap">
             {renderPeriodoFilter()}
             <Select value={dentistaFiltro} onValueChange={setDentistaFiltro}>
