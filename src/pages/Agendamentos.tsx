@@ -340,6 +340,19 @@ const Agendamentos = () => {
                     <TableCell className="hidden sm:table-cell">
                       <Badge variant="outline" className="font-medium">{procedimentoConsultaLabels[a.procedimento]}</Badge>
                     </TableCell>
+                    <TableCell className="hidden lg:table-cell">
+                      <div className="flex flex-wrap gap-1">
+                        {(a.tags || []).length === 0 ? (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        ) : (
+                          (a.tags || []).map((t) => (
+                            <Badge key={t} variant="outline" className={`text-[10px] py-0 ${agendamentoTagClassName(t)}`}>
+                              {AGENDAMENTO_TAG_LABELS[t] || t}
+                            </Badge>
+                          ))
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <Select
                         value={a.status}
