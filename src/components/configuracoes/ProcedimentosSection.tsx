@@ -219,6 +219,15 @@ export default function ProcedimentosSection() {
                         <Button
                           size="icon"
                           variant="ghost"
+                          onClick={() => setComissoesTarget(p)}
+                          aria-label="Configurar comissões"
+                          title="Configurar comissões por dentista"
+                        >
+                          <Percent className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
                           onClick={() => handleOpenEdit(p)}
                           aria-label="Editar"
                         >
