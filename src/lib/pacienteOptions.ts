@@ -82,3 +82,50 @@ export const agendamentoTagDotClass = (value: string): string =>
 
 export const agendamentoTagBorderClass = (value: string): string =>
   AGENDAMENTO_TAG_OPTIONS.find((t) => t.value === value)?.borderClass || "border-l-transparent";
+
+// ---------- Etiquetas customizadas (persistidas em localStorage) ----------
+export type CustomAgendamentoTag = { value: string; label: string; color: string };
+const CUSTOM_TAGS_KEY = "agendamento_etiquetas_custom_v1";
+
+export const getCustomAgendamentoTags = (): CustomAgendamentoTag[] => {
+  try {
+    const raw = localStorage.getItem(CUSTOM_TAGS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+export const saveCustomAgendamentoTag = (label: string, color: string): CustomAgendamentoTag => {
+  const list = getCustomAgendamentoTags();
+  const value = `custom_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const tag: CustomAgendamentoTag = { value, label, color };
+  list.push(tag);
+  localStorage.setItem(CUSTOM_TAGS_KEY, JSON.stringify(list));
+  return tag;
+};
+
+export const deleteCustomAgendamentoTag = (value: string) => {
+  const list = getCustomAgendamentoTags().filter((t) => t.value !== value);
+  localStorage.setItem(CUSTOM_TAGS_KEY, JSON.stringify(list));
+};
+
+export const resolveAgendamentoTagDisplay = (
+  value: string,
+): { label: string; style?: React.CSSProperties; className: string; dotStyle?: React.CSSProperties; dotClass?: string } => {
+  const built = AGENDAMENTO_TAG_OPTIONS.find((t) => t.value === value);
+  if (built) {
+    return { label: built.label, className: built.className, dotClass: built.dotClass };
+  }
+  const custom = getCustomAgendamentoTags().find((t) => t.value === value);
+  if (custom) {
+    return {
+      label: custom.label,
+      className: "border",
+      style: { backgroundColor: `${custom.color}26`, color: custom.color, borderColor: `${custom.color}55` },
+      dotStyle: { backgroundColor: custom.color },
+    };
+  }
+  return { label: value, className: "bg-muted text-foreground border-border" };
+};
+
