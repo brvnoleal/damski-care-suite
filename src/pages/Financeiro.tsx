@@ -378,6 +378,12 @@ const Relatorios = () => {
 
         {/* ========== VISÃO GERAL ========== */}
         <TabsContent value="visao" className="space-y-4">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <PeriodoFilter {...periodoFilterProps} />
+            <Button variant="outline" size="sm" className="gap-2" onClick={handleExportVisao}>
+              <Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span>
+            </Button>
+          </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
               <div className="flex items-center justify-between">
