@@ -188,24 +188,6 @@ const Agenda = () => {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
-            <TabsList className="h-8">
-              <TabsTrigger value="dia" className="text-xs px-3">Dia</TabsTrigger>
-              <TabsTrigger value="semana" className="text-xs px-3">Semana</TabsTrigger>
-              <TabsTrigger value="mes" className="text-xs px-3">Mês</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <div className="flex items-center gap-1">
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev}>
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <div className="min-w-[220px] text-center text-sm font-semibold capitalize">
-              {headerLabel}
-            </div>
-            <Button variant="outline" size="icon" className="h-8 w-8" onClick={goNext}>
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
           <Button
             variant="outline"
             size="sm"
@@ -244,9 +226,25 @@ const Agenda = () => {
 
       <FadeIn delay={0.05}>
         <LiquidGlassCard className="p-3 sm:p-4" draggable={false}>
-          <div className="flex items-center gap-2 mb-3">
-            <Filter className="w-4 h-4 text-primary" />
-            <h2 className="text-xs sm:text-sm font-semibold text-foreground">Filtros</h2>
+          <div className="flex flex-wrap items-center gap-3 mb-3">
+            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
+              <TabsList className="h-8">
+                <TabsTrigger value="dia" className="text-xs px-3">Dia</TabsTrigger>
+                <TabsTrigger value="semana" className="text-xs px-3">Semana</TabsTrigger>
+                <TabsTrigger value="mes" className="text-xs px-3">Mês</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <div className="flex items-center gap-1">
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev}>
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <div className="min-w-[220px] text-center text-sm font-semibold capitalize">
+                {headerLabel}
+              </div>
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={goNext}>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
             {filtrosAtivos && (
               <Button variant="ghost" size="sm" className="h-7 ml-auto text-xs" onClick={limparFiltros}>
                 <X className="w-3 h-3 mr-1" /> Limpar
