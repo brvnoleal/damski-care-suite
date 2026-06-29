@@ -119,6 +119,20 @@ const RelatoriosAvancados = () => {
   const [procedimentos, setProcedimentos] = useState<ProcedimentoRecord[]>([]);
   const [dentistas, setDentistas] = useState<Dentista[]>([]);
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
+  const [holeriteAberto, setHoleriteAberto] = useState<HoleriteData | null>(null);
+  const [sigVersion, setSigVersion] = useState(0);
+
+  const periodoLabel = useMemo(() => {
+    const map: Record<string, string> = {
+      "30": "Últimos 30 dias",
+      "90": "Últimos 90 dias",
+      "365": "Último ano",
+      all: "Período completo",
+    };
+    return map[periodo];
+  }, [periodo]);
+
+  const periodoSigKey = `p-${periodo}`;
 
   useEffect(() => {
     (async () => {
