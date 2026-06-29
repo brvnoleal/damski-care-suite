@@ -185,6 +185,13 @@ const RelatoriosAvancados = () => {
       .filter((d) => d.status !== "pago")
       .reduce((s, d) => s + d.valor, 0);
 
+    // Taxas de maquininha (PIX/débito/crédito) aplicadas automaticamente
+    let taxasMaquininha = 0;
+    pagas.forEach((a) => {
+      const r = calcularTaxa(a.valor, a.forma_pagamento, Number(a.parcelas) || 1);
+      taxasMaquininha += r.valorTaxa;
+    });
+
     let comissaoTotal = 0;
     pagas.forEach((a) => {
       const proc = matchProcedimento(a.procedimento, procedimentos);
@@ -198,15 +205,18 @@ const RelatoriosAvancados = () => {
       });
     });
 
-    const resultadoBruto = receitaPaga - despesaPaga;
+    const receitaLiquida = receitaPaga - taxasMaquininha;
+    const resultadoBruto = receitaLiquida - despesaPaga;
     const resultadoLiquido = resultadoBruto - comissaoTotal;
 
     // Mensal
-    const buckets: Record<string, { receita: number; despesa: number; comissao: number }> = {};
+    const buckets: Record<string, { receita: number; taxa: number; despesa: number; comissao: number }> = {};
     pagas.forEach((a) => {
       const k = monthKey(a.data);
-      buckets[k] = buckets[k] || { receita: 0, despesa: 0, comissao: 0 };
+      buckets[k] = buckets[k] || { receita: 0, taxa: 0, despesa: 0, comissao: 0 };
       buckets[k].receita += a.valor;
+      const r = calcularTaxa(a.valor, a.forma_pagamento, Number(a.parcelas) || 1);
+      buckets[k].taxa += r.valorTaxa;
       const proc = matchProcedimento(a.procedimento, procedimentos);
       if (proc) {
         const c = comissaoLookup.get(`${a.dentista_id}::${proc.id}`);
@@ -223,7 +233,7 @@ const RelatoriosAvancados = () => {
       .filter((d) => d.status === "pago")
       .forEach((d) => {
         const k = monthKey(d.vencimento);
-        buckets[k] = buckets[k] || { receita: 0, despesa: 0, comissao: 0 };
+        buckets[k] = buckets[k] || { receita: 0, taxa: 0, despesa: 0, comissao: 0 };
         buckets[k].despesa += d.valor;
       });
     const mensal = Object.entries(buckets)
@@ -231,13 +241,16 @@ const RelatoriosAvancados = () => {
       .map(([k, v]) => ({
         mes: monthLabel(k),
         receita: v.receita,
+        taxa: v.taxa,
         despesa: v.despesa,
         comissao: v.comissao,
-        resultado: v.receita - v.despesa - v.comissao,
+        resultado: v.receita - v.taxa - v.despesa - v.comissao,
       }));
 
     return {
       receitaPaga,
+      receitaLiquida,
+      taxasMaquininha,
       receitaPendente,
       despesaPaga,
       despesaPendente,
