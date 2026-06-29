@@ -429,7 +429,7 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancad
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">DRE — Demonstrativo de Resultado</h2>
           <div className="flex flex-wrap gap-2 items-center">
-            {renderPeriodoFilter()}
+            
             <Button
               variant="outline"
               size="sm"
@@ -547,7 +547,7 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancad
       <section className="space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">Funil de Vendas & Conversão</h2>
-          {renderPeriodoFilter()}
+          
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -631,7 +631,7 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancad
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">Holerite / Pró-labore por Dentista</h2>
           <div className="flex gap-2 items-center flex-wrap">
-            {renderPeriodoFilter()}
+            
             <Select value={dentistaFiltro} onValueChange={setDentistaFiltro}>
               <SelectTrigger className="w-[220px] h-9 text-sm">
                 <SelectValue />
