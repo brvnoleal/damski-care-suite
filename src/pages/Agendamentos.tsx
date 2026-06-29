@@ -161,7 +161,7 @@ const Agendamentos = () => {
 
   const openEdit = async (a: Agendamento) => {
     setEditingId(a.id);
-    setForm({ data: a.data, horario: a.horario, horario_fim: a.horario_fim || "", paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, status_pagamento: a.status_pagamento || "pendente", observacoes: a.observacoes || "" });
+    setForm({ data: a.data, horario: a.horario, horario_fim: a.horario_fim || "", paciente_id: a.paciente_id, dentista_id: a.dentista_id, procedimento: a.procedimento, status: a.status, valor: a.valor, forma_pagamento: a.forma_pagamento, parcelas: a.parcelas, status_pagamento: a.status_pagamento || "pendente", observacoes: a.observacoes || "", tags: a.tags || [] });
     try {
       const existing = await agendamentoInsumoService.listarPorAgendamento(a.id);
       setInsumosConsulta(existing.map((i) => ({ insumo_id: i.insumo_id, quantidade: i.quantidade })));
