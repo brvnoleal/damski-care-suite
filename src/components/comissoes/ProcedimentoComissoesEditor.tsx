@@ -159,6 +159,7 @@ export const ProcedimentoComissoesEditor = forwardRef<ProcedimentoComissoesEdito
         {dentistas.map((d) => {
           const draft = getDraft(d.id);
           const isSaving = savingId === d.id;
+          const canRemove = !!draft.id || draft.valor !== "";
           return (
             <div
               key={d.id}
@@ -174,7 +175,7 @@ export const ProcedimentoComissoesEditor = forwardRef<ProcedimentoComissoesEdito
                 value={draft.tipo}
                 onValueChange={(v) => patch(d.id, { tipo: v as ComissaoTipo })}
               >
-                <SelectTrigger className="h-9 w-[110px]">
+                <SelectTrigger className="h-9 w-[100px] shrink-0">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -186,7 +187,7 @@ export const ProcedimentoComissoesEditor = forwardRef<ProcedimentoComissoesEdito
                 tipo={draft.tipo}
                 value={draft.valor}
                 onChange={(v) => patch(d.id, { valor: v })}
-                className="w-[130px]"
+                className="w-[120px] shrink-0"
                 ariaLabel={`Valor de comissão para ${d.nome}`}
               />
               {!inline && (
@@ -194,7 +195,7 @@ export const ProcedimentoComissoesEditor = forwardRef<ProcedimentoComissoesEdito
                   type="button"
                   size="icon"
                   variant="secondary"
-                  className="h-9 w-9"
+                  className="h-9 w-9 shrink-0"
                   onClick={() => procedimentoId && handleSave(d.id, procedimentoId)}
                   disabled={isSaving || !procedimentoId || draft.valor === ""}
                   aria-label="Salvar"
@@ -206,18 +207,17 @@ export const ProcedimentoComissoesEditor = forwardRef<ProcedimentoComissoesEdito
                   )}
                 </Button>
               )}
-              {(draft.id || draft.valor !== "") && (
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  className="h-9 w-9 text-destructive"
-                  onClick={() => handleRemove(d.id)}
-                  aria-label="Remover"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
-              )}
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-9 w-9 shrink-0 text-destructive disabled:opacity-30"
+                onClick={() => canRemove && handleRemove(d.id)}
+                disabled={!canRemove}
+                aria-label="Remover"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
             </div>
           );
         })}
