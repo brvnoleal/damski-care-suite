@@ -1,6 +1,11 @@
-import { useState } from "react";
-import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, Package } from "lucide-react";
+import { useRef, useState } from "react";
+import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, Package, Percent } from "lucide-react";
 import { ProcedimentoInsumosDialog } from "@/components/configuracoes/ProcedimentoInsumosDialog";
+import {
+  ProcedimentoComissoesEditor,
+  type ProcedimentoComissoesEditorHandle,
+} from "@/components/comissoes/ProcedimentoComissoesEditor";
+import { ResponsiveDialog as ComissoesDialog } from "@/components/ui/responsive-dialog";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -46,8 +51,10 @@ export default function ProcedimentosSection() {
   const [form, setForm] = useState(emptyForm);
   const [deleteTarget, setDeleteTarget] = useState<ProcedimentoRecord | null>(null);
   const [insumosTarget, setInsumosTarget] = useState<ProcedimentoRecord | null>(null);
+  const [comissoesTarget, setComissoesTarget] = useState<ProcedimentoRecord | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
+  const comissoesEditorRef = useRef<ProcedimentoComissoesEditorHandle>(null);
 
 
   const { data: procedimentos = [], isLoading } = useQuery({
@@ -72,8 +79,18 @@ export default function ProcedimentosSection() {
         preco: Number(form.preco) || 0,
       };
       if (!payload.nome) throw new Error("Informe o nome do procedimento.");
-      if (editing) return procedimentoService.update(editing.id, payload);
-      return procedimentoService.create(payload);
+      const saved = editing
+        ? await procedimentoService.update(editing.id, payload)
+        : await procedimentoService.create(payload);
+      // Persiste as comissões configuradas no editor inline
+      if (saved?.id && comissoesEditorRef.current) {
+        try {
+          await comissoesEditorRef.current.saveAll(saved.id);
+        } catch (e) {
+          console.error("Erro ao salvar comissões:", e);
+        }
+      }
+      return saved;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["procedimentos"] });
@@ -202,6 +219,15 @@ export default function ProcedimentosSection() {
                         <Button
                           size="icon"
                           variant="ghost"
+                          onClick={() => setComissoesTarget(p)}
+                          aria-label="Configurar comissões"
+                          title="Configurar comissões por dentista"
+                        >
+                          <Percent className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
                           onClick={() => handleOpenEdit(p)}
                           aria-label="Editar"
                         >
@@ -311,8 +337,31 @@ export default function ProcedimentosSection() {
               placeholder="0,00"
             />
           </div>
+
+          <div className="space-y-2 pt-2 border-t border-border/40">
+            <div>
+              <Label>Comissões por dentista</Label>
+              <p className="text-[11px] text-muted-foreground">
+                Defina o tipo (% ou R$ fixo) e o valor que cada dentista recebe neste procedimento.
+                Apurada somente quando o pagamento estiver como <strong>pago</strong>.
+              </p>
+            </div>
+            <ProcedimentoComissoesEditor
+              ref={comissoesEditorRef}
+              procedimentoId={editing?.id ?? null}
+              inline
+            />
+          </div>
         </div>
       </ResponsiveDialog>
+
+      <ComissoesDialog
+        open={!!comissoesTarget}
+        onOpenChange={(o) => !o && setComissoesTarget(null)}
+        title={`Comissões — ${comissoesTarget?.nome ?? ""}`}
+      >
+        <ProcedimentoComissoesEditor procedimentoId={comissoesTarget?.id ?? null} />
+      </ComissoesDialog>
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>

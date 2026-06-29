@@ -33,6 +33,7 @@ import {
   type ComissaoTipo,
 } from "@/services/comissaoService";
 import type { Dentista } from "@/types";
+import { CommissionValueInput } from "./CommissionValueInput";
 
 type CellDraft = { tipo: ComissaoTipo; valor: string; id?: string; ativo: boolean };
 
@@ -220,14 +221,12 @@ const ComissoesMatrix = () => {
                               <SelectItem value="fixo">R$ fixo</SelectItem>
                             </SelectContent>
                           </Select>
-                          <Input
-                            type="number"
-                            min={0}
-                            step={draft.tipo === "percentual" ? "0.1" : "0.01"}
-                            placeholder="0"
+                          <CommissionValueInput
+                            tipo={draft.tipo}
                             value={draft.valor}
-                            onChange={(e) => setDraft(d.id, p.id, { valor: e.target.value })}
-                            className="h-9 w-[100px]"
+                            onChange={(v) => setDraft(d.id, p.id, { valor: v })}
+                            className="w-[120px]"
+                            ariaLabel={`Comissão ${d.nome} / ${p.nome}`}
                           />
                           <Button
                             type="button"
