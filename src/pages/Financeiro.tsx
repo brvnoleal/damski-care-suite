@@ -112,7 +112,20 @@ const Relatorios = () => {
         // ============ Financeiro ============
         const totalReceita = realizados.reduce((s: number, a: any) => s + Number(a.valor), 0);
         const totalDespesa = despesas.reduce((s: number, d: any) => s + Number(d.valor), 0);
+
+        // Aplica cálculo automático de taxas (PIX/débito/crédito) sobre cada recebimento realizado
+        let totalTaxas = 0;
+        let totalLiquido = 0;
+        const taxaPorReceita: Record<string, { taxa: number; liquido: number; parcelas: number }> = {};
+        realizados.forEach((a: any) => {
+          const r = calcularTaxa(Number(a.valor) || 0, a.forma_pagamento, Number(a.parcelas) || 1);
+          taxaPorReceita[a.id] = { taxa: r.valorTaxa, liquido: r.valorLiquido, parcelas: r.parcelasEfetivas };
+          totalTaxas += r.valorTaxa;
+          totalLiquido += r.valorLiquido;
+        });
         setReceitaTotal(totalReceita);
+        setTaxasTotal(totalTaxas);
+        setReceitaLiquida(totalLiquido);
         setDespesaTotal(totalDespesa);
 
         const pacAtend = new Set(realizados.map((a: any) => a.paciente_id)).size;
@@ -152,17 +165,23 @@ const Relatorios = () => {
           forma, valor: v.valor, qtd: v.qtd, porcentagem: payTotal > 0 ? Math.round((v.valor / payTotal) * 100) : 0,
         })));
 
-        // Entradas
+        // Entradas — descritivo de procedimento + taxa + líquido
         const ent = realizados
           .sort((a: any, b: any) => b.data.localeCompare(a.data))
-          .map((a: any) => ({
-            id: a.id,
-            paciente: pacMap[a.paciente_id] || "—",
-            procedimento: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
-            valor: Number(a.valor),
-            forma: (formaPagamentoLabels as any)[a.forma_pagamento] || a.forma_pagamento,
-            data: new Date(a.data + "T00:00:00").toLocaleDateString("pt-BR"),
-          }));
+          .map((a: any) => {
+            const t = taxaPorReceita[a.id] || { taxa: 0, liquido: Number(a.valor) || 0, parcelas: 1 };
+            return {
+              id: a.id,
+              paciente: pacMap[a.paciente_id] || "—",
+              procedimento: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
+              valor: Number(a.valor),
+              forma: (formaPagamentoLabels as any)[a.forma_pagamento] || a.forma_pagamento,
+              parcelas: t.parcelas,
+              taxa: t.taxa,
+              liquido: t.liquido,
+              data: new Date(a.data + "T00:00:00").toLocaleDateString("pt-BR"),
+            };
+          });
         setEntradas(ent);
 
         // Saídas
