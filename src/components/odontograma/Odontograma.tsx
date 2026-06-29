@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ToothSvg } from "./ToothSvg";
 import { ToothProcedureDialog } from "./ToothProcedureDialog";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import {
   UPPER_PERMANENT,
@@ -58,24 +58,12 @@ export const Odontograma = ({ pacienteId }: OdontogramaProps) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="inline-flex rounded-md bg-muted p-1">
-          <Button
-            type="button"
-            size="sm"
-            variant={modo === "permanente" ? "default" : "ghost"}
-            onClick={() => setModo("permanente")}
-          >
-            Dentes Permanentes
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant={modo === "deciduo" ? "default" : "ghost"}
-            onClick={() => setModo("deciduo")}
-          >
-            Dentes Decíduos
-          </Button>
-        </div>
+        <Tabs value={modo} onValueChange={(v) => setModo(v as Modo)}>
+          <TabsList>
+            <TabsTrigger value="permanente">Dentes Permanentes</TabsTrigger>
+            <TabsTrigger value="deciduo">Dentes Decíduos</TabsTrigger>
+          </TabsList>
+        </Tabs>
         <div className="flex items-center gap-4 flex-wrap">
           <LegendItem color="hsl(0 0% 100%)" label="Sem tratamento" />
           <LegendItem color="hsl(45 95% 65%)" label="Em andamento" />

@@ -528,7 +528,7 @@ const PacienteDetalhe = () => {
               })()}
             </div>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className="text-xs font-mono text-primary font-semibold">{id}</span>
+              
               <Badge className={patientData.status === "ativo" ? "bg-success/10 text-success border-success/20 text-xs" : "bg-muted text-muted-foreground text-xs"}>
                 {patientData.status === "ativo" ? "Ativo" : "Inativo"}
               </Badge>
