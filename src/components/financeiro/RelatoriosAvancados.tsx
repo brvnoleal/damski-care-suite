@@ -38,6 +38,7 @@ import { pacienteService } from "@/services/pacienteService";
 import type { Dentista, Paciente } from "@/types";
 import { procedimentoConsultaLabels } from "@/types";
 import { exportToXlsx, exportMultiSheetXlsx } from "@/lib/exportXlsx";
+import { calcularTaxa } from "@/lib/maquininhaCalc";
 import {
   ResponsiveContainer,
   PieChart,
@@ -63,6 +64,8 @@ interface Agendamento {
   status: string;
   status_pagamento: string;
   valor: number;
+  forma_pagamento?: string;
+  parcelas?: number;
 }
 
 interface Despesa {
@@ -121,7 +124,7 @@ const RelatoriosAvancados = () => {
       setLoading(true);
       try {
         const [agRes, despRes, com, procs, dts, pacs] = await Promise.all([
-          supabase.from("agendamento").select("id,data,paciente_id,dentista_id,procedimento,status,status_pagamento,valor"),
+          supabase.from("agendamento").select("id,data,paciente_id,dentista_id,procedimento,status,status_pagamento,valor,forma_pagamento,parcelas"),
           supabase.from("despesa").select("id,descricao,valor,status,vencimento"),
           comissaoService.list(),
           procedimentoService.list(),
@@ -182,6 +185,13 @@ const RelatoriosAvancados = () => {
       .filter((d) => d.status !== "pago")
       .reduce((s, d) => s + d.valor, 0);
 
+    // Taxas de maquininha (PIX/débito/crédito) aplicadas automaticamente
+    let taxasMaquininha = 0;
+    pagas.forEach((a) => {
+      const r = calcularTaxa(a.valor, a.forma_pagamento, Number(a.parcelas) || 1);
+      taxasMaquininha += r.valorTaxa;
+    });
+
     let comissaoTotal = 0;
     pagas.forEach((a) => {
       const proc = matchProcedimento(a.procedimento, procedimentos);
@@ -195,15 +205,18 @@ const RelatoriosAvancados = () => {
       });
     });
 
-    const resultadoBruto = receitaPaga - despesaPaga;
+    const receitaLiquida = receitaPaga - taxasMaquininha;
+    const resultadoBruto = receitaLiquida - despesaPaga;
     const resultadoLiquido = resultadoBruto - comissaoTotal;
 
     // Mensal
-    const buckets: Record<string, { receita: number; despesa: number; comissao: number }> = {};
+    const buckets: Record<string, { receita: number; taxa: number; despesa: number; comissao: number }> = {};
     pagas.forEach((a) => {
       const k = monthKey(a.data);
-      buckets[k] = buckets[k] || { receita: 0, despesa: 0, comissao: 0 };
+      buckets[k] = buckets[k] || { receita: 0, taxa: 0, despesa: 0, comissao: 0 };
       buckets[k].receita += a.valor;
+      const r = calcularTaxa(a.valor, a.forma_pagamento, Number(a.parcelas) || 1);
+      buckets[k].taxa += r.valorTaxa;
       const proc = matchProcedimento(a.procedimento, procedimentos);
       if (proc) {
         const c = comissaoLookup.get(`${a.dentista_id}::${proc.id}`);
@@ -220,7 +233,7 @@ const RelatoriosAvancados = () => {
       .filter((d) => d.status === "pago")
       .forEach((d) => {
         const k = monthKey(d.vencimento);
-        buckets[k] = buckets[k] || { receita: 0, despesa: 0, comissao: 0 };
+        buckets[k] = buckets[k] || { receita: 0, taxa: 0, despesa: 0, comissao: 0 };
         buckets[k].despesa += d.valor;
       });
     const mensal = Object.entries(buckets)
@@ -228,13 +241,16 @@ const RelatoriosAvancados = () => {
       .map(([k, v]) => ({
         mes: monthLabel(k),
         receita: v.receita,
+        taxa: v.taxa,
         despesa: v.despesa,
         comissao: v.comissao,
-        resultado: v.receita - v.despesa - v.comissao,
+        resultado: v.receita - v.taxa - v.despesa - v.comissao,
       }));
 
     return {
       receitaPaga,
+      receitaLiquida,
+      taxasMaquininha,
       receitaPendente,
       despesaPaga,
       despesaPendente,
@@ -391,7 +407,9 @@ const RelatoriosAvancados = () => {
             onClick={() => {
               exportToXlsx(
                 [
-                  { Linha: "(+) Receita paga", Valor: dre.receitaPaga },
+                  { Linha: "(+) Receita paga (bruta)", Valor: dre.receitaPaga },
+                  { Linha: "(-) Taxas de maquininha", Valor: dre.taxasMaquininha },
+                  { Linha: "(=) Receita líquida", Valor: dre.receitaLiquida },
                   { Linha: "(-) Despesas pagas", Valor: dre.despesaPaga },
                   { Linha: "(=) Resultado bruto", Valor: dre.resultadoBruto },
                   { Linha: "(-) Comissões devidas", Valor: dre.comissaoTotal },
@@ -412,7 +430,8 @@ const RelatoriosAvancados = () => {
           <LiquidGlassCard className="p-4" draggable={false}>
             <p className="text-xs text-muted-foreground uppercase tracking-wide">Receita Paga</p>
             <p className="text-xl font-bold text-foreground mt-1">{fmtBRL(dre.receitaPaga)}</p>
-            <p className="text-[11px] text-muted-foreground mt-1">A receber: {fmtBRL(dre.receitaPendente)}</p>
+            <p className="text-[11px] text-muted-foreground mt-1">Líquida: {fmtBRL(dre.receitaLiquida)} · Taxas {fmtBRL(dre.taxasMaquininha)}</p>
+            <p className="text-[11px] text-muted-foreground">A receber: {fmtBRL(dre.receitaPendente)}</p>
           </LiquidGlassCard>
           <LiquidGlassCard className="p-4" draggable={false}>
             <p className="text-xs text-muted-foreground uppercase tracking-wide">Despesas Pagas</p>
@@ -443,7 +462,7 @@ const RelatoriosAvancados = () => {
           <div className="p-5 pb-3">
             <h3 className="text-base font-semibold text-foreground">DRE mensal</h3>
             <p className="text-sm text-muted-foreground">
-              Receitas pagas, despesas pagas, comissões devidas e resultado.
+              Receita paga, taxas de maquininha, despesas, comissões devidas e resultado.
             </p>
           </div>
           <div className="px-5 pb-5 overflow-x-auto">
@@ -452,6 +471,7 @@ const RelatoriosAvancados = () => {
                 <TableRow>
                   <TableHead>Mês</TableHead>
                   <TableHead className="text-right">Receita</TableHead>
+                  <TableHead className="text-right">Taxas</TableHead>
                   <TableHead className="text-right">Despesas</TableHead>
                   <TableHead className="text-right">Comissões</TableHead>
                   <TableHead className="text-right">Resultado</TableHead>
@@ -460,7 +480,7 @@ const RelatoriosAvancados = () => {
               <TableBody>
                 {dre.mensal.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-6">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-6">
                       Sem movimentações no período.
                     </TableCell>
                   </TableRow>
@@ -469,6 +489,7 @@ const RelatoriosAvancados = () => {
                     <TableRow key={m.mes}>
                       <TableCell className="font-medium text-foreground">{m.mes}</TableCell>
                       <TableCell className="text-right">{fmtBRL(m.receita)}</TableCell>
+                      <TableCell className="text-right text-warning">{fmtBRL(m.taxa)}</TableCell>
                       <TableCell className="text-right text-destructive">
                         {fmtBRL(m.despesa)}
                       </TableCell>

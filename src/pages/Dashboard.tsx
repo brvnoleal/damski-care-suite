@@ -19,6 +19,7 @@ import DemografiaPanel from "@/components/dashboard/DemografiaPanel";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { supabase } from "@/integrations/supabase/client";
 import { procedimentoConsultaLabels } from "@/types";
+import { calcularTaxa } from "@/lib/maquininhaCalc";
 
 const colorMap = {
   primary: { bg: "bg-primary/10", text: "text-primary" },
@@ -74,7 +75,7 @@ const Dashboard = () => {
   const [nextAppointments, setNextAppointments] = useState<{time: string; patient: string; proc: string; status: string}[]>([]);
   const [criticalSupplies, setCriticalSupplies] = useState<{name: string; lot: string; expiry: string; daysLeft: number}[]>([]);
   const [tratamentosAndamento, setTratamentosAndamento] = useState<{date: string; patient: string; proc: string; dente: number}[]>([]);
-  const [receitaSemana, setReceitaSemana] = useState({ total: 0, realizadas: 0, previstas: 0, items: [] as { proc: string; valor: number }[] });
+  const [receitaSemana, setReceitaSemana] = useState({ total: 0, liquido: 0, taxas: 0, realizadas: 0, previstas: 0, items: [] as { proc: string; valor: number; liquido: number; taxa: number; forma: string; parcelas: number }[] });
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -119,13 +120,26 @@ const Dashboard = () => {
       const pendentesAg = naoCanceladas.filter((a: any) => a.status_pagamento !== "pago");
       const totalRealizado = pagasAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
       const totalPrevisto = pendentesAg.reduce((s: number, a: any) => s + Number(a.valor || 0), 0);
-      const procMap: Record<string, number> = {};
+
+      // Cálculo automático de taxas de maquininha sobre os recebimentos pagos
+      let taxasSemana = 0;
+      let liquidoSemana = 0;
+      const procAgg: Record<string, { valor: number; liquido: number; taxa: number; forma: string; parcelas: number }> = {};
       pagasAg.forEach((a: any) => {
+        const v = Number(a.valor || 0);
+        const r = calcularTaxa(v, a.forma_pagamento, Number(a.parcelas) || 1);
+        taxasSemana += r.valorTaxa;
+        liquidoSemana += r.valorLiquido;
         const k = (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento;
-        procMap[k] = (procMap[k] || 0) + Number(a.valor || 0);
+        if (!procAgg[k]) procAgg[k] = { valor: 0, liquido: 0, taxa: 0, forma: a.forma_pagamento, parcelas: Number(a.parcelas) || 1 };
+        procAgg[k].valor += v;
+        procAgg[k].liquido += r.valorLiquido;
+        procAgg[k].taxa += r.valorTaxa;
       });
-      const procItems = Object.entries(procMap).sort((a, b) => b[1] - a[1]).map(([proc, valor]) => ({ proc, valor }));
-      setReceitaSemana({ total: totalRealizado, realizadas: pagasAg.length, previstas: totalPrevisto, items: procItems });
+      const procItems = Object.entries(procAgg)
+        .sort((a, b) => b[1].valor - a[1].valor)
+        .map(([proc, v]) => ({ proc, ...v }));
+      setReceitaSemana({ total: totalRealizado, liquido: liquidoSemana, taxas: taxasSemana, realizadas: pagasAg.length, previstas: totalPrevisto, items: procItems });
 
       // Agenda do Dia
       const dia = todayAg
@@ -457,10 +471,13 @@ const Dashboard = () => {
             </div>
             <div className="px-4 sm:px-5 py-3 border-b border-white/5">
               <p className="text-xl sm:text-2xl font-bold text-foreground">
-                {receitaSemana.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                {receitaSemana.liquido.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
               </p>
               <p className="text-[11px] text-muted-foreground mt-0.5">
-                {receitaSemana.realizadas} consulta{receitaSemana.realizadas !== 1 ? "s" : ""} realizada{receitaSemana.realizadas !== 1 ? "s" : ""} · previsto {receitaSemana.previstas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                Líquido (após taxas) · Bruto {receitaSemana.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })} · Taxas {receitaSemana.taxas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                {receitaSemana.realizadas} consulta{receitaSemana.realizadas !== 1 ? "s" : ""} paga{receitaSemana.realizadas !== 1 ? "s" : ""} · previsto {receitaSemana.previstas.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
               </p>
             </div>
             <div className="divide-y divide-white/5 flex-1 overflow-y-auto">
@@ -469,10 +486,24 @@ const Dashboard = () => {
               )}
               {receitaSemana.items.map((it, i) => (
                 <div key={i} className="flex items-center justify-between gap-3 px-4 sm:px-5 py-2.5">
-                  <p className="text-sm text-foreground truncate">{it.proc}</p>
-                  <p className="text-sm font-semibold text-success shrink-0">
-                    {it.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                  </p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-foreground truncate">{it.proc}</p>
+                    {it.taxa > 0 && (
+                      <p className="text-[10px] text-muted-foreground">
+                        Taxa {it.taxa.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      </p>
+                    )}
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-semibold text-success">
+                      {it.liquido.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                    </p>
+                    {it.taxa > 0 && (
+                      <p className="text-[10px] text-muted-foreground line-through">
+                        {it.valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+                      </p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

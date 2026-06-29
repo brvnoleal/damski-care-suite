@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   DollarSign, TrendingUp, TrendingDown, Receipt, CalendarCheck, CheckCircle2,
-  UserCheck, ClipboardList, Download, Plus,
+  UserCheck, ClipboardList, Download, Plus, Percent,
 } from "lucide-react";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,6 +24,7 @@ import { FadeIn } from "@/components/FadeIn";
 import { despesaService } from "@/services/despesaService";
 import { procedimentoConsultaLabels, formaPagamentoLabels } from "@/types";
 import { exportMultiSheetXlsx } from "@/lib/exportXlsx";
+import { calcularTaxa, formatBRL } from "@/lib/maquininhaCalc";
 import RelatoriosAvancados from "@/components/financeiro/RelatoriosAvancados";
 
 const pagamentoColors = ["hsl(160 84% 39%)", "hsl(239 84% 67%)", "hsl(38 92% 50%)", "hsl(0 72% 51%)", "hsl(280 60% 55%)"];
@@ -54,6 +55,8 @@ const Relatorios = () => {
 
   // Financeiro
   const [receitaTotal, setReceitaTotal] = useState(0);
+  const [taxasTotal, setTaxasTotal] = useState(0);
+  const [receitaLiquida, setReceitaLiquida] = useState(0);
   const [despesaTotal, setDespesaTotal] = useState(0);
   const [faturamentoMensal, setFaturamentoMensal] = useState<{ mes: string; receita: number; despesas: number }[]>([]);
   const [formasPagamento, setFormasPagamento] = useState<{ forma: string; valor: number; porcentagem: number; qtd: number }[]>([]);
@@ -109,7 +112,20 @@ const Relatorios = () => {
         // ============ Financeiro ============
         const totalReceita = realizados.reduce((s: number, a: any) => s + Number(a.valor), 0);
         const totalDespesa = despesas.reduce((s: number, d: any) => s + Number(d.valor), 0);
+
+        // Aplica cálculo automático de taxas (PIX/débito/crédito) sobre cada recebimento realizado
+        let totalTaxas = 0;
+        let totalLiquido = 0;
+        const taxaPorReceita: Record<string, { taxa: number; liquido: number; parcelas: number }> = {};
+        realizados.forEach((a: any) => {
+          const r = calcularTaxa(Number(a.valor) || 0, a.forma_pagamento, Number(a.parcelas) || 1);
+          taxaPorReceita[a.id] = { taxa: r.valorTaxa, liquido: r.valorLiquido, parcelas: r.parcelasEfetivas };
+          totalTaxas += r.valorTaxa;
+          totalLiquido += r.valorLiquido;
+        });
         setReceitaTotal(totalReceita);
+        setTaxasTotal(totalTaxas);
+        setReceitaLiquida(totalLiquido);
         setDespesaTotal(totalDespesa);
 
         const pacAtend = new Set(realizados.map((a: any) => a.paciente_id)).size;
@@ -149,17 +165,23 @@ const Relatorios = () => {
           forma, valor: v.valor, qtd: v.qtd, porcentagem: payTotal > 0 ? Math.round((v.valor / payTotal) * 100) : 0,
         })));
 
-        // Entradas
+        // Entradas — descritivo de procedimento + taxa + líquido
         const ent = realizados
           .sort((a: any, b: any) => b.data.localeCompare(a.data))
-          .map((a: any) => ({
-            id: a.id,
-            paciente: pacMap[a.paciente_id] || "—",
-            procedimento: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
-            valor: Number(a.valor),
-            forma: (formaPagamentoLabels as any)[a.forma_pagamento] || a.forma_pagamento,
-            data: new Date(a.data + "T00:00:00").toLocaleDateString("pt-BR"),
-          }));
+          .map((a: any) => {
+            const t = taxaPorReceita[a.id] || { taxa: 0, liquido: Number(a.valor) || 0, parcelas: 1 };
+            return {
+              id: a.id,
+              paciente: pacMap[a.paciente_id] || "—",
+              procedimento: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
+              valor: Number(a.valor),
+              forma: (formaPagamentoLabels as any)[a.forma_pagamento] || a.forma_pagamento,
+              parcelas: t.parcelas,
+              taxa: t.taxa,
+              liquido: t.liquido,
+              data: new Date(a.data + "T00:00:00").toLocaleDateString("pt-BR"),
+            };
+          });
         setEntradas(ent);
 
         // Saídas
@@ -185,7 +207,7 @@ const Relatorios = () => {
     load();
   }, []);
 
-  const lucroLiquido = receitaTotal - despesaTotal;
+  const lucroLiquido = receitaLiquida - despesaTotal;
   const ticketMedio = pacientesAtendidos > 0 ? Math.round(receitaTotal / pacientesAtendidos) : 0;
 
   const handleDespesaChange = (field: string, value: string) => setNovaDespesa((prev) => ({ ...prev, [field]: value }));
@@ -248,9 +270,11 @@ const Relatorios = () => {
                         { Métrica: "Taxa de Confirmação (%)", Valor: taxaConfirmacao },
                         { Métrica: "Taxa de Comparecimento (%)", Valor: taxaComparecimento },
                         { Métrica: "Pacientes Atendidos", Valor: pacientesAtendidos },
-                        { Métrica: "Receita Total", Valor: receitaTotal },
+                        { Métrica: "Receita Bruta", Valor: receitaTotal },
+                        { Métrica: "Taxas de Maquininha", Valor: taxasTotal },
+                        { Métrica: "Receita Líquida", Valor: receitaLiquida },
                         { Métrica: "Despesa Total", Valor: despesaTotal },
-                        { Métrica: "Lucro", Valor: receitaTotal - despesaTotal },
+                        { Métrica: "Lucro (Líquida − Despesas)", Valor: receitaLiquida - despesaTotal },
                       ],
                     },
                     { name: "Faturamento Mensal", rows: faturamentoMensal },
@@ -410,10 +434,21 @@ const Relatorios = () => {
             <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Total</p>
+                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Bruta</p>
                   <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {receitaTotal.toLocaleString("pt-BR")}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Líquido: {formatBRL(receitaLiquida)}</p>
                 </div>
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
+              </div>
+            </LiquidGlassCard>
+            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Taxas Maquininha</p>
+                  <p className="text-lg sm:text-2xl font-bold text-warning mt-1">R$ {taxasTotal.toLocaleString("pt-BR")}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Descontadas auto.</p>
+                </div>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-warning/10 flex items-center justify-center"><Percent className="w-4 h-4 sm:w-5 sm:h-5 text-warning" /></div>
               </div>
             </LiquidGlassCard>
             <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
@@ -508,8 +543,8 @@ const Relatorios = () => {
 
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
             <div className="p-5 pb-2">
-              <h3 className="text-base font-semibold text-foreground">Detalhamento de Entradas</h3>
-              <p className="text-sm text-muted-foreground">Receitas por forma de pagamento</p>
+              <h3 className="text-base font-semibold text-foreground">Resumo por Forma de Pagamento</h3>
+              <p className="text-sm text-muted-foreground">Distribuição das entradas pagas</p>
             </div>
             <div className="px-5 pb-5 overflow-x-auto">
               <Table>
@@ -533,6 +568,48 @@ const Relatorios = () => {
                   {formasPagamento.length === 0 && (
                     <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-6">Sem entradas registradas</TableCell></TableRow>
                   )}
+                </TableBody>
+              </Table>
+            </div>
+          </LiquidGlassCard>
+
+          <LiquidGlassCard className="overflow-hidden" draggable={false}>
+            <div className="p-5 pb-2">
+              <h3 className="text-base font-semibold text-foreground">Detalhamento de Recebimentos</h3>
+              <p className="text-sm text-muted-foreground">
+                Cada consulta paga com descritivo do procedimento, taxa da maquininha aplicada e valor líquido recebido.
+              </p>
+            </div>
+            <div className="px-5 pb-5 overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Paciente</TableHead>
+                    <TableHead>Procedimento</TableHead>
+                    <TableHead>Forma</TableHead>
+                    <TableHead className="text-right">Parc.</TableHead>
+                    <TableHead className="text-right">Bruto</TableHead>
+                    <TableHead className="text-right">Taxa</TableHead>
+                    <TableHead className="text-right">Líquido</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {entradas.length === 0 && (
+                    <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-6">Sem recebimentos registrados</TableCell></TableRow>
+                  )}
+                  {entradas.map((e: any) => (
+                    <TableRow key={e.id}>
+                      <TableCell className="text-muted-foreground whitespace-nowrap">{e.data}</TableCell>
+                      <TableCell className="font-medium">{e.paciente}</TableCell>
+                      <TableCell className="text-foreground">{e.procedimento}</TableCell>
+                      <TableCell className="text-muted-foreground">{e.forma}</TableCell>
+                      <TableCell className="text-right text-muted-foreground">{e.parcelas}x</TableCell>
+                      <TableCell className="text-right">{formatBRL(e.valor)}</TableCell>
+                      <TableCell className="text-right text-warning">{e.taxa > 0 ? formatBRL(e.taxa) : "—"}</TableCell>
+                      <TableCell className="text-right font-semibold text-success">{formatBRL(e.liquido)}</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </div>
