@@ -462,7 +462,7 @@ const RelatoriosAvancados = () => {
           <div className="p-5 pb-3">
             <h3 className="text-base font-semibold text-foreground">DRE mensal</h3>
             <p className="text-sm text-muted-foreground">
-              Receitas pagas, despesas pagas, comissões devidas e resultado.
+              Receita paga, taxas de maquininha, despesas, comissões devidas e resultado.
             </p>
           </div>
           <div className="px-5 pb-5 overflow-x-auto">
@@ -471,6 +471,7 @@ const RelatoriosAvancados = () => {
                 <TableRow>
                   <TableHead>Mês</TableHead>
                   <TableHead className="text-right">Receita</TableHead>
+                  <TableHead className="text-right">Taxas</TableHead>
                   <TableHead className="text-right">Despesas</TableHead>
                   <TableHead className="text-right">Comissões</TableHead>
                   <TableHead className="text-right">Resultado</TableHead>
@@ -479,7 +480,7 @@ const RelatoriosAvancados = () => {
               <TableBody>
                 {dre.mensal.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-6">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-6">
                       Sem movimentações no período.
                     </TableCell>
                   </TableRow>
@@ -488,6 +489,7 @@ const RelatoriosAvancados = () => {
                     <TableRow key={m.mes}>
                       <TableCell className="font-medium text-foreground">{m.mes}</TableCell>
                       <TableCell className="text-right">{fmtBRL(m.receita)}</TableCell>
+                      <TableCell className="text-right text-warning">{fmtBRL(m.taxa)}</TableCell>
                       <TableCell className="text-right text-destructive">
                         {fmtBRL(m.despesa)}
                       </TableCell>
