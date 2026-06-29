@@ -692,6 +692,81 @@ const Agendamentos = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={!!pendingStatus} onOpenChange={(o) => { if (!o) setPendingStatus(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar alteração de status</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingStatus ? (
+                <>
+                  Alterar o status da consulta de{" "}
+                  <strong>{getPacienteNome(pendingStatus.ag.paciente_id)}</strong> de{" "}
+                  <strong>{statusConfig[pendingStatus.ag.status]?.label || pendingStatus.ag.status}</strong> para{" "}
+                  <strong>{statusConfig[pendingStatus.novo]?.label || pendingStatus.novo}</strong>?
+                </>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmStatusChange}>Confirmar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <ResponsiveDialog
+        open={newTagOpen}
+        onOpenChange={setNewTagOpen}
+        title="Nova etiqueta"
+        description="Crie uma etiqueta personalizada com cor para identificar consultas."
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setNewTagOpen(false)} className="flex-1 sm:flex-none">Cancelar</Button>
+            <Button
+              onClick={() => {
+                const nome = newTagName.trim();
+                if (!nome) { toast({ title: "Informe o nome da etiqueta", variant: "destructive" }); return; }
+                saveCustomAgendamentoTag(nome, newTagColor);
+                setCustomTags(getCustomAgendamentoTags());
+                setNewTagOpen(false);
+                toast({ title: "Etiqueta criada" });
+              }}
+              className="flex-1 sm:flex-none"
+            >
+              Salvar
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4 py-2">
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Nome da etiqueta *</Label>
+            <Input value={newTagName} onChange={(e) => setNewTagName(e.target.value)} placeholder="Ex: Urgente" autoFocus />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <Palette className="w-3.5 h-3.5" /> Cor da etiqueta
+            </Label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={newTagColor}
+                onChange={(e) => setNewTagColor(e.target.value)}
+                className="h-10 w-16 rounded-md border border-border bg-transparent cursor-pointer"
+              />
+              <Input value={newTagColor} onChange={(e) => setNewTagColor(e.target.value)} className="flex-1 font-mono" />
+              <span
+                className="px-2.5 py-1 rounded-full text-xs font-medium border"
+                style={{ backgroundColor: `${newTagColor}26`, color: newTagColor, borderColor: `${newTagColor}55` }}
+              >
+                <span className="inline-block w-2 h-2 rounded-full mr-1.5 align-middle" style={{ backgroundColor: newTagColor }} />
+                {newTagName || "Pré-visualização"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </ResponsiveDialog>
     </div>
   );
 };
