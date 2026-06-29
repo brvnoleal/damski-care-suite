@@ -30,8 +30,9 @@ import { ProcedimentoCombobox } from "@/components/ProcedimentoCombobox";
 import { ConsultaInsumosEditor, ConsultaInsumoItem } from "@/components/agendamento/ConsultaInsumosEditor";
 import { agendamentoInsumoService } from "@/services/agendamentoInsumoService";
 import { ParcelamentoBreakdown } from "@/components/agendamento/ParcelamentoBreakdown";
-import { AGENDAMENTO_TAG_OPTIONS, agendamentoTagClassName, AGENDAMENTO_TAG_LABELS } from "@/lib/pacienteOptions";
-import { Tag as TagIcon } from "lucide-react";
+import { AGENDAMENTO_TAG_OPTIONS, agendamentoTagClassName, AGENDAMENTO_TAG_LABELS, getCustomAgendamentoTags, saveCustomAgendamentoTag, deleteCustomAgendamentoTag, resolveAgendamentoTagDisplay, type CustomAgendamentoTag } from "@/lib/pacienteOptions";
+import { Tag as TagIcon, Palette } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 
 const emptyAgendamento = (): Omit<Agendamento, "id" | "created_at"> => ({
