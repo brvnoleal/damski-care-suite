@@ -440,18 +440,27 @@ const Agenda = () => {
                           const nome = getPaciente(a.paciente_id)?.nome || "—";
                           const dent = getDentista(a.dentista_id)?.nome || "—";
                           const st = statusConfig[a.status];
+                          const tags = a.tags || [];
+                          const firstTag = tags[0];
+                          const borderClass = firstTag ? agendamentoTagBorderClass(firstTag) : "border-l-transparent";
+                          const dotClass = firstTag ? agendamentoTagDotClass(firstTag) : st?.dot;
                           return (
                             <button
                               key={a.id}
                               onClick={() => setSelected(a)}
-                              className="group flex items-start gap-2 px-2 py-2 text-left rounded-lg hover:bg-white/10 transition-colors border border-white/5"
+                              className={`group flex items-start gap-2 px-2 py-2 text-left rounded-lg hover:bg-white/10 transition-colors border border-white/5 border-l-4 ${borderClass}`}
                             >
-                              <span className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${st?.dot}`} />
+                              <span className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${dotClass}`} />
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span className="text-sm font-mono text-foreground">{a.horario}{a.horario_fim ? `–${a.horario_fim}` : ""}</span>
                                   <span className="text-sm font-medium text-foreground group-hover:text-primary truncate">{nome}</span>
                                   <Badge className={`${st?.className} text-[10px] py-0`}>{st?.label}</Badge>
+                                  {tags.map((t) => (
+                                    <Badge key={t} variant="outline" className={`text-[10px] py-0 ${agendamentoTagClassName(t)}`}>
+                                      {AGENDAMENTO_TAG_LABELS[t] || t}
+                                    </Badge>
+                                  ))}
                                 </div>
                                 <div className="text-xs text-muted-foreground mt-0.5 truncate">
                                   {procedimentoConsultaLabels[a.procedimento] ?? a.procedimento} • {dent}
