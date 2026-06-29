@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, Package, Percent } from "lucide-react";
+import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, Package, BadgeDollarSign } from "lucide-react";
 import { ProcedimentoInsumosDialog } from "@/components/configuracoes/ProcedimentoInsumosDialog";
 import {
   ProcedimentoComissoesEditor,
@@ -223,7 +223,7 @@ export default function ProcedimentosSection() {
                           aria-label="Configurar comissões"
                           title="Configurar comissões por dentista"
                         >
-                          <Percent className="w-4 h-4" />
+                          <BadgeDollarSign className="w-4 h-4" />
                         </Button>
                         <Button
                           size="icon"
