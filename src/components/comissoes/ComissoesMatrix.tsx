@@ -33,6 +33,7 @@ import {
   type ComissaoTipo,
 } from "@/services/comissaoService";
 import type { Dentista } from "@/types";
+import { CommissionValueInput } from "./CommissionValueInput";
 
 type CellDraft = { tipo: ComissaoTipo; valor: string; id?: string; ativo: boolean };
 
