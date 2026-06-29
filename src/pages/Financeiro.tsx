@@ -434,10 +434,21 @@ const Relatorios = () => {
             <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Total</p>
+                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Bruta</p>
                   <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {receitaTotal.toLocaleString("pt-BR")}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Líquido: {formatBRL(receitaLiquida)}</p>
                 </div>
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
+              </div>
+            </LiquidGlassCard>
+            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Taxas Maquininha</p>
+                  <p className="text-lg sm:text-2xl font-bold text-warning mt-1">R$ {taxasTotal.toLocaleString("pt-BR")}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Descontadas auto.</p>
+                </div>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-warning/10 flex items-center justify-center"><Percent className="w-4 h-4 sm:w-5 sm:h-5 text-warning" /></div>
               </div>
             </LiquidGlassCard>
             <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
