@@ -422,14 +422,6 @@ const Agendamentos = () => {
             <Input type="date" value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} />
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Início *</Label>
-            <Input type="time" value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} />
-          </div>
-          <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Término</Label>
-            <Input type="time" value={form.horario_fim || ""} onChange={(e) => setForm({ ...form, horario_fim: e.target.value })} />
-          </div>
-          <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Paciente *</Label>
             <SearchableSelect
               options={pacientes.map((p) => ({ value: p.id, label: p.nome }))}
@@ -439,6 +431,14 @@ const Agendamentos = () => {
               searchPlaceholder="Buscar paciente..."
               emptyText="Nenhum paciente encontrado."
             />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Início *</Label>
+            <Input type="time" value={form.horario} onChange={(e) => setForm({ ...form, horario: e.target.value })} />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Horário Término</Label>
+            <Input type="time" value={form.horario_fim || ""} onChange={(e) => setForm({ ...form, horario_fim: e.target.value })} />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Dentista *</Label>
@@ -451,8 +451,15 @@ const Agendamentos = () => {
               emptyText="Nenhum dentista encontrado."
             />
           </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
+            <ProcedimentoCombobox
+              value={form.procedimento}
+              onChange={(v) => setForm({ ...form, procedimento: v })}
+            />
+          </div>
           {!editingId && (
-            <div>
+            <div className="sm:col-span-2">
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Repetir agendamento</Label>
               <Select value={repetir} onValueChange={(v: RepetirTipo) => setRepetir(v)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -501,13 +508,7 @@ const Agendamentos = () => {
               </Button>
             </div>
           )}
-          <div className="sm:col-span-2">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 block">Procedimento *</Label>
-            <ProcedimentoCombobox
-              value={form.procedimento}
-              onChange={(v) => setForm({ ...form, procedimento: v })}
-            />
-          </div>
+
 
           <div className="sm:col-span-2">
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
