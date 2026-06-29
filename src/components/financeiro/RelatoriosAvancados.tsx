@@ -124,7 +124,7 @@ const RelatoriosAvancados = () => {
       setLoading(true);
       try {
         const [agRes, despRes, com, procs, dts, pacs] = await Promise.all([
-          supabase.from("agendamento").select("id,data,paciente_id,dentista_id,procedimento,status,status_pagamento,valor"),
+          supabase.from("agendamento").select("id,data,paciente_id,dentista_id,procedimento,status,status_pagamento,valor,forma_pagamento,parcelas"),
           supabase.from("despesa").select("id,descricao,valor,status,vencimento"),
           comissaoService.list(),
           procedimentoService.list(),
