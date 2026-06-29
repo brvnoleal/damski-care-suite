@@ -430,7 +430,8 @@ const RelatoriosAvancados = () => {
           <LiquidGlassCard className="p-4" draggable={false}>
             <p className="text-xs text-muted-foreground uppercase tracking-wide">Receita Paga</p>
             <p className="text-xl font-bold text-foreground mt-1">{fmtBRL(dre.receitaPaga)}</p>
-            <p className="text-[11px] text-muted-foreground mt-1">A receber: {fmtBRL(dre.receitaPendente)}</p>
+            <p className="text-[11px] text-muted-foreground mt-1">Líquida: {fmtBRL(dre.receitaLiquida)} · Taxas {fmtBRL(dre.taxasMaquininha)}</p>
+            <p className="text-[11px] text-muted-foreground">A receber: {fmtBRL(dre.receitaPendente)}</p>
           </LiquidGlassCard>
           <LiquidGlassCard className="p-4" draggable={false}>
             <p className="text-xs text-muted-foreground uppercase tracking-wide">Despesas Pagas</p>
