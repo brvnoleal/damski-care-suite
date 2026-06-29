@@ -110,7 +110,9 @@ const matchProcedimento = (
 
 const RelatoriosAvancados = () => {
   const [loading, setLoading] = useState(true);
-  const [periodo, setPeriodo] = useState<"30" | "90" | "365" | "all">("90");
+  const [periodo, setPeriodo] = useState<"30" | "90" | "365" | "all" | "custom">("90");
+  const [dataInicio, setDataInicio] = useState<string>("");
+  const [dataFim, setDataFim] = useState<string>("");
   const [dentistaFiltro, setDentistaFiltro] = useState<string>("all");
 
   const [ags, setAgs] = useState<Agendamento[]>([]);
@@ -123,6 +125,10 @@ const RelatoriosAvancados = () => {
   const [sigVersion, setSigVersion] = useState(0);
 
   const periodoLabel = useMemo(() => {
+    if (periodo === "custom") {
+      if (dataInicio && dataFim) return `${dataInicio} → ${dataFim}`;
+      return "Período personalizado";
+    }
     const map: Record<string, string> = {
       "30": "Últimos 30 dias",
       "90": "Últimos 90 dias",
@@ -130,9 +136,9 @@ const RelatoriosAvancados = () => {
       all: "Período completo",
     };
     return map[periodo];
-  }, [periodo]);
+  }, [periodo, dataInicio, dataFim]);
 
-  const periodoSigKey = `p-${periodo}`;
+  const periodoSigKey = periodo === "custom" ? `c-${dataInicio}-${dataFim}` : `p-${periodo}`;
 
   useEffect(() => {
     (async () => {
@@ -162,7 +168,7 @@ const RelatoriosAvancados = () => {
 
   // ============ Filtragem por período ============
   const cutoff = useMemo(() => {
-    if (periodo === "all") return null;
+    if (periodo === "all" || periodo === "custom") return null;
     const days = Number(periodo);
     const d = new Date();
     d.setDate(d.getDate() - days);
@@ -170,13 +176,27 @@ const RelatoriosAvancados = () => {
   }, [periodo]);
 
   const agsFiltrados = useMemo(
-    () => ags.filter((a) => !cutoff || a.data >= cutoff),
-    [ags, cutoff],
+    () => ags.filter((a) => {
+      if (periodo === "custom") {
+        if (dataInicio && a.data < dataInicio) return false;
+        if (dataFim && a.data > dataFim) return false;
+        return true;
+      }
+      return !cutoff || a.data >= cutoff;
+    }),
+    [ags, cutoff, periodo, dataInicio, dataFim],
   );
 
   const despesasFiltradas = useMemo(
-    () => despesas.filter((d) => !cutoff || d.vencimento >= cutoff),
-    [despesas, cutoff],
+    () => despesas.filter((d) => {
+      if (periodo === "custom") {
+        if (dataInicio && d.vencimento < dataInicio) return false;
+        if (dataFim && d.vencimento > dataFim) return false;
+        return true;
+      }
+      return !cutoff || d.vencimento >= cutoff;
+    }),
+    [despesas, cutoff, periodo, dataInicio, dataFim],
   );
 
   // ============ Mapa de comissão ============
