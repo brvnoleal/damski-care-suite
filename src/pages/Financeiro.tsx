@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   DollarSign, TrendingUp, TrendingDown, Receipt, CalendarCheck, CheckCircle2,
-  UserCheck, ClipboardList, Download, Plus,
+  UserCheck, ClipboardList, Download, Plus, Percent,
 } from "lucide-react";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
