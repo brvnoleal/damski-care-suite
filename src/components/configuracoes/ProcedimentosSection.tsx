@@ -1,6 +1,11 @@
-import { useState } from "react";
-import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, Package } from "lucide-react";
+import { useRef, useState } from "react";
+import { ClipboardList, Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Search, Package, Percent } from "lucide-react";
 import { ProcedimentoInsumosDialog } from "@/components/configuracoes/ProcedimentoInsumosDialog";
+import {
+  ProcedimentoComissoesEditor,
+  type ProcedimentoComissoesEditorHandle,
+} from "@/components/comissoes/ProcedimentoComissoesEditor";
+import { ResponsiveDialog as ComissoesDialog } from "@/components/ui/responsive-dialog";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
