@@ -109,11 +109,14 @@ const matchProcedimento = (
   });
 };
 
-const RelatoriosAvancados = () => {
+interface RelatoriosAvancadosProps {
+  periodo: "30" | "90" | "365" | "all" | "custom";
+  dataInicio: string;
+  dataFim: string;
+}
+
+const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancadosProps) => {
   const [loading, setLoading] = useState(true);
-  const [periodo, setPeriodo] = useState<"30" | "90" | "365" | "all" | "custom">("90");
-  const [dataInicio, setDataInicio] = useState<string>("");
-  const [dataFim, setDataFim] = useState<string>("");
   const [dentistaFiltro, setDentistaFiltro] = useState<string>("all");
 
   const [ags, setAgs] = useState<Agendamento[]>([]);
