@@ -543,8 +543,8 @@ const Relatorios = () => {
 
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
             <div className="p-5 pb-2">
-              <h3 className="text-base font-semibold text-foreground">Detalhamento de Entradas</h3>
-              <p className="text-sm text-muted-foreground">Receitas por forma de pagamento</p>
+              <h3 className="text-base font-semibold text-foreground">Resumo por Forma de Pagamento</h3>
+              <p className="text-sm text-muted-foreground">Distribuição das entradas pagas</p>
             </div>
             <div className="px-5 pb-5 overflow-x-auto">
               <Table>
@@ -568,6 +568,48 @@ const Relatorios = () => {
                   {formasPagamento.length === 0 && (
                     <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-6">Sem entradas registradas</TableCell></TableRow>
                   )}
+                </TableBody>
+              </Table>
+            </div>
+          </LiquidGlassCard>
+
+          <LiquidGlassCard className="overflow-hidden" draggable={false}>
+            <div className="p-5 pb-2">
+              <h3 className="text-base font-semibold text-foreground">Detalhamento de Recebimentos</h3>
+              <p className="text-sm text-muted-foreground">
+                Cada consulta paga com descritivo do procedimento, taxa da maquininha aplicada e valor líquido recebido.
+              </p>
+            </div>
+            <div className="px-5 pb-5 overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Paciente</TableHead>
+                    <TableHead>Procedimento</TableHead>
+                    <TableHead>Forma</TableHead>
+                    <TableHead className="text-right">Parc.</TableHead>
+                    <TableHead className="text-right">Bruto</TableHead>
+                    <TableHead className="text-right">Taxa</TableHead>
+                    <TableHead className="text-right">Líquido</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {entradas.length === 0 && (
+                    <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-6">Sem recebimentos registrados</TableCell></TableRow>
+                  )}
+                  {entradas.map((e: any) => (
+                    <TableRow key={e.id}>
+                      <TableCell className="text-muted-foreground whitespace-nowrap">{e.data}</TableCell>
+                      <TableCell className="font-medium">{e.paciente}</TableCell>
+                      <TableCell className="text-foreground">{e.procedimento}</TableCell>
+                      <TableCell className="text-muted-foreground">{e.forma}</TableCell>
+                      <TableCell className="text-right text-muted-foreground">{e.parcelas}x</TableCell>
+                      <TableCell className="text-right">{formatBRL(e.valor)}</TableCell>
+                      <TableCell className="text-right text-warning">{e.taxa > 0 ? formatBRL(e.taxa) : "—"}</TableCell>
+                      <TableCell className="text-right font-semibold text-success">{formatBRL(e.liquido)}</TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </div>
