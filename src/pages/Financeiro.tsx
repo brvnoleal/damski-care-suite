@@ -353,6 +353,7 @@ const Relatorios = () => {
       <Tabs defaultValue="visao" className="space-y-4">
         <TabsList>
           <TabsTrigger value="visao">Visão Geral</TabsTrigger>
+          <TabsTrigger value="pacientes">Pacientes</TabsTrigger>
           <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
           <TabsTrigger value="avancado">DRE · Funil · Holerite</TabsTrigger>
         </TabsList>
