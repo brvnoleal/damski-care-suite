@@ -51,10 +51,6 @@ const navigation = [
   { name: "Agenda", href: "/agenda", icon: Calendar },
   { name: "Consultas", href: "/agendamentos", icon: CalendarDays },
   { name: "Pacientes", href: "/pacientes", icon: Users },
-  { name: "Procedimentos", href: "/procedimentos", icon: ClipboardList },
-  { name: "Usuários", href: "/dentistas", icon: UserCog },
-  { name: "Documentos", href: "/documentos", icon: FileText },
-  { name: "Insumos", href: "/insumos", icon: Package },
   { name: "Relatórios", href: "/financeiro", icon: DollarSign },
 ];
 
