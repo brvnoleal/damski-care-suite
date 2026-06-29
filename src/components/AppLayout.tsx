@@ -127,18 +127,18 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         </div>
 
         <div className="flex items-center justify-end gap-4">
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="relative text-muted-foreground hover:text-foreground transition-colors">
-                <Bell className="w-[18px] h-[18px]" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[10px] text-destructive-foreground flex items-center justify-center font-bold">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
-              </button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-[360px] p-0 my-4 rounded-2xl overflow-hidden border border-border shadow-2xl" sideOffset={8}>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="group relative inline-flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-all duration-300 active:scale-90">
+              <Bell className="w-[18px] h-[18px] transition-transform duration-300 group-hover:animate-[bellRing_0.9s_both]" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-destructive rounded-full text-[10px] text-destructive-foreground flex items-center justify-center font-bold">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-[360px] p-0 my-4 rounded-2xl overflow-hidden border border-border shadow-2xl" sideOffset={8}>
               <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-popover">
                 <h3 className="text-sm font-semibold text-foreground">Notificações</h3>
                 {unreadCount > 0 && (
