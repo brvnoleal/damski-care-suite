@@ -1,3 +1,4 @@
+import type React from "react";
 // Opções de indicação e etiquetas do paciente
 
 export const INDICACAO_OPTIONS: { value: string; label: string; pessoa?: boolean }[] = [
