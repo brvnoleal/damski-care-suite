@@ -55,6 +55,8 @@ const Relatorios = () => {
 
   // Financeiro
   const [receitaTotal, setReceitaTotal] = useState(0);
+  const [taxasTotal, setTaxasTotal] = useState(0);
+  const [receitaLiquida, setReceitaLiquida] = useState(0);
   const [despesaTotal, setDespesaTotal] = useState(0);
   const [faturamentoMensal, setFaturamentoMensal] = useState<{ mes: string; receita: number; despesas: number }[]>([]);
   const [formasPagamento, setFormasPagamento] = useState<{ forma: string; valor: number; porcentagem: number; qtd: number }[]>([]);
