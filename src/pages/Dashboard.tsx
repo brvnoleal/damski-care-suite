@@ -19,6 +19,7 @@ import DemografiaPanel from "@/components/dashboard/DemografiaPanel";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { supabase } from "@/integrations/supabase/client";
 import { procedimentoConsultaLabels } from "@/types";
+import { calcularTaxa } from "@/lib/maquininhaCalc";
 
 const colorMap = {
   primary: { bg: "bg-primary/10", text: "text-primary" },
