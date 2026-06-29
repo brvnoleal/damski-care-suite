@@ -28,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Loader2, Download, Wallet, TrendingDown, TrendingUp, AlertTriangle, Percent, Users, FileText, FileCheck2 } from "lucide-react";
 import { HoleriteDialog, loadHoleriteSignature, type HoleriteData } from "./HoleriteDialog";
 import { supabase } from "@/integrations/supabase/client";
@@ -413,23 +414,43 @@ const RelatoriosAvancados = () => {
     );
   }
 
+  const renderPeriodoFilter = () => (
+    <div className="flex flex-wrap gap-2 items-center">
+      <Select value={periodo} onValueChange={(v) => setPeriodo(v as any)}>
+        <SelectTrigger className="w-[170px] h-9 text-sm">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="30">Últimos 30 dias</SelectItem>
+          <SelectItem value="90">Últimos 90 dias</SelectItem>
+          <SelectItem value="365">Último ano</SelectItem>
+          <SelectItem value="all">Tudo</SelectItem>
+          <SelectItem value="custom">Personalizado</SelectItem>
+        </SelectContent>
+      </Select>
+      {periodo === "custom" && (
+        <>
+          <Input
+            type="date"
+            value={dataInicio}
+            onChange={(e) => setDataInicio(e.target.value)}
+            className="h-9 w-[150px] text-sm"
+          />
+          <span className="text-xs text-muted-foreground">até</span>
+          <Input
+            type="date"
+            value={dataFim}
+            onChange={(e) => setDataFim(e.target.value)}
+            className="h-9 w-[150px] text-sm"
+          />
+        </>
+      )}
+    </div>
+  );
+
   return (
     <div className="space-y-6">
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-sm text-muted-foreground">Período:</span>
-        <Select value={periodo} onValueChange={(v) => setPeriodo(v as any)}>
-          <SelectTrigger className="w-[180px] h-9 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="30">Últimos 30 dias</SelectItem>
-            <SelectItem value="90">Últimos 90 dias</SelectItem>
-            <SelectItem value="365">Último ano</SelectItem>
-            <SelectItem value="all">Tudo</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+
 
       {/* ===== DRE ===== */}
       <section className="space-y-3">
