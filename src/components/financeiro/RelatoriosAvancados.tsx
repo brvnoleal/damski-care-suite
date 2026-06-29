@@ -573,7 +573,10 @@ const RelatoriosAvancados = () => {
 
       {/* ===== Funil & Conversão ===== */}
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground">Funil de Vendas & Conversão</h2>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h2 className="text-lg font-semibold text-foreground">Funil de Vendas & Conversão</h2>
+          {renderPeriodoFilter()}
+        </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <LiquidGlassCard className="p-4" draggable={false}>
@@ -656,6 +659,8 @@ const RelatoriosAvancados = () => {
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">Holerite / Pró-labore por Dentista</h2>
           <div className="flex gap-2 items-center">
+          <div className="flex gap-2 items-center flex-wrap">
+            {renderPeriodoFilter()}
             <Select value={dentistaFiltro} onValueChange={setDentistaFiltro}>
               <SelectTrigger className="w-[220px] h-9 text-sm">
                 <SelectValue />
