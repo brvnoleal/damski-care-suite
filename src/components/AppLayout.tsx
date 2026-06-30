@@ -10,6 +10,7 @@ import {
   Calendar,
   Package,
   DollarSign,
+  FileBarChart,
   Settings,
   Menu,
   X,
@@ -51,7 +52,7 @@ const navigation = [
   { name: "Agenda", href: "/agenda", icon: Calendar },
   { name: "Consultas", href: "/agendamentos", icon: CalendarDays },
   { name: "Pacientes", href: "/pacientes", icon: Users },
-  { name: "Relatórios", href: "/financeiro", icon: DollarSign },
+  { name: "Relatórios", href: "/financeiro", icon: FileBarChart },
 ];
 
 const AppLayout = ({ children }: AppLayoutProps) => {
