@@ -558,6 +558,7 @@ const Relatorios = () => {
               )}
             </div>
           </LiquidGlassCard>
+          <RelatoriosAvancados periodo={periodo} dataInicio={dataInicio} dataFim={dataFim} section="funil" />
         </TabsContent>
 
         {/* ========== PACIENTES ========== */}
@@ -566,6 +567,14 @@ const Relatorios = () => {
             <PeriodoFilter {...periodoFilterProps} />
           </div>
           <DemografiaPanel />
+        </TabsContent>
+
+        {/* ========== COLABORADORES ========== */}
+        <TabsContent value="colaboradores" className="space-y-4">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <PeriodoFilter {...periodoFilterProps} />
+          </div>
+          <RelatoriosAvancados periodo={periodo} dataInicio={dataInicio} dataFim={dataFim} section="holerite" />
         </TabsContent>
 
         {/* ========== FINANCEIRO ========== */}
@@ -760,14 +769,7 @@ const Relatorios = () => {
               </Table>
             </div>
           </LiquidGlassCard>
-        </TabsContent>
-
-        {/* ========== DRE · FUNIL · HOLERITE ========== */}
-        <TabsContent value="avancado" className="space-y-4">
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <PeriodoFilter {...periodoFilterProps} />
-          </div>
-          <RelatoriosAvancados periodo={periodo} dataInicio={dataInicio} dataFim={dataFim} />
+          <RelatoriosAvancados periodo={periodo} dataInicio={dataInicio} dataFim={dataFim} section="dre" />
         </TabsContent>
       </Tabs>
     </div>
