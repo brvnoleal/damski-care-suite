@@ -577,54 +577,11 @@ const Relatorios = () => {
             </Button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Bruta</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {receitaTotal.toLocaleString("pt-BR")}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Líquido: {formatBRL(receitaLiquida)}</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Taxas Maquininha</p>
-                  <p className="text-lg sm:text-2xl font-bold text-warning mt-1">R$ {taxasTotal.toLocaleString("pt-BR")}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Descontadas auto.</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-warning/10 flex items-center justify-center"><Percent className="w-4 h-4 sm:w-5 sm:h-5 text-warning" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Despesas</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {despesaTotal.toLocaleString("pt-BR")}</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-destructive/10 flex items-center justify-center"><TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Lucro Líquido</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {lucroLiquido.toLocaleString("pt-BR")}</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-success/10 flex items-center justify-center"><TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-success" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Ticket Médio</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {ticketMedio.toLocaleString("pt-BR")}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Por paciente</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
-              </div>
-            </LiquidGlassCard>
+            <KpiCard label="Receita Bruta" value={`R$ ${receitaTotal.toLocaleString("pt-BR")}`} hint={`Líquido: ${formatBRL(receitaLiquida)}`} icon={DollarSign} onExport={exportReceitaBruta} />
+            <KpiCard label="Taxas Maquininha" value={`R$ ${taxasTotal.toLocaleString("pt-BR")}`} hint="Descontadas auto." icon={Percent} iconBg="bg-warning/10" iconColor="text-warning" valueColor="text-warning" onExport={exportTaxasMaquininha} />
+            <KpiCard label="Despesas" value={`R$ ${despesaTotal.toLocaleString("pt-BR")}`} icon={TrendingDown} iconBg="bg-destructive/10" iconColor="text-destructive" onExport={exportDespesas} />
+            <KpiCard label="Lucro Líquido" value={`R$ ${lucroLiquido.toLocaleString("pt-BR")}`} icon={TrendingUp} iconBg="bg-success/10" iconColor="text-success" onExport={exportLucroLiquido} />
+            <KpiCard label="Ticket Médio" value={`R$ ${ticketMedio.toLocaleString("pt-BR")}`} hint="Por paciente" icon={Receipt} onExport={exportTicketMedio} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
