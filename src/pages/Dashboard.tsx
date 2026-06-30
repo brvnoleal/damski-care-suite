@@ -288,59 +288,9 @@ const Dashboard = () => {
       </div>
 
       <FadeIn delay={0.35}>
-        <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-          <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-primary" />
-              <h2 className="text-xs sm:text-sm font-semibold text-foreground">Agenda do Dia</h2>
-            </div>
-            <Badge variant="outline" className="text-[10px]">{agendaDoDia.length} consulta{agendaDoDia.length !== 1 ? "s" : ""}</Badge>
-          </div>
-          <div className="max-h-[320px] overflow-y-auto">
-            {agendaDoDia.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">Nenhuma consulta agendada para hoje</p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent border-b border-white/10">
-                    <TableHead className="text-sm text-foreground font-semibold w-16">Hora</TableHead>
-                    <TableHead className="text-sm text-foreground font-semibold">Paciente</TableHead>
-                    <TableHead className="text-sm text-foreground font-semibold hidden sm:table-cell">Procedimento</TableHead>
-                    <TableHead className="text-sm text-foreground font-semibold text-right">Status</TableHead>
-                    <TableHead className="text-sm text-foreground font-semibold text-right">Pagamento</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {agendaDoDia.map((a, i) => (
-                    <TableRow key={i} className="border-b border-white/5 hover:bg-white/[0.02]">
-                      <TableCell className="py-2.5">
-                        <span className="text-sm font-mono font-semibold text-primary">{a.time}</span>
-                      </TableCell>
-                      <TableCell className="py-2.5">
-                        <p className="text-sm font-medium text-foreground truncate">{a.patient}</p>
-                        <p className="text-sm text-foreground truncate sm:hidden">{a.proc}</p>
-                      </TableCell>
-                      <TableCell className="py-2.5 hidden sm:table-cell">
-                        <span className="text-sm font-medium text-foreground">{a.proc}</span>
-                      </TableCell>
-                      <TableCell className="py-2.5 text-right">
-                        <Badge variant="outline" className={cn("text-[10px] capitalize", a.status === "confirmado" ? "text-success border-success/30" : a.status === "realizado" ? "text-primary border-primary/30" : a.status === "nao_compareceu" ? "text-destructive border-destructive/30" : "text-warning border-warning/30")}>
-                          {a.status === "nao_compareceu" ? "Não Compareceu" : a.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="py-2.5 text-right">
-                        <Badge variant="outline" className={cn("text-[10px] capitalize", a.paymentStatus === "pago" ? "text-success border-success/30" : "text-warning border-warning/30")}>
-                          {a.paymentStatus}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </div>
-        </LiquidGlassCard>
+        <Agenda />
       </FadeIn>
+
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <FadeIn delay={0.5}>
