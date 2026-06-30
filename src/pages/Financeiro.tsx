@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   DollarSign, TrendingUp, TrendingDown, Receipt, CalendarCheck, CheckCircle2,
-  UserCheck, ClipboardList, Download, Plus, Percent, Users,
+  UserCheck, ClipboardList, Download, Plus, Percent, Users, AlertTriangle,
 } from "lucide-react";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -104,15 +104,30 @@ const Relatorios = () => {
   const [saidas, setSaidas] = useState<any[]>([]);
   const [pacientesAtendidos, setPacientesAtendidos] = useState(0);
   const [agendamentosPeriodo, setAgendamentosPeriodo] = useState<any[]>([]);
+  const [criticalSupplies, setCriticalSupplies] = useState<{ name: string; lot: string; expiry: string; daysLeft: number }[]>([]);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [agRes, despRes, pacRes] = await Promise.all([
+        const [agRes, despRes, pacRes, insumoRes] = await Promise.all([
           supabase.from("agendamento").select("*"),
           supabase.from("despesa").select("*"),
           supabase.from("paciente").select("id, nome"),
+          supabase.from("insumo").select("*"),
         ]);
+
+        const nowDt = new Date();
+        const critical = (insumoRes.data || [])
+          .filter((i: any) => !i.sem_validade && i.validade)
+          .map((i: any) => ({
+            name: i.nome,
+            lot: i.lote,
+            expiry: new Date(i.validade).toLocaleDateString("pt-BR"),
+            daysLeft: Math.ceil((new Date(i.validade).getTime() - nowDt.getTime()) / 86400000),
+          }))
+          .filter((i: any) => i.daysLeft >= 0 && i.daysLeft <= 15)
+          .sort((a: any, b: any) => a.daysLeft - b.daysLeft);
+        setCriticalSupplies(critical);
 
         const agendamentos = filtrarPorPeriodo(agRes.data || [], "data", periodo, dataInicio, dataFim);
         const despesas = filtrarPorPeriodo(despRes.data || [], "vencimento", periodo, dataInicio, dataFim);
