@@ -82,6 +82,14 @@ const Relatorios = () => {
         const despesas = filtrarPorPeriodo(despRes.data || [], "vencimento", periodo, dataInicio, dataFim);
         const pacientes = pacRes.data || [];
         const pacMap = Object.fromEntries(pacientes.map((p: any) => [p.id, p.nome]));
+        setAgendamentosPeriodo(agendamentos.map((a: any) => ({
+          data: a.data,
+          paciente: pacMap[a.paciente_id] || "—",
+          procedimento: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
+          status: a.status,
+          valor: Number(a.valor) || 0,
+          forma_pagamento: (formaPagamentoLabels as any)[a.forma_pagamento] || a.forma_pagamento || "—",
+        })));
 
         // ============ Visão Geral ============
         const total = agendamentos.length;
