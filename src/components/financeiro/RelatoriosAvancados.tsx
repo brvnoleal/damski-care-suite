@@ -113,9 +113,14 @@ interface RelatoriosAvancadosProps {
   periodo: "30" | "90" | "365" | "all" | "custom";
   dataInicio: string;
   dataFim: string;
+  /** Quando definido, renderiza apenas a seção indicada. */
+  section?: "dre" | "funil" | "holerite";
 }
 
-const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancadosProps) => {
+const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: RelatoriosAvancadosProps) => {
+  const showDre = !section || section === "dre";
+  const showFunil = !section || section === "funil";
+  const showHolerite = !section || section === "holerite";
   const [loading, setLoading] = useState(true);
   const [dentistaFiltro, setDentistaFiltro] = useState<string>("all");
 
