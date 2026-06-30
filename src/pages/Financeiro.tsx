@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   DollarSign, TrendingUp, TrendingDown, Receipt, CalendarCheck, CheckCircle2,
-  UserCheck, ClipboardList, Download, Plus, Percent,
+  UserCheck, ClipboardList, Download, Plus, Percent, Users,
 } from "lucide-react";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -511,11 +511,11 @@ const Relatorios = () => {
             <TabsTrigger value="pacientes" className="gap-1.5 text-xs">
               <UserCheck className="w-3.5 h-3.5" /> Pacientes
             </TabsTrigger>
+            <TabsTrigger value="colaboradores" className="gap-1.5 text-xs">
+              <Users className="w-3.5 h-3.5" /> Colaboradores
+            </TabsTrigger>
             <TabsTrigger value="financeiro" className="gap-1.5 text-xs">
               <DollarSign className="w-3.5 h-3.5" /> Financeiro
-            </TabsTrigger>
-            <TabsTrigger value="avancado" className="gap-1.5 text-xs">
-              <Receipt className="w-3.5 h-3.5" /> DRE · Funil · Holerite
             </TabsTrigger>
           </TabsList>
         </div>
