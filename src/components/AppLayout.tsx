@@ -49,7 +49,6 @@ interface AppLayoutProps {
 
 const navigation = [
   { name: "Início", href: "/", icon: LayoutDashboard },
-  { name: "Agenda", href: "/agenda", icon: Calendar },
   { name: "Consultas", href: "/agendamentos", icon: CalendarDays },
   { name: "Pacientes", href: "/pacientes", icon: Users },
   { name: "Relatórios", href: "/financeiro", icon: FileBarChart },

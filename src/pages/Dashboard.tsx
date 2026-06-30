@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Agenda from "@/pages/Agenda";
 import {
   Users, Calendar, DollarSign, FileCheck,
   AlertTriangle, ArrowUpRight, ChevronRight, Star, Activity,
