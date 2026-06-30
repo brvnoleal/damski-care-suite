@@ -67,6 +67,7 @@ const Relatorios = () => {
   const [entradas, setEntradas] = useState<any[]>([]);
   const [saidas, setSaidas] = useState<any[]>([]);
   const [pacientesAtendidos, setPacientesAtendidos] = useState(0);
+  const [agendamentosPeriodo, setAgendamentosPeriodo] = useState<any[]>([]);
 
   useEffect(() => {
     const load = async () => {
