@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   DollarSign, TrendingUp, TrendingDown, Receipt, CalendarCheck, CheckCircle2,
-  UserCheck, ClipboardList, Download, Plus, Percent, Users,
+  UserCheck, ClipboardList, Download, Plus, Percent, Users, AlertTriangle,
 } from "lucide-react";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -104,15 +104,30 @@ const Relatorios = () => {
   const [saidas, setSaidas] = useState<any[]>([]);
   const [pacientesAtendidos, setPacientesAtendidos] = useState(0);
   const [agendamentosPeriodo, setAgendamentosPeriodo] = useState<any[]>([]);
+  const [criticalSupplies, setCriticalSupplies] = useState<{ name: string; lot: string; expiry: string; daysLeft: number }[]>([]);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [agRes, despRes, pacRes] = await Promise.all([
+        const [agRes, despRes, pacRes, insumoRes] = await Promise.all([
           supabase.from("agendamento").select("*"),
           supabase.from("despesa").select("*"),
           supabase.from("paciente").select("id, nome"),
+          supabase.from("insumo").select("*"),
         ]);
+
+        const nowDt = new Date();
+        const critical = (insumoRes.data || [])
+          .filter((i: any) => !i.sem_validade && i.validade)
+          .map((i: any) => ({
+            name: i.nome,
+            lot: i.lote,
+            expiry: new Date(i.validade).toLocaleDateString("pt-BR"),
+            daysLeft: Math.ceil((new Date(i.validade).getTime() - nowDt.getTime()) / 86400000),
+          }))
+          .filter((i: any) => i.daysLeft >= 0 && i.daysLeft <= 15)
+          .sort((a: any, b: any) => a.daysLeft - b.daysLeft);
+        setCriticalSupplies(critical);
 
         const agendamentos = filtrarPorPeriodo(agRes.data || [], "data", periodo, dataInicio, dataFim);
         const despesas = filtrarPorPeriodo(despRes.data || [], "vencimento", periodo, dataInicio, dataFim);
@@ -559,6 +574,36 @@ const Relatorios = () => {
             </div>
           </LiquidGlassCard>
           <RelatoriosAvancados periodo={periodo} dataInicio={dataInicio} dataFim={dataFim} section="funil" />
+
+          <LiquidGlassCard className="overflow-hidden" draggable={false}>
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-warning" />
+                <h2 className="text-sm font-semibold text-foreground">Insumos Críticos</h2>
+              </div>
+              <Badge variant="outline" className="text-[10px]">
+                {criticalSupplies.length} item{criticalSupplies.length !== 1 ? "s" : ""}
+              </Badge>
+            </div>
+            <div className="divide-y divide-border max-h-[320px] overflow-y-auto">
+              {criticalSupplies.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-6">Nenhum insumo crítico</p>
+              )}
+              {criticalSupplies.map((s, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 sm:px-5 py-2.5">
+                  <div className={`w-2 h-2 rounded-full shrink-0 ${s.daysLeft <= 0 ? "bg-destructive" : s.daysLeft <= 5 ? "bg-warning" : "bg-success"}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
+                    <p className="text-[11px] text-muted-foreground">Lote {s.lot} · Venc. {s.expiry}</p>
+                  </div>
+                  <Badge variant="outline" className={`text-[10px] shrink-0 ${s.daysLeft <= 0 ? "text-destructive border-destructive/30" : "text-warning border-warning/30"}`}>
+                    {s.daysLeft <= 0 ? "Vencido" : `${s.daysLeft}d`}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </LiquidGlassCard>
+
         </TabsContent>
 
         {/* ========== PACIENTES ========== */}
