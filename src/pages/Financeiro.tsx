@@ -574,6 +574,36 @@ const Relatorios = () => {
             </div>
           </LiquidGlassCard>
           <RelatoriosAvancados periodo={periodo} dataInicio={dataInicio} dataFim={dataFim} section="funil" />
+
+          <LiquidGlassCard className="overflow-hidden" draggable={false}>
+            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-warning" />
+                <h2 className="text-sm font-semibold text-foreground">Insumos Críticos</h2>
+              </div>
+              <Badge variant="outline" className="text-[10px]">
+                {criticalSupplies.length} item{criticalSupplies.length !== 1 ? "s" : ""}
+              </Badge>
+            </div>
+            <div className="divide-y divide-border max-h-[320px] overflow-y-auto">
+              {criticalSupplies.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-6">Nenhum insumo crítico</p>
+              )}
+              {criticalSupplies.map((s, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 sm:px-5 py-2.5">
+                  <div className={`w-2 h-2 rounded-full shrink-0 ${s.daysLeft <= 0 ? "bg-destructive" : s.daysLeft <= 5 ? "bg-warning" : "bg-success"}`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
+                    <p className="text-[11px] text-muted-foreground">Lote {s.lot} · Venc. {s.expiry}</p>
+                  </div>
+                  <Badge variant="outline" className={`text-[10px] shrink-0 ${s.daysLeft <= 0 ? "text-destructive border-destructive/30" : "text-warning border-warning/30"}`}>
+                    {s.daysLeft <= 0 ? "Vencido" : `${s.daysLeft}d`}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </LiquidGlassCard>
+
         </TabsContent>
 
         {/* ========== PACIENTES ========== */}
