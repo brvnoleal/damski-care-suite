@@ -113,9 +113,14 @@ interface RelatoriosAvancadosProps {
   periodo: "30" | "90" | "365" | "all" | "custom";
   dataInicio: string;
   dataFim: string;
+  /** Quando definido, renderiza apenas a seção indicada. */
+  section?: "dre" | "funil" | "holerite";
 }
 
-const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancadosProps) => {
+const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: RelatoriosAvancadosProps) => {
+  const showDre = !section || section === "dre";
+  const showFunil = !section || section === "funil";
+  const showHolerite = !section || section === "holerite";
   const [loading, setLoading] = useState(true);
   const [dentistaFiltro, setDentistaFiltro] = useState<string>("all");
 
@@ -425,6 +430,7 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancad
 
 
       {/* ===== DRE ===== */}
+      {showDre && (
       <section className="space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">DRE — Demonstrativo de Resultado</h2>
@@ -542,8 +548,10 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancad
           </div>
         </LiquidGlassCard>
       </section>
+      )}
 
       {/* ===== Funil & Conversão ===== */}
+      {showFunil && (
       <section className="space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">Funil de Vendas & Conversão</h2>
@@ -625,8 +633,10 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancad
           </div>
         </LiquidGlassCard>
       </section>
+      )}
 
       {/* ===== Holerite ===== */}
+      {showHolerite && (
       <section className="space-y-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-foreground">Holerite / Pró-labore por Dentista</h2>
@@ -773,15 +783,18 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim }: RelatoriosAvancad
           </div>
         )}
       </section>
+      )}
 
-      <HoleriteDialog
-        open={!!holeriteAberto}
-        onOpenChange={(v) => !v && setHoleriteAberto(null)}
-        holerite={holeriteAberto}
-        periodoKey={periodoSigKey}
-        periodoLabel={periodoLabel}
-        onSigned={() => setSigVersion((v) => v + 1)}
-      />
+      {showHolerite && (
+        <HoleriteDialog
+          open={!!holeriteAberto}
+          onOpenChange={(v) => !v && setHoleriteAberto(null)}
+          holerite={holeriteAberto}
+          periodoKey={periodoSigKey}
+          periodoLabel={periodoLabel}
+          onSigned={() => setSigVersion((v) => v + 1)}
+        />
+      )}
 
 
     </div>
