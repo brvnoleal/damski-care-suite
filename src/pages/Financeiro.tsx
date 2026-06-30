@@ -529,46 +529,10 @@ const Relatorios = () => {
             </Button>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Consultas</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">{totalConsultas}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Agendadas</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><CalendarCheck className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Taxa de Confirmação</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">{taxaConfirmacao}%</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Consultas confirmadas</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-success/10 flex items-center justify-center"><CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-success" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Comparecimento</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">{taxaComparecimento}%</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Taxa de presença</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><UserCheck className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Procedimentos</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">{procStatus.reduce((s, p) => s + p.valor, 0)}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Pendentes + Concluídos</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-warning/10 flex items-center justify-center"><ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 text-warning" /></div>
-              </div>
-            </LiquidGlassCard>
+            <KpiCard label="Consultas" value={totalConsultas} hint="Agendadas" icon={CalendarCheck} onExport={exportConsultas} />
+            <KpiCard label="Taxa de Confirmação" value={`${taxaConfirmacao}%`} hint="Consultas confirmadas" icon={CheckCircle2} iconBg="bg-success/10" iconColor="text-success" onExport={exportTaxaConfirmacao} />
+            <KpiCard label="Comparecimento" value={`${taxaComparecimento}%`} hint="Taxa de presença" icon={UserCheck} onExport={exportComparecimento} />
+            <KpiCard label="Procedimentos" value={procStatus.reduce((s, p) => s + p.valor, 0)} hint="Pendentes + Concluídos" icon={ClipboardList} iconBg="bg-warning/10" iconColor="text-warning" onExport={exportProcedimentos} />
           </div>
 
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
