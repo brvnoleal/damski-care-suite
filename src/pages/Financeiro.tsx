@@ -23,7 +23,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { FadeIn } from "@/components/FadeIn";
 import { despesaService } from "@/services/despesaService";
 import { procedimentoConsultaLabels, formaPagamentoLabels } from "@/types";
-import { exportMultiSheetXlsx } from "@/lib/exportXlsx";
+import { exportMultiSheetXlsx, exportToXlsx } from "@/lib/exportXlsx";
 import { calcularTaxa, formatBRL } from "@/lib/maquininhaCalc";
 import RelatoriosAvancados from "@/components/financeiro/RelatoriosAvancados";
 import DemografiaPanel from "@/components/dashboard/DemografiaPanel";
@@ -41,6 +41,42 @@ const faturamentoConfig: ChartConfig = {
   despesas: { label: "Despesas", color: "hsl(var(--destructive))" },
 };
 const procedimentoConfig: ChartConfig = { valor: { label: "Valor", color: "hsl(var(--primary))" } };
+
+interface KpiCardProps {
+  label: string;
+  value: React.ReactNode;
+  hint?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  iconBg?: string;
+  iconColor?: string;
+  valueColor?: string;
+  onExport?: () => void;
+}
+const KpiCard = ({ label, value, hint, icon: Icon, iconBg = "bg-primary/10", iconColor = "text-primary", valueColor = "text-foreground", onExport }: KpiCardProps) => (
+  <LiquidGlassCard draggable={false} className="p-3 sm:p-4 relative">
+    {onExport && (
+      <button
+        type="button"
+        onClick={onExport}
+        aria-label={`Exportar ${label}`}
+        title="Baixar Excel"
+        className="absolute top-2 right-2 w-6 h-6 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+      >
+        <Download className="w-3.5 h-3.5" />
+      </button>
+    )}
+    <div className="flex items-center justify-between gap-2 pr-6">
+      <div className="min-w-0">
+        <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">{label}</p>
+        <p className={`text-sm sm:text-base lg:text-lg font-bold mt-1 truncate ${valueColor}`}>{value}</p>
+        {hint && <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">{hint}</p>}
+      </div>
+      <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
+        <Icon className={`w-4 h-4 ${iconColor}`} />
+      </div>
+    </div>
+  </LiquidGlassCard>
+);
 
 const Relatorios = () => {
   const [periodo, setPeriodo] = useState<PeriodoValue>("365");
@@ -67,6 +103,7 @@ const Relatorios = () => {
   const [entradas, setEntradas] = useState<any[]>([]);
   const [saidas, setSaidas] = useState<any[]>([]);
   const [pacientesAtendidos, setPacientesAtendidos] = useState(0);
+  const [agendamentosPeriodo, setAgendamentosPeriodo] = useState<any[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -81,6 +118,14 @@ const Relatorios = () => {
         const despesas = filtrarPorPeriodo(despRes.data || [], "vencimento", periodo, dataInicio, dataFim);
         const pacientes = pacRes.data || [];
         const pacMap = Object.fromEntries(pacientes.map((p: any) => [p.id, p.nome]));
+        setAgendamentosPeriodo(agendamentos.map((a: any) => ({
+          data: a.data,
+          paciente: pacMap[a.paciente_id] || "—",
+          procedimento: (procedimentoConsultaLabels as any)[a.procedimento] || a.procedimento,
+          status: a.status,
+          valor: Number(a.valor) || 0,
+          forma_pagamento: (formaPagamentoLabels as any)[a.forma_pagamento] || a.forma_pagamento || "—",
+        })));
 
         // ============ Visão Geral ============
         const total = agendamentos.length;
@@ -293,6 +338,105 @@ const Relatorios = () => {
     toast.success("Financeiro exportado");
   };
 
+  // ============ Per-card exports ============
+  const exportConsultas = () => {
+    exportToXlsx(
+      agendamentosPeriodo.map((a) => ({
+        Data: a.data,
+        Paciente: a.paciente,
+        Procedimento: a.procedimento,
+        Status: a.status,
+        "Forma Pagamento": a.forma_pagamento,
+        Valor: a.valor,
+      })),
+      "card-consultas",
+    );
+    toast.success("Consultas exportadas");
+  };
+  const exportTaxaConfirmacao = () => {
+    const confirmados = agendamentosPeriodo.filter((a) => a.status === "confirmado" || a.status === "realizado");
+    exportToXlsx(
+      [
+        { Métrica: "Total", Valor: agendamentosPeriodo.length },
+        { Métrica: "Confirmados + Realizados", Valor: confirmados.length },
+        { Métrica: "Taxa (%)", Valor: taxaConfirmacao },
+      ],
+      "card-taxa-confirmacao",
+    );
+    toast.success("Exportado");
+  };
+  const exportComparecimento = () => {
+    const realizados = agendamentosPeriodo.filter((a) => a.status === "realizado");
+    const cancelados = agendamentosPeriodo.filter((a) => a.status === "cancelado");
+    exportToXlsx(
+      [
+        { Métrica: "Realizados", Valor: realizados.length },
+        { Métrica: "Cancelados", Valor: cancelados.length },
+        { Métrica: "Taxa (%)", Valor: taxaComparecimento },
+      ],
+      "card-comparecimento",
+    );
+    toast.success("Exportado");
+  };
+  const exportProcedimentos = () => {
+    exportToXlsx(procPorTipo, "card-procedimentos");
+    toast.success("Procedimentos exportados");
+  };
+  const exportReceitaBruta = () => {
+    exportToXlsx(
+      entradas.map((e) => ({
+        Data: e.data, Paciente: e.paciente, Procedimento: e.procedimento,
+        Forma: e.forma, Parcelas: e.parcelas, Bruto: e.valor, Taxa: e.taxa, Líquido: e.liquido,
+      })),
+      "card-receita-bruta",
+    );
+    toast.success("Receita exportada");
+  };
+  const exportTaxasMaquininha = () => {
+    exportToXlsx(
+      entradas.filter((e) => e.taxa > 0).map((e) => ({
+        Data: e.data, Paciente: e.paciente, Forma: e.forma, Parcelas: e.parcelas,
+        Bruto: e.valor, Taxa: e.taxa, Líquido: e.liquido,
+      })),
+      "card-taxas-maquininha",
+    );
+    toast.success("Taxas exportadas");
+  };
+  const exportDespesas = () => {
+    exportToXlsx(
+      saidas.map((s) => ({
+        Vencimento: s.vencimento, Descrição: s.descricao, Categoria: s.categoria,
+        Fornecedor: s.fornecedor, Forma: s.forma, Valor: s.valor, Status: s.status,
+      })),
+      "card-despesas",
+    );
+    toast.success("Despesas exportadas");
+  };
+  const exportLucroLiquido = () => {
+    exportToXlsx(
+      [
+        { Métrica: "Receita Bruta", Valor: receitaTotal },
+        { Métrica: "Taxas Maquininha", Valor: taxasTotal },
+        { Métrica: "Receita Líquida", Valor: receitaLiquida },
+        { Métrica: "Despesa Total", Valor: despesaTotal },
+        { Métrica: "Lucro Líquido", Valor: lucroLiquido },
+      ],
+      "card-lucro-liquido",
+    );
+    toast.success("Exportado");
+  };
+  const exportTicketMedio = () => {
+    exportToXlsx(
+      [
+        { Métrica: "Receita Bruta", Valor: receitaTotal },
+        { Métrica: "Pacientes Atendidos", Valor: pacientesAtendidos },
+        { Métrica: "Ticket Médio", Valor: ticketMedio },
+      ],
+      "card-ticket-medio",
+    );
+    toast.success("Exportado");
+  };
+
   return (
     <div className="space-y-6">
       <FadeIn>
@@ -385,46 +529,10 @@ const Relatorios = () => {
             </Button>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Consultas</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">{totalConsultas}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Agendadas</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><CalendarCheck className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Taxa de Confirmação</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">{taxaConfirmacao}%</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Consultas confirmadas</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-success/10 flex items-center justify-center"><CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-success" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Comparecimento</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">{taxaComparecimento}%</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Taxa de presença</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><UserCheck className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Procedimentos</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">{procStatus.reduce((s, p) => s + p.valor, 0)}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Pendentes + Concluídos</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-warning/10 flex items-center justify-center"><ClipboardList className="w-4 h-4 sm:w-5 sm:h-5 text-warning" /></div>
-              </div>
-            </LiquidGlassCard>
+            <KpiCard label="Consultas" value={totalConsultas} hint="Agendadas" icon={CalendarCheck} onExport={exportConsultas} />
+            <KpiCard label="Taxa de Confirmação" value={`${taxaConfirmacao}%`} hint="Consultas confirmadas" icon={CheckCircle2} iconBg="bg-success/10" iconColor="text-success" onExport={exportTaxaConfirmacao} />
+            <KpiCard label="Comparecimento" value={`${taxaComparecimento}%`} hint="Taxa de presença" icon={UserCheck} onExport={exportComparecimento} />
+            <KpiCard label="Procedimentos" value={procStatus.reduce((s, p) => s + p.valor, 0)} hint="Pendentes + Concluídos" icon={ClipboardList} iconBg="bg-warning/10" iconColor="text-warning" onExport={exportProcedimentos} />
           </div>
 
           <LiquidGlassCard className="overflow-hidden" draggable={false}>
@@ -469,54 +577,11 @@ const Relatorios = () => {
             </Button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Receita Bruta</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {receitaTotal.toLocaleString("pt-BR")}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Líquido: {formatBRL(receitaLiquida)}</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Taxas Maquininha</p>
-                  <p className="text-lg sm:text-2xl font-bold text-warning mt-1">R$ {taxasTotal.toLocaleString("pt-BR")}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Descontadas auto.</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-warning/10 flex items-center justify-center"><Percent className="w-4 h-4 sm:w-5 sm:h-5 text-warning" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Despesas</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {despesaTotal.toLocaleString("pt-BR")}</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-destructive/10 flex items-center justify-center"><TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-destructive" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Lucro Líquido</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {lucroLiquido.toLocaleString("pt-BR")}</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-success/10 flex items-center justify-center"><TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-success" /></div>
-              </div>
-            </LiquidGlassCard>
-            <LiquidGlassCard draggable={false} className="p-3 sm:p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide">Ticket Médio</p>
-                  <p className="text-lg sm:text-2xl font-bold text-foreground mt-1">R$ {ticketMedio.toLocaleString("pt-BR")}</p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Por paciente</p>
-                </div>
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 flex items-center justify-center"><Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /></div>
-              </div>
-            </LiquidGlassCard>
+            <KpiCard label="Receita Bruta" value={`R$ ${receitaTotal.toLocaleString("pt-BR")}`} hint={`Líquido: ${formatBRL(receitaLiquida)}`} icon={DollarSign} onExport={exportReceitaBruta} />
+            <KpiCard label="Taxas Maquininha" value={`R$ ${taxasTotal.toLocaleString("pt-BR")}`} hint="Descontadas auto." icon={Percent} iconBg="bg-warning/10" iconColor="text-warning" valueColor="text-warning" onExport={exportTaxasMaquininha} />
+            <KpiCard label="Despesas" value={`R$ ${despesaTotal.toLocaleString("pt-BR")}`} icon={TrendingDown} iconBg="bg-destructive/10" iconColor="text-destructive" onExport={exportDespesas} />
+            <KpiCard label="Lucro Líquido" value={`R$ ${lucroLiquido.toLocaleString("pt-BR")}`} icon={TrendingUp} iconBg="bg-success/10" iconColor="text-success" onExport={exportLucroLiquido} />
+            <KpiCard label="Ticket Médio" value={`R$ ${ticketMedio.toLocaleString("pt-BR")}`} hint="Por paciente" icon={Receipt} onExport={exportTicketMedio} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

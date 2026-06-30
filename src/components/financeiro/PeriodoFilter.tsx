@@ -19,41 +19,53 @@ export const PeriodoFilter = ({
   dataFim,
   onDataInicioChange,
   onDataFimChange,
-}: PeriodoFilterProps) => (
-  <div className="flex flex-wrap gap-2 items-center">
-    <Select value={periodo} onValueChange={(v) => onPeriodoChange(v as PeriodoValue)}>
-      <SelectTrigger className="w-[170px] h-9 text-sm">
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="30">Últimos 30 dias</SelectItem>
-        <SelectItem value="90">Últimos 90 dias</SelectItem>
-        <SelectItem value="365">Último ano</SelectItem>
-        <SelectItem value="all">Tudo</SelectItem>
-        <SelectItem value="custom">Personalizado</SelectItem>
-      </SelectContent>
-    </Select>
-    {periodo === "custom" && (
-      <>
-        <Input
-          type="date"
-          value={dataInicio}
-          onChange={(e) => onDataInicioChange(e.target.value)}
-          className="h-9 w-[150px] text-sm"
-          aria-label="Data inicial"
-        />
-        <span className="text-xs text-muted-foreground">até</span>
-        <Input
-          type="date"
-          value={dataFim}
-          onChange={(e) => onDataFimChange(e.target.value)}
-          className="h-9 w-[150px] text-sm"
-          aria-label="Data final"
-        />
-      </>
-    )}
-  </div>
-);
+}: PeriodoFilterProps) => {
+  const handlePeriodoChange = (v: PeriodoValue) => {
+    onPeriodoChange(v);
+    if (v !== "custom") {
+      onDataInicioChange("");
+      onDataFimChange("");
+    }
+  };
+
+  const handleDate = (which: "inicio" | "fim", v: string) => {
+    if (which === "inicio") onDataInicioChange(v);
+    else onDataFimChange(v);
+    if (v) onPeriodoChange("custom");
+  };
+
+  return (
+    <div className="flex flex-wrap gap-2 items-center">
+      <Select value={periodo} onValueChange={(v) => handlePeriodoChange(v as PeriodoValue)}>
+        <SelectTrigger className="w-[170px] h-9 text-sm">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="30">Últimos 30 dias</SelectItem>
+          <SelectItem value="90">Últimos 90 dias</SelectItem>
+          <SelectItem value="365">Último ano</SelectItem>
+          <SelectItem value="all">Tudo</SelectItem>
+          <SelectItem value="custom">Personalizado</SelectItem>
+        </SelectContent>
+      </Select>
+      <Input
+        type="date"
+        value={dataInicio}
+        onChange={(e) => handleDate("inicio", e.target.value)}
+        className="h-9 w-[150px] text-sm"
+        aria-label="Data inicial"
+      />
+      <span className="text-xs text-muted-foreground">até</span>
+      <Input
+        type="date"
+        value={dataFim}
+        onChange={(e) => handleDate("fim", e.target.value)}
+        className="h-9 w-[150px] text-sm"
+        aria-label="Data final"
+      />
+    </div>
+  );
+};
 
 export const filtrarPorPeriodo = <T extends Record<string, any>>(
   items: T[],
