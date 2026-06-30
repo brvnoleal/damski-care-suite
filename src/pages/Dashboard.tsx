@@ -380,38 +380,7 @@ const Dashboard = () => {
         </FadeIn>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 items-stretch">
-        <FadeIn delay={0.8} className="h-full">
-          <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
-            <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-warning" />
-                <h2 className="text-xs sm:text-sm font-semibold text-foreground">Insumos Críticos</h2>
-              </div>
-              <Link to="/insumos" className="text-xs text-primary hover:underline flex items-center gap-0.5">
-                Ver todos <ChevronRight className="w-3 h-3" />
-              </Link>
-            </div>
-            <div className="divide-y divide-white/5 flex-1 overflow-y-auto">
-              {criticalSupplies.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-6">Nenhum insumo crítico</p>
-              )}
-              {criticalSupplies.map((s, i) => (
-                <div key={i} className="flex items-center gap-3 px-4 sm:px-5 py-2.5">
-                  <div className={cn("w-2 h-2 rounded-full shrink-0", s.daysLeft <= 0 ? "bg-destructive" : s.daysLeft <= 5 ? "bg-warning" : "bg-success")} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
-                    <p className="text-[11px] text-muted-foreground">Lote {s.lot} · Venc. {s.expiry}</p>
-                  </div>
-                  <Badge variant="outline" className={cn("text-[10px] shrink-0", s.daysLeft <= 0 ? "text-destructive border-destructive/30" : "text-warning border-warning/30")}>
-                    {s.daysLeft <= 0 ? "Vencido" : `${s.daysLeft}d`}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </LiquidGlassCard>
-        </FadeIn>
-
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 items-stretch">
         <FadeIn delay={0.9} className="h-full">
           <LiquidGlassCard className="overflow-hidden flex flex-col h-full" draggable={false}>
             <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-white/10">
@@ -464,6 +433,7 @@ const Dashboard = () => {
           </LiquidGlassCard>
         </FadeIn>
       </div>
+
 
     </div>
   );
