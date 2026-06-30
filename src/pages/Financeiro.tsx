@@ -42,6 +42,42 @@ const faturamentoConfig: ChartConfig = {
 };
 const procedimentoConfig: ChartConfig = { valor: { label: "Valor", color: "hsl(var(--primary))" } };
 
+interface KpiCardProps {
+  label: string;
+  value: React.ReactNode;
+  hint?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  iconBg?: string;
+  iconColor?: string;
+  valueColor?: string;
+  onExport?: () => void;
+}
+const KpiCard = ({ label, value, hint, icon: Icon, iconBg = "bg-primary/10", iconColor = "text-primary", valueColor = "text-foreground", onExport }: KpiCardProps) => (
+  <LiquidGlassCard draggable={false} className="p-3 sm:p-4 relative">
+    {onExport && (
+      <button
+        type="button"
+        onClick={onExport}
+        aria-label={`Exportar ${label}`}
+        title="Baixar Excel"
+        className="absolute top-2 right-2 w-6 h-6 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+      >
+        <Download className="w-3.5 h-3.5" />
+      </button>
+    )}
+    <div className="flex items-center justify-between gap-2 pr-6">
+      <div className="min-w-0">
+        <p className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">{label}</p>
+        <p className={`text-sm sm:text-base lg:text-lg font-bold mt-1 truncate ${valueColor}`}>{value}</p>
+        {hint && <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">{hint}</p>}
+      </div>
+      <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl ${iconBg} flex items-center justify-center shrink-0`}>
+        <Icon className={`w-4 h-4 ${iconColor}`} />
+      </div>
+    </div>
+  </LiquidGlassCard>
+);
+
 const Relatorios = () => {
   const [periodo, setPeriodo] = useState<PeriodoValue>("365");
   const [dataInicio, setDataInicio] = useState<string>("");
