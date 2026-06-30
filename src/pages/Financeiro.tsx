@@ -302,6 +302,105 @@ const Relatorios = () => {
     toast.success("Financeiro exportado");
   };
 
+  // ============ Per-card exports ============
+  const exportConsultas = () => {
+    exportToXlsx(
+      agendamentosPeriodo.map((a) => ({
+        Data: a.data,
+        Paciente: a.paciente,
+        Procedimento: a.procedimento,
+        Status: a.status,
+        "Forma Pagamento": a.forma_pagamento,
+        Valor: a.valor,
+      })),
+      "card-consultas",
+    );
+    toast.success("Consultas exportadas");
+  };
+  const exportTaxaConfirmacao = () => {
+    const confirmados = agendamentosPeriodo.filter((a) => a.status === "confirmado" || a.status === "realizado");
+    exportToXlsx(
+      [
+        { Métrica: "Total", Valor: agendamentosPeriodo.length },
+        { Métrica: "Confirmados + Realizados", Valor: confirmados.length },
+        { Métrica: "Taxa (%)", Valor: taxaConfirmacao },
+      ],
+      "card-taxa-confirmacao",
+    );
+    toast.success("Exportado");
+  };
+  const exportComparecimento = () => {
+    const realizados = agendamentosPeriodo.filter((a) => a.status === "realizado");
+    const cancelados = agendamentosPeriodo.filter((a) => a.status === "cancelado");
+    exportToXlsx(
+      [
+        { Métrica: "Realizados", Valor: realizados.length },
+        { Métrica: "Cancelados", Valor: cancelados.length },
+        { Métrica: "Taxa (%)", Valor: taxaComparecimento },
+      ],
+      "card-comparecimento",
+    );
+    toast.success("Exportado");
+  };
+  const exportProcedimentos = () => {
+    exportToXlsx(procPorTipo, "card-procedimentos");
+    toast.success("Procedimentos exportados");
+  };
+  const exportReceitaBruta = () => {
+    exportToXlsx(
+      entradas.map((e) => ({
+        Data: e.data, Paciente: e.paciente, Procedimento: e.procedimento,
+        Forma: e.forma, Parcelas: e.parcelas, Bruto: e.valor, Taxa: e.taxa, Líquido: e.liquido,
+      })),
+      "card-receita-bruta",
+    );
+    toast.success("Receita exportada");
+  };
+  const exportTaxasMaquininha = () => {
+    exportToXlsx(
+      entradas.filter((e) => e.taxa > 0).map((e) => ({
+        Data: e.data, Paciente: e.paciente, Forma: e.forma, Parcelas: e.parcelas,
+        Bruto: e.valor, Taxa: e.taxa, Líquido: e.liquido,
+      })),
+      "card-taxas-maquininha",
+    );
+    toast.success("Taxas exportadas");
+  };
+  const exportDespesas = () => {
+    exportToXlsx(
+      saidas.map((s) => ({
+        Vencimento: s.vencimento, Descrição: s.descricao, Categoria: s.categoria,
+        Fornecedor: s.fornecedor, Forma: s.forma, Valor: s.valor, Status: s.status,
+      })),
+      "card-despesas",
+    );
+    toast.success("Despesas exportadas");
+  };
+  const exportLucroLiquido = () => {
+    exportToXlsx(
+      [
+        { Métrica: "Receita Bruta", Valor: receitaTotal },
+        { Métrica: "Taxas Maquininha", Valor: taxasTotal },
+        { Métrica: "Receita Líquida", Valor: receitaLiquida },
+        { Métrica: "Despesa Total", Valor: despesaTotal },
+        { Métrica: "Lucro Líquido", Valor: lucroLiquido },
+      ],
+      "card-lucro-liquido",
+    );
+    toast.success("Exportado");
+  };
+  const exportTicketMedio = () => {
+    exportToXlsx(
+      [
+        { Métrica: "Receita Bruta", Valor: receitaTotal },
+        { Métrica: "Pacientes Atendidos", Valor: pacientesAtendidos },
+        { Métrica: "Ticket Médio", Valor: ticketMedio },
+      ],
+      "card-ticket-medio",
+    );
+    toast.success("Exportado");
+  };
+
   return (
     <div className="space-y-6">
       <FadeIn>
