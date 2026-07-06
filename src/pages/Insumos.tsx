@@ -183,27 +183,31 @@ const Insumos = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => exportToXlsx(
-                filtered.map((s) => ({
-                  Nome: s.nome,
-                  Categoria: s.categoria ? insumoCategoriaLabels[s.categoria as InsumoCategoria] : "",
-                  Fabricante: s.fabricante,
-                  Lote: s.lote,
-                  Validade: s.validade ?? "Sem validade",
-                  Quantidade: s.quantidade,
-                  Unidade: s.unidade_medida ? insumoUnidadeMedidaLabels[s.unidade_medida as InsumoUnidadeMedida] : "",
-                  "Pacientes Vinculados": s.pacientes_vinculados ?? 0,
-                })),
-                "insumos",
-                "Insumos",
-              )}
+            <ExportButton
               disabled={!filtered.length}
-            >
-              <Download className="w-4 h-4" /> Exportar XLSX
-            </Button>
+              label="Exportar insumos"
+              tooltip="Baixar insumos (Excel)"
+              onExport={() =>
+                exportSheet({
+                  filename: "insumos",
+                  sheetName: "Insumos",
+                  rows: filtered,
+                  columns: [
+                    { header: "Nome", accessor: "nome" },
+                    { header: "Categoria", accessor: (s) => (s.categoria ? insumoCategoriaLabels[s.categoria as InsumoCategoria] : "") },
+                    { header: "Fabricante", accessor: "fabricante" },
+                    { header: "Lote", accessor: "lote" },
+                    { header: "Validade", accessor: (s) => s.validade ?? "", format: "date" },
+                    { header: "Sem validade", accessor: (s) => (s.sem_validade ? "Sim" : "Não") },
+                    { header: "Dias até vencer", accessor: (s) => calcDaysLeft(s.validade) ?? "", format: "integer" },
+                    { header: "Quantidade", accessor: "quantidade", format: "integer" },
+                    { header: "Unidade", accessor: (s) => (s.unidade_medida ? insumoUnidadeMedidaLabels[s.unidade_medida as InsumoUnidadeMedida] : "") },
+                    { header: "Pacientes vinculados", accessor: (s) => s.pacientes_vinculados ?? 0, format: "integer" },
+                    { header: "Cadastrado em", accessor: (s) => s.created_at ?? "", format: "datetime" },
+                  ],
+                })
+              }
+            />
             <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
               <Plus className="w-4 h-4" />
               Cadastrar Insumo
