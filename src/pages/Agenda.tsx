@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, ChevronLeft, ChevronRight, Clock, User, Stethoscope, CreditCard, FileText, Filter, X, Download } from "lucide-react";
-import { exportToXlsx } from "@/lib/exportXlsx";
+import { CalendarDays, ChevronLeft, ChevronRight, Clock, User, Stethoscope, CreditCard, FileText, Filter, X } from "lucide-react";
+import { exportSheet } from "@/lib/exportXlsx";
+import { ExportButton } from "@/components/ExportButton";
 import { FadeIn } from "@/components/FadeIn";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Button } from "@/components/ui/button";
