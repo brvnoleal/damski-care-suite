@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Loader2, Download, Wallet, TrendingDown, TrendingUp, AlertTriangle, Percent, Users, FileText, FileCheck2 } from "lucide-react";
+import { Loader2, Wallet, TrendingDown, TrendingUp, AlertTriangle, Percent, Users, FileText, FileCheck2 } from "lucide-react";
 import { HoleriteDialog, loadHoleriteSignature, type HoleriteData } from "./HoleriteDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
