@@ -625,9 +625,7 @@ const Relatorios = () => {
         <TabsContent value="financeiro" className="space-y-4">
           <div className="flex flex-wrap items-center justify-end gap-2">
             <PeriodoFilter {...periodoFilterProps} />
-            <Button variant="outline" size="sm" className="gap-2" onClick={handleExportFinanceiro}>
-              <Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span>
-            </Button>
+            <ExportButton onExport={handleExportFinanceiro} label="Exportar financeiro" tooltip="Baixar financeiro (Excel)" />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
             <KpiCard label="Receita Bruta" value={`R$ ${receitaTotal.toLocaleString("pt-BR")}`} hint={`Líquido: ${formatBRL(receitaLiquida)}`} icon={DollarSign} onExport={exportReceitaBruta} />
