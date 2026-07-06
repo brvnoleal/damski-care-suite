@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Search, Plus, Edit, Trash2, Calendar, Clock, X, Download } from "lucide-react";
-import { exportToXlsx } from "@/lib/exportXlsx";
+import { Search, Plus, Edit, Trash2, Calendar, Clock, X } from "lucide-react";
+import { exportSheet } from "@/lib/exportXlsx";
+import { ExportButton } from "@/components/ExportButton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { CurrencyInput } from "@/components/ui/currency-input";
@@ -284,30 +285,34 @@ const Agendamentos = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => exportToXlsx(
-                filtered.map((a) => ({
-                  Data: formatDataBR(a.data),
-                  Horário: a.horario,
-                  "Horário Fim": a.horario_fim ?? "",
-                  Paciente: getPacienteNome(a.paciente_id),
-                  Dentista: getDentistaNome(a.dentista_id),
-                  Procedimento: procedimentoConsultaLabels[a.procedimento as ProcedimentoConsulta] ?? a.procedimento,
-                  Status: a.status,
-                  Valor: a.valor,
-                  "Forma Pagamento": formaPagamentoLabels[a.forma_pagamento as FormaPagamento] ?? a.forma_pagamento,
-                  Parcelas: a.parcelas ?? 1,
-                  Observações: a.observacoes ?? "",
-                })),
-                "consultas",
-                "Consultas",
-              )}
+            <ExportButton
               disabled={!filtered.length}
-            >
-              <Download className="w-4 h-4" /> Exportar XLSX
-            </Button>
+              label="Exportar consultas"
+              tooltip="Baixar consultas (Excel)"
+              onExport={() =>
+                exportSheet({
+                  filename: "consultas",
+                  sheetName: "Consultas",
+                  rows: filtered,
+                  columns: [
+                    { header: "Data", accessor: (a) => a.data, format: "date" },
+                    { header: "Horário", accessor: "horario" },
+                    { header: "Horário Fim", accessor: (a) => a.horario_fim ?? "" },
+                    { header: "Paciente", accessor: (a) => getPacienteNome(a.paciente_id) },
+                    { header: "Dentista", accessor: (a) => getDentistaNome(a.dentista_id) },
+                    { header: "Procedimento", accessor: (a) => procedimentoConsultaLabels[a.procedimento as ProcedimentoConsulta] ?? a.procedimento },
+                    { header: "Status", accessor: (a) => statusConfig[a.status]?.label ?? a.status },
+                    { header: "Valor", accessor: (a) => a.valor, format: "currency" },
+                    { header: "Forma de Pagamento", accessor: (a) => formaPagamentoLabels[a.forma_pagamento as FormaPagamento] ?? a.forma_pagamento },
+                    { header: "Parcelas", accessor: (a) => a.parcelas ?? 1, format: "integer" },
+                    { header: "Status Pagamento", accessor: (a) => a.status_pagamento ?? "" },
+                    { header: "Tags", accessor: (a) => (a.tags ?? []).join(", ") },
+                    { header: "Observações", accessor: (a) => a.observacoes ?? "" },
+                    { header: "Criado em", accessor: (a) => a.created_at ?? "", format: "datetime" },
+                  ],
+                })
+              }
+            />
             <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
               <Plus className="w-4 h-4" />
               Nova Consulta

@@ -29,7 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Loader2, Download, Wallet, TrendingDown, TrendingUp, AlertTriangle, Percent, Users, FileText, FileCheck2 } from "lucide-react";
+import { Loader2, Wallet, TrendingDown, TrendingUp, AlertTriangle, Percent, Users, FileText, FileCheck2 } from "lucide-react";
 import { HoleriteDialog, loadHoleriteSignature, type HoleriteData } from "./HoleriteDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -39,7 +39,8 @@ import { dentistaService } from "@/services/dentistaService";
 import { pacienteService } from "@/services/pacienteService";
 import type { Dentista, Paciente } from "@/types";
 import { procedimentoConsultaLabels } from "@/types";
-import { exportToXlsx, exportMultiSheetXlsx } from "@/lib/exportXlsx";
+import { exportToXlsx, exportMultiSheetXlsx, exportSheet } from "@/lib/exportXlsx";
+import { ExportButton } from "@/components/ExportButton";
 import { calcularTaxa } from "@/lib/maquininhaCalc";
 import {
   ResponsiveContainer,
@@ -436,13 +437,14 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
           <h2 className="text-lg font-semibold text-foreground">DRE — Demonstrativo de Resultado</h2>
           <div className="flex flex-wrap gap-2 items-center">
             
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => {
-                exportToXlsx(
-                  [
+            <ExportButton
+              label="Exportar DRE"
+              tooltip="Baixar DRE (Excel)"
+              onExport={() => {
+                exportSheet({
+                  filename: "dre",
+                  sheetName: "DRE",
+                  rows: [
                     { Linha: "(+) Receita paga (bruta)", Valor: dre.receitaPaga },
                     { Linha: "(-) Taxas de maquininha", Valor: dre.taxasMaquininha },
                     { Linha: "(=) Receita líquida", Valor: dre.receitaLiquida },
@@ -453,13 +455,14 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
                     { Linha: "Receita pendente (a receber)", Valor: dre.receitaPendente },
                     { Linha: "Despesas pendentes", Valor: dre.despesaPendente },
                   ],
-                  "dre",
-                );
+                  columns: [
+                    { header: "Linha", accessor: "Linha", width: 40 },
+                    { header: "Valor", accessor: "Valor", format: "currency" },
+                  ],
+                });
                 toast.success("DRE exportado");
               }}
-            >
-              <Download className="w-4 h-4" /> Exportar
-            </Button>
+            />
           </div>
         </div>
 
@@ -655,11 +658,10 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
                 ))}
               </SelectContent>
             </Select>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => {
+            <ExportButton
+              label="Exportar holerite"
+              tooltip="Baixar holerite (Excel)"
+              onExport={() => {
                 const rows = holerite.flatMap((h) =>
                   h.detalhes.map((d) => ({
                     Dentista: h.dentista?.nome || "—",
@@ -670,12 +672,22 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
                     Comissão: d.comissao,
                   })),
                 );
-                exportToXlsx<Record<string, any>>(rows.length ? rows : [{ aviso: "Sem comissões no período" }], "holerite");
+                exportSheet({
+                  filename: "holerite",
+                  sheetName: "Holerite",
+                  rows,
+                  columns: [
+                    { header: "Dentista", accessor: "Dentista" },
+                    { header: "Data", accessor: "Data", format: "date" },
+                    { header: "Procedimento", accessor: "Procedimento" },
+                    { header: "Valor consulta", accessor: "Valor consulta", format: "currency" },
+                    { header: "Base", accessor: "Base", format: "currency" },
+                    { header: "Comissão", accessor: "Comissão", format: "currency" },
+                  ],
+                });
                 toast.success("Holerite exportado");
               }}
-            >
-              <Download className="w-4 h-4" /> Exportar
-            </Button>
+            />
           </div>
         </div>
 

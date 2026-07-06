@@ -24,6 +24,7 @@ import { FadeIn } from "@/components/FadeIn";
 import { despesaService } from "@/services/despesaService";
 import { procedimentoConsultaLabels, formaPagamentoLabels } from "@/types";
 import { exportMultiSheetXlsx, exportToXlsx } from "@/lib/exportXlsx";
+import { ExportButton } from "@/components/ExportButton";
 import { calcularTaxa, formatBRL } from "@/lib/maquininhaCalc";
 import RelatoriosAvancados from "@/components/financeiro/RelatoriosAvancados";
 import DemografiaPanel from "@/components/dashboard/DemografiaPanel";
@@ -539,9 +540,7 @@ const Relatorios = () => {
         <TabsContent value="visao" className="space-y-4">
           <div className="flex flex-wrap items-center justify-end gap-2">
             <PeriodoFilter {...periodoFilterProps} />
-            <Button variant="outline" size="sm" className="gap-2" onClick={handleExportVisao}>
-              <Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span>
-            </Button>
+            <ExportButton onExport={handleExportVisao} label="Exportar visão geral" tooltip="Baixar visão geral (Excel)" />
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <KpiCard label="Consultas" value={totalConsultas} hint="Agendadas" icon={CalendarCheck} onExport={exportConsultas} />
@@ -626,9 +625,7 @@ const Relatorios = () => {
         <TabsContent value="financeiro" className="space-y-4">
           <div className="flex flex-wrap items-center justify-end gap-2">
             <PeriodoFilter {...periodoFilterProps} />
-            <Button variant="outline" size="sm" className="gap-2" onClick={handleExportFinanceiro}>
-              <Download className="w-4 h-4" /><span className="hidden sm:inline">Exportar</span>
-            </Button>
+            <ExportButton onExport={handleExportFinanceiro} label="Exportar financeiro" tooltip="Baixar financeiro (Excel)" />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
             <KpiCard label="Receita Bruta" value={`R$ ${receitaTotal.toLocaleString("pt-BR")}`} hint={`Líquido: ${formatBRL(receitaLiquida)}`} icon={DollarSign} onExport={exportReceitaBruta} />

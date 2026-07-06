@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, ChevronLeft, ChevronRight, Clock, User, Stethoscope, CreditCard, FileText, Filter, X, Download } from "lucide-react";
-import { exportToXlsx } from "@/lib/exportXlsx";
+import { CalendarDays, ChevronLeft, ChevronRight, Clock, User, Stethoscope, CreditCard, FileText, Filter, X } from "lucide-react";
+import { exportSheet } from "@/lib/exportXlsx";
+import { ExportButton } from "@/components/ExportButton";
 import { FadeIn } from "@/components/FadeIn";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 import { Button } from "@/components/ui/button";
@@ -188,38 +189,37 @@ const Agenda = () => {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={() => {
+          <ExportButton
+            disabled={!agendamentosFiltrados.length}
+            label="Exportar agenda"
+            tooltip="Baixar agenda do mês (Excel)"
+            onExport={() => {
               const mesAtual = agendamentosFiltrados
                 .filter((a) => {
                   const [y, m] = a.data.split("-").map(Number);
                   return y === year && m === month + 1;
                 })
                 .sort((a, b) => (a.data + a.horario).localeCompare(b.data + b.horario));
-              exportToXlsx(
-                mesAtual.map((a) => ({
-                  Data: a.data,
-                  Horário: a.horario,
-                  "Horário Fim": a.horario_fim ?? "",
-                  Paciente: getPaciente(a.paciente_id)?.nome ?? "—",
-                  Dentista: getDentista(a.dentista_id)?.nome ?? "—",
-                  Procedimento: procedimentoConsultaLabels[a.procedimento as keyof typeof procedimentoConsultaLabels] ?? a.procedimento,
-                  Status: a.status,
-                  Valor: a.valor,
-                  "Forma Pagamento": formaPagamentoLabels[a.forma_pagamento as keyof typeof formaPagamentoLabels] ?? a.forma_pagamento,
-                  Observações: a.observacoes ?? "",
-                })),
-                `agenda-${year}-${String(month + 1).padStart(2, "0")}`,
-                "Agenda",
-              );
+              exportSheet({
+                filename: `agenda-${year}-${String(month + 1).padStart(2, "0")}`,
+                sheetName: "Agenda",
+                rows: mesAtual,
+                columns: [
+                  { header: "Data", accessor: (a) => a.data, format: "date" },
+                  { header: "Horário", accessor: "horario" },
+                  { header: "Horário Fim", accessor: (a) => a.horario_fim ?? "" },
+                  { header: "Paciente", accessor: (a) => getPaciente(a.paciente_id)?.nome ?? "—" },
+                  { header: "Dentista", accessor: (a) => getDentista(a.dentista_id)?.nome ?? "—" },
+                  { header: "Procedimento", accessor: (a) => procedimentoConsultaLabels[a.procedimento as keyof typeof procedimentoConsultaLabels] ?? a.procedimento },
+                  { header: "Status", accessor: (a) => a.status },
+                  { header: "Valor", accessor: (a) => a.valor, format: "currency" },
+                  { header: "Forma de Pagamento", accessor: (a) => formaPagamentoLabels[a.forma_pagamento as keyof typeof formaPagamentoLabels] ?? a.forma_pagamento },
+                  { header: "Status Pagamento", accessor: (a) => a.status_pagamento ?? "" },
+                  { header: "Observações", accessor: (a) => a.observacoes ?? "" },
+                ],
+              });
             }}
-            disabled={!agendamentosFiltrados.length}
-          >
-            <Download className="w-4 h-4" /> Exportar XLSX
-          </Button>
+          />
         </div>
       </FadeIn>
 

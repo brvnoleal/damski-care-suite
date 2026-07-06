@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, Plus, Filter, Eye, Edit, Trash2, Download } from "lucide-react";
-import { exportToXlsx } from "@/lib/exportXlsx";
+import { Search, Plus, Filter, Eye, Edit, Trash2 } from "lucide-react";
+import { exportSheet } from "@/lib/exportXlsx";
+import { ExportButton } from "@/components/ExportButton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -154,28 +155,46 @@ const Pacientes = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => exportToXlsx(
-                filtered.map((p) => ({
-                  Nome: p.nome, CPF: p.cpf, RG: p.rg ?? "", Sexo: p.sexo ?? "",
-                  "Estado Civil": p.estado_civil ?? "", Telefone: p.telefone ?? "",
-                  Email: p.email ?? "", Instagram: p.instagram ?? "",
-                  "Data Nascimento": p.data_nascimento ?? "",
-                  Plano: p.plano ?? "", "Nº Plano": p.numero_plano ?? "",
-                  "Nº Prontuário": p.numero_prontuario ?? "",
-                  CEP: p.cep ?? "", Estado: p.estado ?? "", Cidade: p.cidade ?? "",
-                  Bairro: p.bairro ?? "", Rua: p.rua ?? "", Número: p.numero ?? "",
-                  Complemento: p.complemento ?? "", Status: p.status,
-                })),
-                "pacientes",
-                "Pacientes",
-              )}
+            <ExportButton
               disabled={!filtered.length}
-            >
-              <Download className="w-4 h-4" /> Exportar XLSX
-            </Button>
+              label="Exportar pacientes"
+              tooltip="Baixar pacientes (Excel)"
+              onExport={() =>
+                exportSheet({
+                  filename: "pacientes",
+                  sheetName: "Pacientes",
+                  rows: filtered,
+                  columns: [
+                    { header: "Nome", accessor: "nome" },
+                    { header: "CPF", accessor: "cpf" },
+                    { header: "RG", accessor: (p) => p.rg ?? "" },
+                    { header: "Sexo", accessor: (p) => p.sexo ?? "" },
+                    { header: "Estado Civil", accessor: (p) => p.estado_civil ?? "" },
+                    { header: "Profissão", accessor: (p) => p.profissao ?? "" },
+                    { header: "Telefone", accessor: (p) => p.telefone ?? "" },
+                    { header: "E-mail", accessor: (p) => p.email ?? "" },
+                    { header: "Instagram", accessor: (p) => p.instagram ?? "" },
+                    { header: "Data de Nascimento", accessor: (p) => p.data_nascimento ?? "", format: "date" },
+                    { header: "Indicação", accessor: (p) => p.indicacao_tipo ?? "" },
+                    { header: "Origem indicação", accessor: (p) => p.indicacao_nome ?? "" },
+                    { header: "Tags", accessor: (p) => (p.tags ?? []).join(", ") },
+                    { header: "Plano", accessor: (p) => p.plano ?? "" },
+                    { header: "Nº Plano", accessor: (p) => p.numero_plano ?? "" },
+                    { header: "Nº Prontuário", accessor: (p) => p.numero_prontuario ?? "" },
+                    { header: "CEP", accessor: (p) => p.cep ?? "" },
+                    { header: "Estado", accessor: (p) => p.estado ?? "" },
+                    { header: "Cidade", accessor: (p) => p.cidade ?? "" },
+                    { header: "Bairro", accessor: (p) => p.bairro ?? "" },
+                    { header: "Rua", accessor: (p) => p.rua ?? "" },
+                    { header: "Número", accessor: (p) => p.numero ?? "" },
+                    { header: "Complemento", accessor: (p) => p.complemento ?? "" },
+                    { header: "Ponto de referência", accessor: (p) => p.ponto_referencia ?? "" },
+                    { header: "Status", accessor: "status" },
+                    { header: "Cadastrado em", accessor: (p) => p.created_at ?? "", format: "datetime" },
+                  ],
+                })
+              }
+            />
             <Button onClick={openCreate} className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm transition-colors">
               <Plus className="w-4 h-4" />
               Novo Paciente
