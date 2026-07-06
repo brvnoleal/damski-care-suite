@@ -24,6 +24,7 @@ import { FadeIn } from "@/components/FadeIn";
 import { despesaService } from "@/services/despesaService";
 import { procedimentoConsultaLabels, formaPagamentoLabels } from "@/types";
 import { exportMultiSheetXlsx, exportToXlsx } from "@/lib/exportXlsx";
+import { ExportButton } from "@/components/ExportButton";
 import { calcularTaxa, formatBRL } from "@/lib/maquininhaCalc";
 import RelatoriosAvancados from "@/components/financeiro/RelatoriosAvancados";
 import DemografiaPanel from "@/components/dashboard/DemografiaPanel";
