@@ -657,11 +657,10 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
                 ))}
               </SelectContent>
             </Select>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => {
+            <ExportButton
+              label="Exportar holerite"
+              tooltip="Baixar holerite (Excel)"
+              onExport={() => {
                 const rows = holerite.flatMap((h) =>
                   h.detalhes.map((d) => ({
                     Dentista: h.dentista?.nome || "—",
@@ -672,12 +671,22 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
                     Comissão: d.comissao,
                   })),
                 );
-                exportToXlsx<Record<string, any>>(rows.length ? rows : [{ aviso: "Sem comissões no período" }], "holerite");
+                exportSheet({
+                  filename: "holerite",
+                  sheetName: "Holerite",
+                  rows,
+                  columns: [
+                    { header: "Dentista", accessor: "Dentista" },
+                    { header: "Data", accessor: "Data", format: "date" },
+                    { header: "Procedimento", accessor: "Procedimento" },
+                    { header: "Valor consulta", accessor: "Valor consulta", format: "currency" },
+                    { header: "Base", accessor: "Base", format: "currency" },
+                    { header: "Comissão", accessor: "Comissão", format: "currency" },
+                  ],
+                });
                 toast.success("Holerite exportado");
               }}
-            >
-              <Download className="w-4 h-4" /> Exportar
-            </Button>
+            />
           </div>
         </div>
 
