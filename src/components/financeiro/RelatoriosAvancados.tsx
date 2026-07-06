@@ -436,13 +436,14 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
           <h2 className="text-lg font-semibold text-foreground">DRE — Demonstrativo de Resultado</h2>
           <div className="flex flex-wrap gap-2 items-center">
             
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => {
-                exportToXlsx(
-                  [
+            <ExportButton
+              label="Exportar DRE"
+              tooltip="Baixar DRE (Excel)"
+              onExport={() => {
+                exportSheet({
+                  filename: "dre",
+                  sheetName: "DRE",
+                  rows: [
                     { Linha: "(+) Receita paga (bruta)", Valor: dre.receitaPaga },
                     { Linha: "(-) Taxas de maquininha", Valor: dre.taxasMaquininha },
                     { Linha: "(=) Receita líquida", Valor: dre.receitaLiquida },
@@ -453,13 +454,14 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
                     { Linha: "Receita pendente (a receber)", Valor: dre.receitaPendente },
                     { Linha: "Despesas pendentes", Valor: dre.despesaPendente },
                   ],
-                  "dre",
-                );
+                  columns: [
+                    { header: "Linha", accessor: "Linha", width: 40 },
+                    { header: "Valor", accessor: "Valor", format: "currency" },
+                  ],
+                });
                 toast.success("DRE exportado");
               }}
-            >
-              <Download className="w-4 h-4" /> Exportar
-            </Button>
+            />
           </div>
         </div>
 
