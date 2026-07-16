@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -220,6 +221,11 @@ const AnamnesePublica = () => {
 
   return (
     <main className="min-h-screen bg-background py-8 px-4">
+      <Helmet>
+        <title>Ficha de Anamnese — {clinicaNome || "CloudSmile"}</title>
+        <meta name="description" content="Preencha sua ficha de anamnese online de forma rápida e segura antes da consulta odontológica." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="max-w-2xl mx-auto space-y-6">
         <header className="text-center space-y-2">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">

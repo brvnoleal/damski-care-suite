@@ -1,0 +1,11 @@
+# CloudSmile
+
+> Sistema de gestão completo para clínicas odontológicas: agenda, prontuário, financeiro, estoque, comissões e relatórios em uma plataforma segura e em conformidade com LGPD e ANVISA RDC 1.002/2025.
+
+CloudSmile é um SaaS multi-tenant voltado a clínicas de odontologia estética e injetáveis. Oferece controle de agendamentos, prontuário eletrônico com odontograma, gestão financeira com cálculo de taxas de maquininhas e comissões por dentista, controle de insumos com rastreabilidade por lote e uma central de confiança e privacidade.
+
+## Pages
+
+- [Início](/): Página principal do produto.
+- [Login](/login): Acesso de dentistas e equipe da clínica.
+- [Central de Confiança e Privacidade](/confianca): Como o CloudSmile trata segurança, privacidade, LGPD e conformidade regulatória.
