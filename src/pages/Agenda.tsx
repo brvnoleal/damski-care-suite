@@ -341,7 +341,7 @@ const Agenda = () => {
                         )}
                       </div>
                       {items.length === 0 && (
-                        <span className="mt-auto text-[9px] sm:text-[10px] text-muted-foreground/40 italic self-start">Livre</span>
+                        <span className="mt-auto text-[9px] sm:text-[10px] text-muted-foreground italic self-start">Livre</span>
                       )}
                     </div>
                   );
