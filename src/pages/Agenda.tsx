@@ -235,13 +235,13 @@ const Agenda = () => {
               </TabsList>
             </Tabs>
             <div className="flex items-center gap-1">
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev} aria-label="Período anterior">
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev}>
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <div className="min-w-[200px] text-center text-sm font-semibold capitalize">
                 {headerLabel}
               </div>
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={goNext} aria-label="Próximo período">
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={goNext}>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
