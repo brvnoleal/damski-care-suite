@@ -36,6 +36,14 @@ export default function Login() {
 
   return (
     <main className="min-h-screen grid lg:grid-cols-2 bg-background">
+      <Helmet>
+        <title>Entrar — CloudSmile</title>
+        <meta name="description" content="Acesse o CloudSmile, o sistema de gestão para clínicas odontológicas. Entre com seu e-mail e senha para gerenciar sua clínica." />
+        <link rel="canonical" href="https://cloudsmile.com.br/login" />
+        <meta property="og:title" content="Entrar — CloudSmile" />
+        <meta property="og:description" content="Acesse o CloudSmile, o sistema de gestão para clínicas odontológicas." />
+        <meta property="og:url" content="https://cloudsmile.com.br/login" />
+      </Helmet>
       <section className="hidden lg:flex items-center justify-center p-10 bg-background">
         <div className="flex flex-col items-center text-center max-w-md">
           <video
