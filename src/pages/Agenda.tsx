@@ -384,7 +384,7 @@ const Agenda = () => {
                           className={`min-h-[50px] border border-white/[0.04] p-1 flex flex-col gap-0.5 ${isToday ? "bg-primary/[0.02]" : "bg-white/[0.01]"}`}
                         >
                           {items.length === 0 ? (
-                            <span className="text-[9px] text-muted-foreground/40 italic">livre</span>
+                            <span className="text-[9px] text-muted-foreground italic">livre</span>
                           ) : (
                             items.map((a) => {
                               const nome = getPaciente(a.paciente_id)?.nome || "—";
