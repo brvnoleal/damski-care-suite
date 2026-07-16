@@ -424,7 +424,7 @@ const Agenda = () => {
                     </div>
                     <div className="min-h-[60px] p-2 flex flex-col gap-1">
                       {items.length === 0 ? (
-                        <span className="text-[11px] text-muted-foreground/50 italic">Sem agendamentos</span>
+                        <span className="text-[11px] text-muted-foreground italic">Sem agendamentos</span>
                       ) : (
                         items.map((a) => {
                           const nome = getPaciente(a.paciente_id)?.nome || "—";
