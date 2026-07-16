@@ -44,8 +44,8 @@ export const AnamneseLinkSection = () => {
               <p className="text-xs text-muted-foreground mb-1.5">Link público da clínica (recepção/tablet):</p>
               <div className="flex gap-2">
                 <Input readOnly value={linkPublico} className="text-xs" />
-                <Button size="icon" variant="secondary" onClick={copiar} title="Copiar"><Copy className="w-4 h-4" /></Button>
-                <Button size="icon" variant="secondary" asChild title="Abrir">
+                <Button size="icon" variant="secondary" onClick={copiar} title="Copiar link" aria-label="Copiar link público da anamnese"><Copy className="w-4 h-4" /></Button>
+                <Button size="icon" variant="secondary" asChild title="Abrir link" aria-label="Abrir link público da anamnese em nova aba">
                   <a href={linkPublico} target="_blank" rel="noopener noreferrer"><ExternalLink className="w-4 h-4" /></a>
                 </Button>
               </div>
