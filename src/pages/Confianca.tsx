@@ -1,10 +1,19 @@
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Shield, Lock, FileText, Database, Mail, UserCheck, AlertTriangle } from "lucide-react";
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
 
 export default function Confianca() {
   return (
     <div className="min-h-screen bg-background py-10 px-4">
+      <Helmet>
+        <title>Central de Confiança e Privacidade — CloudSmile</title>
+        <meta name="description" content="Como o CloudSmile trata segurança, privacidade, LGPD e conformidade regulatória para clínicas odontológicas." />
+        <link rel="canonical" href="https://cloudsmile.com.br/confianca" />
+        <meta property="og:title" content="Central de Confiança e Privacidade — CloudSmile" />
+        <meta property="og:description" content="Como o CloudSmile trata segurança, privacidade, LGPD e conformidade regulatória para clínicas odontológicas." />
+        <meta property="og:url" content="https://cloudsmile.com.br/confianca" />
+      </Helmet>
       <div className="max-w-4xl mx-auto space-y-6">
         <header className="space-y-2">
           <div className="flex items-center gap-3">

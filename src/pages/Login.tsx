@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,14 @@ export default function Login() {
 
   return (
     <main className="min-h-screen grid lg:grid-cols-2 bg-background">
+      <Helmet>
+        <title>Entrar — CloudSmile</title>
+        <meta name="description" content="Acesse o CloudSmile, o sistema de gestão para clínicas odontológicas. Entre com seu e-mail e senha para gerenciar sua clínica." />
+        <link rel="canonical" href="https://cloudsmile.com.br/login" />
+        <meta property="og:title" content="Entrar — CloudSmile" />
+        <meta property="og:description" content="Acesse o CloudSmile, o sistema de gestão para clínicas odontológicas." />
+        <meta property="og:url" content="https://cloudsmile.com.br/login" />
+      </Helmet>
       <section className="hidden lg:flex items-center justify-center p-10 bg-background">
         <div className="flex flex-col items-center text-center max-w-md">
           <video
@@ -43,6 +52,9 @@ export default function Login() {
             loop
             muted
             playsInline
+            preload="auto"
+            width={384}
+            height={384}
             aria-label="CloudSmile - Sistema de gestão para clínicas odontológicas"
             className="w-full max-w-sm h-auto"
           />
@@ -56,7 +68,15 @@ export default function Login() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <div className="flex justify-center lg:hidden mb-4">
-              <img src={logo.url} alt="CloudSmile" className="h-16 w-auto" />
+              <img
+                src={logo.url}
+                alt="CloudSmile"
+                width={160}
+                height={64}
+                fetchPriority="high"
+                decoding="async"
+                className="h-16 w-auto"
+              />
             </div>
             <CardTitle>Acessar o sistema</CardTitle>
             <CardDescription>Entre com seu e-mail e senha</CardDescription>

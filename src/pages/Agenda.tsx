@@ -235,13 +235,13 @@ const Agenda = () => {
               </TabsList>
             </Tabs>
             <div className="flex items-center gap-1">
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev}>
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={goPrev} aria-label="Período anterior">
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <div className="min-w-[200px] text-center text-sm font-semibold capitalize">
                 {headerLabel}
               </div>
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={goNext}>
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={goNext} aria-label="Próximo período">
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
@@ -341,7 +341,7 @@ const Agenda = () => {
                         )}
                       </div>
                       {items.length === 0 && (
-                        <span className="mt-auto text-[9px] sm:text-[10px] text-muted-foreground/40 italic self-start">Livre</span>
+                        <span className="mt-auto text-[9px] sm:text-[10px] text-muted-foreground italic self-start">Livre</span>
                       )}
                     </div>
                   );
@@ -384,7 +384,7 @@ const Agenda = () => {
                           className={`min-h-[50px] border border-white/[0.04] p-1 flex flex-col gap-0.5 ${isToday ? "bg-primary/[0.02]" : "bg-white/[0.01]"}`}
                         >
                           {items.length === 0 ? (
-                            <span className="text-[9px] text-muted-foreground/40 italic">livre</span>
+                            <span className="text-[9px] text-muted-foreground italic">livre</span>
                           ) : (
                             items.map((a) => {
                               const nome = getPaciente(a.paciente_id)?.nome || "—";
@@ -424,7 +424,7 @@ const Agenda = () => {
                     </div>
                     <div className="min-h-[60px] p-2 flex flex-col gap-1">
                       {items.length === 0 ? (
-                        <span className="text-[11px] text-muted-foreground/50 italic">Sem agendamentos</span>
+                        <span className="text-[11px] text-muted-foreground italic">Sem agendamentos</span>
                       ) : (
                         items.map((a) => {
                           const nome = getPaciente(a.paciente_id)?.nome || "—";
