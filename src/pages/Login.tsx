@@ -52,6 +52,9 @@ export default function Login() {
             loop
             muted
             playsInline
+            preload="auto"
+            width={384}
+            height={384}
             aria-label="CloudSmile - Sistema de gestão para clínicas odontológicas"
             className="w-full max-w-sm h-auto"
           />
@@ -65,7 +68,15 @@ export default function Login() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <div className="flex justify-center lg:hidden mb-4">
-              <img src={logo.url} alt="CloudSmile" className="h-16 w-auto" />
+              <img
+                src={logo.url}
+                alt="CloudSmile"
+                width={160}
+                height={64}
+                fetchPriority="high"
+                decoding="async"
+                className="h-16 w-auto"
+              />
             </div>
             <CardTitle>Acessar o sistema</CardTitle>
             <CardDescription>Entre com seu e-mail e senha</CardDescription>
