@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Loader2, Wallet, TrendingDown, TrendingUp, AlertTriangle, Percent, Users, FileText, FileCheck2 } from "lucide-react";
-import { HoleriteDialog, loadHoleriteSignature, type HoleriteData } from "./HoleriteDialog";
+import { HoleriteDialog, type HoleriteData } from "./HoleriteDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { comissaoService, type ComissaoRecord } from "@/services/comissaoService";
@@ -42,6 +42,10 @@ import { procedimentoConsultaLabels } from "@/types";
 import { exportToXlsx, exportMultiSheetXlsx, exportSheet } from "@/lib/exportXlsx";
 import { ExportButton } from "@/components/ExportButton";
 import { calcularTaxa } from "@/lib/maquininhaCalc";
+import {
+  holeriteAssinaturaService,
+  type HoleriteSignatureRecord,
+} from "@/services/holeriteAssinaturaService";
 import {
   ResponsiveContainer,
   PieChart,
@@ -132,7 +136,7 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
   const [dentistas, setDentistas] = useState<Dentista[]>([]);
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [holeriteAberto, setHoleriteAberto] = useState<HoleriteData | null>(null);
-  const [sigVersion, setSigVersion] = useState(0);
+  const [assinaturas, setAssinaturas] = useState<Record<string, HoleriteSignatureRecord>>({});
 
   const periodoLabel = useMemo(() => {
     if (periodo === "custom") {
@@ -413,6 +417,33 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
 
     return Object.values(result).sort((a, b) => b.comissaoTotal - a.comissaoTotal);
   }, [agsFiltrados, comissaoLookup, procedimentos, dentistas, dentistaFiltro]);
+
+  useEffect(() => {
+    if (!showHolerite || loading) return;
+
+    const dentistaIds = holerite
+      .map((h) => h.dentista?.id)
+      .filter((id): id is string => Boolean(id));
+
+    if (dentistaIds.length === 0) {
+      setAssinaturas({});
+      return;
+    }
+
+    let active = true;
+    holeriteAssinaturaService
+      .listar(dentistaIds, periodoSigKey)
+      .then((map) => {
+        if (active) setAssinaturas(map);
+      })
+      .catch((error: any) => {
+        if (active) toast.error(error?.message || "Erro ao carregar assinaturas dos holerites");
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [showHolerite, loading, holerite, periodoSigKey]);
 
 
   if (loading) {
@@ -700,11 +731,8 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
           <div className="space-y-4">
             {holerite.map((h) => {
               const dentistaId = h.dentista?.id || "sd";
-              const sig = h.dentista?.id
-                ? loadHoleriteSignature(h.dentista.id, periodoSigKey)
-                : null;
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              const _v = sigVersion; // força re-render quando assinatura muda
+              const assinatura = h.dentista?.id ? assinaturas[h.dentista.id] : null;
+              const sig = assinatura?.assinatura_data_url || null;
               const holeriteData: HoleriteData = {
                 dentistaId,
                 dentistaNome: h.dentista?.nome || "Dentista removido",
@@ -804,7 +832,16 @@ const RelatoriosAvancados = ({ periodo, dataInicio, dataFim, section }: Relatori
           holerite={holeriteAberto}
           periodoKey={periodoSigKey}
           periodoLabel={periodoLabel}
-          onSigned={() => setSigVersion((v) => v + 1)}
+          signature={holeriteAberto?.dentistaId ? assinaturas[holeriteAberto.dentistaId] || null : null}
+          onSigned={(signature) => {
+            if (!holeriteAberto?.dentistaId) return;
+            setAssinaturas((prev) => {
+              if (signature) return { ...prev, [holeriteAberto.dentistaId]: signature };
+              const next = { ...prev };
+              delete next[holeriteAberto.dentistaId];
+              return next;
+            });
+          }}
         />
       )}
 

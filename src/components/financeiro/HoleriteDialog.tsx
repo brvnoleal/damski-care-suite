@@ -2,14 +2,18 @@
  * Recibo de Pagamento (Holerite / Pró-labore) por dentista.
  * - Cabeçalho com razão social + CNPJ da clínica (Configurações → Perfil do Consultório).
  * - Lista detalhada das comissões do período como "Proventos".
- * - Permite assinatura digital, persistida em localStorage por dentista+período.
+ * - Permite assinatura digital, persistida no Supabase para auditoria.
  */
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { SignaturePad } from "@/components/SignaturePad";
 import { toast } from "sonner";
-import { Pen, FileCheck2, RotateCcw } from "lucide-react";
+import { Pen, FileCheck2, RotateCcw, Loader2 } from "lucide-react";
+import {
+  holeriteAssinaturaService,
+  type HoleriteSignatureRecord,
+} from "@/services/holeriteAssinaturaService";
 
 export interface HoleriteDetalhe {
   id: string;
@@ -48,23 +52,13 @@ interface ClinicProfile {
 const fmtBRL = (n: number) =>
   (Number(n) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const sigKey = (dentistaId: string, periodoKey: string) =>
-  `holerite_sig::${dentistaId}::${periodoKey}`;
-
-export const loadHoleriteSignature = (dentistaId: string, periodoKey: string): string | null => {
-  try {
-    return localStorage.getItem(sigKey(dentistaId, periodoKey));
-  } catch {
-    return null;
-  }
-};
-
 export const HoleriteDialog = ({
   open,
   onOpenChange,
   holerite,
   periodoKey,
   periodoLabel,
+  signature,
   onSigned,
 }: {
   open: boolean;
@@ -72,11 +66,13 @@ export const HoleriteDialog = ({
   holerite: HoleriteData | null;
   periodoKey: string;
   periodoLabel: string;
-  onSigned?: (dataUrl: string | null) => void;
+  signature?: HoleriteSignatureRecord | null;
+  onSigned?: (signature: HoleriteSignatureRecord | null) => void;
 }) => {
   const [clinic, setClinic] = useState<ClinicProfile>({});
   const [sig, setSig] = useState<string>("");
   const [signedAt, setSignedAt] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -88,11 +84,9 @@ export const HoleriteDialog = ({
 
   useEffect(() => {
     if (!open || !holerite) return;
-    const saved = loadHoleriteSignature(holerite.dentistaId, periodoKey);
-    setSig(saved || "");
-    const stamp = localStorage.getItem(`${sigKey(holerite.dentistaId, periodoKey)}::at`);
-    setSignedAt(stamp);
-  }, [open, holerite, periodoKey]);
+    setSig(signature?.assinatura_data_url || "");
+    setSignedAt(signature?.signed_at || null);
+  }, [open, holerite, periodoKey, signature]);
 
   const totais = useMemo(() => {
     if (!holerite) return { proventos: 0, descontos: 0, liquido: 0 };
@@ -101,29 +95,48 @@ export const HoleriteDialog = ({
     return { proventos, descontos, liquido: proventos - descontos };
   }, [holerite]);
 
-  const handleAssinar = () => {
+  const handleAssinar = async () => {
     if (!holerite || !sig) {
       toast.error("Desenhe sua assinatura antes de salvar");
       return;
     }
-    const k = sigKey(holerite.dentistaId, periodoKey);
-    localStorage.setItem(k, sig);
-    const now = new Date().toISOString();
-    localStorage.setItem(`${k}::at`, now);
-    setSignedAt(now);
-    toast.success("Holerite assinado");
-    onSigned?.(sig);
+    setSaving(true);
+    try {
+      const saved = await holeriteAssinaturaService.salvar({
+        dentistaId: holerite.dentistaId,
+        periodoKey,
+        periodoLabel,
+        assinaturaDataUrl: sig,
+      });
+      setSig(saved.assinatura_data_url);
+      setSignedAt(saved.signed_at);
+      toast.success("Holerite assinado");
+      onSigned?.(saved);
+    } catch (error: any) {
+      toast.error(error?.message || "Erro ao salvar assinatura do holerite");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleRevogar = () => {
+  const handleRevogar = async () => {
     if (!holerite) return;
-    const k = sigKey(holerite.dentistaId, periodoKey);
-    localStorage.removeItem(k);
-    localStorage.removeItem(`${k}::at`);
-    setSig("");
-    setSignedAt(null);
-    onSigned?.(null);
-    toast.success("Assinatura removida");
+    setSaving(true);
+    try {
+      await holeriteAssinaturaService.revogar({
+        dentistaId: holerite.dentistaId,
+        periodoKey,
+        periodoLabel,
+      });
+      setSig("");
+      setSignedAt(null);
+      onSigned?.(null);
+      toast.success("Assinatura removida");
+    } catch (error: any) {
+      toast.error(error?.message || "Erro ao remover assinatura do holerite");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!holerite) return null;
@@ -270,12 +283,14 @@ export const HoleriteDialog = ({
           )}
           <div className="flex gap-2 justify-end">
             {signedAt ? (
-              <Button variant="outline" size="sm" onClick={handleRevogar} className="gap-1.5">
-                <RotateCcw className="w-3.5 h-3.5" /> Refazer assinatura
+              <Button variant="outline" size="sm" onClick={handleRevogar} disabled={saving} className="gap-1.5">
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
+                Refazer assinatura
               </Button>
             ) : (
-              <Button size="sm" onClick={handleAssinar} className="gap-1.5">
-                <Pen className="w-3.5 h-3.5" /> Salvar assinatura
+              <Button size="sm" onClick={handleAssinar} disabled={saving} className="gap-1.5">
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Pen className="w-3.5 h-3.5" />}
+                Salvar assinatura
               </Button>
             )}
           </div>
