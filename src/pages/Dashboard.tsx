@@ -18,6 +18,7 @@ import {
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/FadeIn";
 
 import { LiquidGlassCard } from "@/components/ui/liquid-glass";
+import StatsSection from "@/components/ui/stats";
 import { supabase } from "@/integrations/supabase/client";
 import { procedimentoConsultaLabels } from "@/types";
 import { calcularTaxa, formatBRL } from "@/lib/maquininhaCalc";
